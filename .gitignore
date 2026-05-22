@@ -1,0 +1,33 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors / IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Claude Code — user-local overrides (shared settings.json may be committed)
+.claude/settings.local.json
+.claude/**/*.local.json
+
+# Node tooling (if added later — keeps the repo future-proof)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# Logs and temp
+*.log
+.tmp/
+tmp/
+
+# Environment
+.env
+.env.local
+.env.*.local
