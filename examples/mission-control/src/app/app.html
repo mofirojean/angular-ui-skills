@@ -1,14 +1,96 @@
-<main class="min-h-screen p-8 flex flex-col items-center justify-center gap-6">
-  <h1 class="text-3xl font-bold">Mission Control</h1>
-  <p class="text-muted-foreground text-sm">Phase 0 — Spartan/ng smoke test</p>
+<div hlmSidebarWrapper class="flex min-h-screen">
+  <hlm-sidebar>
+    <div hlmSidebarHeader>
+      <a routerLink="/" class="flex items-center gap-2 px-2 py-1 font-semibold">
+        <ng-icon hlm name="lucideBot" size="lg" />
+        <span>Mission Control</span>
+      </a>
+    </div>
 
-  <div class="flex items-center gap-3">
-    <button hlmBtn>Primary</button>
-    <button hlmBtn variant="outline">Outline</button>
-    <button hlmBtn variant="ghost" (click)="toggleTheme()">
-      Toggle theme — {{ mode() }}
+    <div hlmSidebarContent>
+      <div hlmSidebarGroup>
+        <button hlmSidebarGroupLabel>Workspace</button>
+        <ul hlmSidebarMenu>
+          @for (item of navItems; track item.route) {
+            <li hlmSidebarMenuItem>
+              <a
+                hlmSidebarMenuButton
+                [routerLink]="item.route"
+                routerLinkActive="bg-sidebar-accent text-sidebar-accent-foreground"
+                [routerLinkActiveOptions]="{ exact: !!item.exact }"
+              >
+                <ng-icon hlm [name]="item.icon" />
+                <span>{{ item.label }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div hlmSidebarFooter>
+      <p class="text-muted-foreground px-2 py-1 text-xs">v0.0.0 · Phase 1</p>
+    </div>
+  </hlm-sidebar>
+
+  <main class="flex flex-1 flex-col">
+    <header class="flex items-center justify-between border-b px-4 py-3">
+      <div class="flex items-center gap-2">
+        <button hlmSidebarTrigger aria-label="Toggle sidebar"></button>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button
+          hlmBtn
+          variant="ghost"
+          size="icon"
+          (click)="toggleTheme()"
+          [attr.aria-label]="'Switch to ' + (mode() === 'light' ? 'dark' : 'light') + ' mode'"
+        >
+          <ng-icon hlm [name]="themeIcon()" />
+        </button>
+
+        <button
+          hlmBtn
+          variant="ghost"
+          size="icon"
+          [hlmDropdownMenuTrigger]="userMenu"
+          aria-label="Open user menu"
+          class="rounded-full"
+        >
+          <hlm-avatar>
+            <span hlmAvatarFallback>MJ</span>
+          </hlm-avatar>
+        </button>
+      </div>
+    </header>
+
+    <section class="flex-1 p-6">
+      <router-outlet />
+    </section>
+  </main>
+</div>
+
+<ng-template #userMenu>
+  <hlm-dropdown-menu class="w-56">
+    <hlm-dropdown-menu-label>Mofiro Jean</hlm-dropdown-menu-label>
+    <hlm-dropdown-menu-separator />
+    <hlm-dropdown-menu-group>
+      <button hlmDropdownMenuItem>
+        <ng-icon hlm name="lucideUser" />
+        <span>Profile</span>
+      </button>
+      <a hlmDropdownMenuItem routerLink="/settings">
+        <ng-icon hlm name="lucideSettings" />
+        <span>Settings</span>
+      </a>
+    </hlm-dropdown-menu-group>
+    <hlm-dropdown-menu-separator />
+    <button hlmDropdownMenuItem>
+      <ng-icon hlm name="lucideLogOut" />
+      <span>Log out</span>
     </button>
-  </div>
+  </hlm-dropdown-menu>
+</ng-template>
 
-  <router-outlet />
-</main>
+<hlm-toaster />

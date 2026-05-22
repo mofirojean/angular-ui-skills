@@ -253,6 +253,8 @@ After `init`, `ui-theme`, and at least one generated component:
 | Dark mode doesn't trigger | `.dark` class isn't being applied to `<html>` or `<body>` | Add a theme service that toggles the class; see [theming.md](theming.md). |
 | "Where is the Helm component source?" | Confusion about Helm's copy-into-repo model | Find the path in `tsconfig.json` `paths` - the `@spartan-ng/helm/<name>` alias points at it. Configured by `components.json` `componentsPath`. Helm components are **not** in `node_modules`. |
 | Imports use a path that doesn't exist | Generated tsconfig path alias is missing | Check `tsconfig.json` `paths` - the `init` schematic should have added `@spartan-ng/helm/*` aliases pointing to the generated UI library folder. |
+| `NG3004: Unable to import component X. The module '@spartan-ng/helm/<name>' could not be found.` after generating a new Helm component while `ng serve` is running | esbuild/Vite cached the `tsconfig.json` `paths` at dev-server start; new aliases added by `ng g @spartan-ng/cli:ui <name>` are not picked up on hot reload | **Stop and restart `ng serve`.** A fresh server reads the updated `tsconfig.json`. Verify the alias exists first: `grep "@spartan-ng/helm/<name>" tsconfig.json`. |
+| `NG0309: Directive _BrnButton matches multiple times on the same element` | Stacking two directives that both host-directive `HlmButton` (e.g. `<button hlmSidebarTrigger hlmBtn>`) — both bring `BrnButton`, which Angular forbids twice on one host | Use the more specific trigger directive on its own. `hlmSidebarTrigger` is a self-contained component (own template, own styling) — drop `hlmBtn`. The same applies to any future Helm directive that internally composes `HlmButton`. |
 
 ## See also
 

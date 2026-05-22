@@ -169,9 +169,7 @@ The 9 Helm components for structuring page layout - containers, separators, coll
       </div>
     </hlm-sidebar>
     <main>
-      <button hlmSidebarTrigger hlmBtn variant="ghost" size="icon" aria-label="Toggle sidebar">
-        <ng-icon hlm name="lucideMenu" />
-      </button>
+      <button hlmSidebarTrigger aria-label="Toggle sidebar"></button>
       <!-- page content -->
     </main>
   </div>
@@ -179,6 +177,7 @@ The 9 Helm components for structuring page layout - containers, separators, coll
 - **Service methods**: `setOpen(open)`, `setOpenMobile(open)`, `setVariant(variant)`, `toggleSidebar()`. Read-only signals: `open`, `openMobile`, `isMobile`, `variant`, `state` (`'expanded' | 'collapsed'`).
 - **Sub-directives**: `hlmSidebarWrapper`, `hlmSidebarHeader`, `hlmSidebarContent`, `hlmSidebarFooter`, `hlmSidebarGroup`, `hlmSidebarGroupLabel`, `hlmSidebarGroupContent`, `hlmSidebarMenu`, `hlmSidebarMenuItem`, `hlmSidebarMenuButton`, `hlmSidebarMenuAction`, `hlmSidebarMenuBadge`, `hlmSidebarMenuSub`, `hlmSidebarMenuSubItem`, `hlmSidebarMenuSubButton`, `hlmSidebarSeparator`, `hlmSidebarTrigger`.
 - **Gotcha**: The outer `<div hlmSidebarWrapper>` is required - it wraps both the sidebar and the main content area. Forgetting it makes the trigger silently fail.
+- **Gotcha (NG0309)**: `hlmSidebarTrigger` is a **self-contained component** (selector `button[hlmSidebarTrigger]`). It already host-directives `HlmButton`, applies `provideBrnButtonConfig({ variant: 'ghost', size: 'icon' })`, and renders the `lucidePanelLeft` icon from its own template. **Do not also add `hlmBtn`** — that re-applies `BrnButton` and triggers `NG0309: Directive _BrnButton matches multiple times on the same element`. Just write `<button hlmSidebarTrigger aria-label="Toggle sidebar"></button>` with no children.
 
 ### Tabs
 

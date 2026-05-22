@@ -30,7 +30,9 @@
       "@spartan-ng/helm/tabs": ["./src/libs/ui/tabs/src/index.ts"],
       "@spartan-ng/helm/table": ["./src/libs/ui/table/src/index.ts"],
       "@spartan-ng/helm/badge": ["./src/libs/ui/badge/src/index.ts"],
-      "@spartan-ng/helm/avatar": ["./src/libs/ui/avatar/src/index.ts"]
+      "@spartan-ng/helm/avatar": ["./src/libs/ui/avatar/src/index.ts"],
+      "@spartan-ng/helm/sonner": ["./src/libs/ui/sonner/src/index.ts"],
+      "@spartan-ng/helm/empty": ["./src/libs/ui/empty/src/index.ts"]
     }
   },
   "angularCompilerOptions": {
