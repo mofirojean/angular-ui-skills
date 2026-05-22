@@ -1,0 +1,14 @@
+<main class="min-h-screen p-8 flex flex-col items-center justify-center gap-6">
+  <h1 class="text-3xl font-bold">Mission Control</h1>
+  <p class="text-muted-foreground text-sm">Phase 0 — Spartan/ng smoke test</p>
+
+  <div class="flex items-center gap-3">
+    <button hlmBtn>Primary</button>
+    <button hlmBtn variant="outline">Outline</button>
+    <button hlmBtn variant="ghost" (click)="toggleTheme()">
+      Toggle theme — {{ mode() }}
+    </button>
+  </div>
+
+  <router-outlet />
+</main>

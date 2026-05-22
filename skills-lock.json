@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "spartan-ng-developer": {
+      "source": "mofirojean/angular-ui-skills",
+      "sourceType": "github",
+      "skillPath": "skills/spartan-ng-developer/SKILL.md",
+      "computedHash": "385956ff6344c7d0d43078b4a2ac76f0f71232bbbc11a6c49d037b02508368de"
+    }
+  }
+}
