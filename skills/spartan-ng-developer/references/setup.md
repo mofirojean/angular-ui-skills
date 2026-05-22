@@ -2,6 +2,8 @@
 
 Install Spartan/ng into an Angular project. Follow the steps in order: detect the project layout, detect the Tailwind version, run Spartan's `init` schematic, run `ui-theme` to seed the theme variables, then generate Helm components as needed.
 
+> ⚠ **For AI agents / CI / automation:** the `init` and `ui-theme` schematics are **fully interactive** (they prompt via `enquirer` and ignore `--defaults` / `--interactive=false` because their `schema.json` files have empty `properties`). If you don't have a TTY, follow §"Non-interactive install" below instead of the interactive `init` flow.
+
 ## Step 1 - Detect project layout
 
 Read the project root:
@@ -126,6 +128,60 @@ module.exports = {
 ```
 
 Then add the CSS variable theme block - see [theming.md](theming.md).
+
+## Non-interactive install (for AI agents and CI)
+
+`init` and `ui-theme` cannot be run non-interactively — their `schema.json` files have empty `properties: {}` and the prompts live inside the generator code via `enquirer.prompt()` calls. **No flag will suppress them.** Verified by reading `node_modules/@spartan-ng/cli/src/generators/{init,theme}/generator.js`.
+
+For automated environments, replicate what `init` + `ui-theme` would do, then continue with the regular `ng g @spartan-ng/cli:ui <name>` flow (which *does* accept flags). Exact steps:
+
+**A. Install the dependencies `init` would add** (versions inferred from `src/generators/base/versions.js` and `build-dependency-array.js`):
+
+```sh
+npm install -D @spartan-ng/cli
+# Runtime deps init adds
+npm install @spartan-ng/brain @angular/cdk tailwind-merge
+# Only needed if you later generate icon or spinner (init adds them lazily)
+npm install @ng-icons/core @ng-icons/lucide
+# Tailwind v4 dev dep init adds
+npm install -D tw-animate-css
+```
+
+Match the version of `@spartan-ng/brain` to your installed `@spartan-ng/cli`. CDK should match your Angular major version.
+
+**B. Write the styles entry point yourself.** The exact template the `ui-theme` generator writes for Tailwind v4 + the Neutral theme is:
+
+```css
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+@import 'tailwindcss/utilities.css';
+@import "@spartan-ng/brain/hlm-tailwind-preset.css";
+
+:root {
+  color-scheme: light;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  /* full :root variable block — see theming.md */
+}
+
+:root.dark {
+  color-scheme: dark;
+  /* full :root.dark variable block — see theming.md */
+}
+
+@layer base {
+  * { @apply border-border outline-ring/50; }
+  body { @apply bg-background text-foreground; }
+}
+```
+
+If `ng add tailwindcss` wrote a bare `@import 'tailwindcss';`, **remove** that line — the four explicit layer imports above replace it.
+
+The Neutral block is in [theming.md](theming.md). For other base themes (Stone, Zinc, Gray, Slate), pull values from `node_modules/@spartan-ng/cli/src/generators/theme/libs/colors.js` `exports.themes`.
+
+**C. Create `components.json` at the repo root.** `init` writes this; if it didn't run, write it yourself with the path you want. See https://spartan.ng/documentation/components-json.
+
+After A + B + C, the rest (`ng g @spartan-ng/cli:ui <name>`) works non-interactively when you supply the component name as a positional arg.
 
 ## Step 7 - Generate Helm components
 

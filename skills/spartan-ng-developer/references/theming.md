@@ -34,6 +34,8 @@ Add the following to your global stylesheet (`src/styles.css`) after the Tailwin
 
 ```css
 :root {
+  color-scheme: light;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -63,7 +65,8 @@ Add the following to your global stylesheet (`src/styles.css`) after the Tailwin
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-.dark {
+:root.dark {
+  color-scheme: dark;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -93,7 +96,22 @@ Add the following to your global stylesheet (`src/styles.css`) after the Tailwin
 }
 ```
 
+After the two variable blocks, the `ui-theme` schematic also appends a base layer that applies the border/foreground tokens globally:
+
+```css
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+```
+
 > **Use `oklch()`, not hex or HSL.** Spartan's defaults are in `oklch` (perceptually uniform color space) for better dark-mode contrast and easier tweaking. Stay in `oklch` when defining custom values - mixing color spaces produces inconsistent perceived lightness.
+
+> **Dark-mode selector is `:root.dark`** — the class goes on `<html>` (which IS `:root`). A `body.dark` or scoped `.dark` selector won't match Spartan's stylesheet.
 
 ## 3. Toggling dark mode
 

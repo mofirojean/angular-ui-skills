@@ -14,6 +14,9 @@ desktop.ini
 .claude/settings.local.json
 .claude/**/*.local.json
 
+# Agent-skills CLI install directory (universal copies of installed skills)
+.agents/
+
 # Node tooling (if added later — keeps the repo future-proof)
 node_modules/
 npm-debug.log*
