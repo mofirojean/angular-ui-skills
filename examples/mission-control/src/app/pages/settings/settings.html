@@ -1,5 +1,5 @@
 <div class="flex flex-col gap-3">
-  <!-- Animated header -->
+  
   <header
     class="animate-in fade-in-50 slide-in-from-top-2 bg-card relative overflow-hidden rounded-lg border duration-500"
   >
@@ -25,7 +25,6 @@
     </div>
   </header>
 
-  <!-- Tabs -->
   <hlm-tabs tab="profile">
     <hlm-tabs-list class="flex w-full justify-start gap-1 overflow-x-auto">
       <button hlmTabsTrigger="profile">
@@ -50,7 +49,6 @@
       </button>
     </hlm-tabs-list>
 
-    <!-- ============ PROFILE ============ -->
     <div hlmTabsContent="profile" class="mt-3">
       <section hlmCard>
         <div hlmCardHeader class="p-4! pb-2!">
@@ -58,7 +56,7 @@
           <p hlmCardDescription class="text-xs">Your public identity across the workspace.</p>
         </div>
         <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" hlmCardContent class="p-4! pt-2! flex flex-col gap-4">
-          <!-- Avatar uploader -->
+          
           <div class="flex items-center gap-4 border-b pb-4">
             <hlm-avatar class="!h-16 !w-16">
               <span hlmAvatarFallback class="text-lg">MJ</span>
@@ -76,7 +74,6 @@
             </div>
           </div>
 
-          <!-- Name + Email -->
           <div class="grid gap-4 sm:grid-cols-2">
             <div hlmField>
               <label hlmFieldLabel for="set-name">Full name</label>
@@ -94,7 +91,6 @@
             </div>
           </div>
 
-          <!-- Bio -->
           <div hlmField>
             <div class="flex items-center justify-between">
               <label hlmFieldLabel for="set-bio">Bio</label>
@@ -103,7 +99,6 @@
             <textarea hlmTextarea id="set-bio" formControlName="bio" rows="3" placeholder="Tell your team about yourself"></textarea>
           </div>
 
-          <!-- Locale + Timezone (native-select) -->
           <div class="grid gap-4 sm:grid-cols-2">
             <div hlmField>
               <label hlmFieldLabel for="set-locale">Language</label>
@@ -123,7 +118,6 @@
             </div>
           </div>
 
-          <!-- Theme radio-group -->
           <div hlmField>
             <label hlmFieldLabel>Theme preference</label>
             <hlm-radio-group formControlName="theme" class="grid grid-cols-3 gap-3">
@@ -157,7 +151,6 @@
             </hlm-radio-group>
           </div>
 
-          <!-- Density toggle group -->
           <div hlmField>
             <label hlmFieldLabel>UI density</label>
             <hlm-toggle-group type="single" variant="outline" size="sm" formControlName="density">
@@ -167,7 +160,6 @@
             </hlm-toggle-group>
           </div>
 
-          <!-- Checkboxes -->
           <div class="flex flex-col gap-2 border-t pt-4">
             <label class="hover:bg-muted/30 flex cursor-pointer items-start gap-3 rounded-md p-2">
               <hlm-checkbox formControlName="weeklyDigest" class="mt-0.5" />
@@ -192,7 +184,6 @@
             </label>
           </div>
 
-          <!-- Actions -->
           <div class="flex items-center justify-end gap-2 border-t pt-4">
             <button type="button" hlmBtn variant="ghost">Discard</button>
             <button type="submit" hlmBtn [disabled]="profileForm.invalid">
@@ -204,7 +195,6 @@
       </section>
     </div>
 
-    <!-- ============ TEAM ============ -->
     <div hlmTabsContent="team" class="mt-3 flex flex-col gap-3">
       <section hlmCard>
         <div hlmCardHeader class="flex items-center justify-between p-4! pb-2!">
@@ -281,9 +271,8 @@
       </section>
     </div>
 
-    <!-- ============ BILLING ============ -->
     <div hlmTabsContent="billing" class="mt-3 flex flex-col gap-3">
-      <!-- Current plan -->
+      
       <section hlmCard class="from-primary/5 to-card relative overflow-hidden bg-gradient-to-br">
         <div hlmCardContent class="p-5! flex flex-wrap items-center justify-between gap-4">
           <div class="flex items-center gap-4">
@@ -308,7 +297,6 @@
         </div>
       </section>
 
-      <!-- Usage + payment method -->
       <section class="grid gap-3 lg:grid-cols-2">
         <div hlmCard>
           <div hlmCardHeader class="p-4! pb-2!">
@@ -362,7 +350,6 @@
         </div>
       </section>
 
-      <!-- Invoice history -->
       <section hlmCard>
         <div hlmCardHeader class="p-4! pb-2!">
           <h3 hlmCardTitle class="text-base">Invoice history</h3>
@@ -404,7 +391,6 @@
       </section>
     </div>
 
-    <!-- ============ NOTIFICATIONS ============ -->
     <div hlmTabsContent="notifications" class="mt-3">
       <section hlmCard>
         <div hlmCardHeader class="p-4! pb-2!">
@@ -412,7 +398,7 @@
           <p hlmCardDescription class="text-xs">Pick what reaches you and where.</p>
         </div>
         <div hlmCardContent class="p-0!">
-          <!-- Header row -->
+          
           <div class="text-muted-foreground hidden border-b px-4 py-2 text-[10px] font-semibold uppercase tracking-wider sm:grid sm:grid-cols-[1fr_60px_60px_60px]">
             <div>Notification</div>
             <div class="text-center">Email</div>
@@ -459,7 +445,6 @@
       </section>
     </div>
 
-    <!-- ============ INTEGRATIONS ============ -->
     <div hlmTabsContent="integrations" class="mt-3 flex flex-col gap-3">
       <section hlmCard>
         <div hlmCardHeader class="flex items-center justify-between p-4! pb-2!">
@@ -517,7 +502,6 @@
   </hlm-tabs>
 </div>
 
-<!-- Invite dialog -->
 <hlm-dialog>
   <button #inviteTrigger hlmDialogTrigger class="hidden" aria-hidden="true">open</button>
   <hlm-dialog-content *hlmDialogPortal="let ctx" class="w-[min(480px,92vw)]!">

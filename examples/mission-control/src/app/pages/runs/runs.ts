@@ -50,8 +50,6 @@ export class Runs {
   protected readonly isLoading = signal(true);
   protected readonly rowSkeletons = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-  // Filters ------------------------------------------------------------------
-
   protected readonly searchQuery = signal('');
   protected readonly statusFilter = signal<StatusFilter>('all');
   protected readonly selectedAgent = signal<AgentFilterOption | null>(null);
@@ -75,8 +73,6 @@ export class Runs {
   protected readonly agentToString = (a: AgentFilterOption | null): string => a?.name ?? '';
   protected readonly agentEquals = (a: AgentFilterOption | null, b: AgentFilterOption | null) => a?.id === b?.id;
 
-  // Aggregate KPIs -----------------------------------------------------------
-
   protected readonly kpis = computed(() => {
     const all = RUNS;
     const succeeded = all.filter((r) => r.status === 'success');
@@ -97,8 +93,6 @@ export class Runs {
       { label: 'Total cost', value: `$${totalCost.toFixed(2)}`, icon: 'lucideCircleDollarSign', tone: 'neutral' },
     ] as const;
   });
-
-  // Sorting + pagination -----------------------------------------------------
 
   protected readonly sortKey = signal<SortKey>('startedAt');
   protected readonly sortDir = signal<SortDirection>('desc');
@@ -156,8 +150,6 @@ export class Runs {
     return { start, end, total };
   });
 
-  // Detail sheet ------------------------------------------------------------
-
   protected readonly detailRun = signal<RunDetail | null>(null);
   protected readonly detailTrigger = viewChild<ElementRef<HTMLButtonElement>>('detailTrigger');
 
@@ -165,8 +157,6 @@ export class Runs {
     this.detailRun.set(getRunDetail(run));
     queueMicrotask(() => this.detailTrigger()?.nativeElement.click());
   }
-
-  // Visuals ------------------------------------------------------------------
 
   protected statusVariant(status: RunStatus): BadgeVariant {
     switch (status) {
@@ -235,8 +225,6 @@ export class Runs {
     return JSON.stringify(value, null, 2);
   }
 
-  // Sort + filter actions ----------------------------------------------------
-
   protected toggleSort(key: SortKey): void {
     if (this.sortKey() === key) {
       this.sortDir.update((d) => (d === 'asc' ? 'desc' : 'asc'));
@@ -276,8 +264,6 @@ export class Runs {
     this.triggerFilter.set(next);
     this.page.set(1);
   }
-
-  // Run actions -------------------------------------------------------------
 
   protected retryRun(): void {
     const r = this.detailRun();

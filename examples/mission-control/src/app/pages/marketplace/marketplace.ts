@@ -57,8 +57,6 @@ export class Marketplace {
   protected readonly categories = CATEGORIES;
   private readonly agents = MARKETPLACE_AGENTS;
 
-  // Filters ------------------------------------------------------------------
-
   protected readonly searchQuery = signal('');
   protected readonly category = signal<Category>('all');
   protected readonly sort = signal<SortKey>('popular');
@@ -92,8 +90,6 @@ export class Marketplace {
     return list;
   });
 
-  // KPIs --------------------------------------------------------------------
-
   protected readonly stats = computed(() => {
     const all = this.agents;
     const totalInstalls = all.reduce((sum, a) => sum + a.installs, 0);
@@ -107,8 +103,6 @@ export class Marketplace {
       avgRating: (all.reduce((s, a) => s + a.rating, 0) / all.length).toFixed(1),
     };
   });
-
-  // Install dialog -----------------------------------------------------------
 
   protected readonly installAgent = signal<MarketAgent | null>(null);
   protected readonly installStep = signal<'confirm' | 'otp' | 'success'>('confirm');
@@ -150,7 +144,7 @@ export class Marketplace {
   }
 
   protected coverImage(id: string): string {
-    // Picsum returns a deterministic photo for each seed — no API key, free CDN.
+
     return `https://picsum.photos/seed/${id}/800/450`;
   }
 
@@ -160,8 +154,6 @@ export class Marketplace {
       return { filled: value >= 1, half: value > 0 && value < 1 };
     });
   }
-
-  // Filter actions ----------------------------------------------------------
 
   protected onSearch(ev: Event): void {
     this.searchQuery.set((ev.target as HTMLInputElement).value);

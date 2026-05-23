@@ -44,7 +44,6 @@
     </div>
   </header>
 
-  <!-- KPI strip -->
   <section class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
     @if (isLoading()) {
       @for (i of [0,1,2,3,4,5]; track i) {
@@ -80,7 +79,6 @@
     }
   </section>
 
-  <!-- Filter bar -->
   <section hlmCard>
     <div hlmCardContent class="p-3! flex flex-wrap items-center gap-3">
       <hlm-input-group class="min-w-40 flex-1">
@@ -155,7 +153,6 @@
     </div>
   </section>
 
-  <!-- Bulk action bar -->
   @if (selectedCount() > 0) {
     <section
       hlmCard
@@ -192,7 +189,6 @@
     </section>
   }
 
-  <!-- Table -->
   <section hlmCard>
     <div hlmCardContent class="p-0!">
       @if (isLoading()) {
@@ -401,7 +397,6 @@
   </section>
 </div>
 
-<!-- Per-row actions menu (shared by dropdown + context menu) -->
 <ng-template #rowActions>
   @let agent = activeAgent();
   @if (agent) {
@@ -445,7 +440,6 @@
   }
 </ng-template>
 
-<!-- New agent dialog - opened programmatically via #newAgentTrigger -->
 <hlm-dialog>
   <button #newAgentTrigger hlmDialogTrigger class="hidden" aria-hidden="true">open new agent</button>
   <hlm-dialog-content *hlmDialogPortal="let ctx" class="w-[min(620px,92vw)]!">
@@ -462,7 +456,7 @@
     </hlm-dialog-header>
 
     <form [formGroup]="newAgentForm" (ngSubmit)="submitNewAgent(ctx)" class="flex max-h-[60vh] flex-col gap-4 overflow-y-auto px-6 py-2">
-      <!-- Icon picker -->
+      
       <div hlmField>
         <label hlmFieldLabel>Icon</label>
         <div class="grid grid-cols-6 gap-1.5 sm:grid-cols-9">
@@ -483,7 +477,6 @@
         </div>
       </div>
 
-      <!-- Name -->
       <div hlmField>
         <label hlmFieldLabel for="agent-name">Name</label>
         <input hlmInput id="agent-name" formControlName="name" placeholder="e.g. Lead Scorer v2" />
@@ -496,7 +489,6 @@
         }
       </div>
 
-      <!-- Description -->
       <div hlmField>
         <label hlmFieldLabel for="agent-desc">Description</label>
         <textarea
@@ -516,7 +508,6 @@
         }
       </div>
 
-      <!-- Category + Owner -->
       <div class="grid gap-3 sm:grid-cols-2">
         <div hlmField>
           <label hlmFieldLabel>Category</label>
@@ -553,7 +544,6 @@
         </div>
       </div>
 
-      <!-- Status toggle group -->
       <div hlmField>
         <label hlmFieldLabel>Initial status</label>
         <hlm-toggle-group type="single" variant="outline" size="sm" formControlName="status">
@@ -569,7 +559,6 @@
         <p hlmFieldDescription>Active agents can be triggered immediately. Drafts wait on review.</p>
       </div>
 
-      <!-- Enabled switch -->
       <div class="bg-muted/30 flex items-center justify-between rounded-md border p-3">
         <div>
           <p class="text-sm font-medium">Enabled</p>
@@ -589,7 +578,6 @@
   </hlm-dialog-content>
 </hlm-dialog>
 
-<!-- Quick preview sheet (right side) - opened programmatically via #previewTrigger -->
 <hlm-sheet>
   <button #previewTrigger hlmSheetTrigger class="hidden" aria-hidden="true">open preview</button>
   <hlm-sheet-content *hlmSheetPortal class="w-[min(420px,90vw)]!">
@@ -608,10 +596,9 @@
       </hlm-sheet-header>
 
       <div class="flex flex-col gap-4 px-6 py-4">
-        <!-- Description -->
+        
         <p class="text-sm">{{ agent.description }}</p>
 
-        <!-- Status + Owner -->
         <div class="grid grid-cols-2 gap-3">
           <div>
             <p class="text-muted-foreground mb-1 text-[10px] font-semibold uppercase tracking-wider">Status</p>
@@ -631,7 +618,6 @@
           </div>
         </div>
 
-        <!-- KPIs -->
         <div class="grid grid-cols-3 gap-2 rounded-md border p-3">
           <div class="text-center">
             <p class="text-muted-foreground text-[9px] font-semibold uppercase tracking-wider">Runs today</p>
@@ -654,7 +640,6 @@
           </div>
         </div>
 
-        <!-- 7-day chart -->
         <div>
           <p class="text-muted-foreground mb-2 text-[10px] font-semibold uppercase tracking-wider">7-day runs</p>
           <svg viewBox="0 0 100 28" preserveAspectRatio="none" class="h-12 w-full overflow-visible">
@@ -670,7 +655,6 @@
           </svg>
         </div>
 
-        <!-- Tags -->
         @if (agent.tags.length > 0) {
           <div>
             <p class="text-muted-foreground mb-2 text-[10px] font-semibold uppercase tracking-wider">Tags</p>
@@ -682,7 +666,6 @@
           </div>
         }
 
-        <!-- Meta -->
         <hlm-separator />
         <div class="grid grid-cols-2 gap-3 text-xs">
           <div>
@@ -695,7 +678,6 @@
           </div>
         </div>
 
-        <!-- Actions -->
         <div class="mt-2 flex flex-col gap-2">
           <button hlmBtn class="w-full" (click)="runAgent(agent)">
             <ng-icon hlm size="sm" name="lucidePlay" />

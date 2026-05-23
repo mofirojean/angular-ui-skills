@@ -1,6 +1,6 @@
 <div hlmSidebarWrapper class="flex min-h-screen">
   <hlm-sidebar>
-    <!-- Workspace switcher header -->
+    
     <div hlmSidebarHeader class="border-sidebar-border border-b p-2">
       <button
         hlmBtn
@@ -22,7 +22,7 @@
     </div>
 
     <div hlmSidebarContent class="px-1 py-2">
-      <!-- Pinned shortcuts -->
+      
       <div hlmSidebarGroup>
         <button hlmSidebarGroupLabel>Pinned</button>
         <ul hlmSidebarMenu>
@@ -40,7 +40,6 @@
         </ul>
       </div>
 
-      <!-- Workspace nav (with collapsible sub-menus) -->
       <div hlmSidebarGroup class="mt-2">
         <button hlmSidebarGroupLabel>Workspace</button>
         <ul hlmSidebarMenu>
@@ -117,7 +116,6 @@
         </ul>
       </div>
 
-      <!-- Resources -->
       <div hlmSidebarGroup class="mt-2">
         <button hlmSidebarGroupLabel>Resources</button>
         <ul hlmSidebarMenu>
@@ -133,7 +131,6 @@
       </div>
     </div>
 
-    <!-- Footer: trial banner + user card -->
     <div hlmSidebarFooter class="border-sidebar-border flex flex-col gap-2 border-t p-2">
       @if (user.trialDaysLeft > 0) {
         <div class="from-primary/10 to-primary/0 border-primary/20 rounded-md border bg-gradient-to-br p-3">
@@ -174,7 +171,6 @@
     >
       <button hlmSidebarTrigger aria-label="Toggle sidebar"></button>
 
-      <!-- Global search / command palette trigger -->
       <button
         type="button"
         (click)="openPalette()"

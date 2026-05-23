@@ -1,5 +1,5 @@
 <div class="flex flex-col gap-3">
-  <!-- Animated header -->
+  
   <header
     class="animate-in fade-in-50 slide-in-from-top-2 bg-card relative overflow-hidden rounded-lg border duration-500"
   >
@@ -35,7 +35,6 @@
     </div>
   </header>
 
-  <!-- KPI strip -->
   <section class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
     @if (isLoading()) {
       @for (i of [0,1,2,3,4,5]; track i) {
@@ -68,7 +67,6 @@
     }
   </section>
 
-  <!-- Filter bar -->
   <section hlmCard>
     <div hlmCardContent class="p-3! flex flex-wrap items-center gap-3">
       <hlm-input-group class="min-w-60 flex-1">
@@ -78,7 +76,6 @@
         <input hlmInputGroupInput placeholder="Search by run id, agent, user…" [value]="searchQuery()" (input)="onSearch($event)" />
       </hlm-input-group>
 
-      <!-- Status filter (toggle group) -->
       <hlm-toggle-group
         type="single"
         variant="outline"
@@ -101,7 +98,6 @@
         </button>
       </hlm-toggle-group>
 
-      <!-- Trigger filter (select) -->
       <hlm-select
         class="w-36"
         [value]="triggerFilter()"
@@ -118,7 +114,6 @@
         </hlm-select-content>
       </hlm-select>
 
-      <!-- Agent combobox -->
       <hlm-combobox
         class="w-56"
         [value]="selectedAgent()"
@@ -158,7 +153,6 @@
     </div>
   </section>
 
-  <!-- Table -->
   <section hlmCard>
     <div hlmCardContent class="p-0!">
       @if (isLoading()) {
@@ -281,7 +275,6 @@
   </section>
 </div>
 
-<!-- Run detail sheet (right side) -->
 <hlm-sheet>
   <button #detailTrigger hlmSheetTrigger class="hidden" aria-hidden="true">open detail</button>
   <hlm-sheet-content *hlmSheetPortal class="w-[min(520px,92vw)]!">
@@ -304,7 +297,7 @@
       </hlm-sheet-header>
 
       <div class="flex flex-col gap-5 overflow-y-auto px-6 py-4">
-        <!-- KPI strip -->
+        
         <div class="grid grid-cols-2 gap-2 rounded-md border p-3 text-center sm:grid-cols-4">
           <div>
             <p class="text-muted-foreground text-[9px] font-semibold uppercase tracking-wider">Started</p>
@@ -329,7 +322,6 @@
           </div>
         </div>
 
-        <!-- Trigger + tokens -->
         <div class="grid grid-cols-2 gap-3 text-xs">
           <div class="flex flex-col gap-1">
             <p class="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">Triggered by</p>
@@ -353,7 +345,6 @@
           </div>
         </div>
 
-        <!-- Steps timeline -->
         <div>
           <p class="text-muted-foreground mb-2 text-[10px] font-semibold uppercase tracking-wider">Execution timeline</p>
           <ol class="relative border-l pl-5">
@@ -394,7 +385,6 @@
           </ol>
         </div>
 
-        <!-- Error block -->
         @if (run.error) {
           <div class="border-destructive/30 bg-destructive/5 rounded-md border p-3">
             <p class="text-destructive flex items-center gap-2 text-xs font-semibold">
@@ -405,7 +395,6 @@
           </div>
         }
 
-        <!-- Output JSON -->
         <div>
           <p class="text-muted-foreground mb-2 text-[10px] font-semibold uppercase tracking-wider">Output</p>
           <pre class="bg-muted text-foreground/90 overflow-x-auto rounded-md p-3 font-mono text-[11px] leading-relaxed">{{ formatJson(run.output) }}</pre>
@@ -413,7 +402,6 @@
 
         <hlm-separator />
 
-        <!-- Actions -->
         <div class="flex flex-col gap-2">
           <button hlmBtn class="w-full" (click)="retryRun()">
             <ng-icon hlm size="sm" name="lucidePlay" />

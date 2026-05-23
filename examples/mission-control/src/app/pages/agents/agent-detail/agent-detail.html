@@ -18,7 +18,7 @@
   </div>
 } @else if (agent(); as a) {
   <div class="flex flex-col gap-4">
-    <!-- Breadcrumb back -->
+    
     <div class="flex items-center gap-2 text-xs">
       <a hlmBtn variant="ghost" size="sm" routerLink="/agents" class="h-7 px-2">
         <ng-icon hlm size="xs" name="lucideChevronLeft" />
@@ -28,7 +28,6 @@
       <span class="text-muted-foreground">{{ a.id }}</span>
     </div>
 
-    <!-- Header card -->
     <header
       class="animate-in fade-in-50 slide-in-from-top-2 bg-card relative overflow-hidden rounded-lg border duration-500"
     >
@@ -81,7 +80,6 @@
       </div>
     </header>
 
-    <!-- Tabs -->
     <hlm-tabs tab="overview">
       <hlm-tabs-list class="w-full justify-start overflow-x-auto">
         <button hlmTabsTrigger="overview">
@@ -106,9 +104,8 @@
         </button>
       </hlm-tabs-list>
 
-      <!-- OVERVIEW TAB -->
       <div hlmTabsContent="overview" class="mt-4 flex flex-col gap-4">
-        <!-- KPI strip -->
+        
         <section class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           @for (kpi of overviewKpis(); track kpi.label) {
             <section hlmCard class="transition-shadow hover:shadow-sm">
@@ -131,7 +128,6 @@
           }
         </section>
 
-        <!-- 7-day chart + recent runs -->
         <section class="grid gap-4 lg:grid-cols-3">
           <section hlmCard class="lg:col-span-2">
             <div hlmCardHeader class="p-4! pb-2!">
@@ -187,7 +183,6 @@
         </section>
       </div>
 
-      <!-- CONFIG TAB -->
       <div hlmTabsContent="config" class="mt-4">
         <section hlmCard>
           <div hlmCardHeader class="p-5! pb-3!">
@@ -196,7 +191,7 @@
           </div>
           <div hlmCardContent class="p-5! pt-0!">
             <form [formGroup]="configForm" (ngSubmit)="saveConfig()" class="grid gap-5 lg:grid-cols-2">
-              <!-- Name + Description (col-span-2) -->
+              
               <div hlmField class="lg:col-span-2">
                 <label hlmFieldLabel for="cfg-name">Name</label>
                 <input hlmInput id="cfg-name" formControlName="name" placeholder="Agent name" />
@@ -213,7 +208,6 @@
                 }
               </div>
 
-              <!-- Category + Owner -->
               <div hlmField>
                 <label hlmFieldLabel>Category</label>
                 <hlm-select formControlName="category" class="w-full">
@@ -242,7 +236,6 @@
                 </hlm-select>
               </div>
 
-              <!-- Schedule mode toggle group (col-span-2) -->
               <div hlmField class="lg:col-span-2">
                 <label hlmFieldLabel>Schedule mode</label>
                 <hlm-toggle-group type="single" variant="outline" size="sm" formControlName="scheduleMode">
@@ -262,7 +255,6 @@
                 <p hlmFieldDescription>Choose how runs are initiated.</p>
               </div>
 
-              <!-- First run date -->
               <div hlmField>
                 <label hlmFieldLabel for="cfg-firstrun">First run</label>
                 <hlm-date-picker buttonId="cfg-firstrun" formControlName="firstRun">
@@ -270,7 +262,6 @@
                 </hlm-date-picker>
               </div>
 
-              <!-- Notification email -->
               <div hlmField>
                 <label hlmFieldLabel for="cfg-email">Notification email</label>
                 <input hlmInput id="cfg-email" formControlName="notificationEmail" type="email" placeholder="ops@example.com" />
@@ -279,7 +270,6 @@
                 }
               </div>
 
-              <!-- Max concurrent slider -->
               <div hlmField>
                 <label hlmFieldLabel>
                   Max concurrent runs:
@@ -291,7 +281,6 @@
                 <p hlmFieldDescription>How many runs can execute in parallel.</p>
               </div>
 
-              <!-- API timeout slider -->
               <div hlmField>
                 <label hlmFieldLabel>
                   API timeout (seconds):
@@ -302,7 +291,6 @@
                 <hlm-slider formControlName="apiTimeout" [min]="5" [max]="120" [step]="5" />
               </div>
 
-              <!-- Retry policy radio group (col-span-2) -->
               <div hlmField class="lg:col-span-2">
                 <label hlmFieldLabel>Retry policy</label>
                 <hlm-radio-group formControlName="retryPolicy" class="flex flex-wrap gap-4">
@@ -327,7 +315,6 @@
                 </hlm-radio-group>
               </div>
 
-              <!-- Tags checkbox group (col-span-2) -->
               <div hlmField class="lg:col-span-2" formGroupName="tags">
                 <label hlmFieldLabel>Tags</label>
                 <div class="flex flex-wrap gap-4 text-sm">
@@ -350,7 +337,6 @@
                 </div>
               </div>
 
-              <!-- Toggle rows (col-span-2) -->
               <div class="lg:col-span-2">
                 <hlm-separator class="my-2" />
                 <div class="flex flex-col gap-3">
@@ -379,7 +365,6 @@
               </div>
             </form>
 
-            <!-- Sticky footer actions -->
             <div class="bg-background -mx-5 mt-6 flex items-center justify-end gap-2 border-t px-5 pt-4">
               <button hlmBtn variant="outline" type="button" (click)="resetConfig()">Reset</button>
               <button hlmBtn type="button" (click)="saveConfig()" [disabled]="configForm.invalid">
@@ -391,7 +376,6 @@
         </section>
       </div>
 
-      <!-- RUNS TAB -->
       <div hlmTabsContent="runs" class="mt-4">
         <section hlmCard>
           <div hlmCardHeader class="p-4! pb-2!">
@@ -439,7 +423,6 @@
         </section>
       </div>
 
-      <!-- LOGS TAB — Resizable split: timeline left, JSON right -->
       <div hlmTabsContent="logs" class="mt-4">
         <section hlmCard>
           <div hlmCardHeader class="p-4! pb-2!">
@@ -505,7 +488,6 @@
         </section>
       </div>
 
-      <!-- PERMISSIONS TAB — Accordion -->
       <div hlmTabsContent="permissions" class="mt-4">
         <section hlmCard>
           <div hlmCardHeader class="p-4! pb-2!">
@@ -514,7 +496,7 @@
           </div>
           <div hlmCardContent class="p-4! pt-0!">
             <hlm-accordion type="multiple">
-              <!-- API Access -->
+              
               <hlm-accordion-item value="api">
                 <hlm-accordion-trigger>
                   <span class="inline-flex items-center gap-2">
@@ -540,7 +522,6 @@
                 </hlm-accordion-content>
               </hlm-accordion-item>
 
-              <!-- Data Sources -->
               <hlm-accordion-item value="data">
                 <hlm-accordion-trigger>
                   <span class="inline-flex items-center gap-2">
@@ -571,7 +552,6 @@
                 </hlm-accordion-content>
               </hlm-accordion-item>
 
-              <!-- Notifications -->
               <hlm-accordion-item value="notifications">
                 <hlm-accordion-trigger>
                   <span class="inline-flex items-center gap-2">
@@ -613,7 +593,6 @@
                 </hlm-accordion-content>
               </hlm-accordion-item>
 
-              <!-- Audit log -->
               <hlm-accordion-item value="audit">
                 <hlm-accordion-trigger>
                   <span class="inline-flex items-center gap-2">

@@ -29,14 +29,13 @@ export const SCHEDULES: readonly Schedule[] = [
   { id: 'sch-12', name: 'Lead scorer recompute', agent: AGENTS_REF.leadScorer, cron: '0 22 * * *', humanReadable: 'Daily at 22:00', frequency: 'daily', nextRun: 'today 22:00', nextRunMinutes: 540, lastRun: 'yesterday 22:00', status: 'active', successRate: 98, runsThisWeek: 7 },
 ];
 
-// Days of the current month that have scheduled runs (for calendar highlight)
 const today = new Date();
 const yearOfToday = today.getFullYear();
 const monthOfToday = today.getMonth();
 const daysInMonth = new Date(yearOfToday, monthOfToday + 1, 0).getDate();
 
 export const SCHEDULED_DAYS: Date[] = Array.from({ length: daysInMonth }, (_, i) => i + 1)
-  // every weekday gets at least one run, plus the 1st of the month
+
   .filter((d) => {
     const day = new Date(yearOfToday, monthOfToday, d);
     const dow = day.getDay();

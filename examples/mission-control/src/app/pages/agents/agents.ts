@@ -112,8 +112,6 @@ export class Agents {
   protected readonly isLoading = signal(true);
   protected readonly rowSkeletons = [0, 1, 2, 3, 4, 5, 6, 7];
 
-  // Source data --------------------------------------------------------------
-
   private readonly agents = AGENTS;
   protected readonly totalAgentsCount = AGENTS.length;
   protected readonly ownerOptions = OWNER_OPTIONS;
@@ -123,8 +121,6 @@ export class Agents {
   protected readonly activeCount = computed(
     () => this.agents.filter((a) => a.status === 'active').length,
   );
-
-  // Filters ------------------------------------------------------------------
 
   protected readonly searchQuery = signal('');
   protected readonly statusFilter = signal<StatusFilter>('all');
@@ -139,8 +135,6 @@ export class Agents {
 
   protected readonly ownerToString = (option: OwnerOption | null): string => option?.name ?? '';
   protected readonly ownerEquals = (a: OwnerOption | null, b: OwnerOption | null): boolean => a?.id === b?.id;
-
-  // KPI strip ---------------------------------------------------------------
 
   protected readonly kpis = computed<readonly AgentKpi[]>(() => {
     const all = this.agents;
@@ -161,8 +155,6 @@ export class Agents {
       { label: 'Spend today', value: `$${totalCost.toFixed(2)}`, icon: 'lucideCircleDollarSign', tone: 'neutral', hint: 'Across all runs' },
     ];
   });
-
-  // Sorting + pagination ----------------------------------------------------
 
   protected readonly sortKey = signal<SortKey>('lastRun');
   protected readonly sortDir = signal<SortDirection>('asc');
@@ -223,8 +215,6 @@ export class Agents {
     const end = Math.min(start + AGENTS_PAGE_SIZE - 1, total);
     return { start, end, total };
   });
-
-  // Selection ---------------------------------------------------------------
 
   protected readonly selectedIds = signal<ReadonlySet<string>>(new Set());
   protected readonly selectedCount = computed(() => this.selectedIds().size);
@@ -287,8 +277,6 @@ export class Agents {
     this.clearSelection();
   }
 
-  // Preview sheet -----------------------------------------------------------
-
   protected readonly previewAgent = signal<Agent | null>(null);
   protected readonly previewTrigger = viewChild<ElementRef<HTMLButtonElement>>('previewTrigger');
 
@@ -296,8 +284,6 @@ export class Agents {
     this.previewAgent.set(agent);
     queueMicrotask(() => this.previewTrigger()?.nativeElement.click());
   }
-
-  // New agent dialog --------------------------------------------------------
 
   protected readonly newAgentTrigger = viewChild<ElementRef<HTMLButtonElement>>('newAgentTrigger');
 
@@ -343,8 +329,6 @@ export class Agents {
     ctx.close();
   }
 
-  // Status visuals ----------------------------------------------------------
-
   protected statusVariant(status: AgentStatus): BadgeVariant {
     switch (status) {
       case 'active':
@@ -375,8 +359,6 @@ export class Agents {
     return agent.status === 'active' && agent.successRate > 0 && agent.successRate < 90;
   }
 
-  // Sparkline ----------------------------------------------------------------
-
   protected sparkPath(series: readonly number[]): string {
     if (series.length === 0) return '';
     const min = Math.min(...series);
@@ -392,8 +374,6 @@ export class Agents {
       })
       .join(' ');
   }
-
-  // Sort + filter actions ----------------------------------------------------
 
   protected toggleSort(key: SortKey): void {
     if (this.sortKey() === key) {
@@ -432,8 +412,6 @@ export class Agents {
   protected setActiveAgent(agent: Agent): void {
     this.activeAgent.set(agent);
   }
-
-  // Row actions --------------------------------------------------------------
 
   protected runAgent(agent: Agent): void {
     toast.success(`${agent.name} queued for run`, { description: 'Started by you · just now' });

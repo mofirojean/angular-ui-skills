@@ -50,8 +50,6 @@ interface HeatmapDay {
   readonly intensity: 0 | 1 | 2 | 3 | 4;
 }
 
-// Parse a single cron field — accepts '*', ranges like '1-5', steps like '*/2',
-// lists like '1,3,5', and plain numbers. Returns the set of matching values in [min, max].
 function parseCronField(field: string, min: number, max: number): Set<number> {
   const result = new Set<number>();
   if (field === '*') {
@@ -147,7 +145,6 @@ export class Schedules {
   protected readonly schedules = signal<readonly Schedule[]>(SCHEDULES);
   protected readonly agentOptions = AGENT_OPTIONS;
 
-  // Today reference (frozen at component creation)
   private readonly _today = new Date();
   protected readonly todayLabel = computed(() => {
     const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -160,10 +157,7 @@ export class Schedules {
     return (minutesSinceMidnight / (24 * 60)) * 100;
   });
 
-  // Hour ticks for the swimlane axis (every 3 hours)
   protected readonly hourTicks = [0, 3, 6, 9, 12, 15, 18, 21];
-
-  // SWIMLANE — one row per active schedule running today --------------------
 
   protected readonly swimlaneRows = computed<readonly SwimlaneRow[]>(() => {
     const todayActives = this.schedules().filter(
@@ -184,7 +178,7 @@ export class Schedules {
         intensity: Math.min(4, Math.floor(runs.length / 4)),
       };
     });
-    // Sort by run count descending (busiest at top)
+
     rows.sort((a, b) => b.runCount - a.runCount);
     return rows;
   });
@@ -192,8 +186,6 @@ export class Schedules {
   protected readonly todayTotalRuns = computed(() =>
     this.swimlaneRows().reduce((sum, r) => sum + r.runCount, 0),
   );
-
-  // NEXT UP — 3 imminent active schedules -----------------------------------
 
   protected readonly nextUp = computed<readonly Schedule[]>(() =>
     [...this.schedules()]
@@ -214,8 +206,6 @@ export class Schedules {
     return `in ${d}d`;
   }
 
-  // 14-DAY HEATMAP ----------------------------------------------------------
-
   protected readonly heatmapDays = computed<readonly HeatmapDay[]>(() => {
     const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
     const start = new Date(this._today);
@@ -230,7 +220,6 @@ export class Schedules {
       const schedules = activeSchedules.filter((s) => scheduleRunsOnDate(s, d));
       const runCount = schedules.reduce((sum, s) => sum + runTimesForDate(s, d).length, 0);
 
-      // Intensity buckets based on run count
       let intensity: 0 | 1 | 2 | 3 | 4;
       if (runCount === 0) intensity = 0;
       else if (runCount < 20) intensity = 1;
@@ -286,8 +275,6 @@ export class Schedules {
     return `${weekdays[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()}`;
   }
 
-  // KPIs --------------------------------------------------------------------
-
   protected readonly kpis = computed(() => {
     const all = this.schedules();
     const active = all.filter((s) => s.status === 'active').length;
@@ -305,16 +292,12 @@ export class Schedules {
     ];
   });
 
-  // Upcoming + paused (compact lists below) ---------------------------------
-
   protected readonly allSchedules = computed<readonly Schedule[]>(() =>
     [...this.schedules()].sort((a, b) => {
       if (a.status === b.status) return a.nextRunMinutes - b.nextRunMinutes;
       return a.status === 'active' ? -1 : 1;
     }),
   );
-
-  // New schedule dialog -----------------------------------------------------
 
   protected readonly newScheduleTrigger = viewChild<ElementRef<HTMLButtonElement>>('newScheduleTrigger');
 
@@ -358,8 +341,6 @@ export class Schedules {
     });
     ctx.close();
   }
-
-  // Actions ------------------------------------------------------------------
 
   protected toggleStatus(id: string): void {
     let nextStatus: ScheduleStatus = 'active';

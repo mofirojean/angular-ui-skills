@@ -72,8 +72,6 @@ export class Settings {
   protected readonly team = signal<readonly TeamMember[]>(TEAM_MEMBERS);
   protected readonly integrations = signal<readonly Integration[]>(INTEGRATIONS);
 
-  // Profile form ------------------------------------------------------------
-
   protected readonly profileForm = this.fb.nonNullable.group({
     fullName: ['Mofiro Jean', [Validators.required, Validators.minLength(2)]],
     email: ['mofiro@example.com', [Validators.required, Validators.email]],
@@ -107,8 +105,6 @@ export class Settings {
     }
     toast.success('Profile saved', { description: 'Changes are live across the workspace' });
   }
-
-  // Team --------------------------------------------------------------------
 
   protected readonly inviteTrigger = viewChild<ElementRef<HTMLButtonElement>>('inviteTrigger');
 
@@ -167,8 +163,6 @@ export class Settings {
     { value: 'viewer', label: 'Viewer' },
   ];
 
-  // Billing -----------------------------------------------------------------
-
   protected readonly plan = {
     name: 'Pro',
     price: 49,
@@ -205,8 +199,6 @@ export class Settings {
     }
   }
 
-  // Notifications -----------------------------------------------------------
-
   protected readonly notificationState = signal<Record<string, NotificationChannelState>>({
     'n-failures': { email: true, slack: true, push: true },
     'n-digest': { email: true, slack: false, push: false },
@@ -226,8 +218,6 @@ export class Settings {
       [groupId]: { ...state[groupId], [channel]: value },
     }));
   }
-
-  // Integrations ------------------------------------------------------------
 
   protected readonly connectedCount = computed(
     () => this.integrations().filter((i) => i.connected).length,

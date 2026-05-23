@@ -107,14 +107,10 @@ export class AgentDetail {
   protected readonly categories = CATEGORIES;
   protected readonly triggerPatterns = TRIGGER_PATTERNS;
 
-  // Data per tab ------------------------------------------------------------
-
   protected readonly runs: readonly RunHistoryEntry[] = SAMPLE_RUNS;
   protected readonly permissions: readonly PermissionEntry[] = SAMPLE_PERMISSIONS;
   protected readonly auditEntries: readonly AuditEntry[] = SAMPLE_AUDIT;
   protected readonly dataSources = signal<readonly DataSource[]>(SAMPLE_DATA_SOURCES);
-
-  // Logs (selectable list + JSON viewer) -----------------------------------
 
   protected readonly logs: readonly LogEntry[] = SAMPLE_LOGS;
   protected readonly selectedLogId = signal<string>(SAMPLE_LOGS[0]?.id ?? '');
@@ -136,8 +132,6 @@ export class AgentDetail {
       2,
     );
   });
-
-  // Config form -------------------------------------------------------------
 
   protected readonly configForm = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
@@ -172,8 +166,6 @@ export class AgentDetail {
     return this.configForm.controls.notificationEmail;
   }
 
-  // KPIs (for Overview) -----------------------------------------------------
-
   protected readonly overviewKpis = computed(() => {
     const a = this.agent();
     if (!a) return [];
@@ -184,8 +176,6 @@ export class AgentDetail {
       { label: 'Last run', value: a.lastRun, icon: 'lucideClock', tone: 'neutral' },
     ] as const;
   });
-
-  // Sparkline helper --------------------------------------------------------
 
   protected sparkPath(series: readonly number[]): string {
     if (series.length === 0) return '';
@@ -218,8 +208,6 @@ export class AgentDetail {
     const line = pts.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
     return `${line} L${pts[pts.length - 1][0].toFixed(1)},${h} L${pts[0][0].toFixed(1)},${h} Z`;
   }
-
-  // Visuals -----------------------------------------------------------------
 
   protected statusVariant(status: AgentStatus): BadgeVariant {
     switch (status) {
@@ -274,8 +262,6 @@ export class AgentDetail {
         return 'lucideFileText';
     }
   }
-
-  // Actions ------------------------------------------------------------------
 
   protected runAgent(): void {
     const a = this.agent();

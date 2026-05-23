@@ -20,7 +20,7 @@
   </button>
 
   <hlm-popover-content *hlmPopoverPortal class="w-[360px]! p-0!">
-    <!-- Header -->
+    
     <div class="flex items-center justify-between gap-2 px-4 py-3">
       <div>
         <p class="text-sm font-semibold leading-none">Notifications</p>
@@ -40,7 +40,6 @@
 
     <hlm-separator orientation="horizontal" />
 
-    <!-- List -->
     <ul class="max-h-[360px] divide-y overflow-y-auto">
       @for (n of items(); track n.id) {
         <li>
@@ -83,7 +82,6 @@
 
     <hlm-separator orientation="horizontal" />
 
-    <!-- Footer -->
     <div class="px-2 py-2">
       <button hlmBtn variant="ghost" size="sm" class="h-8 w-full justify-center text-xs">
         View all notifications

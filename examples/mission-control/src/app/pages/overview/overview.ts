@@ -56,8 +56,6 @@ export class Overview {
   protected readonly kpiSkeletons = [0, 1, 2, 3];
   protected readonly rowSkeletons = [0, 1, 2, 3, 4];
 
-  // Donut --------------------------------------------------------------------
-
   protected readonly statusTotal = computed(() =>
     this.statusBreakdown.reduce((sum, s) => sum + s.value, 0),
   );
@@ -78,8 +76,6 @@ export class Overview {
     });
   });
 
-  // Bar chart ----------------------------------------------------------------
-
   protected readonly agentBars = computed<readonly BarSegment[]>(() => {
     const max = Math.max(...this.agentUsage.map((a) => a.runs));
     return this.agentUsage.map((a) => ({
@@ -95,8 +91,6 @@ export class Overview {
       'animate-in fade-in-50 slide-in-from-top-1 group relative flex items-start gap-2.5 rounded-md p-2 transition-colors duration-500';
     return first ? `${base} bg-primary/5 ring-1 ring-primary/15` : base;
   }
-
-  // Sortable + paginated runs ------------------------------------------------
 
   protected readonly sortKey = signal<SortKey>('startedAt');
   protected readonly sortDir = signal<SortDirection>('desc');
@@ -130,8 +124,6 @@ export class Overview {
     const end = Math.min(start + PAGE_SIZE - 1, this.runs.length);
     return { start, end, total: this.runs.length };
   });
-
-  // Trend chart geometry + interactivity ------------------------------------
 
   protected readonly trendWidth = 720;
   protected readonly trendHeight = 200;
@@ -188,8 +180,6 @@ export class Overview {
   });
 
   protected readonly trendSvg = viewChild<ElementRef<SVGSVGElement>>('trendSvg');
-
-  // Helpers ------------------------------------------------------------------
 
   private sparkPoints(series: readonly number[]): ReadonlyArray<readonly [number, number]> {
     if (series.length === 0) return [];

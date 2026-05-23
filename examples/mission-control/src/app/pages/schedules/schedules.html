@@ -1,5 +1,5 @@
 <div class="flex flex-col gap-3">
-  <!-- Animated header -->
+  
   <header
     class="animate-in fade-in-50 slide-in-from-top-2 bg-card relative overflow-hidden rounded-lg border duration-500"
   >
@@ -37,7 +37,6 @@
     </div>
   </header>
 
-  <!-- KPI strip -->
   <section class="grid grid-cols-2 gap-3 lg:grid-cols-4">
     @if (isLoading()) {
       @for (i of [0,1,2,3]; track i) {
@@ -70,9 +69,8 @@
     }
   </section>
 
-  <!-- HERO: Today timeline (3/4) + Next up (1/4) -->
   <section class="grid gap-3 lg:grid-cols-4">
-    <!-- Swimlane timeline -->
+    
     <section hlmCard class="lg:col-span-3">
       <div hlmCardHeader class="flex items-center justify-between p-4! pb-2!">
         <div>
@@ -98,7 +96,7 @@
             No schedules running today.
           </div>
         } @else {
-          <!-- Hour-tick axis -->
+          
           <div class="relative ml-44 h-5 border-b">
             @for (h of hourTicks; track h) {
               <div
@@ -108,7 +106,7 @@
                 {{ h }}:00
               </div>
             }
-            <!-- Now line label -->
+            
             <div
               class="text-amber-600 absolute -top-0.5 -translate-x-1/2 text-[10px] font-semibold tabular-nums"
               [style.left.%]="nowPercent()"
@@ -117,11 +115,10 @@
             </div>
           </div>
 
-          <!-- Swimlane rows -->
           <ol class="space-y-1 pt-1">
             @for (row of swimlaneRows(); track row.schedule.id) {
               <li class="group hover:bg-muted/30 flex items-center gap-3 rounded-md py-1 pl-2 pr-3 transition-colors">
-                <!-- Agent label -->
+                
                 <a
                   [routerLink]="['/agents', row.schedule.agent.id]"
                   class="flex w-28 shrink-0 items-center gap-2 overflow-hidden sm:w-40"
@@ -135,21 +132,20 @@
                   </div>
                 </a>
 
-                <!-- Timeline track -->
                 <div class="border-border/60 relative h-7 flex-1 rounded-sm border-l border-r">
-                  <!-- Inner subtle hour gridlines -->
+                  
                   @for (h of hourTicks; track h) {
                     <span
                       class="bg-border/40 absolute inset-y-0 w-px"
                       [style.left.%]="(h / 24) * 100"
                     ></span>
                   }
-                  <!-- Now indicator line -->
+                  
                   <span
                     class="bg-amber-500 absolute inset-y-0 w-0.5 z-10"
                     [style.left.%]="nowPercent()"
                   ></span>
-                  <!-- Run markers -->
+                  
                   @for (run of row.runs; track run.leftPercent) {
                     <span
                       class="bg-primary absolute top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full transition-transform group-hover:scale-125"
@@ -159,12 +155,10 @@
                   }
                 </div>
 
-                <!-- Run count -->
                 <span class="text-muted-foreground w-12 shrink-0 text-right font-mono text-[11px] tabular-nums">
                   {{ row.runCount }}/d
                 </span>
 
-                <!-- Actions menu -->
                 <button
                   hlmBtn
                   variant="ghost"
@@ -204,7 +198,6 @@
       </div>
     </section>
 
-    <!-- Next up countdown cards -->
     <section hlmCard class="lg:col-span-1">
       <div hlmCardHeader class="flex items-center justify-between p-4! pb-2!">
         <div>
@@ -263,7 +256,6 @@
     </section>
   </section>
 
-  <!-- 14-day density heatmap -->
   <section hlmCard>
     <div hlmCardHeader class="flex items-center justify-between p-4! pb-2!">
       <div>
@@ -341,7 +333,6 @@
           }
         </div>
 
-        <!-- Intensity legend -->
         <div class="text-muted-foreground mt-3 flex items-center justify-end gap-1.5 text-[10px]">
           <span>Less</span>
           <span class="bg-muted/40 h-3 w-3 rounded-sm"></span>
@@ -355,7 +346,6 @@
     </div>
   </section>
 
-  <!-- All schedules — compact list -->
   <section hlmCard>
     <div hlmCardHeader class="p-4! pb-2!">
       <h2 hlmCardTitle class="text-base">All schedules</h2>
@@ -431,7 +421,6 @@
   </section>
 </div>
 
-<!-- New schedule dialog -->
 <hlm-dialog>
   <button #newScheduleTrigger hlmDialogTrigger class="hidden" aria-hidden="true">open</button>
   <hlm-dialog-content *hlmDialogPortal="let ctx" class="w-[min(560px,92vw)]!">
