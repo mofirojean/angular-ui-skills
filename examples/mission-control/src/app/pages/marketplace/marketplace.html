@@ -1,2 +1,458 @@
-<h1 class="text-2xl font-semibold">Marketplace</h1>
-<p class="text-muted-foreground mt-1 text-sm">Phase 5 will fill this with a carousel of featured agents and an install flow with OTP confirmation.</p>
+<div class="flex flex-col gap-3">
+  <!-- Animated header -->
+  <header
+    class="animate-in fade-in-50 slide-in-from-top-2 bg-card relative overflow-hidden rounded-lg border duration-500"
+  >
+    <div class="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/20 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-16 -left-12 h-40 w-40 rounded-full bg-amber-500/10 blur-3xl"></div>
+
+    <div class="relative flex flex-wrap items-center justify-between gap-4 p-5">
+      <div class="flex items-center gap-4">
+        <div class="bg-primary text-primary-foreground ring-primary/10 flex h-12 w-12 items-center justify-center rounded-xl ring-4">
+          <ng-icon hlm size="lg" name="lucideStore" />
+        </div>
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 class="text-2xl font-semibold leading-none tracking-tight">Marketplace</h1>
+            <span hlmBadge variant="outline" class="gap-1">
+              <ng-icon hlm size="xs" name="lucideTrendingUp" class="text-emerald-600" />
+              {{ stats().trending }} trending
+            </span>
+            <span hlmBadge variant="secondary" class="gap-1">
+              <ng-icon hlm size="xs" name="lucideSparkles" />
+              {{ stats().newCount }} new
+            </span>
+          </div>
+          <p class="text-muted-foreground mt-1.5 text-sm">
+            {{ stats().total }} agents · {{ formatInstalls(stats().totalInstalls) }} total installs · {{ stats().avgRating }}★ average
+          </p>
+        </div>
+      </div>
+
+      <button hlmBtn variant="outline" class="shadow-sm">
+        <ng-icon hlm size="sm" name="lucideRocket" />
+        Submit your agent
+      </button>
+    </div>
+  </header>
+
+  <!-- FEATURED CAROUSEL -->
+  <section hlmCard>
+    <div hlmCardHeader class="flex items-center justify-between p-4! pb-2!">
+      <div>
+        <h2 hlmCardTitle class="text-base">Featured</h2>
+        <p hlmCardDescription class="text-xs">Editor-picked, production-ready agents.</p>
+      </div>
+      <span hlmBadge variant="outline" class="gap-1">
+        <ng-icon hlm size="xs" name="lucideSparkles" class="text-amber-500" />
+        Editors' choice
+      </span>
+    </div>
+    <div hlmCardContent class="p-4! pt-0!">
+      @if (isLoading()) {
+        <div class="flex gap-3 overflow-hidden">
+          @for (i of [0,1,2,3]; track i) {
+            <hlm-skeleton class="h-48 w-72 shrink-0" />
+          }
+        </div>
+      } @else {
+        <hlm-carousel>
+          <hlm-carousel-content>
+            @for (a of featured(); track a.id) {
+              <hlm-carousel-item class="basis-full sm:basis-1/2 lg:basis-1/3">
+                <article hlmCard class="group h-full overflow-hidden transition-shadow hover:shadow-lg">
+                  <div [hlmAspectRatio]="16 / 9" class="bg-muted relative overflow-hidden">
+                    <img
+                      [src]="coverImage(a.id)"
+                      [alt]="a.name + ' cover'"
+                      loading="lazy"
+                      class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <!-- Brand-color tint (multiply over photo) -->
+                    <div class="absolute inset-0 mix-blend-multiply opacity-80" [class]="'bg-gradient-to-br ' + a.accent"></div>
+                    <!-- Dark vignette for icon legibility -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent"></div>
+                    <!-- Icon tile -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                      <div class="bg-background/80 ring-foreground/10 flex h-16 w-16 items-center justify-center rounded-2xl shadow-lg ring-1 backdrop-blur-md">
+                        <ng-icon hlm size="xl" [name]="a.icon" class="text-foreground" />
+                      </div>
+                    </div>
+                    @if (a.isTrending) {
+                      <span hlmBadge class="absolute left-3 top-3 gap-1 bg-amber-500 text-white shadow-sm">
+                        <ng-icon hlm size="xs" name="lucideTrendingUp" />
+                        Trending
+                      </span>
+                    }
+                    @if (a.isNew) {
+                      <span hlmBadge class="absolute right-3 top-3 gap-1 bg-emerald-500 text-white shadow-sm">
+                        <ng-icon hlm size="xs" name="lucideSparkles" />
+                        New
+                      </span>
+                    }
+                  </div>
+                  <div hlmCardContent class="p-4! flex flex-col gap-2">
+                    <div class="flex items-start justify-between gap-2">
+                      <div class="min-w-0">
+                        <div class="flex items-center gap-1">
+                          <h3 class="truncate text-sm font-semibold leading-tight">{{ a.name }}</h3>
+                          @if (a.verified) {
+                            <ng-icon hlm size="xs" name="lucideShieldCheck" class="text-primary shrink-0" />
+                          }
+                        </div>
+                        <p class="text-muted-foreground line-clamp-2 mt-0.5 text-xs">{{ a.summary }}</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center justify-between text-[11px]">
+                      <span class="inline-flex items-center gap-1">
+                        <ng-icon hlm size="xs" name="lucideStar" class="text-amber-500" />
+                        <span class="font-medium tabular-nums">{{ a.rating }}</span>
+                        <span class="text-muted-foreground">({{ a.reviewCount }})</span>
+                      </span>
+                      <span class="text-muted-foreground inline-flex items-center gap-1 tabular-nums">
+                        <ng-icon hlm size="xs" name="lucideDownload" />
+                        {{ formatInstalls(a.installs) }}
+                      </span>
+                    </div>
+                    <button hlmBtn size="sm" class="mt-1 w-full" (click)="openInstallDialog(a)">
+                      <ng-icon hlm size="xs" name="lucideDownload" />
+                      Install
+                    </button>
+                  </div>
+                </article>
+              </hlm-carousel-item>
+            }
+          </hlm-carousel-content>
+          <button hlm-carousel-previous></button>
+          <button hlm-carousel-next></button>
+        </hlm-carousel>
+      }
+    </div>
+  </section>
+
+  <!-- Filter bar -->
+  <section hlmCard>
+    <div hlmCardContent class="p-3! flex flex-wrap items-center gap-3">
+      <hlm-input-group class="min-w-60 flex-1">
+        <hlm-input-group-addon align="inline-start">
+          <ng-icon hlm size="sm" name="lucideSearch" />
+        </hlm-input-group-addon>
+        <input hlmInputGroupInput placeholder="Search agents, authors, tags…" [value]="searchQuery()" (input)="onSearch($event)" />
+      </hlm-input-group>
+
+      <hlm-select class="w-44" [value]="category()" (valueChange)="onCategoryChange($event)">
+        <hlm-select-trigger class="w-full">
+          <hlm-select-value placeholder="Category" />
+        </hlm-select-trigger>
+        <hlm-select-content *hlmSelectPortal>
+          @for (c of categories; track c.value) {
+            <hlm-select-item [value]="c.value">{{ c.label }}</hlm-select-item>
+          }
+        </hlm-select-content>
+      </hlm-select>
+
+      <hlm-select class="w-40" [value]="sort()" (valueChange)="onSortChange($event)">
+        <hlm-select-trigger class="w-full">
+          <hlm-select-value placeholder="Sort by" />
+        </hlm-select-trigger>
+        <hlm-select-content *hlmSelectPortal>
+          <hlm-select-item value="popular">Most installed</hlm-select-item>
+          <hlm-select-item value="newest">Recently updated</hlm-select-item>
+          <hlm-select-item value="rating">Highest rated</hlm-select-item>
+        </hlm-select-content>
+      </hlm-select>
+
+      <hlm-popover>
+        <button hlmBtn variant="outline" size="sm" hlmPopoverTrigger>
+          <ng-icon hlm size="xs" name="lucideShield" />
+          More filters
+          @if (verifiedOnly() || newOnly()) {
+            <span class="bg-primary text-primary-foreground ml-1 flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold">
+              {{ (verifiedOnly() ? 1 : 0) + (newOnly() ? 1 : 0) }}
+            </span>
+          }
+        </button>
+        <hlm-popover-content *hlmPopoverPortal class="w-64">
+          <p class="mb-2 text-xs font-semibold uppercase tracking-wider">Quick filters</p>
+          <label class="hover:bg-muted/40 flex cursor-pointer items-center justify-between rounded-md p-2 text-sm">
+            <span class="inline-flex items-center gap-2">
+              <ng-icon hlm size="sm" name="lucideShieldCheck" class="text-primary" />
+              Verified only
+            </span>
+            <input
+              type="checkbox"
+              class="border-input h-4 w-4 rounded border"
+              [checked]="verifiedOnly()"
+              (change)="verifiedOnly.set($any($event.target).checked)"
+            />
+          </label>
+          <label class="hover:bg-muted/40 flex cursor-pointer items-center justify-between rounded-md p-2 text-sm">
+            <span class="inline-flex items-center gap-2">
+              <ng-icon hlm size="sm" name="lucideSparkles" class="text-emerald-500" />
+              New this week
+            </span>
+            <input
+              type="checkbox"
+              class="border-input h-4 w-4 rounded border"
+              [checked]="newOnly()"
+              (change)="newOnly.set($any($event.target).checked)"
+            />
+          </label>
+        </hlm-popover-content>
+      </hlm-popover>
+
+      @if (hasFilters) {
+        <button hlmBtn variant="ghost" size="sm" (click)="clearFilters()">
+          <ng-icon hlm size="xs" name="lucideCircleX" />
+          Clear
+        </button>
+      }
+
+      <span class="text-muted-foreground ml-auto text-xs tabular-nums">
+        <span class="text-foreground font-medium">{{ filtered().length }}</span>
+        / {{ stats().total }}
+      </span>
+    </div>
+  </section>
+
+  <!-- Grid of agents -->
+  <section>
+    @if (isLoading()) {
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        @for (i of [0,1,2,3,4,5,6,7]; track i) {
+          <hlm-skeleton class="h-72 w-full" />
+        }
+      </div>
+    } @else if (filtered().length === 0) {
+      <section hlmCard>
+        <div hlmCardContent class="flex flex-col items-center justify-center gap-3 p-12 text-center">
+          <ng-icon hlm size="xl" name="lucideFolderSearch" class="text-muted-foreground" />
+          <div>
+            <p class="text-sm font-medium">No agents match</p>
+            <p class="text-muted-foreground mt-1 text-xs">Try clearing filters or searching for something else.</p>
+          </div>
+          <button hlmBtn variant="outline" size="sm" (click)="clearFilters()">Clear filters</button>
+        </div>
+      </section>
+    } @else {
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        @for (a of filtered(); track a.id) {
+          <article hlmCard class="group flex flex-col overflow-hidden transition-all hover:-translate-y-0.5 hover:shadow-md">
+            <div [hlmAspectRatio]="16 / 9" class="bg-muted relative overflow-hidden">
+              <img
+                [src]="coverImage(a.id)"
+                [alt]="a.name + ' cover'"
+                loading="lazy"
+                class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div class="absolute inset-0 mix-blend-multiply opacity-80" [class]="'bg-gradient-to-br ' + a.accent"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent"></div>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="bg-background/80 ring-foreground/10 flex h-14 w-14 items-center justify-center rounded-xl shadow-lg ring-1 backdrop-blur-md transition-transform group-hover:scale-110">
+                  <ng-icon hlm size="lg" [name]="a.icon" class="text-foreground" />
+                </div>
+              </div>
+              @if (a.isTrending) {
+                <span hlmBadge class="absolute left-2 top-2 gap-1 bg-amber-500 text-[10px] text-white shadow-sm">
+                  <ng-icon hlm size="xs" name="lucideTrendingUp" />
+                  Trending
+                </span>
+              } @else if (a.isNew) {
+                <span hlmBadge class="absolute left-2 top-2 gap-1 bg-emerald-500 text-[10px] text-white shadow-sm">
+                  <ng-icon hlm size="xs" name="lucideSparkles" />
+                  New
+                </span>
+              }
+            </div>
+
+            <div hlmCardContent class="p-3! flex flex-1 flex-col gap-2">
+              <div>
+                <div class="flex items-center gap-1">
+                  <h3 class="truncate text-sm font-semibold leading-tight">{{ a.name }}</h3>
+                  @if (a.verified) {
+                    <ng-icon hlm size="xs" name="lucideShieldCheck" class="text-primary shrink-0" />
+                  }
+                </div>
+                <p class="text-muted-foreground line-clamp-2 mt-1 text-xs">{{ a.summary }}</p>
+              </div>
+
+              <hlm-hover-card>
+                <a
+                  hlmHoverCardTrigger
+                  class="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 self-start text-[11px] transition-colors"
+                >
+                  <hlm-avatar size="sm" class="!h-4 !w-4">
+                    <span hlmAvatarFallback class="text-[8px]">{{ a.author.initials }}</span>
+                  </hlm-avatar>
+                  <span>{{ a.author.name }}</span>
+                  @if (a.author.verified) {
+                    <ng-icon hlm size="xs" name="lucideShieldCheck" class="text-primary" />
+                  }
+                </a>
+                <hlm-hover-card-content *hlmHoverCardPortal class="w-72">
+                  <div class="flex items-start gap-3">
+                    <hlm-avatar size="lg">
+                      <span hlmAvatarFallback>{{ a.author.initials }}</span>
+                    </hlm-avatar>
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-1">
+                        <p class="truncate text-sm font-semibold">{{ a.author.name }}</p>
+                        @if (a.author.verified) {
+                          <ng-icon hlm size="xs" name="lucideShieldCheck" class="text-primary shrink-0" />
+                        }
+                      </div>
+                      <p class="text-muted-foreground text-xs">{{ a.author.handle }}</p>
+                      <p class="mt-2 text-xs leading-snug">{{ a.author.bio }}</p>
+                      <div class="text-muted-foreground mt-2 flex gap-3 text-[11px] tabular-nums">
+                        <span><span class="text-foreground font-medium">{{ a.author.agentCount }}</span> agents</span>
+                        <span><span class="text-foreground font-medium">{{ formatInstalls(a.author.totalInstalls) }}</span> installs</span>
+                      </div>
+                    </div>
+                  </div>
+                </hlm-hover-card-content>
+              </hlm-hover-card>
+
+              <div class="mt-auto flex items-center justify-between border-t pt-2 text-[11px]">
+                <span class="inline-flex items-center gap-0.5">
+                  @for (s of starArray(a.rating); track $index) {
+                    <ng-icon
+                      hlm
+                      size="xs"
+                      name="lucideStar"
+                      [class.text-amber-500]="s.filled"
+                      [class.text-muted-foreground/30]="!s.filled && !s.half"
+                    />
+                  }
+                  <span class="ml-1 font-medium tabular-nums">{{ a.rating }}</span>
+                </span>
+                <span class="text-muted-foreground inline-flex items-center gap-1 tabular-nums">
+                  <ng-icon hlm size="xs" name="lucideDownload" />
+                  {{ formatInstalls(a.installs) }}
+                </span>
+              </div>
+
+              <button hlmBtn variant="outline" size="sm" class="w-full" (click)="openInstallDialog(a)">
+                <ng-icon hlm size="xs" name="lucideDownload" />
+                Install · v{{ a.version }}
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </section>
+</div>
+
+<!-- Install dialog -->
+<hlm-dialog>
+  <button #installTrigger hlmDialogTrigger class="hidden" aria-hidden="true">open</button>
+  <hlm-dialog-content *hlmDialogPortal="let ctx" class="w-[min(480px,92vw)]!">
+    @let agent = installAgent();
+    @if (agent) {
+      @if (installStep() === 'confirm') {
+        <hlm-dialog-header>
+          <div class="flex items-center gap-3">
+            <div [class]="'bg-gradient-to-br flex h-12 w-12 items-center justify-center rounded-xl ' + agent.accent">
+              <ng-icon hlm size="base" [name]="agent.icon" class="text-foreground/80" />
+            </div>
+            <div class="min-w-0">
+              <h3 hlmDialogTitle class="truncate text-base">Install {{ agent.name }}</h3>
+              <p hlmDialogDescription class="text-xs">v{{ agent.version }} · by {{ agent.author.name }}</p>
+            </div>
+          </div>
+        </hlm-dialog-header>
+
+        <div class="flex flex-col gap-3 px-6 py-2 text-sm">
+          <p class="text-muted-foreground text-xs">{{ agent.description }}</p>
+
+          <div class="grid grid-cols-3 gap-2 rounded-md border p-3 text-center">
+            <div>
+              <p class="text-muted-foreground text-[9px] font-semibold uppercase tracking-wider">Rating</p>
+              <p class="mt-1 font-mono text-sm font-semibold tabular-nums">{{ agent.rating }}★</p>
+            </div>
+            <div class="border-x">
+              <p class="text-muted-foreground text-[9px] font-semibold uppercase tracking-wider">Installs</p>
+              <p class="mt-1 font-mono text-sm font-semibold tabular-nums">{{ formatInstalls(agent.installs) }}</p>
+            </div>
+            <div>
+              <p class="text-muted-foreground text-[9px] font-semibold uppercase tracking-wider">Updated</p>
+              <p class="mt-1 font-mono text-sm font-semibold tabular-nums">{{ agent.updatedDays }}d</p>
+            </div>
+          </div>
+
+          <div class="border-amber-500/30 bg-amber-500/5 flex items-start gap-2 rounded-md border p-3 text-xs">
+            <ng-icon hlm size="sm" name="lucideShield" class="text-amber-600 mt-0.5 shrink-0" />
+            <div>
+              <p class="font-medium">Two-factor verification required</p>
+              <p class="text-muted-foreground mt-1">Installing an agent grants it API access. We'll send a 6-digit code to your authenticator.</p>
+            </div>
+          </div>
+        </div>
+
+        <hlm-dialog-footer>
+          <button hlmBtn variant="outline" (click)="ctx.close()">Cancel</button>
+          <button hlmBtn (click)="proceedToOtp()">
+            Continue
+            <ng-icon hlm size="sm" name="lucideArrowRight" />
+          </button>
+        </hlm-dialog-footer>
+      }
+
+      @if (installStep() === 'otp') {
+        <hlm-dialog-header>
+          <div class="flex items-center gap-3">
+            <div class="bg-primary text-primary-foreground flex h-12 w-12 items-center justify-center rounded-xl">
+              <ng-icon hlm size="base" name="lucideShield" />
+            </div>
+            <div>
+              <h3 hlmDialogTitle class="text-base">Verify your identity</h3>
+              <p hlmDialogDescription class="text-xs">Enter the 6-digit code from your authenticator.</p>
+            </div>
+          </div>
+        </hlm-dialog-header>
+
+        <div class="flex flex-col items-center gap-4 px-6 py-4">
+          <brn-input-otp maxLength="6" [ngModel]="otpCode()" (ngModelChange)="onOtpInput($event)">
+            <hlm-input-otp-group>
+              <hlm-input-otp-slot [index]="0" />
+              <hlm-input-otp-slot [index]="1" />
+              <hlm-input-otp-slot [index]="2" />
+              <hlm-input-otp-separator />
+              <hlm-input-otp-slot [index]="3" />
+              <hlm-input-otp-slot [index]="4" />
+              <hlm-input-otp-slot [index]="5" />
+            </hlm-input-otp-group>
+          </brn-input-otp>
+
+          <p class="text-muted-foreground text-center text-xs">
+            Didn't get a code?
+            <button class="text-foreground underline-offset-2 hover:underline">Resend</button>
+          </p>
+        </div>
+
+        <hlm-dialog-footer>
+          <button hlmBtn variant="outline" (click)="installStep.set('confirm')">Back</button>
+          <button hlmBtn (click)="verifyAndInstall(ctx)" [disabled]="otpCode().length < 6">
+            <ng-icon hlm size="sm" name="lucideShieldCheck" />
+            Verify &amp; install
+          </button>
+        </hlm-dialog-footer>
+      }
+
+      @if (installStep() === 'success') {
+        <div class="flex flex-col items-center gap-3 p-8 text-center">
+          <div class="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10 ring-4 ring-emerald-500/20">
+            <ng-icon hlm size="xl" name="lucideCircleCheck" class="text-emerald-600" />
+          </div>
+          <div>
+            <h3 class="text-base font-semibold">Installing {{ agent.name }}…</h3>
+            <p class="text-muted-foreground mt-1 text-xs">This usually takes a few seconds.</p>
+          </div>
+          <div class="bg-muted h-1 w-full overflow-hidden rounded-full">
+            <div class="bg-primary h-full w-full animate-pulse rounded-full"></div>
+          </div>
+        </div>
+      }
+    }
+  </hlm-dialog-content>
+</hlm-dialog>
