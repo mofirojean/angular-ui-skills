@@ -27,6 +27,7 @@ import {
   lucideEllipsisVertical,
   lucideFileText,
   lucideFolderSearch,
+  lucideGithub,
   lucideHeart,
   lucideHistory,
   lucideHouse,
