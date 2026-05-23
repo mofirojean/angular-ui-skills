@@ -174,27 +174,21 @@
     >
       <button hlmSidebarTrigger aria-label="Toggle sidebar"></button>
 
-      <!-- Global search -->
-      <hlm-input-group
-        class="hover:ring-border focus-within:ring-ring max-w-md flex-1 transition-shadow focus-within:ring-1 hover:ring-1"
+      <!-- Global search / command palette trigger -->
+      <button
+        type="button"
+        (click)="openPalette()"
+        aria-label="Open command palette"
+        class="border-border bg-background hover:bg-muted/40 focus-visible:ring-ring text-muted-foreground flex h-9 max-w-md flex-1 items-center gap-2 rounded-md border px-3 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2"
       >
-        <hlm-input-group-addon align="inline-start">
-          <ng-icon hlm size="sm" name="lucideSearch" class="text-muted-foreground" />
-        </hlm-input-group-addon>
-        <input
-          hlmInputGroupInput
-          placeholder="Search agents, runs, schedules…"
-          aria-label="Global search"
-          class="text-sm"
-        />
-        <hlm-input-group-addon align="inline-end">
-          <kbd
-            class="border-border bg-muted text-muted-foreground rounded border px-1.5 py-0.5 font-mono text-[10px] leading-none"
-          >
-            ⌘K
-          </kbd>
-        </hlm-input-group-addon>
-      </hlm-input-group>
+        <ng-icon hlm size="sm" name="lucideSearch" />
+        <span class="flex-1 truncate">Search agents, runs, schedules…</span>
+        <kbd
+          class="border-border bg-muted rounded border px-1.5 py-0.5 font-mono text-[10px] leading-none"
+        >
+          ⌘K
+        </kbd>
+      </button>
 
       <div class="ml-auto flex items-center gap-1">
         <a
@@ -209,6 +203,7 @@
         >
           <ng-icon hlm size="sm" name="lucideGithub" />
         </a>
+        <app-notifications />
         <button
           hlmBtn
           variant="ghost"
@@ -226,6 +221,8 @@
     </section>
   </main>
 </div>
+
+<app-command-palette #palette />
 
 <ng-template #userMenu>
   <hlm-dropdown-menu class="w-56">

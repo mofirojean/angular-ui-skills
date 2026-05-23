@@ -1,0 +1,74 @@
+<hlm-command-dialog [state]="state()" (stateChange)="onStateChange($event)" dialogContentClass="max-w-lg p-0 overflow-hidden">
+  <hlm-command class="w-full">
+    <hlm-command-input placeholder="Search commands, pages, actions…" />
+    <hlm-command-list class="max-h-[420px]!">
+      <div hlmCommandEmpty>
+        <div class="flex flex-col items-center justify-center gap-2 py-8 text-sm">
+          <ng-icon hlm size="lg" name="lucideFolderSearch" class="text-muted-foreground" />
+          <p class="text-muted-foreground">No matches found.</p>
+        </div>
+      </div>
+
+      <hlm-command-group>
+        <div hlmCommandGroupLabel>Navigation</div>
+        @for (a of navigation; track a.id) {
+          <button hlmCommandItem [value]="a.label" (selected)="run(a)">
+            <ng-icon hlm size="sm" [name]="a.icon" />
+            <span class="flex-1 text-start truncate">{{ a.label }}</span>
+            @if (a.shortcut) {
+              <span hlmCommandShortcut>{{ a.shortcut }}</span>
+            }
+          </button>
+        }
+      </hlm-command-group>
+
+      <hlm-command-separator />
+
+      <hlm-command-group>
+        <div hlmCommandGroupLabel>Actions</div>
+        @for (a of actions; track a.id) {
+          <button hlmCommandItem [value]="a.label" (selected)="run(a)">
+            <ng-icon hlm size="sm" [name]="a.icon" />
+            <span class="flex-1 text-start truncate">{{ a.label }}</span>
+            @if (a.shortcut) {
+              <span hlmCommandShortcut>{{ a.shortcut }}</span>
+            }
+          </button>
+        }
+      </hlm-command-group>
+
+      <hlm-command-separator />
+
+      <hlm-command-group>
+        <div hlmCommandGroupLabel>Preferences</div>
+        @for (a of preferences; track a.id) {
+          <button hlmCommandItem [value]="a.label" (selected)="run(a)">
+            <ng-icon hlm size="sm" [name]="a.icon" />
+            <span class="flex-1 text-start truncate">{{ a.label }}</span>
+            @if (a.shortcut) {
+              <span hlmCommandShortcut>{{ a.shortcut }}</span>
+            }
+          </button>
+        }
+      </hlm-command-group>
+    </hlm-command-list>
+  </hlm-command>
+
+  <div class="border-border bg-muted/30 flex items-center justify-between gap-2 border-t px-3 py-2 text-[11px]">
+    <div class="text-muted-foreground flex items-center gap-3">
+      <span class="flex items-center gap-1">
+        <kbd class="border-border bg-background rounded border px-1.5 py-0.5 font-mono text-[10px]">↑↓</kbd>
+        navigate
+      </span>
+      <span class="flex items-center gap-1">
+        <kbd class="border-border bg-background rounded border px-1.5 py-0.5 font-mono text-[10px]">↵</kbd>
+        select
+      </span>
+      <span class="flex items-center gap-1">
+        <kbd class="border-border bg-background rounded border px-1.5 py-0.5 font-mono text-[10px]">esc</kbd>
+        close
+      </span>
+    </div>
+    <span class="text-muted-foreground">Mission Control</span>
+  </div>
+</hlm-command-dialog>

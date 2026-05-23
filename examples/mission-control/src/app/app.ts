@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DOCUMENT } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -14,6 +14,8 @@ import { HlmInputGroupImports } from '@spartan-ng/helm/input-group';
 import { HlmSeparatorImports } from '@spartan-ng/helm/separator';
 import { HlmSidebarImports } from '@spartan-ng/helm/sidebar';
 import { HlmToasterImports } from '@spartan-ng/helm/sonner';
+import { CommandPalette } from './shared/command-palette/command-palette';
+import { Notifications } from './shared/notifications/notifications';
 
 interface NavChild {
   readonly label: string;
@@ -74,6 +76,8 @@ interface AppUser {
     HlmSeparatorImports,
     HlmSidebarImports,
     HlmToasterImports,
+    CommandPalette,
+    Notifications,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -208,5 +212,11 @@ export class App {
     const next = this.mode() === 'light' ? 'dark' : 'light';
     this.mode.set(next);
     this.document.documentElement.classList.toggle('dark', next === 'dark');
+  }
+
+  protected readonly palette = viewChild<CommandPalette>('palette');
+
+  protected openPalette(): void {
+    this.palette()?.show();
   }
 }

@@ -1,0 +1,93 @@
+<hlm-popover align="end" sideOffset="8">
+  <button
+    hlmBtn
+    variant="ghost"
+    size="icon-sm"
+    hlmPopoverTrigger
+    aria-label="Notifications"
+    class="relative"
+  >
+    <ng-icon hlm size="sm" name="lucideBell" />
+    @if (unread() > 0) {
+      <span
+        class="bg-destructive ring-background absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-semibold leading-none text-white ring-2"
+        aria-hidden="true"
+      >
+        {{ unread() }}
+      </span>
+      <span class="sr-only">{{ unread() }} unread</span>
+    }
+  </button>
+
+  <hlm-popover-content *hlmPopoverPortal class="w-[360px]! p-0!">
+    <!-- Header -->
+    <div class="flex items-center justify-between gap-2 px-4 py-3">
+      <div>
+        <p class="text-sm font-semibold leading-none">Notifications</p>
+        <p class="text-muted-foreground mt-1 text-[11px]">
+          @if (unread() > 0) {
+            <span class="text-foreground font-medium">{{ unread() }}</span> unread ·
+          }
+          {{ items().length }} total
+        </p>
+      </div>
+      @if (unread() > 0) {
+        <button hlmBtn variant="ghost" size="sm" class="h-7 text-xs" (click)="markAllRead()">
+          Mark all read
+        </button>
+      }
+    </div>
+
+    <hlm-separator orientation="horizontal" />
+
+    <!-- List -->
+    <ul class="max-h-[360px] divide-y overflow-y-auto">
+      @for (n of items(); track n.id) {
+        <li>
+          <button
+            type="button"
+            class="hover:bg-muted/40 group w-full text-left transition-colors"
+            (click)="markRead(n.id)"
+          >
+            <div class="flex items-start gap-3 px-4 py-3">
+              <div
+                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md"
+                [class]="toneClass(n.tone)"
+              >
+                <ng-icon hlm size="sm" [name]="n.icon" />
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-start gap-2">
+                  <p
+                    class="flex-1 truncate text-xs leading-tight"
+                    [class.font-semibold]="!n.read"
+                    [class.text-foreground]="!n.read"
+                    [class.text-muted-foreground]="n.read"
+                  >
+                    {{ n.title }}
+                  </p>
+                  @if (!n.read) {
+                    <span class="bg-primary mt-1 h-1.5 w-1.5 shrink-0 rounded-full" aria-hidden="true"></span>
+                  }
+                </div>
+                <p class="text-muted-foreground mt-0.5 line-clamp-2 text-[11px] leading-snug">
+                  {{ n.description }}
+                </p>
+                <p class="text-muted-foreground/70 mt-1 text-[10px] tabular-nums">{{ n.time }}</p>
+              </div>
+            </div>
+          </button>
+        </li>
+      }
+    </ul>
+
+    <hlm-separator orientation="horizontal" />
+
+    <!-- Footer -->
+    <div class="px-2 py-2">
+      <button hlmBtn variant="ghost" size="sm" class="h-8 w-full justify-center text-xs">
+        View all notifications
+      </button>
+    </div>
+  </hlm-popover-content>
+</hlm-popover>
