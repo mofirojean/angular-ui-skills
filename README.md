@@ -4,12 +4,14 @@ Agent skills that teach AI coding assistants (Claude Code, Cursor, Codex, GitHub
 
 ## Skills
 
-| Skill | Library | Status |
-|---|---|---|
-| [`spartan-ng-developer`](./skills/spartan-ng-developer) | [Spartan/ng](https://spartan.ng) | 🚧 In progress |
-| `primeng-developer` | [PrimeNG](https://primeng.org) | ⏳ Planned |
-| `ng-zorro-developer` | [NG-ZORRO](https://ng.ant.design) | ⏳ Planned |
-| `angular-material-developer` | [Angular Material](https://material.angular.dev) | ⏳ Planned |
+| Skill | Library | Status | Tracks |
+|---|---|---|---|
+| [`spartan-ng-developer`](./skills/spartan-ng-developer) | [Spartan/ng](https://spartan.ng) | ✅ Ready | `@spartan-ng/brain` v0.0.1-alpha.696 |
+| `primeng-developer` | [PrimeNG](https://primeng.org) | 🚧 In progress | — |
+| `ng-zorro-developer` | [NG-ZORRO](https://ng.ant.design) | ⏳ Planned | — |
+| `angular-material-developer` | [Angular Material](https://material.angular.dev) | ⏳ Planned | — |
+
+> **Update cadence.** Each skill is pinned to a specific upstream library version (see *Tracks*). When the upstream ships a new release, the skill is re-validated against it and the *Tracks* column is bumped. Open an issue if you spot drift between a skill's docs and the version it claims to track.
 
 > Each skill is designed as an **extension** to `angular-developer`. Install both for the best experience - the base skill covers Angular fundamentals (signals, DI, routing, forms, SSR, accessibility), and the UI-library skill layers in library-specific guidance on top.
 
