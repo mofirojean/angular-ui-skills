@@ -287,7 +287,7 @@
             }
           </div>
         } @else {
-          <ul class="max-h-60 space-y-0.5 overflow-y-auto pr-1">
+          <ul class="max-h-60 space-y-0.5 overflow-y-auto p-1">
             @for (act of activity; track act.id; let first = $first; let i = $index) {
               <li [class]="activityClass(first)" [style.animation-delay.ms]="i * 60">
                 <hlm-avatar size="sm">

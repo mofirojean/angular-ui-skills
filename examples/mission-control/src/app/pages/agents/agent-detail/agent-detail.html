@@ -1,0 +1,652 @@
+@if (isLoading()) {
+  <div class="flex flex-col gap-4">
+    <hlm-skeleton class="h-24 w-full" />
+    <hlm-skeleton class="h-10 w-96" />
+    <hlm-skeleton class="h-96 w-full" />
+  </div>
+} @else if (notFound()) {
+  <div class="flex flex-col items-center justify-center gap-3 py-24 text-center">
+    <ng-icon hlm size="xl" name="lucideFolderSearch" class="text-muted-foreground" />
+    <div>
+      <h1 class="text-lg font-semibold">Agent not found</h1>
+      <p class="text-muted-foreground mt-1 text-sm">No agent matches this URL.</p>
+    </div>
+    <a hlmBtn variant="outline" size="sm" routerLink="/agents">
+      <ng-icon hlm size="xs" name="lucideChevronLeft" />
+      Back to agents
+    </a>
+  </div>
+} @else if (agent(); as a) {
+  <div class="flex flex-col gap-4">
+    <!-- Breadcrumb back -->
+    <div class="flex items-center gap-2 text-xs">
+      <a hlmBtn variant="ghost" size="sm" routerLink="/agents" class="h-7 px-2">
+        <ng-icon hlm size="xs" name="lucideChevronLeft" />
+        Agents
+      </a>
+      <span class="text-muted-foreground">/</span>
+      <span class="text-muted-foreground">{{ a.id }}</span>
+    </div>
+
+    <!-- Header card -->
+    <header
+      class="animate-in fade-in-50 slide-in-from-top-2 bg-card relative overflow-hidden rounded-lg border duration-500"
+    >
+      <div class="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/20 blur-3xl"></div>
+      <div class="pointer-events-none absolute -bottom-16 -left-12 h-40 w-40 rounded-full bg-emerald-500/10 blur-3xl"></div>
+
+      <div class="relative flex flex-wrap items-start justify-between gap-4 p-5">
+        <div class="flex items-start gap-4">
+          <div
+            class="bg-primary text-primary-foreground ring-primary/10 flex h-14 w-14 items-center justify-center rounded-xl ring-4 transition-transform hover:rotate-3 hover:scale-105"
+          >
+            <ng-icon hlm size="lg" [name]="a.icon" />
+          </div>
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+              <h1 class="text-2xl font-semibold leading-none tracking-tight">{{ a.name }}</h1>
+              <span hlmBadge [variant]="statusVariant(a.status)" class="gap-1 capitalize">
+                <ng-icon hlm size="xs" [name]="statusIcon(a.status)" />
+                {{ a.status }}
+              </span>
+            </div>
+            <p class="text-muted-foreground mt-1.5 max-w-xl text-sm">{{ a.description }}</p>
+            <div class="text-muted-foreground mt-3 flex flex-wrap items-center gap-3 text-xs">
+              <span class="inline-flex items-center gap-1.5">
+                <hlm-avatar size="sm">
+                  <span hlmAvatarFallback class="text-[10px]">{{ a.owner.initials }}</span>
+                </hlm-avatar>
+                {{ a.owner.name }}
+              </span>
+              <hlm-separator orientation="vertical" class="h-4" />
+              <span class="font-mono">{{ a.id }}</span>
+              <hlm-separator orientation="vertical" class="h-4" />
+              <span>{{ a.category }}</span>
+              <hlm-separator orientation="vertical" class="h-4" />
+              <span>Created {{ a.created }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button hlmBtn variant="outline" size="sm">
+            <ng-icon hlm size="xs" name="lucidePencil" />
+            Edit
+          </button>
+          <button hlmBtn size="sm" (click)="runAgent()" class="shadow-primary/20 shadow-md">
+            <ng-icon hlm size="xs" name="lucidePlay" />
+            Run now
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Tabs -->
+    <hlm-tabs tab="overview">
+      <hlm-tabs-list>
+        <button hlmTabsTrigger="overview">
+          <ng-icon hlm size="xs" name="lucideHouse" />
+          Overview
+        </button>
+        <button hlmTabsTrigger="config">
+          <ng-icon hlm size="xs" name="lucideSettings" />
+          Config
+        </button>
+        <button hlmTabsTrigger="runs">
+          <ng-icon hlm size="xs" name="lucidePlay" />
+          Runs
+        </button>
+        <button hlmTabsTrigger="logs">
+          <ng-icon hlm size="xs" name="lucideTerminal" />
+          Logs
+        </button>
+        <button hlmTabsTrigger="permissions">
+          <ng-icon hlm size="xs" name="lucideShield" />
+          Permissions
+        </button>
+      </hlm-tabs-list>
+
+      <!-- OVERVIEW TAB -->
+      <div hlmTabsContent="overview" class="mt-4 flex flex-col gap-4">
+        <!-- KPI strip -->
+        <section class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          @for (kpi of overviewKpis(); track kpi.label) {
+            <section hlmCard class="transition-shadow hover:shadow-sm">
+              <div hlmCardContent class="p-4!">
+                <div class="flex items-center justify-between">
+                  <p class="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider leading-none">{{ kpi.label }}</p>
+                  <ng-icon
+                    hlm
+                    size="xs"
+                    [name]="kpi.icon"
+                    [class.text-emerald-600]="kpi.tone === 'positive'"
+                    [class.text-amber-600]="kpi.tone === 'warning'"
+                    [class.text-destructive]="kpi.tone === 'destructive'"
+                    [class.text-muted-foreground]="kpi.tone === 'neutral'"
+                  />
+                </div>
+                <p class="mt-2 text-2xl font-semibold tabular-nums leading-none">{{ kpi.value }}</p>
+              </div>
+            </section>
+          }
+        </section>
+
+        <!-- 7-day chart + recent runs -->
+        <section class="grid gap-4 lg:grid-cols-3">
+          <section hlmCard class="lg:col-span-2">
+            <div hlmCardHeader class="p-4! pb-2!">
+              <h2 hlmCardTitle class="text-sm">7-day runs trend</h2>
+              <p hlmCardDescription class="text-xs">Daily run counts for this agent.</p>
+            </div>
+            <div hlmCardContent class="p-4! pt-0!">
+              <svg viewBox="0 0 100 28" preserveAspectRatio="none" class="h-32 w-full overflow-visible">
+                <defs>
+                  <linearGradient id="agentDetailFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="var(--primary)" stop-opacity="0.3" />
+                    <stop offset="100%" stop-color="var(--primary)" stop-opacity="0" />
+                  </linearGradient>
+                </defs>
+                <path [attr.d]="sparkAreaPath(a.runsTrend)" fill="url(#agentDetailFill)" />
+                <path
+                  [attr.d]="sparkPath(a.runsTrend)"
+                  fill="none"
+                  stroke="var(--primary)"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  vector-effect="non-scaling-stroke"
+                />
+              </svg>
+              <div class="text-muted-foreground mt-2 flex justify-between text-[10px] uppercase tracking-wider">
+                <span>7d ago</span>
+                <span>Today</span>
+              </div>
+            </div>
+          </section>
+
+          <section hlmCard>
+            <div hlmCardHeader class="p-4! pb-2!">
+              <h2 hlmCardTitle class="text-sm">Tags</h2>
+              <p hlmCardDescription class="text-xs">Lifecycle and category labels.</p>
+            </div>
+            <div hlmCardContent class="p-4! pt-0!">
+              @if (a.tags.length > 0) {
+                <div class="flex flex-wrap gap-1.5">
+                  @for (tag of a.tags; track tag) {
+                    <span hlmBadge variant="outline" class="text-[10px] capitalize">{{ tag }}</span>
+                  }
+                </div>
+              } @else {
+                <p class="text-muted-foreground text-xs">No tags assigned.</p>
+              }
+              <hlm-separator class="my-3" />
+              <p class="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">Last run</p>
+              <p class="mt-1 font-mono text-sm">{{ a.lastRun }}</p>
+            </div>
+          </section>
+        </section>
+      </div>
+
+      <!-- CONFIG TAB -->
+      <div hlmTabsContent="config" class="mt-4">
+        <section hlmCard>
+          <div hlmCardHeader class="p-5! pb-3!">
+            <h2 hlmCardTitle class="text-sm">Agent configuration</h2>
+            <p hlmCardDescription class="text-xs">Tune the agent's behavior. Save to apply.</p>
+          </div>
+          <div hlmCardContent class="p-5! pt-0!">
+            <form [formGroup]="configForm" (ngSubmit)="saveConfig()" class="grid gap-5 lg:grid-cols-2">
+              <!-- Name + Description (col-span-2) -->
+              <div hlmField class="lg:col-span-2">
+                <label hlmFieldLabel for="cfg-name">Name</label>
+                <input hlmInput id="cfg-name" formControlName="name" placeholder="Agent name" />
+                @if (nameCtrl.invalid && nameCtrl.touched) {
+                  <p hlmFieldError>Name is required (min 3 chars).</p>
+                }
+              </div>
+
+              <div hlmField class="lg:col-span-2">
+                <label hlmFieldLabel for="cfg-desc">Description</label>
+                <textarea hlmTextarea id="cfg-desc" formControlName="description" rows="3"></textarea>
+                @if (descCtrl.invalid && descCtrl.touched) {
+                  <p hlmFieldError>Description must be at least 10 characters.</p>
+                }
+              </div>
+
+              <!-- Category + Owner -->
+              <div hlmField>
+                <label hlmFieldLabel>Category</label>
+                <hlm-select formControlName="category" class="w-full">
+                  <hlm-select-trigger class="w-full">
+                    <hlm-select-value placeholder="Select category" />
+                  </hlm-select-trigger>
+                  <hlm-select-content *hlmSelectPortal>
+                    @for (cat of categories; track cat) {
+                      <hlm-select-item [value]="cat">{{ cat }}</hlm-select-item>
+                    }
+                  </hlm-select-content>
+                </hlm-select>
+              </div>
+
+              <div hlmField>
+                <label hlmFieldLabel>Owner</label>
+                <hlm-select formControlName="ownerId" class="w-full">
+                  <hlm-select-trigger class="w-full">
+                    <hlm-select-value placeholder="Select owner" />
+                  </hlm-select-trigger>
+                  <hlm-select-content *hlmSelectPortal>
+                    @for (owner of ownerOptions; track owner.id) {
+                      <hlm-select-item [value]="owner.id">{{ owner.name }}</hlm-select-item>
+                    }
+                  </hlm-select-content>
+                </hlm-select>
+              </div>
+
+              <!-- Schedule mode toggle group (col-span-2) -->
+              <div hlmField class="lg:col-span-2">
+                <label hlmFieldLabel>Schedule mode</label>
+                <hlm-toggle-group type="single" variant="outline" size="sm" formControlName="scheduleMode">
+                  <button hlmToggleGroupItem value="manual">
+                    <ng-icon hlm size="xs" name="lucidePlay" />
+                    Manual
+                  </button>
+                  <button hlmToggleGroupItem value="cron">
+                    <ng-icon hlm size="xs" name="lucideCalendar" />
+                    Schedule
+                  </button>
+                  <button hlmToggleGroupItem value="webhook">
+                    <ng-icon hlm size="xs" name="lucideWebhook" />
+                    Webhook
+                  </button>
+                </hlm-toggle-group>
+                <p hlmFieldDescription>Choose how runs are initiated.</p>
+              </div>
+
+              <!-- First run date -->
+              <div hlmField>
+                <label hlmFieldLabel for="cfg-firstrun">First run</label>
+                <hlm-date-picker buttonId="cfg-firstrun" formControlName="firstRun">
+                  <span>Pick a date</span>
+                </hlm-date-picker>
+              </div>
+
+              <!-- Notification email -->
+              <div hlmField>
+                <label hlmFieldLabel for="cfg-email">Notification email</label>
+                <input hlmInput id="cfg-email" formControlName="notificationEmail" type="email" placeholder="ops@example.com" />
+                @if (emailCtrl.invalid && emailCtrl.touched && emailCtrl.hasError('email')) {
+                  <p hlmFieldError>Invalid email format.</p>
+                }
+              </div>
+
+              <!-- Max concurrent slider -->
+              <div hlmField>
+                <label hlmFieldLabel>
+                  Max concurrent runs:
+                  <span class="text-foreground font-semibold tabular-nums">
+                    {{ configForm.value.maxConcurrent }}
+                  </span>
+                </label>
+                <hlm-slider formControlName="maxConcurrent" [min]="1" [max]="10" [step]="1" />
+                <p hlmFieldDescription>How many runs can execute in parallel.</p>
+              </div>
+
+              <!-- API timeout slider -->
+              <div hlmField>
+                <label hlmFieldLabel>
+                  API timeout (seconds):
+                  <span class="text-foreground font-semibold tabular-nums">
+                    {{ configForm.value.apiTimeout }}s
+                  </span>
+                </label>
+                <hlm-slider formControlName="apiTimeout" [min]="5" [max]="120" [step]="5" />
+              </div>
+
+              <!-- Retry policy radio group (col-span-2) -->
+              <div hlmField class="lg:col-span-2">
+                <label hlmFieldLabel>Retry policy</label>
+                <hlm-radio-group formControlName="retryPolicy" class="flex flex-wrap gap-4">
+                  <div class="flex items-center gap-2">
+                    <hlm-radio value="never" inputId="ret-never">
+                      <hlm-radio-indicator indicator />
+                    </hlm-radio>
+                    <label hlmLabel for="ret-never">Never</label>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <hlm-radio value="once" inputId="ret-once">
+                      <hlm-radio-indicator indicator />
+                    </hlm-radio>
+                    <label hlmLabel for="ret-once">Once</label>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <hlm-radio value="exponential" inputId="ret-exp">
+                      <hlm-radio-indicator indicator />
+                    </hlm-radio>
+                    <label hlmLabel for="ret-exp">Exponential backoff</label>
+                  </div>
+                </hlm-radio-group>
+              </div>
+
+              <!-- Tags checkbox group (col-span-2) -->
+              <div hlmField class="lg:col-span-2" formGroupName="tags">
+                <label hlmFieldLabel>Tags</label>
+                <div class="flex flex-wrap gap-4 text-sm">
+                  <label class="flex items-center gap-2">
+                    <hlm-checkbox formControlName="production" />
+                    <span>Production</span>
+                  </label>
+                  <label class="flex items-center gap-2">
+                    <hlm-checkbox formControlName="beta" />
+                    <span>Beta</span>
+                  </label>
+                  <label class="flex items-center gap-2">
+                    <hlm-checkbox formControlName="experimental" />
+                    <span>Experimental</span>
+                  </label>
+                  <label class="flex items-center gap-2">
+                    <hlm-checkbox formControlName="critical" />
+                    <span>Critical</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Toggle rows (col-span-2) -->
+              <div class="lg:col-span-2">
+                <hlm-separator class="my-2" />
+                <div class="flex flex-col gap-3">
+                  <div class="flex items-center justify-between rounded-md border p-3">
+                    <div>
+                      <p class="text-sm font-medium">Enabled</p>
+                      <p class="text-muted-foreground text-xs">Allow scheduled runs to fire.</p>
+                    </div>
+                    <hlm-switch formControlName="enabled" />
+                  </div>
+                  <div class="flex items-center justify-between rounded-md border p-3">
+                    <div>
+                      <p class="text-sm font-medium">Alert on failure</p>
+                      <p class="text-muted-foreground text-xs">Send a notification when a run fails.</p>
+                    </div>
+                    <hlm-switch formControlName="alertOnFailure" />
+                  </div>
+                  <div class="flex items-center justify-between rounded-md border p-3">
+                    <div>
+                      <p class="text-sm font-medium">Critical alerts only</p>
+                      <p class="text-muted-foreground text-xs">Suppress informational notifications.</p>
+                    </div>
+                    <hlm-switch formControlName="criticalAlertsOnly" />
+                  </div>
+                </div>
+              </div>
+            </form>
+
+            <!-- Sticky footer actions -->
+            <div class="bg-background -mx-5 mt-6 flex items-center justify-end gap-2 border-t px-5 pt-4">
+              <button hlmBtn variant="outline" type="button" (click)="resetConfig()">Reset</button>
+              <button hlmBtn type="button" (click)="saveConfig()" [disabled]="configForm.invalid">
+                <ng-icon hlm size="sm" name="lucideCircleCheck" />
+                Save changes
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- RUNS TAB -->
+      <div hlmTabsContent="runs" class="mt-4">
+        <section hlmCard>
+          <div hlmCardHeader class="p-4! pb-2!">
+            <h2 hlmCardTitle class="text-sm">Run history</h2>
+            <p hlmCardDescription class="text-xs">Most recent runs of this agent.</p>
+          </div>
+          <div hlmCardContent class="p-0!">
+            <table hlmTable class="text-xs">
+              <thead hlmTHead>
+                <tr hlmTr>
+                  <th hlmTh class="w-24">Run</th>
+                  <th hlmTh>Started</th>
+                  <th hlmTh>Duration</th>
+                  <th hlmTh>Status</th>
+                  <th hlmTh>Trigger</th>
+                  <th hlmTh class="text-right">Cost</th>
+                </tr>
+              </thead>
+              <tbody hlmTBody>
+                @for (run of runs; track run.id) {
+                  <tr hlmTr class="hover:bg-muted/40 cursor-pointer transition-colors">
+                    <td hlmTd class="font-mono text-[11px]">{{ run.id }}</td>
+                    <td hlmTd class="text-muted-foreground tabular-nums">{{ run.startedAt }}</td>
+                    <td hlmTd class="font-mono tabular-nums">{{ run.duration }}</td>
+                    <td hlmTd>
+                      <span class="inline-flex items-center gap-1.5">
+                        <ng-icon
+                          hlm
+                          size="xs"
+                          [name]="run.status === 'success' ? 'lucideCircleCheck' : run.status === 'failed' ? 'lucideCircleX' : 'lucideClock'"
+                          [class.text-emerald-600]="run.status === 'success'"
+                          [class.text-destructive]="run.status === 'failed'"
+                          [class.text-amber-600]="run.status === 'running'"
+                        />
+                        <span hlmBadge [variant]="run.status === 'success' ? 'default' : run.status === 'failed' ? 'destructive' : 'outline'" class="text-[10px] capitalize">{{ run.status }}</span>
+                      </span>
+                    </td>
+                    <td hlmTd class="text-muted-foreground">{{ run.trigger }}</td>
+                    <td hlmTd class="text-right font-mono tabular-nums">${{ run.cost.toFixed(2) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- LOGS TAB — Resizable split: timeline left, JSON right -->
+      <div hlmTabsContent="logs" class="mt-4">
+        <section hlmCard>
+          <div hlmCardHeader class="p-4! pb-2!">
+            <h2 hlmCardTitle class="text-sm">Run logs</h2>
+            <p hlmCardDescription class="text-xs">Click any log entry to see its full payload on the right.</p>
+          </div>
+          <div hlmCardContent class="p-0!">
+            <hlm-resizable-group direction="horizontal" class="h-[500px] rounded-b-lg border-t">
+              <hlm-resizable-panel [defaultSize]="40" [minSize]="25">
+                <ul class="h-full overflow-y-auto">
+                  @for (log of logs; track log.id) {
+                    <li>
+                      <button
+                        type="button"
+                        class="hover:bg-muted/50 flex w-full items-start gap-2 border-b p-3 text-left text-xs transition-colors"
+                        [class.bg-muted]="selectedLogId() === log.id"
+                        (click)="selectLog(log.id)"
+                      >
+                        <ng-icon
+                          hlm
+                          size="xs"
+                          [name]="logIcon(log.level)"
+                          class="mt-0.5 shrink-0"
+                          [class.text-emerald-600]="log.level === 'success'"
+                          [class.text-amber-600]="log.level === 'warn'"
+                          [class.text-destructive]="log.level === 'error'"
+                          [class.text-blue-500]="log.level === 'info'"
+                          [class.text-muted-foreground]="log.level === 'debug'"
+                        />
+                        <div class="min-w-0 flex-1">
+                          <p class="truncate font-medium">{{ log.message }}</p>
+                          <p class="text-muted-foreground mt-0.5 font-mono text-[10px] uppercase tracking-wider">{{ log.timestamp }} · {{ log.level }}</p>
+                        </div>
+                      </button>
+                    </li>
+                  }
+                </ul>
+              </hlm-resizable-panel>
+              <hlm-resizable-handle withHandle />
+              <hlm-resizable-panel [defaultSize]="60" [minSize]="40">
+                @if (selectedLog(); as log) {
+                  <div class="h-full overflow-y-auto p-4">
+                    <div class="mb-3 flex items-center gap-2">
+                      <ng-icon
+                        hlm
+                        size="sm"
+                        [name]="logIcon(log.level)"
+                        [class.text-emerald-600]="log.level === 'success'"
+                        [class.text-amber-600]="log.level === 'warn'"
+                        [class.text-destructive]="log.level === 'error'"
+                        [class.text-blue-500]="log.level === 'info'"
+                        [class.text-muted-foreground]="log.level === 'debug'"
+                      />
+                      <p class="text-sm font-medium">{{ log.message }}</p>
+                      <span hlmBadge variant="outline" class="ml-auto text-[10px] uppercase">{{ log.level }}</span>
+                    </div>
+                    <pre class="bg-muted text-foreground/90 overflow-auto rounded-md p-3 font-mono text-[11px] leading-relaxed">{{ selectedLogJson() }}</pre>
+                  </div>
+                }
+              </hlm-resizable-panel>
+            </hlm-resizable-group>
+          </div>
+        </section>
+      </div>
+
+      <!-- PERMISSIONS TAB — Accordion -->
+      <div hlmTabsContent="permissions" class="mt-4">
+        <section hlmCard>
+          <div hlmCardHeader class="p-4! pb-2!">
+            <h2 hlmCardTitle class="text-sm">Permissions & access</h2>
+            <p hlmCardDescription class="text-xs">Who can do what with this agent, and which data it can touch.</p>
+          </div>
+          <div hlmCardContent class="p-4! pt-0!">
+            <hlm-accordion type="multiple">
+              <!-- API Access -->
+              <hlm-accordion-item value="api">
+                <hlm-accordion-trigger>
+                  <span class="inline-flex items-center gap-2">
+                    <ng-icon hlm size="sm" name="lucideKey" class="text-muted-foreground" />
+                    API access
+                    <span hlmBadge variant="secondary" class="text-[10px]">
+                      {{ permissions.length }} scopes
+                    </span>
+                  </span>
+                </hlm-accordion-trigger>
+                <hlm-accordion-content>
+                  <ul class="flex flex-col gap-3">
+                    @for (perm of permissions; track perm.label) {
+                      <li class="flex items-center justify-between gap-3 rounded-md border p-3">
+                        <div>
+                          <p class="text-sm font-medium">{{ perm.label }}</p>
+                          <p class="text-muted-foreground mt-0.5 text-xs">{{ perm.description }}</p>
+                        </div>
+                        <hlm-switch [checked]="perm.granted" />
+                      </li>
+                    }
+                  </ul>
+                </hlm-accordion-content>
+              </hlm-accordion-item>
+
+              <!-- Data Sources -->
+              <hlm-accordion-item value="data">
+                <hlm-accordion-trigger>
+                  <span class="inline-flex items-center gap-2">
+                    <ng-icon hlm size="sm" name="lucideDatabase" class="text-muted-foreground" />
+                    Data sources
+                    <span hlmBadge variant="secondary" class="text-[10px]">
+                      {{ dataSources().length }} configured
+                    </span>
+                  </span>
+                </hlm-accordion-trigger>
+                <hlm-accordion-content>
+                  <ul class="flex flex-col gap-2">
+                    @for (ds of dataSources(); track ds.id) {
+                      <li class="flex items-center justify-between gap-3 rounded-md border p-3">
+                        <div class="flex items-center gap-3">
+                          <div class="bg-muted text-muted-foreground flex h-8 w-8 items-center justify-center rounded-md">
+                            <ng-icon hlm size="sm" [name]="dataSourceIcon(ds.type)" />
+                          </div>
+                          <div>
+                            <p class="text-sm font-medium">{{ ds.label }}</p>
+                            <p class="text-muted-foreground text-[11px] uppercase tracking-wider">{{ ds.type }}</p>
+                          </div>
+                        </div>
+                        <hlm-switch [checked]="ds.enabled" (checkedChange)="toggleDataSource(ds.id)" />
+                      </li>
+                    }
+                  </ul>
+                </hlm-accordion-content>
+              </hlm-accordion-item>
+
+              <!-- Notifications -->
+              <hlm-accordion-item value="notifications">
+                <hlm-accordion-trigger>
+                  <span class="inline-flex items-center gap-2">
+                    <ng-icon hlm size="sm" name="lucideBell" class="text-muted-foreground" />
+                    Notification channels
+                  </span>
+                </hlm-accordion-trigger>
+                <hlm-accordion-content>
+                  <div class="grid gap-3 sm:grid-cols-2">
+                    <div class="flex items-center justify-between rounded-md border p-3">
+                      <div class="flex items-center gap-2">
+                        <ng-icon hlm size="sm" name="lucideMail" />
+                        <span class="text-sm font-medium">Email</span>
+                      </div>
+                      <hlm-switch [checked]="true" />
+                    </div>
+                    <div class="flex items-center justify-between rounded-md border p-3">
+                      <div class="flex items-center gap-2">
+                        <ng-icon hlm size="sm" name="lucideMessageSquare" />
+                        <span class="text-sm font-medium">Slack</span>
+                      </div>
+                      <hlm-switch [checked]="true" />
+                    </div>
+                    <div class="flex items-center justify-between rounded-md border p-3">
+                      <div class="flex items-center gap-2">
+                        <ng-icon hlm size="sm" name="lucideWebhook" />
+                        <span class="text-sm font-medium">Webhook</span>
+                      </div>
+                      <hlm-switch [checked]="false" />
+                    </div>
+                    <div class="flex items-center justify-between rounded-md border p-3">
+                      <div class="flex items-center gap-2">
+                        <ng-icon hlm size="sm" name="lucideMessageSquare" />
+                        <span class="text-sm font-medium">SMS</span>
+                      </div>
+                      <hlm-switch [checked]="false" />
+                    </div>
+                  </div>
+                </hlm-accordion-content>
+              </hlm-accordion-item>
+
+              <!-- Audit log -->
+              <hlm-accordion-item value="audit">
+                <hlm-accordion-trigger>
+                  <span class="inline-flex items-center gap-2">
+                    <ng-icon hlm size="sm" name="lucideHistory" class="text-muted-foreground" />
+                    Audit log
+                    <span hlmBadge variant="secondary" class="text-[10px]">
+                      {{ auditEntries.length }} events
+                    </span>
+                  </span>
+                </hlm-accordion-trigger>
+                <hlm-accordion-content>
+                  <ul class="flex flex-col gap-2">
+                    @for (entry of auditEntries; track entry.id) {
+                      <li class="flex items-start gap-3 rounded-md border p-3 text-xs">
+                        <hlm-avatar size="sm">
+                          <span hlmAvatarFallback class="text-[10px]">{{ entry.who.charAt(0) }}</span>
+                        </hlm-avatar>
+                        <div class="min-w-0 flex-1">
+                          <p>
+                            <span class="font-medium">{{ entry.who }}</span>
+                            <span class="text-muted-foreground"> {{ entry.action }}</span>
+                          </p>
+                          <p class="text-muted-foreground mt-0.5 text-[10px]">{{ entry.when }}</p>
+                        </div>
+                      </li>
+                    }
+                  </ul>
+                </hlm-accordion-content>
+              </hlm-accordion-item>
+            </hlm-accordion>
+          </div>
+        </section>
+      </div>
+    </hlm-tabs>
+  </div>
+}

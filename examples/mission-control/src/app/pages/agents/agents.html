@@ -1,2 +1,712 @@
-<h1 class="text-2xl font-semibold">Agents</h1>
-<p class="text-muted-foreground mt-1 text-sm">Phase 3 will fill this with the agents list (data table) and detail page.</p>
+<div class="flex flex-col gap-3">
+  <header
+    class="animate-in fade-in-50 slide-in-from-top-2 bg-card relative overflow-hidden rounded-lg border duration-500"
+  >
+    <div class="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/20 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-16 -left-12 h-40 w-40 rounded-full bg-emerald-500/10 blur-3xl"></div>
+
+    <div class="relative flex flex-wrap items-center justify-between gap-4 p-5">
+      <div class="flex items-center gap-4">
+        <div
+          class="bg-primary text-primary-foreground ring-primary/10 group flex h-12 w-12 items-center justify-center rounded-xl ring-4 transition-all duration-300 hover:rotate-6 hover:scale-105 hover:shadow-lg"
+        >
+          <ng-icon hlm size="lg" name="lucideBot" class="transition-transform group-hover:scale-110" />
+        </div>
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 class="text-2xl font-semibold leading-none tracking-tight">Agents</h1>
+            <span hlmBadge variant="outline" class="gap-1.5">
+              <span class="relative flex h-2 w-2">
+                <span class="absolute inline-flex h-full w-full animate-spin rounded-full bg-emerald-500 opacity-75"></span>
+                <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+              </span>
+              {{ activeCount() }} live
+            </span>
+            <span hlmBadge variant="secondary" class="gap-1">
+              <ng-icon hlm size="xs" name="lucideUsers" />
+              {{ totalAgentsCount }} total
+            </span>
+          </div>
+          <p class="text-muted-foreground mt-1.5 text-sm">
+            Click any row to preview · right-click for quick actions.
+          </p>
+        </div>
+      </div>
+
+      <button
+        hlmBtn
+        (click)="openNewAgentDialog()"
+        class="shadow-primary/20 hover:shadow-primary/30 group shadow-lg transition-shadow hover:shadow-xl"
+      >
+        <ng-icon hlm size="sm" name="lucidePlus" class="transition-transform group-hover:rotate-90" />
+        New agent
+      </button>
+    </div>
+  </header>
+
+  <!-- KPI strip -->
+  <section class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+    @if (isLoading()) {
+      @for (i of [0,1,2,3,4,5]; track i) {
+        <section hlmCard>
+          <div hlmCardContent class="p-3!">
+            <hlm-skeleton class="h-3 w-16" />
+            <hlm-skeleton class="mt-2 h-5 w-12" />
+            <hlm-skeleton class="mt-1.5 h-3 w-20" />
+          </div>
+        </section>
+      }
+    } @else {
+      @for (kpi of kpis(); track kpi.label) {
+        <section hlmCard class="transition-shadow hover:shadow-sm">
+          <div hlmCardContent class="p-3!">
+            <div class="flex items-center justify-between">
+              <p class="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider leading-none">{{ kpi.label }}</p>
+              <ng-icon
+                hlm
+                size="xs"
+                [name]="kpi.icon"
+                [class.text-emerald-600]="kpi.tone === 'positive'"
+                [class.text-amber-600]="kpi.tone === 'warning'"
+                [class.text-destructive]="kpi.tone === 'destructive'"
+                [class.text-muted-foreground]="kpi.tone === 'neutral'"
+              />
+            </div>
+            <p class="mt-2 text-xl font-semibold tabular-nums leading-none">{{ kpi.value }}</p>
+            <p class="text-muted-foreground mt-1.5 text-[10px]">{{ kpi.hint }}</p>
+          </div>
+        </section>
+      }
+    }
+  </section>
+
+  <!-- Filter bar -->
+  <section hlmCard>
+    <div hlmCardContent class="p-3! flex flex-wrap items-center gap-3">
+      <hlm-input-group class="min-w-40 flex-1">
+        <hlm-input-group-addon align="inline-start">
+          <ng-icon hlm size="sm" name="lucideSearch" />
+        </hlm-input-group-addon>
+        <input
+          hlmInputGroupInput
+          placeholder="Search by name, description, tag…"
+          [value]="searchQuery()"
+          (input)="onSearch($event)"
+        />
+      </hlm-input-group>
+
+      <hlm-toggle-group
+        type="single"
+        variant="outline"
+        size="sm"
+        [value]="statusFilter()"
+        (valueChange)="onStatusChange($event)"
+      >
+        <button hlmToggleGroupItem value="all">All</button>
+        <button hlmToggleGroupItem value="active">Active</button>
+        <button hlmToggleGroupItem value="draft">Drafts</button>
+        <button hlmToggleGroupItem value="disabled">Disabled</button>
+        <button hlmToggleGroupItem value="archived">Archived</button>
+      </hlm-toggle-group>
+
+      <hlm-combobox
+        class="w-60"
+        [value]="selectedOwner()"
+        (valueChange)="selectedOwner.set($event); page.set(1)"
+        [search]="ownerSearch()"
+        (searchChange)="ownerSearch.set($event)"
+        [itemToString]="ownerToString"
+        [isItemEqualToValue]="ownerEquals"
+      >
+        <hlm-combobox-trigger class="w-full">
+          <ng-icon hlm size="sm" name="lucideUsers" class="text-muted-foreground mr-1 shrink-0" />
+          <hlm-combobox-value>
+            <hlm-combobox-placeholder>All owners</hlm-combobox-placeholder>
+          </hlm-combobox-value>
+        </hlm-combobox-trigger>
+        <hlm-combobox-content *hlmComboboxPortal class="w-[var(--brn-popover-trigger-width)]!">
+          <hlm-combobox-input placeholder="Search owners…" />
+          <ul hlmComboboxList>
+            @for (owner of filteredOwners(); track owner.id) {
+              <hlm-combobox-item [value]="owner">
+                <span class="inline-flex items-center gap-2">
+                  <hlm-avatar size="sm">
+                    <span hlmAvatarFallback class="text-[10px]">{{ owner.initials }}</span>
+                  </hlm-avatar>
+                  {{ owner.name }}
+                </span>
+              </hlm-combobox-item>
+            }
+          </ul>
+        </hlm-combobox-content>
+      </hlm-combobox>
+
+      @if (searchQuery() || statusFilter() !== 'all' || selectedOwner()) {
+        <button hlmBtn variant="ghost" size="sm" (click)="clearFilters()">
+          <ng-icon hlm size="xs" name="lucideCircleX" />
+          Clear
+        </button>
+      }
+
+      <span class="text-muted-foreground ml-auto text-xs tabular-nums">
+        <span class="text-foreground font-medium">{{ filteredAgents().length }}</span>
+        / {{ totalAgentsCount }}
+      </span>
+    </div>
+  </section>
+
+  <!-- Bulk action bar -->
+  @if (selectedCount() > 0) {
+    <section
+      hlmCard
+      class="border-primary/30 bg-primary/5 animate-in fade-in-50 slide-in-from-top-1 duration-200 p-0"
+    >
+      <div hlmCardContent class="p-3! flex items-center gap-3">
+        <div class="flex items-center gap-2 text-sm">
+          <span class="bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-md text-[11px] font-semibold tabular-nums">
+            {{ selectedCount() }}
+          </span>
+          <span class="font-medium">{{ selectedCount() === 1 ? 'agent' : 'agents' }} selected</span>
+        </div>
+        <hlm-separator orientation="vertical" class="h-6" />
+        <button hlmBtn variant="outline" size="sm" (click)="bulkAction('run')">
+          <ng-icon hlm size="xs" name="lucidePlay" />
+          Run
+        </button>
+        <button hlmBtn variant="outline" size="sm" (click)="bulkAction('disable')">
+          <ng-icon hlm size="xs" name="lucidePause" />
+          Disable
+        </button>
+        <button hlmBtn variant="outline" size="sm" (click)="bulkAction('archive')">
+          <ng-icon hlm size="xs" name="lucideArchive" />
+          Archive
+        </button>
+        <button hlmBtn variant="outline" size="sm" (click)="bulkAction('delete')" class="text-destructive">
+          <ng-icon hlm size="xs" name="lucideTrash2" />
+          Delete
+        </button>
+        <button hlmBtn variant="ghost" size="sm" (click)="clearSelection()" class="ml-auto">
+          Clear
+        </button>
+      </div>
+    </section>
+  }
+
+  <!-- Table -->
+  <section hlmCard>
+    <div hlmCardContent class="p-0!">
+      @if (isLoading()) {
+        <div class="space-y-2 p-4">
+          @for (i of rowSkeletons; track i) {
+            <hlm-skeleton class="h-12 w-full" />
+          }
+        </div>
+      } @else if (paginatedAgents().length === 0) {
+        <div class="flex flex-col items-center justify-center gap-3 p-12 text-center">
+          <ng-icon hlm size="xl" name="lucideFolderSearch" class="text-muted-foreground" />
+          <div>
+            <p class="text-sm font-medium">No agents match</p>
+            <p class="text-muted-foreground mt-1 text-xs">Try clearing filters or searching for something else.</p>
+          </div>
+          <button hlmBtn variant="outline" size="sm" (click)="clearFilters()">Clear filters</button>
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table hlmTable class="text-xs">
+            <thead hlmTHead>
+              <tr hlmTr>
+                <th hlmTh class="w-10">
+                  <hlm-checkbox
+                    [checked]="allOnPageSelected()"
+                    [indeterminate]="someOnPageSelected() && !allOnPageSelected()"
+                    (checkedChange)="toggleSelectAll()"
+                    aria-label="Select all on page"
+                  />
+                </th>
+                <th hlmTh>
+                  <button type="button" class="hover:text-foreground -mx-1 inline-flex items-center gap-1 rounded px-1 transition-colors" (click)="toggleSort('name')">
+                    Agent
+                    <ng-icon hlm size="xs" name="lucideChevronsUpDown" [class.opacity-100]="sortKey() === 'name'" [class.opacity-40]="sortKey() !== 'name'" />
+                  </button>
+                </th>
+                <th hlmTh>Owner</th>
+                <th hlmTh>Status</th>
+                <th hlmTh>
+                  <button type="button" class="hover:text-foreground -mx-1 inline-flex items-center gap-1 rounded px-1 transition-colors" (click)="toggleSort('lastRun')">
+                    Last run
+                    <ng-icon hlm size="xs" name="lucideChevronsUpDown" [class.opacity-100]="sortKey() === 'lastRun'" [class.opacity-40]="sortKey() !== 'lastRun'" />
+                  </button>
+                </th>
+                <th hlmTh class="w-28">7-day trend</th>
+                <th hlmTh class="text-right">
+                  <button type="button" class="hover:text-foreground -mx-1 ml-auto inline-flex items-center gap-1 rounded px-1 transition-colors" (click)="toggleSort('runsToday')">
+                    Runs
+                    <ng-icon hlm size="xs" name="lucideChevronsUpDown" [class.opacity-100]="sortKey() === 'runsToday'" [class.opacity-40]="sortKey() !== 'runsToday'" />
+                  </button>
+                </th>
+                <th hlmTh class="text-right">
+                  <button type="button" class="hover:text-foreground -mx-1 ml-auto inline-flex items-center gap-1 rounded px-1 transition-colors" (click)="toggleSort('successRate')">
+                    Success
+                    <ng-icon hlm size="xs" name="lucideChevronsUpDown" [class.opacity-100]="sortKey() === 'successRate'" [class.opacity-40]="sortKey() !== 'successRate'" />
+                  </button>
+                </th>
+                <th hlmTh class="w-12"></th>
+              </tr>
+            </thead>
+            <tbody hlmTBody>
+              @for (agent of paginatedAgents(); track agent.id) {
+                <tr
+                  hlmTr
+                  [hlmContextMenuTrigger]="rowActions"
+                  (hlmContextMenuOpened)="setActiveAgent(agent)"
+                  (click)="openPreview(agent)"
+                  class="hover:bg-muted/40 group/row relative cursor-pointer transition-colors"
+                  [class.bg-primary/5]="isSelected(agent.id)"
+                >
+                  <td hlmTd (click)="$event.stopPropagation()">
+                    <hlm-checkbox
+                      [checked]="isSelected(agent.id)"
+                      (checkedChange)="toggleSelected(agent.id)"
+                      [attr.aria-label]="'Select ' + agent.name"
+                    />
+                  </td>
+                  <td hlmTd>
+                    <div class="flex items-center gap-3">
+                      <div class="bg-muted text-muted-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-md">
+                        <ng-icon hlm size="sm" [name]="agent.icon" />
+                      </div>
+                      <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                          <p class="text-foreground truncate font-medium">{{ agent.name }}</p>
+                          @if (needsAttention(agent)) {
+                            <ng-icon
+                              hlm
+                              size="xs"
+                              name="lucideCircleX"
+                              class="text-destructive shrink-0"
+                              [attr.title]="'Success rate below 90%'"
+                            />
+                          }
+                        </div>
+                        <p class="text-muted-foreground truncate text-[11px]">{{ agent.description }}</p>
+                        @if (agent.tags.length > 0) {
+                          <div class="mt-1 flex flex-wrap items-center gap-1">
+                            @for (tag of agent.tags; track tag) {
+                              <span hlmBadge variant="outline" class="h-4 px-1.5 text-[9px] font-medium uppercase tracking-wider">
+                                {{ tag }}
+                              </span>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  </td>
+                  <td hlmTd>
+                    <span class="inline-flex items-center gap-2">
+                      <hlm-avatar size="sm">
+                        <span hlmAvatarFallback class="text-[10px]">{{ agent.owner.initials }}</span>
+                      </hlm-avatar>
+                      <span class="text-[11px]">{{ agent.owner.name }}</span>
+                    </span>
+                  </td>
+                  <td hlmTd>
+                    <span class="inline-flex items-center gap-1.5">
+                      <ng-icon
+                        hlm
+                        size="xs"
+                        [name]="statusIcon(agent.status)"
+                        [class.text-emerald-600]="agent.status === 'active'"
+                        [class.text-amber-600]="agent.status === 'draft'"
+                        [class.text-destructive]="agent.status === 'disabled'"
+                        [class.text-muted-foreground]="agent.status === 'archived'"
+                      />
+                      <span hlmBadge [variant]="statusVariant(agent.status)" class="text-[10px] capitalize">{{ agent.status }}</span>
+                    </span>
+                  </td>
+                  <td hlmTd class="text-muted-foreground tabular-nums">{{ agent.lastRun }}</td>
+                  <td hlmTd>
+                    <svg viewBox="0 0 100 24" preserveAspectRatio="none" class="h-6 w-full overflow-visible">
+                      <path
+                        [attr.d]="sparkPath(agent.runsTrend)"
+                        fill="none"
+                        [attr.stroke]="agent.status === 'active' ? 'var(--primary)' : 'var(--muted-foreground)'"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-opacity="0.9"
+                        vector-effect="non-scaling-stroke"
+                      />
+                    </svg>
+                  </td>
+                  <td hlmTd class="text-right">
+                    <span class="font-mono text-[11px] tabular-nums">{{ agent.runsToday }}</span>
+                  </td>
+                  <td hlmTd class="text-right">
+                    @if (agent.successRate > 0) {
+                      <span
+                        class="font-mono text-[11px] font-medium tabular-nums"
+                        [class.text-emerald-600]="agent.successRate >= 95"
+                        [class.text-amber-600]="agent.successRate < 95 && agent.successRate >= 90"
+                        [class.text-destructive]="agent.successRate < 90"
+                      >
+                        {{ agent.successRate }}%
+                      </span>
+                    } @else {
+                      <span class="text-muted-foreground text-[11px]">-</span>
+                    }
+                  </td>
+                  <td hlmTd class="text-right" (click)="$event.stopPropagation()">
+                    <button
+                      hlmBtn
+                      variant="ghost"
+                      size="icon-sm"
+                      [hlmDropdownMenuTrigger]="rowActions"
+                      (click)="setActiveAgent(agent)"
+                      aria-label="Open actions"
+                    >
+                      <ng-icon hlm size="xs" name="lucideEllipsisVertical" />
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="flex flex-col gap-2 border-t p-3 sm:flex-row sm:items-center sm:justify-between">
+          <p class="text-muted-foreground text-xs">
+            Showing
+            <span class="text-foreground font-medium">{{ visibleRange().start }}-{{ visibleRange().end }}</span>
+            of
+            <span class="text-foreground font-medium">{{ visibleRange().total }}</span>
+          </p>
+          <nav class="flex items-center gap-1" aria-label="Pagination">
+            <button hlmBtn variant="outline" size="sm" (click)="goToPage(page() - 1)" [disabled]="page() === 1">
+              <ng-icon hlm size="xs" name="lucideChevronLeft" />
+              Previous
+            </button>
+            @for (n of pageNumbers(); track n) {
+              <button hlmBtn [variant]="n === page() ? 'default' : 'ghost'" size="sm" class="w-9 px-0" (click)="goToPage(n)">
+                {{ n }}
+              </button>
+            }
+            <button hlmBtn variant="outline" size="sm" (click)="goToPage(page() + 1)" [disabled]="page() === totalPages()">
+              Next
+              <ng-icon hlm size="xs" name="lucideChevronRight" />
+            </button>
+          </nav>
+        </div>
+      }
+    </div>
+  </section>
+</div>
+
+<!-- Per-row actions menu (shared by dropdown + context menu) -->
+<ng-template #rowActions>
+  @let agent = activeAgent();
+  @if (agent) {
+    <hlm-dropdown-menu class="w-56">
+      <hlm-dropdown-menu-label>
+        <div class="flex flex-col">
+          <span class="text-sm font-medium">{{ agent.name }}</span>
+          <span class="text-muted-foreground text-[11px]">{{ agent.id }}</span>
+        </div>
+      </hlm-dropdown-menu-label>
+      <hlm-dropdown-menu-separator />
+      <hlm-dropdown-menu-group>
+        <button hlmDropdownMenuItem (click)="runAgent(agent)">
+          <ng-icon hlm size="sm" name="lucidePlay" />
+          <span>Run now</span>
+        </button>
+        <a hlmDropdownMenuItem [routerLink]="['/agents', agent.id]">
+          <ng-icon hlm size="sm" name="lucideArrowRight" />
+          <span>Open detail</span>
+        </a>
+        <button hlmDropdownMenuItem (click)="editAgent(agent)">
+          <ng-icon hlm size="sm" name="lucidePencil" />
+          <span>Edit</span>
+        </button>
+        <button hlmDropdownMenuItem (click)="duplicateAgent(agent)">
+          <ng-icon hlm size="sm" name="lucideCopy" />
+          <span>Duplicate</span>
+        </button>
+      </hlm-dropdown-menu-group>
+      <hlm-dropdown-menu-separator />
+      <button hlmDropdownMenuItem (click)="toggleAgentEnabled(agent)">
+        <ng-icon hlm size="sm" [name]="agent.status === 'disabled' ? 'lucidePlay' : 'lucidePause'" />
+        <span>{{ agent.status === 'disabled' ? 'Enable' : 'Disable' }}</span>
+      </button>
+      <hlm-dropdown-menu-separator />
+      <button hlmDropdownMenuItem (click)="deleteAgent(agent)" class="text-destructive">
+        <ng-icon hlm size="sm" name="lucideTrash2" />
+        <span>Delete</span>
+      </button>
+    </hlm-dropdown-menu>
+  }
+</ng-template>
+
+<!-- New agent dialog - opened programmatically via #newAgentTrigger -->
+<hlm-dialog>
+  <button #newAgentTrigger hlmDialogTrigger class="hidden" aria-hidden="true">open new agent</button>
+  <hlm-dialog-content *hlmDialogPortal="let ctx" class="w-[min(620px,92vw)]!">
+    <hlm-dialog-header>
+      <div class="flex items-center gap-3">
+        <div class="bg-primary text-primary-foreground ring-primary/10 flex h-10 w-10 items-center justify-center rounded-lg ring-4">
+          <ng-icon hlm size="sm" name="lucideSparkles" />
+        </div>
+        <div>
+          <h3 hlmDialogTitle>Create new agent</h3>
+          <p hlmDialogDescription>Configure and deploy. You can change anything later.</p>
+        </div>
+      </div>
+    </hlm-dialog-header>
+
+    <form [formGroup]="newAgentForm" (ngSubmit)="submitNewAgent(ctx)" class="flex max-h-[60vh] flex-col gap-4 overflow-y-auto px-6 py-2">
+      <!-- Icon picker -->
+      <div hlmField>
+        <label hlmFieldLabel>Icon</label>
+        <div class="grid grid-cols-9 gap-1.5">
+          @for (icon of iconOptions; track icon) {
+            <button
+              type="button"
+              class="hover:bg-muted flex aspect-square items-center justify-center rounded-md border transition-all"
+              [class.border-primary]="newAgentForm.value.iconName === icon"
+              [class.bg-primary]="newAgentForm.value.iconName === icon"
+              [class.text-primary-foreground]="newAgentForm.value.iconName === icon"
+              [class.shadow-sm]="newAgentForm.value.iconName === icon"
+              (click)="newAgentForm.patchValue({ iconName: icon })"
+              [attr.aria-label]="'Pick icon ' + icon"
+            >
+              <ng-icon hlm size="sm" [name]="icon" />
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Name -->
+      <div hlmField>
+        <label hlmFieldLabel for="agent-name">Name</label>
+        <input hlmInput id="agent-name" formControlName="name" placeholder="e.g. Lead Scorer v2" />
+        @if (nameCtrl.invalid && nameCtrl.touched) {
+          @if (nameCtrl.hasError('required')) {
+            <p hlmFieldError>Name is required.</p>
+          } @else if (nameCtrl.hasError('minlength')) {
+            <p hlmFieldError>At least 3 characters.</p>
+          }
+        }
+      </div>
+
+      <!-- Description -->
+      <div hlmField>
+        <label hlmFieldLabel for="agent-desc">Description</label>
+        <textarea
+          hlmTextarea
+          id="agent-desc"
+          formControlName="description"
+          rows="3"
+          placeholder="What does this agent do? Who is it for?"
+        ></textarea>
+        <p hlmFieldDescription>Keep it descriptive - teammates scan this in lists.</p>
+        @if (descCtrl.invalid && descCtrl.touched) {
+          @if (descCtrl.hasError('required')) {
+            <p hlmFieldError>Description is required.</p>
+          } @else if (descCtrl.hasError('minlength')) {
+            <p hlmFieldError>At least 10 characters.</p>
+          }
+        }
+      </div>
+
+      <!-- Category + Owner -->
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div hlmField>
+          <label hlmFieldLabel>Category</label>
+          <hlm-select formControlName="category" class="w-full">
+            <hlm-select-trigger class="w-full">
+              <hlm-select-value placeholder="Select category" />
+            </hlm-select-trigger>
+            <hlm-select-content *hlmSelectPortal>
+              @for (cat of categories; track cat) {
+                <hlm-select-item [value]="cat">{{ cat }}</hlm-select-item>
+              }
+            </hlm-select-content>
+          </hlm-select>
+        </div>
+        <div hlmField>
+          <label hlmFieldLabel>Owner</label>
+          <hlm-select formControlName="ownerId" class="w-full">
+            <hlm-select-trigger class="w-full">
+              <hlm-select-value placeholder="Select owner" />
+            </hlm-select-trigger>
+            <hlm-select-content *hlmSelectPortal>
+              @for (owner of ownerOptions; track owner.id) {
+                <hlm-select-item [value]="owner.id">
+                  <span class="inline-flex items-center gap-2">
+                    <hlm-avatar size="sm">
+                      <span hlmAvatarFallback class="text-[10px]">{{ owner.initials }}</span>
+                    </hlm-avatar>
+                    {{ owner.name }}
+                  </span>
+                </hlm-select-item>
+              }
+            </hlm-select-content>
+          </hlm-select>
+        </div>
+      </div>
+
+      <!-- Status toggle group -->
+      <div hlmField>
+        <label hlmFieldLabel>Initial status</label>
+        <hlm-toggle-group type="single" variant="outline" size="sm" formControlName="status">
+          <button hlmToggleGroupItem value="draft">
+            <ng-icon hlm size="xs" name="lucideCircleDashed" />
+            Draft
+          </button>
+          <button hlmToggleGroupItem value="active">
+            <ng-icon hlm size="xs" name="lucideCircleCheck" />
+            Active
+          </button>
+        </hlm-toggle-group>
+        <p hlmFieldDescription>Active agents can be triggered immediately. Drafts wait on review.</p>
+      </div>
+
+      <!-- Enabled switch -->
+      <div class="bg-muted/30 flex items-center justify-between rounded-md border p-3">
+        <div>
+          <p class="text-sm font-medium">Enabled</p>
+          <p class="text-muted-foreground mt-0.5 text-xs">Allow scheduled runs to fire automatically.</p>
+        </div>
+        <hlm-switch formControlName="enabled" />
+      </div>
+    </form>
+
+    <hlm-dialog-footer>
+      <button hlmBtn variant="outline" (click)="ctx.close()">Cancel</button>
+      <button hlmBtn type="button" (click)="submitNewAgent(ctx)" [disabled]="newAgentForm.invalid">
+        <ng-icon hlm size="sm" name="lucideSparkles" />
+        Create agent
+      </button>
+    </hlm-dialog-footer>
+  </hlm-dialog-content>
+</hlm-dialog>
+
+<!-- Quick preview sheet (right side) - opened programmatically via #previewTrigger -->
+<hlm-sheet>
+  <button #previewTrigger hlmSheetTrigger class="hidden" aria-hidden="true">open preview</button>
+  <hlm-sheet-content *hlmSheetPortal class="w-[min(420px,90vw)]!">
+    @let agent = previewAgent();
+    @if (agent) {
+      <hlm-sheet-header>
+        <div class="flex items-center gap-3">
+          <div class="bg-muted text-muted-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-md">
+            <ng-icon hlm size="base" [name]="agent.icon" />
+          </div>
+          <div class="min-w-0">
+            <h3 hlmSheetTitle class="truncate text-base">{{ agent.name }}</h3>
+            <p hlmSheetDescription class="truncate text-xs">{{ agent.id }} · {{ agent.category }}</p>
+          </div>
+        </div>
+      </hlm-sheet-header>
+
+      <div class="flex flex-col gap-4 px-6 py-4">
+        <!-- Description -->
+        <p class="text-sm">{{ agent.description }}</p>
+
+        <!-- Status + Owner -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <p class="text-muted-foreground mb-1 text-[10px] font-semibold uppercase tracking-wider">Status</p>
+            <span hlmBadge [variant]="statusVariant(agent.status)" class="capitalize">
+              <ng-icon hlm size="xs" [name]="statusIcon(agent.status)" class="mr-1" />
+              {{ agent.status }}
+            </span>
+          </div>
+          <div>
+            <p class="text-muted-foreground mb-1 text-[10px] font-semibold uppercase tracking-wider">Owner</p>
+            <div class="inline-flex items-center gap-2">
+              <hlm-avatar size="sm">
+                <span hlmAvatarFallback class="text-[10px]">{{ agent.owner.initials }}</span>
+              </hlm-avatar>
+              <span class="text-sm font-medium">{{ agent.owner.name }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="grid grid-cols-3 gap-2 rounded-md border p-3">
+          <div class="text-center">
+            <p class="text-muted-foreground text-[9px] font-semibold uppercase tracking-wider">Runs today</p>
+            <p class="mt-1 font-mono text-base font-semibold tabular-nums">{{ agent.runsToday }}</p>
+          </div>
+          <div class="border-x text-center">
+            <p class="text-muted-foreground text-[9px] font-semibold uppercase tracking-wider">Success</p>
+            <p
+              class="mt-1 font-mono text-base font-semibold tabular-nums"
+              [class.text-emerald-600]="agent.successRate >= 95"
+              [class.text-amber-600]="agent.successRate < 95 && agent.successRate >= 90"
+              [class.text-destructive]="agent.successRate < 90 && agent.successRate > 0"
+            >
+              {{ agent.successRate > 0 ? agent.successRate + '%' : '-' }}
+            </p>
+          </div>
+          <div class="text-center">
+            <p class="text-muted-foreground text-[9px] font-semibold uppercase tracking-wider">Cost</p>
+            <p class="mt-1 font-mono text-base font-semibold tabular-nums">${{ agent.costToday.toFixed(2) }}</p>
+          </div>
+        </div>
+
+        <!-- 7-day chart -->
+        <div>
+          <p class="text-muted-foreground mb-2 text-[10px] font-semibold uppercase tracking-wider">7-day runs</p>
+          <svg viewBox="0 0 100 28" preserveAspectRatio="none" class="h-12 w-full overflow-visible">
+            <path
+              [attr.d]="sparkPath(agent.runsTrend)"
+              fill="none"
+              stroke="var(--primary)"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              vector-effect="non-scaling-stroke"
+            />
+          </svg>
+        </div>
+
+        <!-- Tags -->
+        @if (agent.tags.length > 0) {
+          <div>
+            <p class="text-muted-foreground mb-2 text-[10px] font-semibold uppercase tracking-wider">Tags</p>
+            <div class="flex flex-wrap gap-1.5">
+              @for (tag of agent.tags; track tag) {
+                <span hlmBadge variant="outline" class="text-[10px] capitalize">{{ tag }}</span>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Meta -->
+        <hlm-separator />
+        <div class="grid grid-cols-2 gap-3 text-xs">
+          <div>
+            <p class="text-muted-foreground text-[10px]">Last run</p>
+            <p class="font-medium">{{ agent.lastRun }}</p>
+          </div>
+          <div>
+            <p class="text-muted-foreground text-[10px]">Created</p>
+            <p class="font-medium">{{ agent.created }}</p>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="mt-2 flex flex-col gap-2">
+          <button hlmBtn class="w-full" (click)="runAgent(agent)">
+            <ng-icon hlm size="sm" name="lucidePlay" />
+            Run now
+          </button>
+          <a hlmBtn variant="outline" class="w-full" [routerLink]="['/agents', agent.id]">
+            <ng-icon hlm size="sm" name="lucideArrowRight" />
+            Open full detail
+          </a>
+        </div>
+      </div>
+    }
+  </hlm-sheet-content>
+</hlm-sheet>

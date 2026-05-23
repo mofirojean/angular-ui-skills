@@ -13,6 +13,11 @@ export const routes: Routes = [
     title: 'Agents · Mission Control',
   },
   {
+    path: 'agents/:id',
+    loadComponent: () => import('./pages/agents/agent-detail/agent-detail').then((m) => m.AgentDetail),
+    title: 'Agent detail · Mission Control',
+  },
+  {
     path: 'runs',
     loadComponent: () => import('./pages/runs/runs').then((m) => m.Runs),
     title: 'Runs · Mission Control',
