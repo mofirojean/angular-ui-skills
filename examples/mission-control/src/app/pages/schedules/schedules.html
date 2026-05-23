@@ -4,7 +4,7 @@
     class="animate-in fade-in-50 slide-in-from-top-2 bg-card relative overflow-hidden rounded-lg border duration-500"
   >
     <div class="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/20 blur-3xl"></div>
-    <div class="pointer-events-none absolute -bottom-16 -left-12 h-40 w-40 rounded-full bg-sky-500/10 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-16 -left-12 h-40 w-40 rounded-full bg-emerald-500/10 blur-3xl"></div>
 
     <div class="relative flex flex-wrap items-center justify-between gap-4 p-5">
       <div class="flex items-center gap-4">
@@ -16,26 +16,24 @@
             <h1 class="text-2xl font-semibold leading-none tracking-tight">Schedules</h1>
             <span hlmBadge variant="outline" class="gap-1.5">
               <span class="relative flex h-2 w-2">
-                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-500 opacity-75"></span>
-                <span class="relative inline-flex h-2 w-2 rounded-full bg-sky-500"></span>
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75"></span>
+                <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
               </span>
               {{ kpis()[0].value }} active
             </span>
           </div>
-          <p class="text-muted-foreground mt-1.5 text-sm">When agents run on their own. New schedule to add one.</p>
+          <p class="text-muted-foreground mt-1.5 text-sm">{{ todayLabel() }} · {{ todayTotalRuns() }} runs scheduled today</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
-        <a hlmBtn variant="outline" size="sm" routerLink="/runs">
-          <ng-icon hlm size="xs" name="lucidePlay" />
-          Recent runs
-        </a>
-        <button hlmBtn size="sm" (click)="openNewScheduleDialog()" class="shadow-primary/20 shadow-md">
-          <ng-icon hlm size="xs" name="lucidePlus" />
-          New schedule
-        </button>
-      </div>
+      <button
+        hlmBtn
+        (click)="openNewScheduleDialog()"
+        class="shadow-primary/20 hover:shadow-primary/30 group shadow-lg transition-shadow hover:shadow-xl"
+      >
+        <ng-icon hlm size="sm" name="lucidePlus" class="transition-transform group-hover:rotate-90" />
+        New schedule
+      </button>
     </div>
   </header>
 
@@ -46,13 +44,13 @@
         <section hlmCard>
           <div hlmCardContent class="p-3!">
             <hlm-skeleton class="h-3 w-16" />
-            <hlm-skeleton class="mt-2 h-6 w-20" />
+            <hlm-skeleton class="mt-2 h-5 w-12" />
           </div>
         </section>
       }
     } @else {
       @for (kpi of kpis(); track kpi.label) {
-        <section hlmCard>
+        <section hlmCard class="transition-shadow hover:shadow-sm">
           <div hlmCardContent class="p-3!">
             <div class="flex items-center justify-between">
               <p class="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider leading-none">{{ kpi.label }}</p>
@@ -72,162 +70,379 @@
     }
   </section>
 
-  <!-- Calendar + Upcoming -->
-  <section class="grid gap-3 lg:grid-cols-3">
-    <!-- Calendar card -->
-    <section hlmCard class="lg:col-span-1">
-      <div hlmCardHeader class="p-4! pb-2!">
-        <h2 hlmCardTitle class="text-sm">Calendar</h2>
-        <p hlmCardDescription class="text-xs">Scheduled days are highlighted.</p>
-      </div>
-      <div hlmCardContent class="p-4! pt-0! flex justify-center">
-        @if (isLoading()) {
-          <hlm-skeleton class="h-72 w-full" />
-        } @else {
-          <hlm-calendar
-            [date]="selectedDate()"
-            (dateChange)="selectedDate.set($event)"
-            [highlightDays]="highlightedDays"
-          />
-        }
-      </div>
-    </section>
-
-    <!-- Upcoming list -->
-    <section hlmCard class="lg:col-span-2">
-      <div hlmCardHeader class="p-4! pb-2! flex items-center justify-between">
+  <!-- HERO: Today timeline (3/4) + Next up (1/4) -->
+  <section class="grid gap-3 lg:grid-cols-4">
+    <!-- Swimlane timeline -->
+    <section hlmCard class="lg:col-span-3">
+      <div hlmCardHeader class="flex items-center justify-between p-4! pb-2!">
         <div>
-          <h2 hlmCardTitle class="text-sm">Upcoming</h2>
-          <p hlmCardDescription class="text-xs">Next 8 runs across all active schedules.</p>
+          <h2 hlmCardTitle class="text-base">Today's timeline</h2>
+          <p hlmCardDescription class="text-xs">
+            Each row is one schedule. Dots mark its run times across the day.
+          </p>
         </div>
-        <span hlmBadge variant="outline" class="text-[10px]">
+        <span hlmBadge variant="outline" class="gap-1 text-[10px]">
           <ng-icon hlm size="xs" name="lucideClock" />
-          Sorted by next run
+          {{ todayTotalRuns() }} runs
         </span>
       </div>
-      <div hlmCardContent class="p-4! pt-0!">
+      <div hlmCardContent class="p-4! pt-1!">
         @if (isLoading()) {
           <div class="space-y-2">
             @for (i of skeletonRows; track i) {
-              <hlm-skeleton class="h-14 w-full" />
+              <hlm-skeleton class="h-7 w-full" />
             }
           </div>
-        } @else if (upcomingSchedules().length === 0) {
-          <p class="text-muted-foreground py-8 text-center text-sm">No active schedules yet.</p>
+        } @else if (swimlaneRows().length === 0) {
+          <div class="text-muted-foreground py-8 text-center text-sm">
+            No schedules running today.
+          </div>
         } @else {
-          <ul class="flex flex-col gap-2">
-            @for (s of upcomingSchedules(); track s.id) {
-              <li class="hover:bg-muted/40 group flex items-center gap-3 rounded-md border p-3 transition-colors">
-                <div class="bg-muted text-muted-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-md">
-                  <ng-icon hlm size="sm" [name]="s.agent.icon" />
-                </div>
-                <div class="min-w-0 flex-1">
-                  <div class="flex items-center gap-2">
-                    <p class="truncate text-sm font-medium">{{ s.name }}</p>
-                    <span hlmBadge variant="outline" class="gap-1 text-[10px]">
-                      <ng-icon hlm size="xs" [name]="frequencyIcon(s.frequency)" />
-                      {{ s.humanReadable }}
-                    </span>
+          <!-- Hour-tick axis -->
+          <div class="relative ml-44 h-5 border-b">
+            @for (h of hourTicks; track h) {
+              <div
+                class="text-muted-foreground absolute -bottom-1 -translate-x-1/2 text-[10px] tabular-nums"
+                [style.left.%]="(h / 24) * 100"
+              >
+                {{ h }}:00
+              </div>
+            }
+            <!-- Now line label -->
+            <div
+              class="text-amber-600 absolute -top-0.5 -translate-x-1/2 text-[10px] font-semibold tabular-nums"
+              [style.left.%]="nowPercent()"
+            >
+              NOW
+            </div>
+          </div>
+
+          <!-- Swimlane rows -->
+          <ol class="space-y-1 pt-1">
+            @for (row of swimlaneRows(); track row.schedule.id) {
+              <li class="group hover:bg-muted/30 flex items-center gap-3 rounded-md py-1 pl-2 pr-3 transition-colors">
+                <!-- Agent label -->
+                <a
+                  [routerLink]="['/agents', row.schedule.agent.id]"
+                  class="flex w-40 shrink-0 items-center gap-2 overflow-hidden"
+                >
+                  <div class="bg-muted text-muted-foreground flex h-6 w-6 shrink-0 items-center justify-center rounded">
+                    <ng-icon hlm size="xs" [name]="row.schedule.agent.icon" />
                   </div>
-                  <p class="text-muted-foreground mt-0.5 truncate text-[11px]">
-                    <span class="font-mono">{{ s.cron }}</span>
-                    <span> · {{ s.agent.name }}</span>
-                  </p>
+                  <div class="min-w-0">
+                    <p class="truncate text-xs font-medium leading-tight">{{ row.schedule.name }}</p>
+                    <p class="text-muted-foreground truncate text-[10px] leading-tight">{{ row.schedule.humanReadable }}</p>
+                  </div>
+                </a>
+
+                <!-- Timeline track -->
+                <div class="border-border/60 relative h-7 flex-1 rounded-sm border-l border-r">
+                  <!-- Inner subtle hour gridlines -->
+                  @for (h of hourTicks; track h) {
+                    <span
+                      class="bg-border/40 absolute inset-y-0 w-px"
+                      [style.left.%]="(h / 24) * 100"
+                    ></span>
+                  }
+                  <!-- Now indicator line -->
+                  <span
+                    class="bg-amber-500 absolute inset-y-0 w-0.5 z-10"
+                    [style.left.%]="nowPercent()"
+                  ></span>
+                  <!-- Run markers -->
+                  @for (run of row.runs; track run.leftPercent) {
+                    <span
+                      class="bg-primary absolute top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full transition-transform group-hover:scale-125"
+                      [style.left.%]="run.leftPercent"
+                      [attr.title]="run.label"
+                    ></span>
+                  }
                 </div>
-                <div class="text-right">
-                  <p class="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Next</p>
-                  <p class="font-mono text-xs tabular-nums">{{ s.nextRun }}</p>
-                </div>
+
+                <!-- Run count -->
+                <span class="text-muted-foreground w-12 shrink-0 text-right font-mono text-[11px] tabular-nums">
+                  {{ row.runCount }}/d
+                </span>
+
+                <!-- Actions menu -->
                 <button
                   hlmBtn
                   variant="ghost"
                   size="icon-sm"
-                  [hlmDropdownMenuTrigger]="scheduleMenu"
-                  (click)="selectedScheduleForMenu = s"
+                  [hlmDropdownMenuTrigger]="rowMenu"
                   aria-label="Schedule actions"
+                  class="opacity-0 transition-opacity group-hover:opacity-100"
                 >
                   <ng-icon hlm size="xs" name="lucideEllipsisVertical" />
                 </button>
+
+                <ng-template #rowMenu>
+                  <hlm-dropdown-menu class="w-44">
+                    <button hlmDropdownMenuItem (click)="runNow(row.schedule)">
+                      <ng-icon hlm size="sm" name="lucidePlay" />
+                      <span>Run now</span>
+                    </button>
+                    <button hlmDropdownMenuItem (click)="toggleStatus(row.schedule.id)">
+                      <ng-icon hlm size="sm" name="lucidePause" />
+                      <span>Pause</span>
+                    </button>
+                    <a hlmDropdownMenuItem [routerLink]="['/agents', row.schedule.agent.id]">
+                      <ng-icon hlm size="sm" name="lucideBot" />
+                      <span>View agent</span>
+                    </a>
+                    <hlm-dropdown-menu-separator />
+                    <button hlmDropdownMenuItem (click)="deleteSchedule(row.schedule)" class="text-destructive">
+                      <ng-icon hlm size="sm" name="lucideTrash2" />
+                      <span>Delete</span>
+                    </button>
+                  </hlm-dropdown-menu>
+                </ng-template>
               </li>
             }
-          </ul>
+          </ol>
+        }
+      </div>
+    </section>
+
+    <!-- Next up countdown cards -->
+    <section hlmCard class="lg:col-span-1">
+      <div hlmCardHeader class="flex items-center justify-between p-4! pb-2!">
+        <div>
+          <h2 hlmCardTitle class="text-base">Next up</h2>
+          <p hlmCardDescription class="text-xs">Imminent runs.</p>
+        </div>
+        <span class="inline-flex items-center gap-1.5 text-[10px]">
+          <span class="relative flex h-2 w-2">
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75"></span>
+            <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+          </span>
+          <span class="text-emerald-600 font-medium">Live</span>
+        </span>
+      </div>
+      <div hlmCardContent class="p-4! pt-2!">
+        @if (isLoading()) {
+          <div class="space-y-2">
+            @for (i of [0,1,2]; track i) {
+              <hlm-skeleton class="h-20 w-full" />
+            }
+          </div>
+        } @else {
+          <ol class="space-y-2">
+            @for (s of nextUp(); track s.id; let idx = $index) {
+              <li
+                class="group bg-card relative overflow-hidden rounded-md border p-3 transition-all hover:shadow-md"
+                [class.border-amber-500/40]="idx === 0"
+                [class.bg-amber-500/5]="idx === 0"
+              >
+                @if (idx === 0) {
+                  <div class="pointer-events-none absolute -right-6 -top-6 h-16 w-16 rounded-full bg-amber-500/20 blur-2xl"></div>
+                }
+                <div class="relative flex items-start gap-2">
+                  <div class="bg-muted text-muted-foreground flex h-7 w-7 shrink-0 items-center justify-center rounded">
+                    <ng-icon hlm size="xs" [name]="s.agent.icon" />
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <p class="truncate text-xs font-semibold leading-tight">{{ s.name }}</p>
+                    <p class="text-muted-foreground truncate text-[10px] leading-tight">{{ s.agent.name }}</p>
+                  </div>
+                </div>
+                <div class="mt-2 flex items-baseline justify-between">
+                  <span
+                    class="font-mono text-lg font-semibold tabular-nums leading-none"
+                    [class.text-amber-600]="idx === 0"
+                  >
+                    {{ formatCountdown(s.nextRunMinutes) }}
+                  </span>
+                  <span class="text-muted-foreground font-mono text-[10px] tabular-nums">{{ s.cron }}</span>
+                </div>
+              </li>
+            }
+          </ol>
         }
       </div>
     </section>
   </section>
 
-  <!-- Paused schedules -->
-  @if (pausedSchedules().length > 0) {
-    <section hlmCard>
-      <div hlmCardHeader class="p-4! pb-2!">
-        <h2 hlmCardTitle class="text-sm flex items-center gap-2">
-          <ng-icon hlm size="sm" name="lucidePause" class="text-amber-600" />
-          Paused schedules
-        </h2>
-        <p hlmCardDescription class="text-xs">These exist but won't trigger until resumed.</p>
+  <!-- 14-day density heatmap -->
+  <section hlmCard>
+    <div hlmCardHeader class="flex items-center justify-between p-4! pb-2!">
+      <div>
+        <h2 hlmCardTitle class="text-base">Next 14 days</h2>
+        <p hlmCardDescription class="text-xs">
+          Color intensity = runs scheduled that day. Hover for details.
+        </p>
       </div>
-      <div hlmCardContent class="p-4! pt-0!">
-        <ul class="flex flex-col gap-2">
-          @for (s of pausedSchedules(); track s.id) {
-            <li class="flex items-center gap-3 rounded-md border p-3 opacity-75">
-              <div class="bg-muted text-muted-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-md">
-                <ng-icon hlm size="sm" [name]="s.agent.icon" />
+      @if (heatmapPeak(); as peak) {
+        <span hlmBadge variant="outline" class="text-[10px]">
+          Peak: {{ peak.runCount }} runs on {{ formatHeatmapDate(peak.date) }}
+        </span>
+      }
+    </div>
+    <div hlmCardContent class="p-4! pt-2!">
+      @if (isLoading()) {
+        <hlm-skeleton class="h-20 w-full" />
+      } @else {
+        <div class="grid grid-cols-7 gap-1.5 sm:grid-cols-14 lg:grid-cols-14">
+          @for (day of heatmapDays(); track day.date.getTime()) {
+            <hlm-hover-card>
+              <button
+                hlmHoverCardTrigger
+                type="button"
+                class="group relative flex aspect-square w-10 flex-col items-center justify-center rounded-full transition-all hover:scale-110"
+                [class]="heatmapClass(day.intensity)"
+              >
+                <span
+                  class="text-[10px] font-semibold uppercase leading-none"
+                  [class.text-primary-foreground]="day.intensity >= 3"
+                  [class.text-muted-foreground]="day.intensity <= 1"
+                >
+                  {{ day.weekday }}
+                </span>
+                <span
+                  class="mt-0.5 font-mono text-sm font-bold tabular-nums leading-none"
+                  [class.text-primary-foreground]="day.intensity >= 3"
+                  [class.text-foreground]="day.intensity <= 2"
+                >
+                  {{ day.day }}
+                </span>
+                @if (day.isToday) {
+                  <span class="ring-amber-500 absolute inset-0 rounded-full ring-2 ring-offset-1 ring-offset-background"></span>
+                }
+              </button>
+              <hlm-hover-card-content *hlmHoverCardPortal class="w-72 p-0!">
+                <header class="border-b p-3">
+                  <p class="text-sm font-semibold leading-tight">{{ formatHeatmapDate(day.date) }}</p>
+                  <p class="text-muted-foreground text-[11px] leading-tight">
+                    <span class="text-foreground font-medium">{{ day.scheduleCount }}</span>
+                    schedule{{ day.scheduleCount === 1 ? '' : 's' }} ·
+                    <span class="text-foreground font-medium">{{ day.runCount }}</span>
+                    total runs
+                  </p>
+                </header>
+                @if (day.schedules.length === 0) {
+                  <p class="text-muted-foreground p-4 text-center text-xs">Nothing scheduled.</p>
+                } @else {
+                  <ul class="max-h-64 overflow-y-auto p-2">
+                    @for (s of day.schedules; track s.id) {
+                      <li class="hover:bg-muted/50 flex items-center gap-2 rounded-md p-1.5 transition-colors">
+                        <div class="bg-muted text-muted-foreground flex h-6 w-6 shrink-0 items-center justify-center rounded">
+                          <ng-icon hlm size="xs" [name]="s.agent.icon" />
+                        </div>
+                        <div class="min-w-0 flex-1">
+                          <p class="truncate text-xs font-medium leading-tight">{{ s.name }}</p>
+                          <p class="text-muted-foreground truncate text-[10px] leading-tight">{{ s.humanReadable }}</p>
+                        </div>
+                      </li>
+                    }
+                  </ul>
+                }
+              </hlm-hover-card-content>
+            </hlm-hover-card>
+          }
+        </div>
+
+        <!-- Intensity legend -->
+        <div class="text-muted-foreground mt-3 flex items-center justify-end gap-1.5 text-[10px]">
+          <span>Less</span>
+          <span class="bg-muted/40 h-3 w-3 rounded-sm"></span>
+          <span class="bg-primary/20 h-3 w-3 rounded-sm"></span>
+          <span class="bg-primary/40 h-3 w-3 rounded-sm"></span>
+          <span class="bg-primary/70 h-3 w-3 rounded-sm"></span>
+          <span class="bg-primary h-3 w-3 rounded-sm"></span>
+          <span>More</span>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- All schedules — compact list -->
+  <section hlmCard>
+    <div hlmCardHeader class="p-4! pb-2!">
+      <h2 hlmCardTitle class="text-base">All schedules</h2>
+      <p hlmCardDescription class="text-xs">Active first, paused at the bottom.</p>
+    </div>
+    <div hlmCardContent class="p-2! pt-0!">
+      @if (isLoading()) {
+        <div class="space-y-1 p-2">
+          @for (i of skeletonRows; track i) {
+            <hlm-skeleton class="h-10 w-full" />
+          }
+        </div>
+      } @else {
+        <ul class="space-y-0.5">
+          @for (s of allSchedules(); track s.id) {
+            <li
+              class="group hover:bg-muted/30 flex items-center gap-3 rounded-md p-2 transition-colors"
+              [class.opacity-60]="s.status === 'paused'"
+            >
+              <div class="bg-muted text-muted-foreground flex h-7 w-7 shrink-0 items-center justify-center rounded">
+                <ng-icon hlm size="xs" [name]="s.agent.icon" />
               </div>
               <div class="min-w-0 flex-1">
-                <p class="truncate text-sm font-medium">{{ s.name }}</p>
-                <p class="text-muted-foreground truncate text-[11px]">{{ s.humanReadable }} · {{ s.agent.name }}</p>
+                <p class="truncate text-sm font-medium leading-tight">{{ s.name }}</p>
+                <p class="text-muted-foreground truncate text-[11px] leading-tight">
+                  <ng-icon hlm size="xs" [name]="frequencyIcon(s.frequency)" class="-mt-0.5 mr-1 inline" />
+                  {{ s.humanReadable }} · {{ s.agent.name }}
+                </p>
               </div>
-              <button hlmBtn variant="outline" size="sm" (click)="toggleStatus(s.id)">
-                <ng-icon hlm size="xs" name="lucidePlay" />
-                Resume
+              <span class="text-muted-foreground hidden font-mono text-[10px] tabular-nums sm:inline">{{ s.cron }}</span>
+              <div class="text-right">
+                <p class="text-[11px] font-medium leading-tight" [class.text-amber-600]="s.status === 'active'">
+                  {{ s.status === 'active' ? s.nextRun : 'Paused' }}
+                </p>
+                <p class="text-muted-foreground text-[10px] leading-tight">{{ s.successRate }}%</p>
+              </div>
+              <button
+                hlmBtn
+                variant="ghost"
+                size="icon-sm"
+                [hlmDropdownMenuTrigger]="listMenu"
+                aria-label="Schedule actions"
+              >
+                <ng-icon hlm size="xs" name="lucideEllipsisVertical" />
               </button>
+
+              <ng-template #listMenu>
+                <hlm-dropdown-menu class="w-44">
+                  <button hlmDropdownMenuItem (click)="runNow(s)">
+                    <ng-icon hlm size="sm" name="lucidePlay" />
+                    <span>Run now</span>
+                  </button>
+                  <button hlmDropdownMenuItem (click)="toggleStatus(s.id)">
+                    <ng-icon hlm size="sm" [name]="s.status === 'paused' ? 'lucidePlay' : 'lucidePause'" />
+                    <span>{{ s.status === 'paused' ? 'Resume' : 'Pause' }}</span>
+                  </button>
+                  <a hlmDropdownMenuItem [routerLink]="['/agents', s.agent.id]">
+                    <ng-icon hlm size="sm" name="lucideBot" />
+                    <span>View agent</span>
+                  </a>
+                  <hlm-dropdown-menu-separator />
+                  <button hlmDropdownMenuItem (click)="deleteSchedule(s)" class="text-destructive">
+                    <ng-icon hlm size="sm" name="lucideTrash2" />
+                    <span>Delete</span>
+                  </button>
+                </hlm-dropdown-menu>
+              </ng-template>
             </li>
           }
         </ul>
-      </div>
-    </section>
-  }
+      }
+    </div>
+  </section>
 </div>
-
-<!-- Per-row schedule actions menu -->
-<ng-template #scheduleMenu>
-  @if (selectedScheduleForMenu; as s) {
-    <hlm-dropdown-menu class="w-48">
-      <hlm-dropdown-menu-label>{{ s.name }}</hlm-dropdown-menu-label>
-      <hlm-dropdown-menu-separator />
-      <button hlmDropdownMenuItem (click)="runNow(s)">
-        <ng-icon hlm size="sm" name="lucidePlay" />
-        Run now
-      </button>
-      <button hlmDropdownMenuItem (click)="toggleStatus(s.id)">
-        <ng-icon hlm size="sm" [name]="s.status === 'active' ? 'lucidePause' : 'lucidePlay'" />
-        {{ s.status === 'active' ? 'Pause' : 'Resume' }}
-      </button>
-      <a hlmDropdownMenuItem [routerLink]="['/agents', s.agent.id]">
-        <ng-icon hlm size="sm" name="lucideBot" />
-        View agent
-      </a>
-      <hlm-dropdown-menu-separator />
-      <button hlmDropdownMenuItem (click)="deleteSchedule(s)" class="text-destructive">
-        <ng-icon hlm size="sm" name="lucideTrash2" />
-        Delete
-      </button>
-    </hlm-dropdown-menu>
-  }
-</ng-template>
 
 <!-- New schedule dialog -->
 <hlm-dialog>
-  <button #newScheduleTrigger hlmDialogTrigger class="hidden" aria-hidden="true">open new schedule</button>
+  <button #newScheduleTrigger hlmDialogTrigger class="hidden" aria-hidden="true">open</button>
   <hlm-dialog-content *hlmDialogPortal="let ctx" class="w-[min(560px,92vw)]!">
     <hlm-dialog-header>
       <div class="flex items-center gap-3">
-        <div class="bg-primary text-primary-foreground ring-primary/10 flex h-10 w-10 items-center justify-center rounded-lg ring-4">
-          <ng-icon hlm size="sm" name="lucideCalendar" />
+        <div class="bg-primary text-primary-foreground flex h-10 w-10 items-center justify-center rounded-lg">
+          <ng-icon hlm size="sm" name="lucideCalendarDays" />
         </div>
         <div>
-          <h3 hlmDialogTitle>New schedule</h3>
-          <p hlmDialogDescription>Pick an agent and when it should run.</p>
+          <h3 hlmDialogTitle>Create schedule</h3>
+          <p hlmDialogDescription>Run an agent on a recurring cadence.</p>
         </div>
       </div>
     </hlm-dialog-header>
@@ -235,7 +450,7 @@
     <form [formGroup]="newScheduleForm" (ngSubmit)="submitNewSchedule(ctx)" class="flex flex-col gap-4 px-6 py-2">
       <div hlmField>
         <label hlmFieldLabel for="sch-name">Name</label>
-        <input hlmInput id="sch-name" formControlName="name" placeholder="e.g. Nightly data sync" />
+        <input hlmInput id="sch-name" formControlName="name" placeholder="Nightly data sync" />
         @if (nameCtrl.invalid && nameCtrl.touched) {
           <p hlmFieldError>Name is required (min 3 chars).</p>
         }
@@ -243,7 +458,7 @@
 
       <div hlmField>
         <label hlmFieldLabel>Agent</label>
-        <hlm-select formControlName="agentId" class="w-full">
+        <hlm-select formControlName="agentId">
           <hlm-select-trigger class="w-full">
             <hlm-select-value placeholder="Pick an agent" />
           </hlm-select-trigger>
@@ -258,60 +473,61 @@
       <div hlmField>
         <label hlmFieldLabel>Frequency</label>
         <hlm-toggle-group type="single" variant="outline" size="sm" formControlName="frequency">
-          <button hlmToggleGroupItem value="hourly">Hourly</button>
-          <button hlmToggleGroupItem value="daily">Daily</button>
-          <button hlmToggleGroupItem value="weekly">Weekly</button>
+          <button hlmToggleGroupItem value="hourly">
+            <ng-icon hlm size="xs" name="lucideClock" />
+            Hourly
+          </button>
+          <button hlmToggleGroupItem value="daily">
+            <ng-icon hlm size="xs" name="lucideCalendar" />
+            Daily
+          </button>
+          <button hlmToggleGroupItem value="weekly">
+            <ng-icon hlm size="xs" name="lucideCalendarDays" />
+            Weekly
+          </button>
           <button hlmToggleGroupItem value="monthly">Monthly</button>
-          <button hlmToggleGroupItem value="custom">Custom</button>
+          <button hlmToggleGroupItem value="custom">
+            <ng-icon hlm size="xs" name="lucideTerminal" />
+            Custom
+          </button>
         </hlm-toggle-group>
       </div>
 
       @if (newScheduleForm.value.frequency === 'weekly') {
         <div hlmField>
           <label hlmFieldLabel>Day of week</label>
-          <hlm-radio-group formControlName="weekday" class="flex flex-wrap gap-3">
+          <hlm-radio-group formControlName="weekday" class="grid grid-cols-7 gap-2">
             @for (d of ['mon','tue','wed','thu','fri','sat','sun']; track d) {
-              <div class="flex items-center gap-1.5">
+              <div class="flex flex-col items-center gap-1">
                 <hlm-radio [value]="d" [inputId]="'wd-' + d">
                   <hlm-radio-indicator indicator />
                 </hlm-radio>
-                <label hlmLabel [for]="'wd-' + d" class="text-xs capitalize">{{ d }}</label>
+                <label hlmLabel [attr.for]="'wd-' + d" class="text-[10px] uppercase">{{ d }}</label>
               </div>
             }
           </hlm-radio-group>
         </div>
       }
 
-      @if (newScheduleForm.value.frequency !== 'custom' && newScheduleForm.value.frequency !== 'hourly') {
+      @if (newScheduleForm.value.frequency === 'daily' || newScheduleForm.value.frequency === 'weekly' || newScheduleForm.value.frequency === 'monthly') {
         <div hlmField>
-          <label hlmFieldLabel for="sch-hour">Hour (24h)</label>
-          <input
-            hlmInput
-            id="sch-hour"
-            formControlName="hour"
-            type="number"
-            min="0"
-            max="23"
-            placeholder="9"
-          />
-          <p hlmFieldDescription>Runs at this hour, on the hour.</p>
+          <label hlmFieldLabel for="sch-hour">Hour of day (0–23)</label>
+          <input hlmInput id="sch-hour" type="number" min="0" max="23" formControlName="hour" />
         </div>
       }
 
       @if (newScheduleForm.value.frequency === 'custom') {
         <div hlmField>
           <label hlmFieldLabel for="sch-cron">Cron expression</label>
-          <input hlmInput id="sch-cron" formControlName="cron" class="font-mono" placeholder="0 9 * * *" />
-          <p hlmFieldDescription>Standard 5-field cron — minutes, hours, day-of-month, month, day-of-week.</p>
+          <input hlmInput id="sch-cron" formControlName="cron" class="font-mono" placeholder="*/15 9-18 * * 1-5" />
+          <p hlmFieldDescription>Five fields: minute · hour · day-of-month · month · day-of-week.</p>
         </div>
       }
-
-      <hlm-separator />
 
       <div class="flex items-center justify-between rounded-md border p-3">
         <div>
           <p class="text-sm font-medium">Enabled</p>
-          <p class="text-muted-foreground mt-0.5 text-xs">Start triggering runs immediately.</p>
+          <p class="text-muted-foreground mt-0.5 text-xs">Allow this schedule to trigger runs.</p>
         </div>
         <hlm-switch formControlName="enabled" />
       </div>
@@ -319,7 +535,7 @@
       <div class="flex items-center justify-between rounded-md border p-3">
         <div>
           <p class="text-sm font-medium">Alert on failure</p>
-          <p class="text-muted-foreground mt-0.5 text-xs">Notify when a scheduled run fails.</p>
+          <p class="text-muted-foreground mt-0.5 text-xs">Send a notification when a run fails.</p>
         </div>
         <hlm-switch formControlName="alertOnFailure" />
       </div>
@@ -328,7 +544,7 @@
     <hlm-dialog-footer>
       <button hlmBtn variant="outline" (click)="ctx.close()">Cancel</button>
       <button hlmBtn type="button" (click)="submitNewSchedule(ctx)" [disabled]="newScheduleForm.invalid">
-        <ng-icon hlm size="sm" name="lucideCircleCheck" />
+        <ng-icon hlm size="sm" name="lucidePlus" />
         Create schedule
       </button>
     </hlm-dialog-footer>

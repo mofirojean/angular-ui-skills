@@ -51,7 +51,8 @@
       "@spartan-ng/helm/radio-group": ["./src/libs/ui/radio-group/src/index.ts"],
       "@spartan-ng/helm/date-picker": ["./src/libs/ui/date-picker/src/index.ts"],
       "@spartan-ng/helm/calendar": ["./src/libs/ui/calendar/src/index.ts"],
-      "@spartan-ng/helm/popover": ["./src/libs/ui/popover/src/index.ts"]
+      "@spartan-ng/helm/popover": ["./src/libs/ui/popover/src/index.ts"],
+      "@spartan-ng/helm/hover-card": ["./src/libs/ui/hover-card/src/index.ts"]
     }
   },
   "angularCompilerOptions": {
