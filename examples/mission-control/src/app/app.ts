@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { DOCUMENT } from '@angular/common';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter, map, startWith } from 'rxjs/operators';
 import { NgIcon } from '@ng-icons/core';
 import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
@@ -79,6 +81,16 @@ interface AppUser {
 })
 export class App {
   private readonly document = inject(DOCUMENT);
+  private readonly router = inject(Router);
+
+  private readonly currentUrl = toSignal(
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      map((e) => e.urlAfterRedirects),
+      startWith(this.router.url),
+    ),
+    { initialValue: this.router.url },
+  );
 
   protected readonly mode = signal<'light' | 'dark'>('light');
   protected readonly themeIcon = computed(() => (this.mode() === 'light' ? 'lucideMoon' : 'lucideSun'));
@@ -174,6 +186,22 @@ export class App {
       else next.add(id);
       return next;
     });
+  }
+
+  private readonly selectedChild = signal<Record<string, string>>({});
+
+  protected selectChild(parentId: string, childLabel: string): void {
+    this.selectedChild.update((map) => ({ ...map, [parentId]: childLabel }));
+  }
+
+  protected isChildActive(item: NavItem, child: NavChild): boolean {
+    const url = this.currentUrl();
+    const parentRoute = item.route;
+    const onParentRoute = url === parentRoute || url.startsWith(parentRoute + '/');
+    if (!onParentRoute) return false;
+    const picked = this.selectedChild()[item.id];
+    if (picked) return picked === child.label;
+    return item.children?.[0]?.label === child.label;
   }
 
   protected toggleTheme(): void {

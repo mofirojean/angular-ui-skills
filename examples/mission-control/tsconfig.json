@@ -55,7 +55,8 @@
       "@spartan-ng/helm/hover-card": ["./src/libs/ui/hover-card/src/index.ts"],
       "@spartan-ng/helm/carousel": ["./src/libs/ui/carousel/src/index.ts"],
       "@spartan-ng/helm/aspect-ratio": ["./src/libs/ui/aspect-ratio/src/index.ts"],
-      "@spartan-ng/helm/input-otp": ["./src/libs/ui/input-otp/src/index.ts"]
+      "@spartan-ng/helm/input-otp": ["./src/libs/ui/input-otp/src/index.ts"],
+      "@spartan-ng/helm/native-select": ["./src/libs/ui/native-select/src/index.ts"]
     }
   },
   "angularCompilerOptions": {

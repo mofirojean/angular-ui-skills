@@ -1,2 +1,573 @@
-<h1 class="text-2xl font-semibold">Settings</h1>
-<p class="text-muted-foreground mt-1 text-sm">Phase 6 will fill this with profile, team, billing, notifications, and integrations tabs.</p>
+<div class="flex flex-col gap-3">
+  <!-- Animated header -->
+  <header
+    class="animate-in fade-in-50 slide-in-from-top-2 bg-card relative overflow-hidden rounded-lg border duration-500"
+  >
+    <div class="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/20 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-16 -left-12 h-40 w-40 rounded-full bg-amber-500/10 blur-3xl"></div>
+
+    <div class="relative flex flex-wrap items-center justify-between gap-4 p-5">
+      <div class="flex items-center gap-4">
+        <div class="bg-primary text-primary-foreground ring-primary/10 flex h-12 w-12 items-center justify-center rounded-xl ring-4">
+          <ng-icon hlm size="lg" name="lucideSettings" />
+        </div>
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 class="text-2xl font-semibold leading-none tracking-tight">Settings</h1>
+            <span hlmBadge variant="outline" class="gap-1">
+              <ng-icon hlm size="xs" name="lucideSparkles" class="text-primary" />
+              {{ plan.name }} workspace
+            </span>
+          </div>
+          <p class="text-muted-foreground mt-1.5 text-sm">Profile, team, billing, notifications, and integrations.</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <hlm-tabs tab="profile">
+    <hlm-tabs-list class="flex w-full justify-start gap-1 overflow-x-auto">
+      <button hlmTabsTrigger="profile">
+        <ng-icon hlm size="xs" name="lucideUser" />
+        Profile
+      </button>
+      <button hlmTabsTrigger="team">
+        <ng-icon hlm size="xs" name="lucideUsers" />
+        Team
+      </button>
+      <button hlmTabsTrigger="billing">
+        <ng-icon hlm size="xs" name="lucideCreditCard" />
+        Billing
+      </button>
+      <button hlmTabsTrigger="notifications">
+        <ng-icon hlm size="xs" name="lucideBell" />
+        Notifications
+      </button>
+      <button hlmTabsTrigger="integrations">
+        <ng-icon hlm size="xs" name="lucideZap" />
+        Integrations
+      </button>
+    </hlm-tabs-list>
+
+    <!-- ============ PROFILE ============ -->
+    <div hlmTabsContent="profile" class="mt-3">
+      <section hlmCard>
+        <div hlmCardHeader class="p-4! pb-2!">
+          <h2 hlmCardTitle class="text-base">Profile</h2>
+          <p hlmCardDescription class="text-xs">Your public identity across the workspace.</p>
+        </div>
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" hlmCardContent class="p-4! pt-2! flex flex-col gap-4">
+          <!-- Avatar uploader -->
+          <div class="flex items-center gap-4 border-b pb-4">
+            <hlm-avatar class="!h-16 !w-16">
+              <span hlmAvatarFallback class="text-lg">MJ</span>
+            </hlm-avatar>
+            <div class="flex flex-col gap-1">
+              <p class="text-sm font-medium">Profile picture</p>
+              <p class="text-muted-foreground text-xs">PNG or JPG, max 2 MB.</p>
+              <div class="mt-1 flex items-center gap-2">
+                <button type="button" hlmBtn variant="outline" size="sm">
+                  <ng-icon hlm size="xs" name="lucideDownload" class="rotate-180" />
+                  Upload
+                </button>
+                <button type="button" hlmBtn variant="ghost" size="sm" class="text-destructive">Remove</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Name + Email -->
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div hlmField>
+              <label hlmFieldLabel for="set-name">Full name</label>
+              <input hlmInput id="set-name" formControlName="fullName" />
+              @if (nameCtrl.invalid && nameCtrl.touched) {
+                <p hlmFieldError>Name is required.</p>
+              }
+            </div>
+            <div hlmField>
+              <label hlmFieldLabel for="set-email">Email</label>
+              <input hlmInput id="set-email" type="email" formControlName="email" />
+              @if (emailCtrl.invalid && emailCtrl.touched) {
+                <p hlmFieldError>Enter a valid email.</p>
+              }
+            </div>
+          </div>
+
+          <!-- Bio -->
+          <div hlmField>
+            <div class="flex items-center justify-between">
+              <label hlmFieldLabel for="set-bio">Bio</label>
+              <span class="text-muted-foreground text-[10px] tabular-nums">{{ bioLength() }} / 280</span>
+            </div>
+            <textarea hlmTextarea id="set-bio" formControlName="bio" rows="3" placeholder="Tell your team about yourself"></textarea>
+          </div>
+
+          <!-- Locale + Timezone (native-select) -->
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div hlmField>
+              <label hlmFieldLabel for="set-locale">Language</label>
+              <hlm-native-select id="set-locale" formControlName="locale">
+                @for (loc of locales; track loc.value) {
+                  <option hlmNativeSelectOption [value]="loc.value">{{ loc.label }}</option>
+                }
+              </hlm-native-select>
+            </div>
+            <div hlmField>
+              <label hlmFieldLabel for="set-tz">Timezone</label>
+              <hlm-native-select id="set-tz" formControlName="timezone">
+                @for (tz of timezones; track tz.value) {
+                  <option hlmNativeSelectOption [value]="tz.value">{{ tz.label }}</option>
+                }
+              </hlm-native-select>
+            </div>
+          </div>
+
+          <!-- Theme radio-group -->
+          <div hlmField>
+            <label hlmFieldLabel>Theme preference</label>
+            <hlm-radio-group formControlName="theme" class="grid grid-cols-3 gap-3">
+              <label hlmLabel class="hover:border-primary/40 has-[input:checked]:border-primary has-[input:checked]:bg-primary/5 flex cursor-pointer items-center gap-3 rounded-md border p-3 transition-colors">
+                <hlm-radio value="system" inputId="theme-system">
+                  <hlm-radio-indicator indicator />
+                </hlm-radio>
+                <div class="flex flex-col">
+                  <span class="text-sm font-medium">System</span>
+                  <span class="text-muted-foreground text-[11px]">Match OS</span>
+                </div>
+              </label>
+              <label hlmLabel class="hover:border-primary/40 has-[input:checked]:border-primary has-[input:checked]:bg-primary/5 flex cursor-pointer items-center gap-3 rounded-md border p-3 transition-colors">
+                <hlm-radio value="light" inputId="theme-light">
+                  <hlm-radio-indicator indicator />
+                </hlm-radio>
+                <div class="flex flex-col">
+                  <span class="text-sm font-medium">Light</span>
+                  <span class="text-muted-foreground text-[11px]">Always bright</span>
+                </div>
+              </label>
+              <label hlmLabel class="hover:border-primary/40 has-[input:checked]:border-primary has-[input:checked]:bg-primary/5 flex cursor-pointer items-center gap-3 rounded-md border p-3 transition-colors">
+                <hlm-radio value="dark" inputId="theme-dark">
+                  <hlm-radio-indicator indicator />
+                </hlm-radio>
+                <div class="flex flex-col">
+                  <span class="text-sm font-medium">Dark</span>
+                  <span class="text-muted-foreground text-[11px]">Always dark</span>
+                </div>
+              </label>
+            </hlm-radio-group>
+          </div>
+
+          <!-- Density toggle group -->
+          <div hlmField>
+            <label hlmFieldLabel>UI density</label>
+            <hlm-toggle-group type="single" variant="outline" size="sm" formControlName="density">
+              <button hlmToggleGroupItem value="compact">Compact</button>
+              <button hlmToggleGroupItem value="cozy">Cozy</button>
+              <button hlmToggleGroupItem value="comfortable">Comfortable</button>
+            </hlm-toggle-group>
+          </div>
+
+          <!-- Checkboxes -->
+          <div class="flex flex-col gap-2 border-t pt-4">
+            <label class="hover:bg-muted/30 flex cursor-pointer items-start gap-3 rounded-md p-2">
+              <hlm-checkbox formControlName="weeklyDigest" class="mt-0.5" />
+              <div>
+                <p class="text-sm font-medium">Weekly performance digest</p>
+                <p class="text-muted-foreground text-xs">A summary of your workspace, every Monday at 09:00.</p>
+              </div>
+            </label>
+            <label class="hover:bg-muted/30 flex cursor-pointer items-start gap-3 rounded-md p-2">
+              <hlm-checkbox formControlName="marketingEmails" class="mt-0.5" />
+              <div>
+                <p class="text-sm font-medium">Product news &amp; tips</p>
+                <p class="text-muted-foreground text-xs">Occasional updates from our team. No spam, ever.</p>
+              </div>
+            </label>
+            <label class="hover:bg-muted/30 flex cursor-pointer items-start gap-3 rounded-md p-2">
+              <hlm-checkbox formControlName="betaFeatures" class="mt-0.5" />
+              <div>
+                <p class="text-sm font-medium">Beta features</p>
+                <p class="text-muted-foreground text-xs">Try unreleased features as soon as they're ready.</p>
+              </div>
+            </label>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center justify-end gap-2 border-t pt-4">
+            <button type="button" hlmBtn variant="ghost">Discard</button>
+            <button type="submit" hlmBtn [disabled]="profileForm.invalid">
+              <ng-icon hlm size="sm" name="lucideCircleCheck" />
+              Save changes
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <!-- ============ TEAM ============ -->
+    <div hlmTabsContent="team" class="mt-3 flex flex-col gap-3">
+      <section hlmCard>
+        <div hlmCardHeader class="flex items-center justify-between p-4! pb-2!">
+          <div>
+            <h2 hlmCardTitle class="text-base">Team members</h2>
+            <p hlmCardDescription class="text-xs">{{ team().length }} people · manage their roles + access</p>
+          </div>
+          <button hlmBtn size="sm" (click)="openInviteDialog()">
+            <ng-icon hlm size="xs" name="lucideUserPlus" />
+            Invite
+          </button>
+        </div>
+        <div hlmCardContent class="p-0!">
+          <div class="overflow-x-auto">
+            <table hlmTable class="text-xs">
+              <thead hlmTHead>
+                <tr hlmTr>
+                  <th hlmTh>Member</th>
+                  <th hlmTh>Role</th>
+                  <th hlmTh>Last active</th>
+                  <th hlmTh>Joined</th>
+                  <th hlmTh class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody hlmTBody>
+                @for (m of team(); track m.id) {
+                  <tr hlmTr class="hover:bg-muted/40">
+                    <td hlmTd>
+                      <div class="flex items-center gap-3">
+                        <hlm-avatar size="sm">
+                          <span hlmAvatarFallback class="text-[10px]">{{ m.initials }}</span>
+                        </hlm-avatar>
+                        <div>
+                          <p class="font-medium leading-tight">{{ m.name }}</p>
+                          <p class="text-muted-foreground text-[11px] leading-tight">{{ m.email }}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td hlmTd>
+                      @if (m.role === 'owner') {
+                        <span hlmBadge>Owner</span>
+                      } @else {
+                        <hlm-select class="w-28" [value]="m.role" (valueChange)="updateRole(m.id, $event)">
+                          <hlm-select-trigger class="w-full text-xs">
+                            <hlm-select-value placeholder="Role" />
+                          </hlm-select-trigger>
+                          <hlm-select-content *hlmSelectPortal>
+                            @for (r of roleOptions; track r.value) {
+                              @if (r.value !== 'owner') {
+                                <hlm-select-item [value]="r.value">{{ r.label }}</hlm-select-item>
+                              }
+                            }
+                          </hlm-select-content>
+                        </hlm-select>
+                      }
+                    </td>
+                    <td hlmTd class="text-muted-foreground">{{ m.lastActive }}</td>
+                    <td hlmTd class="text-muted-foreground">{{ m.joined }}</td>
+                    <td hlmTd class="text-right">
+                      @if (m.role !== 'owner') {
+                        <button hlmBtn variant="ghost" size="sm" class="text-destructive" (click)="removeMember(m)">
+                          Remove
+                        </button>
+                      } @else {
+                        <span class="text-muted-foreground text-[10px]">—</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ BILLING ============ -->
+    <div hlmTabsContent="billing" class="mt-3 flex flex-col gap-3">
+      <!-- Current plan -->
+      <section hlmCard class="from-primary/5 to-card relative overflow-hidden bg-gradient-to-br">
+        <div hlmCardContent class="p-5! flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-4">
+            <div class="bg-primary text-primary-foreground flex h-12 w-12 items-center justify-center rounded-xl ring-4 ring-primary/10">
+              <ng-icon hlm size="lg" name="lucideSparkles" />
+            </div>
+            <div>
+              <p class="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">Current plan</p>
+              <div class="flex items-baseline gap-1.5">
+                <span class="text-2xl font-semibold leading-none">{{ plan.name }}</span>
+                <span class="text-muted-foreground text-sm">
+                  · ${{ plan.price }}/{{ plan.cycle }}
+                </span>
+              </div>
+              <p class="text-muted-foreground mt-1 text-xs">Renews {{ plan.renews }}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button hlmBtn variant="outline" size="sm">Change plan</button>
+            <button hlmBtn variant="ghost" size="sm" class="text-destructive">Cancel</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Usage + payment method -->
+      <section class="grid gap-3 lg:grid-cols-2">
+        <div hlmCard>
+          <div hlmCardHeader class="p-4! pb-2!">
+            <h3 hlmCardTitle class="text-base">Usage this month</h3>
+            <p hlmCardDescription class="text-xs">Resets on Jun 01.</p>
+          </div>
+          <div hlmCardContent class="p-4! pt-2! space-y-3">
+            @for (u of usage; track u.label) {
+              <div>
+                <div class="mb-1 flex items-center justify-between text-[11px]">
+                  <span class="font-medium">{{ u.label }}</span>
+                  <span class="text-muted-foreground tabular-nums">
+                    <span class="text-foreground font-medium">{{ u.used }}</span>{{ u.unit }} / {{ u.limit }}{{ u.unit }}
+                  </span>
+                </div>
+                <div class="bg-muted h-1.5 overflow-hidden rounded-full">
+                  <div
+                    class="h-full rounded-full transition-all duration-500"
+                    [class.bg-emerald-500]="usageVariant(u.used, u.limit) === 'positive'"
+                    [class.bg-amber-500]="usageVariant(u.used, u.limit) === 'warning'"
+                    [class.bg-destructive]="usageVariant(u.used, u.limit) === 'destructive'"
+                    [style.width.%]="usagePercent(u.used, u.limit)"
+                  ></div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div hlmCard>
+          <div hlmCardHeader class="p-4! pb-2!">
+            <h3 hlmCardTitle class="text-base">Payment method</h3>
+            <p hlmCardDescription class="text-xs">Charged each {{ plan.cycle }}.</p>
+          </div>
+          <div hlmCardContent class="p-4! pt-2! flex flex-col gap-3">
+            <div class="flex items-center gap-3 rounded-md border p-3">
+              <div class="bg-muted text-muted-foreground flex h-10 w-14 items-center justify-center rounded">
+                <ng-icon hlm size="base" name="lucideCreditCard" />
+              </div>
+              <div class="flex-1">
+                <p class="font-mono text-sm font-medium">···· ···· ···· 4242</p>
+                <p class="text-muted-foreground text-[11px]">Expires 09/27 · Visa</p>
+              </div>
+              <button hlmBtn variant="ghost" size="sm">Edit</button>
+            </div>
+            <button hlmBtn variant="outline" size="sm" class="self-start">
+              <ng-icon hlm size="xs" name="lucideCreditCard" />
+              Add backup card
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Invoice history -->
+      <section hlmCard>
+        <div hlmCardHeader class="p-4! pb-2!">
+          <h3 hlmCardTitle class="text-base">Invoice history</h3>
+          <p hlmCardDescription class="text-xs">Last 6 invoices · download PDFs anytime.</p>
+        </div>
+        <div hlmCardContent class="p-0!">
+          <div class="overflow-x-auto">
+            <table hlmTable class="text-xs">
+              <thead hlmTHead>
+                <tr hlmTr>
+                  <th hlmTh>Date</th>
+                  <th hlmTh>Description</th>
+                  <th hlmTh>Amount</th>
+                  <th hlmTh>Status</th>
+                  <th hlmTh class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody hlmTBody>
+                @for (inv of invoices; track inv.id) {
+                  <tr hlmTr class="hover:bg-muted/40">
+                    <td hlmTd class="font-medium">{{ inv.date }}</td>
+                    <td hlmTd class="text-muted-foreground">{{ inv.description }}</td>
+                    <td hlmTd class="font-mono tabular-nums">${{ inv.amount.toFixed(2) }}</td>
+                    <td hlmTd>
+                      <span hlmBadge [variant]="invoiceVariant(inv.status)" class="capitalize">{{ inv.status }}</span>
+                    </td>
+                    <td hlmTd class="text-right">
+                      <button hlmBtn variant="ghost" size="sm">
+                        <ng-icon hlm size="xs" name="lucideDownload" />
+                        PDF
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ NOTIFICATIONS ============ -->
+    <div hlmTabsContent="notifications" class="mt-3">
+      <section hlmCard>
+        <div hlmCardHeader class="p-4! pb-2!">
+          <h2 hlmCardTitle class="text-base">Notifications</h2>
+          <p hlmCardDescription class="text-xs">Pick what reaches you and where.</p>
+        </div>
+        <div hlmCardContent class="p-0!">
+          <!-- Header row -->
+          <div class="text-muted-foreground hidden border-b px-4 py-2 text-[10px] font-semibold uppercase tracking-wider sm:grid sm:grid-cols-[1fr_60px_60px_60px]">
+            <div>Notification</div>
+            <div class="text-center">Email</div>
+            <div class="text-center">Slack</div>
+            <div class="text-center">Push</div>
+          </div>
+          <div class="divide-y">
+            @for (g of notificationGroups; track g.id) {
+              <div class="grid items-center gap-3 px-4 py-3 sm:grid-cols-[1fr_60px_60px_60px]">
+                <div class="flex items-start gap-3">
+                  <div class="bg-muted text-muted-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-md">
+                    <ng-icon hlm size="sm" [name]="g.icon" />
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium leading-tight">{{ g.label }}</p>
+                    <p class="text-muted-foreground mt-0.5 text-xs leading-tight">{{ g.description }}</p>
+                  </div>
+                </div>
+                <div class="flex justify-center">
+                  <hlm-switch
+                    [checked]="isChannelOn(g.id, 'email')"
+                    (checkedChange)="toggleChannel(g.id, 'email', $event)"
+                    [attr.aria-label]="g.label + ' email'"
+                  />
+                </div>
+                <div class="flex justify-center">
+                  <hlm-switch
+                    [checked]="isChannelOn(g.id, 'slack')"
+                    (checkedChange)="toggleChannel(g.id, 'slack', $event)"
+                    [attr.aria-label]="g.label + ' slack'"
+                  />
+                </div>
+                <div class="flex justify-center">
+                  <hlm-switch
+                    [checked]="isChannelOn(g.id, 'push')"
+                    (checkedChange)="toggleChannel(g.id, 'push', $event)"
+                    [attr.aria-label]="g.label + ' push'"
+                  />
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ INTEGRATIONS ============ -->
+    <div hlmTabsContent="integrations" class="mt-3 flex flex-col gap-3">
+      <section hlmCard>
+        <div hlmCardHeader class="flex items-center justify-between p-4! pb-2!">
+          <div>
+            <h2 hlmCardTitle class="text-base">Integrations</h2>
+            <p hlmCardDescription class="text-xs">
+              <span class="text-foreground font-medium">{{ connectedCount() }}</span>
+              of {{ integrations().length }} connected.
+            </p>
+          </div>
+          <button hlmBtn variant="outline" size="sm">
+            <ng-icon hlm size="xs" name="lucideZap" />
+            Browse all
+          </button>
+        </div>
+        <div hlmCardContent class="p-0!">
+          <ul class="divide-y">
+            @for (i of integrations(); track i.id) {
+              <li class="hover:bg-muted/30 flex items-start gap-4 px-4 py-3 transition-colors">
+                <div class="bg-muted text-muted-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-md">
+                  <ng-icon hlm size="base" [name]="i.icon" />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <p class="text-sm font-semibold leading-tight">{{ i.name }}</p>
+                    <span hlmBadge variant="secondary" class="text-[10px]">{{ integrationCategoryLabel(i.category) }}</span>
+                    @if (i.connected) {
+                      <span hlmBadge variant="outline" class="text-emerald-600 text-[10px]">
+                        <span class="bg-emerald-500 h-1.5 w-1.5 rounded-full"></span>
+                        Connected
+                      </span>
+                    }
+                  </div>
+                  <p class="text-muted-foreground mt-0.5 text-xs leading-snug">{{ i.description }}</p>
+                  @if (i.connected && i.accountLabel) {
+                    <p class="text-muted-foreground mt-1 font-mono text-[10px]">{{ i.accountLabel }}</p>
+                  }
+                </div>
+                <div class="flex shrink-0 items-center gap-2">
+                  @if (i.connected) {
+                    <button hlmBtn variant="ghost" size="sm">Configure</button>
+                  }
+                  <hlm-switch
+                    [checked]="i.connected"
+                    (checkedChange)="toggleIntegration(i.id)"
+                    [attr.aria-label]="i.name + ' toggle'"
+                  />
+                </div>
+              </li>
+            }
+          </ul>
+        </div>
+      </section>
+    </div>
+  </hlm-tabs>
+</div>
+
+<!-- Invite dialog -->
+<hlm-dialog>
+  <button #inviteTrigger hlmDialogTrigger class="hidden" aria-hidden="true">open</button>
+  <hlm-dialog-content *hlmDialogPortal="let ctx" class="w-[min(480px,92vw)]!">
+    <hlm-dialog-header>
+      <div class="flex items-center gap-3">
+        <div class="bg-primary text-primary-foreground flex h-10 w-10 items-center justify-center rounded-lg">
+          <ng-icon hlm size="sm" name="lucideUserPlus" />
+        </div>
+        <div>
+          <h3 hlmDialogTitle>Invite a team member</h3>
+          <p hlmDialogDescription class="text-xs">We'll send them an email with sign-in instructions.</p>
+        </div>
+      </div>
+    </hlm-dialog-header>
+
+    <form [formGroup]="inviteForm" (ngSubmit)="sendInvite(ctx)" class="flex flex-col gap-4 px-6 py-2">
+      <div hlmField>
+        <label hlmFieldLabel for="inv-email">Email address</label>
+        <input hlmInput id="inv-email" type="email" formControlName="email" placeholder="teammate@example.com" />
+        @if (inviteEmailCtrl.invalid && inviteEmailCtrl.touched) {
+          <p hlmFieldError>Enter a valid email.</p>
+        }
+      </div>
+
+      <div hlmField>
+        <label hlmFieldLabel>Role</label>
+        <hlm-select formControlName="role">
+          <hlm-select-trigger class="w-full">
+            <hlm-select-value placeholder="Select role" />
+          </hlm-select-trigger>
+          <hlm-select-content *hlmSelectPortal>
+            <hlm-select-item value="admin">Admin — manage everything except billing</hlm-select-item>
+            <hlm-select-item value="editor">Editor — create + edit agents</hlm-select-item>
+            <hlm-select-item value="viewer">Viewer — read-only access</hlm-select-item>
+          </hlm-select-content>
+        </hlm-select>
+      </div>
+
+      <div hlmField>
+        <label hlmFieldLabel for="inv-msg">Message (optional)</label>
+        <textarea hlmTextarea id="inv-msg" formControlName="message" rows="3" placeholder="Hey! Joining you on Mission Control…"></textarea>
+      </div>
+    </form>
+
+    <hlm-dialog-footer>
+      <button hlmBtn variant="outline" (click)="ctx.close()">Cancel</button>
+      <button hlmBtn (click)="sendInvite(ctx)" [disabled]="inviteForm.invalid">
+        <ng-icon hlm size="sm" name="lucideMail" />
+        Send invite
+      </button>
+    </hlm-dialog-footer>
+  </hlm-dialog-content>
+</hlm-dialog>
