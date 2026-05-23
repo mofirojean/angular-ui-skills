@@ -1,2 +1,436 @@
-<h1 class="text-2xl font-semibold">Runs</h1>
-<p class="text-muted-foreground mt-1 text-sm">Phase 4 will fill this with a filterable runs table and a run-detail sheet.</p>
+<div class="flex flex-col gap-3">
+  <!-- Animated header -->
+  <header
+    class="animate-in fade-in-50 slide-in-from-top-2 bg-card relative overflow-hidden rounded-lg border duration-500"
+  >
+    <div class="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/20 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-16 -left-12 h-40 w-40 rounded-full bg-amber-500/10 blur-3xl"></div>
+
+    <div class="relative flex flex-wrap items-center justify-between gap-4 p-5">
+      <div class="flex items-center gap-4">
+        <div class="bg-primary text-primary-foreground ring-primary/10 flex h-12 w-12 items-center justify-center rounded-xl ring-4">
+          <ng-icon hlm size="lg" name="lucidePlay" />
+        </div>
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 class="text-2xl font-semibold leading-none tracking-tight">Runs</h1>
+            <span hlmBadge variant="outline" class="gap-1.5">
+              <span class="relative flex h-2 w-2">
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-500 opacity-75"></span>
+                <span class="relative inline-flex h-2 w-2 rounded-full bg-amber-500"></span>
+              </span>
+              {{ kpis()[3].value }} running
+            </span>
+          </div>
+          <p class="text-muted-foreground mt-1.5 text-sm">
+            Every agent execution. Click any row for full details.
+          </p>
+        </div>
+      </div>
+
+      <a hlmBtn variant="outline" size="sm" routerLink="/schedules">
+        <ng-icon hlm size="xs" name="lucideCalendar" />
+        Schedules
+      </a>
+    </div>
+  </header>
+
+  <!-- KPI strip -->
+  <section class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+    @if (isLoading()) {
+      @for (i of [0,1,2,3,4,5]; track i) {
+        <section hlmCard>
+          <div hlmCardContent class="p-3!">
+            <hlm-skeleton class="h-3 w-16" />
+            <hlm-skeleton class="mt-2 h-5 w-12" />
+          </div>
+        </section>
+      }
+    } @else {
+      @for (kpi of kpis(); track kpi.label) {
+        <section hlmCard class="transition-shadow hover:shadow-sm">
+          <div hlmCardContent class="p-3!">
+            <div class="flex items-center justify-between">
+              <p class="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider leading-none">{{ kpi.label }}</p>
+              <ng-icon
+                hlm
+                size="xs"
+                [name]="kpi.icon"
+                [class.text-emerald-600]="kpi.tone === 'positive'"
+                [class.text-destructive]="kpi.tone === 'destructive'"
+                [class.text-muted-foreground]="kpi.tone === 'neutral'"
+              />
+            </div>
+            <p class="mt-2 text-xl font-semibold tabular-nums leading-none">{{ kpi.value }}</p>
+          </div>
+        </section>
+      }
+    }
+  </section>
+
+  <!-- Filter bar -->
+  <section hlmCard>
+    <div hlmCardContent class="p-3! flex flex-wrap items-center gap-3">
+      <hlm-input-group class="min-w-60 flex-1">
+        <hlm-input-group-addon align="inline-start">
+          <ng-icon hlm size="sm" name="lucideSearch" />
+        </hlm-input-group-addon>
+        <input hlmInputGroupInput placeholder="Search by run id, agent, user…" [value]="searchQuery()" (input)="onSearch($event)" />
+      </hlm-input-group>
+
+      <!-- Status filter (toggle group) -->
+      <hlm-toggle-group
+        type="single"
+        variant="outline"
+        size="sm"
+        [value]="statusFilter()"
+        (valueChange)="onStatusChange($event)"
+      >
+        <button hlmToggleGroupItem value="all">All</button>
+        <button hlmToggleGroupItem value="success">
+          <ng-icon hlm size="xs" name="lucideCircleCheck" class="text-emerald-600" />
+        </button>
+        <button hlmToggleGroupItem value="failed">
+          <ng-icon hlm size="xs" name="lucideCircleX" class="text-destructive" />
+        </button>
+        <button hlmToggleGroupItem value="running">
+          <ng-icon hlm size="xs" name="lucideClock" class="text-amber-600" />
+        </button>
+        <button hlmToggleGroupItem value="queued">
+          <ng-icon hlm size="xs" name="lucideCircleDashed" />
+        </button>
+      </hlm-toggle-group>
+
+      <!-- Trigger filter (select) -->
+      <hlm-select
+        class="w-36"
+        [value]="triggerFilter()"
+        (valueChange)="onTriggerChange($event)"
+      >
+        <hlm-select-trigger class="w-full">
+          <hlm-select-value placeholder="Trigger" />
+        </hlm-select-trigger>
+        <hlm-select-content *hlmSelectPortal>
+          <hlm-select-item value="all">All triggers</hlm-select-item>
+          <hlm-select-item value="manual">Manual</hlm-select-item>
+          <hlm-select-item value="schedule">Schedule</hlm-select-item>
+          <hlm-select-item value="webhook">Webhook</hlm-select-item>
+        </hlm-select-content>
+      </hlm-select>
+
+      <!-- Agent combobox -->
+      <hlm-combobox
+        class="w-56"
+        [value]="selectedAgent()"
+        (valueChange)="selectedAgent.set($event); page.set(1)"
+        [search]="agentSearch()"
+        (searchChange)="agentSearch.set($event)"
+        [itemToString]="agentToString"
+        [isItemEqualToValue]="agentEquals"
+      >
+        <hlm-combobox-trigger class="w-full">
+          <ng-icon hlm size="sm" name="lucideBot" class="text-muted-foreground mr-1 shrink-0" />
+          <hlm-combobox-value>
+            <hlm-combobox-placeholder>All agents</hlm-combobox-placeholder>
+          </hlm-combobox-value>
+        </hlm-combobox-trigger>
+        <hlm-combobox-content *hlmComboboxPortal class="w-[var(--brn-popover-trigger-width)]!">
+          <hlm-combobox-input placeholder="Search agents…" />
+          <ul hlmComboboxList>
+            @for (a of filteredAgents(); track a.id) {
+              <hlm-combobox-item [value]="a">{{ a.name }}</hlm-combobox-item>
+            }
+          </ul>
+        </hlm-combobox-content>
+      </hlm-combobox>
+
+      @if (hasFilters) {
+        <button hlmBtn variant="ghost" size="sm" (click)="clearFilters()">
+          <ng-icon hlm size="xs" name="lucideCircleX" />
+          Clear
+        </button>
+      }
+
+      <span class="text-muted-foreground ml-auto text-xs tabular-nums">
+        <span class="text-foreground font-medium">{{ filteredRuns().length }}</span>
+        / {{ kpis()[0].value }}
+      </span>
+    </div>
+  </section>
+
+  <!-- Table -->
+  <section hlmCard>
+    <div hlmCardContent class="p-0!">
+      @if (isLoading()) {
+        <div class="space-y-2 p-4">
+          @for (i of rowSkeletons; track i) {
+            <hlm-skeleton class="h-10 w-full" />
+          }
+        </div>
+      } @else if (paginatedRuns().length === 0) {
+        <div class="flex flex-col items-center justify-center gap-3 p-12 text-center">
+          <ng-icon hlm size="xl" name="lucideFolderSearch" class="text-muted-foreground" />
+          <div>
+            <p class="text-sm font-medium">No runs match</p>
+            <p class="text-muted-foreground mt-1 text-xs">Try clearing filters or expanding the time range.</p>
+          </div>
+          <button hlmBtn variant="outline" size="sm" (click)="clearFilters()">Clear filters</button>
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table hlmTable class="text-xs">
+            <thead hlmTHead>
+              <tr hlmTr>
+                <th hlmTh class="w-24">Run</th>
+                <th hlmTh>
+                  <button type="button" class="hover:text-foreground -mx-1 inline-flex items-center gap-1 rounded px-1 transition-colors" (click)="toggleSort('agent')">
+                    Agent
+                    <ng-icon hlm size="xs" name="lucideChevronsUpDown" [class.opacity-100]="sortKey() === 'agent'" [class.opacity-40]="sortKey() !== 'agent'" />
+                  </button>
+                </th>
+                <th hlmTh>Status</th>
+                <th hlmTh>
+                  <button type="button" class="hover:text-foreground -mx-1 inline-flex items-center gap-1 rounded px-1 transition-colors" (click)="toggleSort('startedAt')">
+                    Started
+                    <ng-icon hlm size="xs" name="lucideChevronsUpDown" [class.opacity-100]="sortKey() === 'startedAt'" [class.opacity-40]="sortKey() !== 'startedAt'" />
+                  </button>
+                </th>
+                <th hlmTh>Triggered by</th>
+                <th hlmTh class="text-right">
+                  <button type="button" class="hover:text-foreground -mx-1 ml-auto inline-flex items-center gap-1 rounded px-1 transition-colors" (click)="toggleSort('duration')">
+                    Duration
+                    <ng-icon hlm size="xs" name="lucideChevronsUpDown" [class.opacity-100]="sortKey() === 'duration'" [class.opacity-40]="sortKey() !== 'duration'" />
+                  </button>
+                </th>
+                <th hlmTh class="text-right">
+                  <button type="button" class="hover:text-foreground -mx-1 ml-auto inline-flex items-center gap-1 rounded px-1 transition-colors" (click)="toggleSort('cost')">
+                    Cost
+                    <ng-icon hlm size="xs" name="lucideChevronsUpDown" [class.opacity-100]="sortKey() === 'cost'" [class.opacity-40]="sortKey() !== 'cost'" />
+                  </button>
+                </th>
+              </tr>
+            </thead>
+            <tbody hlmTBody>
+              @for (run of paginatedRuns(); track run.id) {
+                <tr hlmTr (click)="openDetail(run)" class="hover:bg-muted/40 cursor-pointer transition-colors">
+                  <td hlmTd class="font-mono text-[11px]">{{ run.id }}</td>
+                  <td hlmTd>
+                    <span class="inline-flex items-center gap-2">
+                      <div class="bg-muted text-muted-foreground flex h-6 w-6 shrink-0 items-center justify-center rounded">
+                        <ng-icon hlm size="xs" [name]="run.agent.icon" />
+                      </div>
+                      <span class="font-medium">{{ run.agent.name }}</span>
+                    </span>
+                  </td>
+                  <td hlmTd>
+                    <span class="inline-flex items-center gap-1.5">
+                      <ng-icon
+                        hlm
+                        size="xs"
+                        [name]="statusIcon(run.status)"
+                        [class.text-emerald-600]="run.status === 'success'"
+                        [class.text-destructive]="run.status === 'failed'"
+                        [class.text-amber-600]="run.status === 'running'"
+                        [class.text-muted-foreground]="run.status === 'queued'"
+                        [class.animate-pulse]="run.status === 'running'"
+                      />
+                      <span hlmBadge [variant]="statusVariant(run.status)" class="text-[10px] capitalize">{{ run.status }}</span>
+                    </span>
+                  </td>
+                  <td hlmTd class="text-muted-foreground tabular-nums">{{ run.startedAt }}</td>
+                  <td hlmTd>
+                    <span class="inline-flex items-center gap-2">
+                      <hlm-avatar size="sm">
+                        <span hlmAvatarFallback class="text-[10px]">{{ run.triggeredBy.initials }}</span>
+                      </hlm-avatar>
+                      <span class="text-[11px]">{{ run.triggeredBy.name }}</span>
+                      <ng-icon hlm size="xs" [name]="triggerIcon(run.trigger)" class="text-muted-foreground" />
+                    </span>
+                  </td>
+                  <td hlmTd class="text-right font-mono text-[11px] tabular-nums">{{ run.duration }}</td>
+                  <td hlmTd class="text-right font-mono text-[11px] tabular-nums">${{ run.cost.toFixed(2) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="flex flex-col gap-2 border-t p-3 sm:flex-row sm:items-center sm:justify-between">
+          <p class="text-muted-foreground text-xs">
+            Showing
+            <span class="text-foreground font-medium">{{ visibleRange().start }}–{{ visibleRange().end }}</span>
+            of
+            <span class="text-foreground font-medium">{{ visibleRange().total }}</span>
+          </p>
+          <nav class="flex items-center gap-1" aria-label="Pagination">
+            <button hlmBtn variant="outline" size="sm" (click)="goToPage(page() - 1)" [disabled]="page() === 1">
+              <ng-icon hlm size="xs" name="lucideChevronLeft" />
+              Previous
+            </button>
+            @for (n of pageNumbers(); track n) {
+              <button hlmBtn [variant]="n === page() ? 'default' : 'ghost'" size="sm" class="w-9 px-0" (click)="goToPage(n)">{{ n }}</button>
+            }
+            <button hlmBtn variant="outline" size="sm" (click)="goToPage(page() + 1)" [disabled]="page() === totalPages()">
+              Next
+              <ng-icon hlm size="xs" name="lucideChevronRight" />
+            </button>
+          </nav>
+        </div>
+      }
+    </div>
+  </section>
+</div>
+
+<!-- Run detail sheet (right side) -->
+<hlm-sheet>
+  <button #detailTrigger hlmSheetTrigger class="hidden" aria-hidden="true">open detail</button>
+  <hlm-sheet-content *hlmSheetPortal class="w-[min(520px,92vw)]!">
+    @let run = detailRun();
+    @if (run) {
+      <hlm-sheet-header>
+        <div class="flex items-start gap-3">
+          <div class="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-lg">
+            <ng-icon hlm size="sm" [name]="run.agent.icon" />
+          </div>
+          <div class="min-w-0 flex-1">
+            <h3 hlmSheetTitle class="text-base">{{ run.agent.name }}</h3>
+            <p hlmSheetDescription class="font-mono text-xs">{{ run.id }}</p>
+          </div>
+          <span hlmBadge [variant]="statusVariant(run.status)" class="gap-1 capitalize">
+            <ng-icon hlm size="xs" [name]="statusIcon(run.status)" />
+            {{ run.status }}
+          </span>
+        </div>
+      </hlm-sheet-header>
+
+      <div class="flex flex-col gap-5 overflow-y-auto px-6 py-4">
+        <!-- KPI strip -->
+        <div class="grid grid-cols-4 gap-2 rounded-md border p-3 text-center">
+          <div>
+            <p class="text-muted-foreground text-[9px] font-semibold uppercase tracking-wider">Started</p>
+            <p class="mt-1 font-mono text-sm font-semibold tabular-nums">{{ run.startedAt }}</p>
+          </div>
+          <div class="border-x">
+            <p class="text-muted-foreground text-[9px] font-semibold uppercase tracking-wider">Duration</p>
+            <p class="mt-1 font-mono text-sm font-semibold tabular-nums">{{ run.duration }}</p>
+          </div>
+          <div class="border-r">
+            <p class="text-muted-foreground text-[9px] font-semibold uppercase tracking-wider">Cost</p>
+            <p class="mt-1 font-mono text-sm font-semibold tabular-nums">${{ run.cost.toFixed(2) }}</p>
+          </div>
+          <div>
+            <p class="text-muted-foreground text-[9px] font-semibold uppercase tracking-wider">Retries</p>
+            <p
+              class="mt-1 font-mono text-sm font-semibold tabular-nums"
+              [class.text-destructive]="run.retries > 0"
+            >
+              {{ run.retries }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Trigger + tokens -->
+        <div class="grid grid-cols-2 gap-3 text-xs">
+          <div class="flex flex-col gap-1">
+            <p class="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">Triggered by</p>
+            <div class="inline-flex items-center gap-2">
+              <hlm-avatar size="sm">
+                <span hlmAvatarFallback class="text-[10px]">{{ run.triggeredBy.initials }}</span>
+              </hlm-avatar>
+              <span class="font-medium">{{ run.triggeredBy.name }}</span>
+              <ng-icon hlm size="xs" [name]="triggerIcon(run.trigger)" class="text-muted-foreground" />
+              <span class="text-muted-foreground capitalize">{{ run.trigger }}</span>
+            </div>
+          </div>
+          <div class="flex flex-col gap-1">
+            <p class="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">Tokens</p>
+            <p class="font-mono tabular-nums">
+              <span class="font-medium">{{ run.tokensIn.toLocaleString() }}</span>
+              <span class="text-muted-foreground"> in · </span>
+              <span class="font-medium">{{ run.tokensOut.toLocaleString() }}</span>
+              <span class="text-muted-foreground"> out</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Steps timeline -->
+        <div>
+          <p class="text-muted-foreground mb-2 text-[10px] font-semibold uppercase tracking-wider">Execution timeline</p>
+          <ol class="relative border-l pl-5">
+            @for (step of run.steps; track step.label; let last = $last) {
+              <li class="relative pb-3 last:pb-0">
+                <span
+                  class="bg-background absolute -left-[26px] top-0.5 flex h-4 w-4 items-center justify-center rounded-full ring-2"
+                  [class.ring-emerald-500]="step.status === 'completed'"
+                  [class.ring-amber-500]="step.status === 'running'"
+                  [class.ring-destructive]="step.status === 'failed'"
+                  [class.ring-border]="step.status === 'pending'"
+                >
+                  <ng-icon
+                    hlm
+                    size="xs"
+                    [name]="stepIcon(step.status)"
+                    [class.text-emerald-600]="step.status === 'completed'"
+                    [class.text-amber-600]="step.status === 'running'"
+                    [class.text-destructive]="step.status === 'failed'"
+                    [class.text-muted-foreground]="step.status === 'pending'"
+                    [class.animate-pulse]="step.status === 'running'"
+                  />
+                </span>
+                <div class="flex items-center justify-between gap-3">
+                  <p
+                    class="text-sm"
+                    [class.font-medium]="step.status === 'running' || step.status === 'failed'"
+                    [class.text-muted-foreground]="step.status === 'pending'"
+                  >
+                    {{ step.label }}
+                  </p>
+                  <span class="text-muted-foreground font-mono text-[10px] tabular-nums">
+                    {{ formatMs(step.durationMs) }}
+                  </span>
+                </div>
+              </li>
+            }
+          </ol>
+        </div>
+
+        <!-- Error block -->
+        @if (run.error) {
+          <div class="border-destructive/30 bg-destructive/5 rounded-md border p-3">
+            <p class="text-destructive flex items-center gap-2 text-xs font-semibold">
+              <ng-icon hlm size="xs" name="lucideTriangleAlert" />
+              Run failed
+            </p>
+            <p class="text-destructive/80 mt-1 font-mono text-[11px]">{{ run.error }}</p>
+          </div>
+        }
+
+        <!-- Output JSON -->
+        <div>
+          <p class="text-muted-foreground mb-2 text-[10px] font-semibold uppercase tracking-wider">Output</p>
+          <pre class="bg-muted text-foreground/90 overflow-x-auto rounded-md p-3 font-mono text-[11px] leading-relaxed">{{ formatJson(run.output) }}</pre>
+        </div>
+
+        <hlm-separator />
+
+        <!-- Actions -->
+        <div class="flex flex-col gap-2">
+          <button hlmBtn class="w-full" (click)="retryRun()">
+            <ng-icon hlm size="sm" name="lucidePlay" />
+            Re-run with same input
+          </button>
+          <div class="grid grid-cols-2 gap-2">
+            <a hlmBtn variant="outline" [routerLink]="['/agents', run.agent.id]">
+              <ng-icon hlm size="sm" name="lucideBot" />
+              View agent
+            </a>
+            <button hlmBtn variant="outline" (click)="copyRunId()">
+              <ng-icon hlm size="sm" name="lucideCopy" />
+              Copy ID
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </hlm-sheet-content>
+</hlm-sheet>
