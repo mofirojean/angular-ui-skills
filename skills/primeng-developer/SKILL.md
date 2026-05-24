@@ -11,7 +11,7 @@ metadata:
 
 > **Pairs with `angular-developer`** - that skill provides Angular fundamentals (signals, DI, routing, forms, SSR, accessibility). This skill focuses on PrimeNG specifics. Install both for the best experience.
 
-1. Always check the project's PrimeNG version before providing guidance. PrimeNG v18 introduced major component **renames** (Calendar→DatePicker, Dropdown→Select, InputSwitch→ToggleSwitch, OverlayPanel→Popover, Sidebar→Drawer) and a new design-token theming system. `package.json` is the source of truth — when in doubt, look there before recommending an API. See [migration.md](references/migration.md).
+1. Always check the project's PrimeNG version before providing guidance. PrimeNG v18 introduced major component **renames** (Calendar→DatePicker, Dropdown→Select, InputSwitch→ToggleSwitch, OverlayPanel→Popover, Sidebar→Drawer) and a new design-token theming system. `package.json` is the source of truth, when in doubt, look there before recommending an API. See [migration.md](references/migration.md).
 
 2. Detect which **theming mode** the project uses before adding components:
    - If `@primeuix/themes` is imported and `providePrimeNG({ theme: ... })` is configured → **Styled mode** (default).
@@ -20,21 +20,21 @@ metadata:
 
 3. Components are **standalone since v18**. Always import the standalone class (e.g. `Button` from `'primeng/button'`), not the legacy `*Module`. Legacy modules still export for backwards compatibility but should not be added to new code.
 
-4. After generating PrimeNG code, run `ng build` to catch compile errors. The two most common AI mistakes are: (a) forgetting `provideAnimationsAsync()` in `app.config.ts`, and (b) importing from `@primeng/themes` instead of `@primeuix/themes`. See [setup.md](references/setup.md).
+4. After generating PrimeNG code, run `ng build` to catch compile errors. The most common AI mistakes are: (a) importing from `@primeng/themes` instead of `@primeuix/themes` (deprecated path); (b) forgetting `provideAnimationsAsync()` on v18 to v20 projects (PrimeNG v21+ uses native CSS animations and no longer requires it); (c) using v17 component names (`Calendar`, `Dropdown`, `OverlayPanel`, `Sidebar`, `InputSwitch`) after the v18 renames. See [setup.md](references/setup.md) and [migration.md](references/migration.md).
 
 ## PrimeNG architecture: Styled, Unstyled, PassThrough
 
-PrimeNG ships compiled in `node_modules` — there is no source-copy CLI. Customization happens through three escalating mechanisms:
+PrimeNG ships compiled in `node_modules`, there is no source-copy CLI. Customization happens through three escalating mechanisms:
 
-- **Design tokens** (Styled mode) — override theme variables at the preset level via `definePreset(Aura, {...})`. Best for most theming needs. See [theming.md](references/theming.md).
-- **PassThrough (`pt`)** — per-component prop that injects classes/attributes into any internal DOM section. Works in both Styled and Unstyled modes. Use when tokens aren't enough. See [passthrough.md](references/passthrough.md).
-- **Unstyled mode** — strip PrimeNG's styles entirely and provide your own (typically Tailwind via `tailwindcss-primeui`). Use for teams that already own a design system. See [styled-vs-unstyled.md](references/styled-vs-unstyled.md).
+- **Design tokens** (Styled mode), override theme variables at the preset level via `definePreset(Aura, {...})`. Best for most theming needs. See [theming.md](references/theming.md).
+- **PassThrough (`pt`)**, per-component prop that injects classes/attributes into any internal DOM section. Works in both Styled and Unstyled modes. Use when tokens aren't enough. See [passthrough.md](references/passthrough.md).
+- **Unstyled mode**, strip PrimeNG's styles entirely and provide your own (typically Tailwind via `tailwindcss-primeui`). Use for teams that already own a design system. See [styled-vs-unstyled.md](references/styled-vs-unstyled.md).
 
 **Default to Styled mode with Aura preset.** Reach for PassThrough when you need to override specific internal sections. Reach for Unstyled only when the project is committed to a Tailwind-driven design system.
 
 ## Installation and theming
 
-- **Setup**: Install `primeng @primeuix/themes @primeuix/styles`, wire `provideAnimationsAsync()` and `providePrimeNG()`, common pitfalls. Read [setup.md](references/setup.md)
+- **Setup**: Install `primeng @primeuix/themes @primeuix/styles`, wire `providePrimeNG()` (and `provideAnimationsAsync()` on v18 to v20), common pitfalls. Read [setup.md](references/setup.md)
 - **Theming**: Aura / Lara / Nora / Material presets, design tokens, dark mode, `definePreset` overrides, runtime preset switching, CSS layer ordering. Read [theming.md](references/theming.md)
 - **Styled vs Unstyled**: When to use each mode, Tailwind v4 + `tailwindcss-primeui` integration, Volt UI reference patterns. Read [styled-vs-unstyled.md](references/styled-vs-unstyled.md)
 - **PassThrough**: The `pt` API, global `pt` in `providePrimeNG`, nested-component prefix (`pcBadge`), `ptOptions.mergeSections` and `mergeProps`. Read [passthrough.md](references/passthrough.md)

@@ -1,20 +1,20 @@
-# Mission Control — Build Plan
+# Mission Control - Build Plan
 
 > **Status:** Plan. Not yet scaffolded. See "Next session: where to start" at the bottom.
 
-A reference Angular application built with the `spartan-ng-developer` skill. The point is not the app — the point is that **building this proves the skill is correct**. Every component the skill documents gets used here; anything that doesn't match docs → fix the skill, then keep going.
+A reference Angular application built with the `spartan-ng-developer` skill. The point is not the app - the point is that **building this proves the skill is correct**. Every component the skill documents gets used here; anything that doesn't match docs → fix the skill, then keep going.
 
 ## What it is
 
-**Mission Control** — admin dashboard for a fictional AI agent platform. Think Vercel + Linear + a CI dashboard, applied to a runtime that runs autonomous agents. Users register agents, schedule runs, watch them execute, install community agents from a marketplace.
+**Mission Control** - admin dashboard for a fictional AI agent platform. Think Vercel + Linear + a CI dashboard, applied to a runtime that runs autonomous agents. Users register agents, schedule runs, watch them execute, install community agents from a marketplace.
 
-The narrative is on-theme for the repo (agent skills) and gives every Spartan component a natural home — no contrived "showcase" feel.
+The narrative is on-theme for the repo (agent skills) and gives every Spartan component a natural home - no contrived "showcase" feel.
 
 ## Goals
 
 1. **Validate the skill end-to-end.** Use all 56 Helm components at least once. Anywhere the skill is wrong, surface it now, not after publishing.
 2. **Produce a portfolio-grade example.** Real interactions, real layouts, dark mode, keyboard nav, no console errors. Something we can point users at.
-3. **Stay shippable in slices.** Each build phase ends with a runnable app — no waterfall.
+3. **Stay shippable in slices.** Each build phase ends with a runnable app - no waterfall.
 
 ## Out of scope
 
@@ -25,12 +25,12 @@ The narrative is on-theme for the repo (agent skills) and gives every Spartan co
 
 ## Tech stack
 
-- **Angular** — latest stable (v21 at writing); we'll use Reactive Forms per [project preference](../../memory/feedback_forms_strategy.md). Signal Forms moves in when Angular v22 ships stable.
-- **Spartan/ng** — latest. Install via the skill's own `setup.md` instructions (this is also a meta-validation).
-- **Tailwind v4** — recommended by Spartan.
-- **TanStack Angular Table** — required by Spartan's Data Table.
-- **ngx-scrollbar** — required by Spartan's Scroll Area.
-- **@ng-icons/lucide** — required by Spartan's Icon.
+- **Angular** - latest stable (v21 at writing); we'll use Reactive Forms per [project preference](../../memory/feedback_forms_strategy.md). Signal Forms moves in when Angular v22 ships stable.
+- **Spartan/ng** - latest. Install via the skill's own `setup.md` instructions (this is also a meta-validation).
+- **Tailwind v4** - recommended by Spartan.
+- **TanStack Angular Table** - required by Spartan's Data Table.
+- **ngx-scrollbar** - required by Spartan's Scroll Area.
+- **@ng-icons/lucide** - required by Spartan's Icon.
 
 ## Pages
 
@@ -49,7 +49,7 @@ List + detail.
 - Right-click row → **Context Menu** (same actions)
 - Click row → `/agents/:id` detail
 - Detail uses **Tabs**: Overview · Config · Runs · Logs · Permissions
-  - **Config** tab is the full-form showcase — every form control type
+  - **Config** tab is the full-form showcase - every form control type
   - **Logs** tab is a **Resizable** split (timeline tree ⇆ JSON viewer inside **Scroll Area**)
   - **Permissions** tab uses **Accordion** sections
 
@@ -60,7 +60,7 @@ Filterable table + side-drawer detail.
 - Click row → **Sheet** slides in from the right with run detail (output, timing, logs)
 
 ### 4. Schedules (`/schedules`)
-- **Calendar** (multi-mode) — scheduled days highlighted
+- **Calendar** (multi-mode) - scheduled days highlighted
 - "New schedule" → **Dialog** with a form (Date Picker, Combobox for agent, Toggle Group for cadence, Slider for retry count, **Switch** for enabled)
 - Upcoming schedules **Item** list below
 
@@ -82,12 +82,12 @@ Tabs: Profile · Team · Billing · Notifications · Integrations
 
 ## Global shell
 
-- **Sidebar** (`HlmSidebarService`) — primary nav, Ctrl/⌘+B to collapse, mobile-responsive
+- **Sidebar** (`HlmSidebarService`) - primary nav, Ctrl/⌘+B to collapse, mobile-responsive
 - **Header**:
   - Left: app logo + **Breadcrumb**
-  - Middle: **Menubar** (File · Edit · View · Run · Help — e.g. *File → New Agent* opens the create dialog)
+  - Middle: **Menubar** (File · Edit · View · Run · Help - e.g. *File → New Agent* opens the create dialog)
   - Right: search button (**Command** palette via Cmd+K), notifications, **Avatar** with **Dropdown Menu**
-- **Command palette** — global Cmd+K. Navigate + run actions. **Kbd** chips visible in items.
+- **Command palette** - global Cmd+K. Navigate + run actions. **Kbd** chips visible in items.
 - **Dark mode** toggle in header (the canonical pattern from `theming.md`)
 - **Sonner** toaster mounted at app root for all "X succeeded / failed" feedback
 - **Tooltip** on every icon-only button
@@ -158,34 +158,34 @@ Tabs: Profile · Team · Billing · Notifications · Integrations
 
 Small slices. Each phase ends runnable + commitable.
 
-### Phase 0 — Foundation
+### Phase 0 - Foundation
 1. `cd examples` → `ng new mission-control --routing --style=css --ssr=false`
 2. Move this `PLAN.md` into the new project root if `ng new` complains about the directory.
 3. Follow `references/setup.md` from the skill: `ng g @spartan-ng/cli:init` → `ng g @spartan-ng/cli:ui-theme`.
 4. Generate the first wave of Helm components: `button card input label field sidebar sheet dialog dropdown-menu tabs table badge icon avatar tooltip`.
-5. `ng serve` — confirm the dev server runs, a hello-Spartan button renders, dark mode toggles via the theme service in `theming.md`.
+5. `ng serve` - confirm the dev server runs, a hello-Spartan button renders, dark mode toggles via the theme service in `theming.md`.
 6. **Validation gate:** every step above came from the skill. If anything went sideways, fix the skill before continuing.
 
-### Phase 1 — Shell + routing
+### Phase 1 - Shell + routing
 Sidebar + header + main outlet. Route stubs for all 7 pages. Theme toggle. Mock user in header dropdown. **Sonner** toaster mounted.
 
-### Phase 2 — Overview
+### Phase 2 - Overview
 KPI Cards, Recent Runs Table, Activity feed Item list. Skeleton loaders.
 
-### Phase 3 — Agents (list + detail)
+### Phase 3 - Agents (list + detail)
 Data Table with TanStack, filter bar, row Dropdown/Context menu, Alert Dialog confirm. Detail page with Tabs; build the full Config form here (every form control gets used).
 
-### Phase 4 — Runs + Schedules
+### Phase 4 - Runs + Schedules
 Runs filterable table + Sheet detail. Schedules Calendar + Dialog form.
 
-### Phase 5 — Marketplace
+### Phase 5 - Marketplace
 Carousel + Card grid + Hover Card. Install Dialog → Input OTP → Sonner.
 
-### Phase 6 — Settings
+### Phase 6 - Settings
 All tabs: Profile · Team · Billing · Notifications · Integrations.
 
-### Phase 7 — Polish
-- **Command palette** (Cmd+K) last — by now we know every route and action it should expose
+### Phase 7 - Polish
+- **Command palette** (Cmd+K) last - by now we know every route and action it should expose
 - Empty / loading / error states everywhere
 - Keyboard shortcuts visible (Kbd hints)
 - Mobile responsive (sidebar collapse)
@@ -219,6 +219,6 @@ cd "D:\Projects\Open Source\angular-ui-skills\examples"
 Claude should:
 1. Read `examples/mission-control/PLAN.md` (this file)
 2. Read the skill's `setup.md` and `theming.md`
-3. Begin Phase 0 — scaffold the Angular app, run Spartan init + ui-theme, generate the first wave of components, get the dev server up.
+3. Begin Phase 0 - scaffold the Angular app, run Spartan init + ui-theme, generate the first wave of components, get the dev server up.
 
 Each phase is its own commit (or PR). Don't try to land the whole app in one go.

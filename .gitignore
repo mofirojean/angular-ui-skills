@@ -36,3 +36,4 @@ tmp/
 .env
 .env.local
 .env.*.local
+.cache/
