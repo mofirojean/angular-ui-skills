@@ -1,0 +1,382 @@
+<ng-template #sideNav>
+  <div class="flex h-full flex-col text-[13px]">
+    <!-- Workspace switcher (click to collapse sidebar) -->
+    <button
+      type="button"
+      class="hover:bg-surface-100 dark:hover:bg-surface-800 m-1.5 flex items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors"
+      (click)="toggleSidebar()"
+      pTooltip="Collapse sidebar"
+      tooltipPosition="bottom"
+      aria-label="Collapse sidebar"
+    >
+      <div class="bg-primary text-primary-contrast flex h-7 w-7 shrink-0 items-center justify-center rounded text-[11px] font-semibold">
+        {{ workspace.initials }}
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-[13px] font-semibold leading-tight">{{ workspace.name }}</p>
+        <p class="text-muted-color truncate text-[10px] leading-tight">{{ workspace.tier }}</p>
+      </div>
+      <i class="pi pi-angles-left text-muted-color !text-[10px]"></i>
+    </button>
+
+    <!-- AUM + positions strip -->
+    <div class="mx-1.5 mb-1 grid grid-cols-2 gap-1">
+      <div class="border-surface bg-surface-50 dark:bg-surface-900 rounded border px-2 py-1">
+        <p class="text-muted-color text-[9px] font-semibold uppercase tracking-wider leading-none">AUM</p>
+        <p class="mt-0.5 font-mono text-[12px] font-semibold leading-tight tabular-nums">{{ workspace.aum }}</p>
+      </div>
+      <div class="border-surface bg-surface-50 dark:bg-surface-900 rounded border px-2 py-1">
+        <p class="text-muted-color text-[9px] font-semibold uppercase tracking-wider leading-none">Positions</p>
+        <p class="mt-0.5 font-mono text-[12px] font-semibold leading-tight tabular-nums">{{ workspace.positions }}</p>
+      </div>
+    </div>
+
+    <!-- Market status pill -->
+    <div class="mx-1.5 mb-1 flex items-center justify-between rounded-md px-2 py-1">
+      <span class="text-muted-color flex items-center gap-1.5 text-[11px]">
+        @if (marketStatus() === 'open') {
+          <span class="relative flex h-1.5 w-1.5">
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-60"></span>
+            <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+          </span>
+        } @else {
+          <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+        }
+        {{ marketLabel() }}
+      </span>
+      <span class="text-muted-color font-mono text-[10px] tabular-nums">14:32 ET</span>
+    </div>
+
+    <!-- Scrollable middle -->
+    <div class="flex-1 overflow-y-auto px-1.5 pb-2">
+      <!-- Pinned tickers -->
+      <div class="mb-3">
+        <div class="text-muted-color flex items-center justify-between px-1.5 pb-1 pt-2">
+          <span class="text-[10px] font-semibold uppercase tracking-wider">Pinned</span>
+          <button
+            type="button"
+            class="hover:text-color text-[10px] transition-colors"
+            pTooltip="Add ticker"
+            tooltipPosition="bottom"
+            aria-label="Add ticker"
+          >
+            <i class="pi pi-plus !text-[10px]"></i>
+          </button>
+        </div>
+        <ul class="flex flex-col gap-0.5">
+          @for (t of pinned; track t.symbol) {
+            <li>
+              <a
+                [routerLink]="t.route"
+                (click)="closeMobileNav()"
+                class="hover:bg-surface-100 dark:hover:bg-surface-800 group flex items-center gap-2 rounded-md px-1.5 py-1.5 transition-colors"
+              >
+                <div class="min-w-0 flex-1">
+                  <p class="truncate font-mono text-[11px] font-semibold leading-tight">{{ t.symbol }}</p>
+                  <p class="text-muted-color truncate text-[9px] leading-tight">{{ t.name }}</p>
+                </div>
+                <svg
+                  width="42"
+                  height="12"
+                  viewBox="0 0 42 12"
+                  class="shrink-0"
+                  [class.text-emerald-500]="t.change > 0"
+                  [class.text-rose-500]="t.change < 0"
+                  aria-hidden="true"
+                >
+                  <polyline [attr.points]="t.spark" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round" stroke-linecap="round" />
+                </svg>
+                <div class="shrink-0 text-right">
+                  <p class="font-mono text-[11px] font-semibold leading-tight tabular-nums">{{ t.price }}</p>
+                  <p
+                    class="font-mono text-[9px] leading-tight tabular-nums"
+                    [class.text-emerald-500]="t.change > 0"
+                    [class.text-rose-500]="t.change < 0"
+                  >
+                    {{ formatChange(t.change) }}
+                  </p>
+                </div>
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <!-- Workspace nav -->
+      <div class="mb-3">
+        <p class="text-muted-color px-1.5 pb-1 text-[10px] font-semibold uppercase tracking-wider">Workspace</p>
+        <ul class="flex flex-col gap-0.5">
+          @for (item of navItems; track item.route) {
+            <li>
+              <a
+                [routerLink]="item.route"
+                [routerLinkActiveOptions]="{ exact: !!item.exact }"
+                routerLinkActive="bg-primary/15 text-primary font-medium"
+                (click)="closeMobileNav()"
+                class="hover:bg-surface-100 dark:hover:bg-surface-800 group flex items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] transition-colors"
+              >
+                <i class="{{ item.icon }} !text-[13px] shrink-0 opacity-70 group-hover:opacity-100"></i>
+                <span class="flex-1 truncate">{{ item.label }}</span>
+                @if (item.badge) {
+                  <span class="bg-surface-100 dark:bg-surface-800 text-muted-color rounded px-1 py-px font-mono text-[10px] tabular-nums">{{ item.badge }}</span>
+                }
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <!-- Markets strip -->
+      <div class="mb-3">
+        <p class="text-muted-color px-1.5 pb-1 text-[10px] font-semibold uppercase tracking-wider">Markets</p>
+        <ul class="flex flex-col gap-0.5">
+          @for (m of markets; track m.label) {
+            <li class="hover:bg-surface-100 dark:hover:bg-surface-800 flex items-center justify-between rounded-md px-2 py-1 transition-colors">
+              <span class="text-[12px]">{{ m.label }}</span>
+              <span class="flex items-center gap-2">
+                <span class="font-mono text-[11px] tabular-nums">{{ m.value }}</span>
+                <span
+                  class="font-mono text-[10px] tabular-nums"
+                  [class.text-emerald-500]="m.change > 0"
+                  [class.text-rose-500]="m.change < 0"
+                >
+                  {{ formatChange(m.change) }}
+                </span>
+              </span>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <!-- Resources -->
+      <div>
+        <p class="text-muted-color px-1.5 pb-1 text-[10px] font-semibold uppercase tracking-wider">Resources</p>
+        <ul class="flex flex-col gap-0.5">
+          @for (r of resources; track r.label) {
+            <li>
+              <a
+                [href]="r.href"
+                class="hover:bg-surface-100 dark:hover:bg-surface-800 group flex items-center gap-2.5 rounded-md px-2 py-1.5 text-[12px] transition-colors"
+              >
+                <i class="{{ r.icon }} !text-[12px] shrink-0 opacity-70 group-hover:opacity-100"></i>
+                <span class="flex-1 truncate">{{ r.label }}</span>
+                @if (r.badge) {
+                  <span class="bg-primary text-primary-contrast rounded px-1 py-px font-mono text-[9px] font-semibold leading-none">{{ r.badge }}</span>
+                }
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+
+    <!-- Trial banner -->
+    @if (user.trialDaysLeft > 0) {
+      <div class="border-surface mx-1.5 mb-1.5 rounded-md border px-2.5 py-2">
+        <p class="flex items-center gap-1.5 text-[11px] font-semibold">
+          <i class="pi pi-sparkles text-primary !text-[10px]"></i>
+          {{ user.plan }} trial
+        </p>
+        <div class="bg-surface-100 dark:bg-surface-800 mt-1 h-1 overflow-hidden rounded-full">
+          <div class="bg-primary h-full" [style.width.%]="(user.trialDaysLeft / 14) * 100"></div>
+        </div>
+        <p class="text-muted-color mt-1 text-[10px]">{{ user.trialDaysLeft }} of 14 days left</p>
+        <p-button label="Upgrade" size="small" class="mt-1.5 block" styleClass="!w-full !py-1 !text-[11px]" />
+      </div>
+    }
+
+    <div class="border-surface mx-3 border-t"></div>
+
+    <!-- User pill -->
+    <button
+      type="button"
+      class="hover:bg-surface-100 dark:hover:bg-surface-800 m-1.5 flex items-center gap-2 rounded-md px-1.5 py-1.5 text-left transition-colors"
+      (click)="userMenu.toggle($event)"
+      aria-label="Open user menu"
+    >
+      <p-avatar [label]="user.initials" shape="circle" size="normal" styleClass="!h-7 !w-7 !text-[11px]" />
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-[12px] font-medium leading-tight">{{ user.name }}</p>
+        <p class="text-muted-color flex items-center gap-1 text-[10px] leading-tight">
+          <span class="bg-emerald-500 h-1 w-1 rounded-full"></span>
+          Online
+        </p>
+      </div>
+      <i class="pi pi-chevron-up text-muted-color !text-[10px]"></i>
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #sideNavCompact>
+  <div class="flex h-full flex-col items-center text-[13px]">
+    <!-- AC tile (click to expand) -->
+    <button
+      type="button"
+      class="bg-primary text-primary-contrast m-2 flex h-7 w-7 shrink-0 items-center justify-center rounded text-[11px] font-semibold transition-transform hover:scale-105"
+      (click)="toggleSidebar()"
+      pTooltip="Expand sidebar"
+      tooltipPosition="right"
+      aria-label="Expand sidebar"
+    >
+      {{ workspace.initials }}
+    </button>
+
+    <div class="border-surface mx-2 mb-2 w-8 border-t"></div>
+
+    <!-- Compact nav -->
+    <nav class="flex flex-1 flex-col items-center gap-0.5 overflow-y-auto px-1">
+      @for (item of navItems; track item.route) {
+        <a
+          [routerLink]="item.route"
+          [routerLinkActiveOptions]="{ exact: !!item.exact }"
+          routerLinkActive="bg-primary/15 text-primary"
+          (click)="closeMobileNav()"
+          [pTooltip]="item.label + (item.badge ? ' · ' + item.badge : '')"
+          tooltipPosition="right"
+          class="hover:bg-surface-100 dark:hover:bg-surface-800 relative flex h-8 w-8 items-center justify-center rounded-md transition-colors"
+          [attr.aria-label]="item.label"
+        >
+          <i class="{{ item.icon }} !text-[14px]"></i>
+          @if (item.badge) {
+            <span class="bg-rose-500 absolute -right-0.5 -top-0.5 h-1.5 w-1.5 rounded-full"></span>
+          }
+        </a>
+      }
+    </nav>
+
+    <div class="border-surface mx-2 my-1 w-8 border-t"></div>
+
+    <!-- Theme toggle (small) -->
+    <button
+      type="button"
+      class="hover:bg-surface-100 dark:hover:bg-surface-800 mb-1 flex h-8 w-8 items-center justify-center rounded-md transition-colors"
+      (click)="toggleTheme()"
+      [pTooltip]="mode() === 'light' ? 'Dark mode' : 'Light mode'"
+      tooltipPosition="right"
+    >
+      <i class="{{ modeIcon() }} !text-[13px]"></i>
+    </button>
+
+    <!-- User avatar -->
+    <button
+      type="button"
+      class="hover:bg-surface-100 dark:hover:bg-surface-800 m-1 flex h-8 w-8 items-center justify-center rounded-md transition-colors"
+      (click)="userMenu.toggle($event)"
+      [pTooltip]="user.name"
+      tooltipPosition="right"
+      aria-label="Open user menu"
+    >
+      <p-avatar [label]="user.initials" shape="circle" styleClass="!h-6 !w-6 !text-[10px]" />
+    </button>
+  </div>
+</ng-template>
+
+<div class="bg-surface-0 dark:bg-surface-950 text-color flex min-h-screen text-[13px]">
+  <!-- Persistent sidebar (lg+) -->
+  <aside
+    class="border-surface bg-surface-50 dark:bg-surface-900 hidden shrink-0 border-r transition-[width] duration-150 lg:flex lg:flex-col"
+    [class.w-60]="!sidebarCollapsed()"
+    [class.w-14]="sidebarCollapsed()"
+  >
+    @if (sidebarCollapsed()) {
+      <ng-container *ngTemplateOutlet="sideNavCompact" />
+    } @else {
+      <ng-container *ngTemplateOutlet="sideNav" />
+    }
+  </aside>
+
+  <!-- Mobile Drawer -->
+  <p-drawer [(visible)]="mobileNavOpen" position="left" [style]="{ width: '15rem' }" [showCloseIcon]="false">
+    <ng-container *ngTemplateOutlet="sideNav" />
+  </p-drawer>
+
+  <!-- Main column -->
+  <div class="flex min-w-0 flex-1 flex-col">
+    <header class="border-surface bg-surface-0/85 dark:bg-surface-950/85 supports-backdrop-filter:bg-surface-0/60 sticky top-0 z-10 flex h-11 items-center gap-1.5 border-b px-2.5 backdrop-blur-xl">
+      <!-- Mobile sidebar trigger -->
+      <p-button
+        icon="pi pi-bars"
+        severity="secondary"
+        variant="text"
+        size="small"
+        [rounded]="true"
+        styleClass="!h-7 !w-7"
+        class="lg:hidden"
+        (onClick)="mobileNavOpen.set(true)"
+        aria-label="Open navigation"
+      />
+
+      <!-- Desktop sidebar collapse / expand -->
+      <p-button
+        [icon]="sidebarToggleIcon()"
+        severity="secondary"
+        variant="text"
+        size="small"
+        [rounded]="true"
+        styleClass="!h-7 !w-7"
+        class="hidden lg:inline-flex"
+        (onClick)="toggleSidebar()"
+        [pTooltip]="sidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+        tooltipPosition="bottom"
+        [attr.aria-label]="sidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+      />
+
+      <button
+        type="button"
+        class="border-surface text-muted-color hover:bg-surface-100 bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-800 flex h-7 max-w-md flex-1 items-center gap-2 rounded-md border px-2.5 text-left text-[12px] transition-colors"
+        aria-label="Open command palette"
+      >
+        <i class="pi pi-search !text-[11px]"></i>
+        <span class="flex-1 truncate">Search tickers, runs, settings…</span>
+        <kbd class="border-surface bg-surface-100 dark:bg-surface-800 hidden rounded border px-1 py-px font-mono text-[10px] leading-none sm:inline">⌘K</kbd>
+      </button>
+
+      <div class="ml-auto flex items-center gap-0.5">
+        <p-overlaybadge value="3" severity="danger">
+          <p-button
+            icon="pi pi-bell"
+            severity="secondary"
+            variant="text"
+            size="small"
+            [rounded]="true"
+            styleClass="!h-7 !w-7"
+            pTooltip="Notifications"
+            tooltipPosition="bottom"
+            aria-label="Notifications"
+          />
+        </p-overlaybadge>
+
+        <p-button
+          [icon]="modeIcon()"
+          severity="secondary"
+          variant="text"
+          size="small"
+          [rounded]="true"
+          styleClass="!h-7 !w-7"
+          (onClick)="toggleTheme()"
+          [pTooltip]="mode() === 'light' ? 'Dark mode' : 'Light mode'"
+          tooltipPosition="bottom"
+          [attr.aria-label]="'Switch to ' + (mode() === 'light' ? 'dark' : 'light') + ' mode'"
+        />
+
+        <button
+          type="button"
+          class="hover:bg-surface-100 dark:hover:bg-surface-800 ml-1 hidden h-7 items-center gap-1.5 rounded-md px-1 transition-colors lg:inline-flex"
+          (click)="userMenu.toggle($event)"
+          aria-label="Open user menu"
+        >
+          <p-avatar [label]="user.initials" shape="circle" styleClass="!h-6 !w-6 !text-[10px]" />
+          <i class="pi pi-chevron-down text-muted-color !text-[10px]"></i>
+        </button>
+      </div>
+    </header>
+
+    <section class="flex-1 p-3">
+      <router-outlet />
+    </section>
+  </div>
+</div>
+
+<p-menu #userMenu [model]="userMenuModel" [popup]="true" appendTo="body" />
+<p-toast position="top-right" />
+<p-confirmdialog />

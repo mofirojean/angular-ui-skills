@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "primeng-developer": {
+      "source": "mofirojean/angular-ui-skills",
+      "sourceType": "github",
+      "skillPath": "skills/primeng-developer/SKILL.md",
+      "computedHash": "bbf00131316aa4e0dce7ab624cc0713d55ac9348d21dea257a654b04e5f6f683"
+    },
     "spartan-ng-developer": {
       "source": "mofirojean/angular-ui-skills",
       "sourceType": "github",
