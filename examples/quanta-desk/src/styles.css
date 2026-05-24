@@ -36,6 +36,20 @@ body {
   line-height: 1;
 }
 
+/* Tags - no size input on <p-tag>, override defaults globally */
+.p-tag {
+  padding: 0.125rem 0.375rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  border-radius: 4px;
+}
+
+.p-tag-icon {
+  font-size: 0.625rem;
+}
+
 /* Menus (Menu, ContextMenu) - dense rows, small icons, small caps section labels */
 .p-menu {
   min-width: 12rem;
@@ -91,4 +105,13 @@ body {
 .p-tooltip-text {
   padding: 0.25rem 0.5rem;
   font-size: 0.6875rem;
+}
+
+/* Chart host needs explicit block + dimensions so flex parents can size it.
+   Without this the host stays inline and Tailwind h-full has no effect. */
+p-chart,
+.p-chart {
+  display: block;
+  height: 100%;
+  width: 100%;
 }

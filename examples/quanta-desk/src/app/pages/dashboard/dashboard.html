@@ -1,9 +1,275 @@
 <div class="flex flex-col gap-3">
-  <header>
-    <h1 class="text-lg font-semibold tracking-tight">Dashboard</h1>
-    <p class="text-muted-color mt-0.5 text-[12px]">Portfolio snapshot, performance, top movers.</p>
+  <!-- Page header -->
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <h1 class="text-lg font-semibold tracking-tight">Dashboard</h1>
+      <p class="text-muted-color mt-0.5 text-[12px]">
+        Portfolio snapshot, performance, top movers.
+        <span class="ml-1.5 font-mono tabular-nums">As of 14:32 ET</span>
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="border-surface bg-surface-50 dark:bg-surface-900 flex items-center gap-px rounded-md border p-0.5">
+        @for (p of periods; track p) {
+          <button
+            type="button"
+            class="px-2 py-0.5 text-[11px] font-medium rounded transition-colors"
+            [class.bg-primary]="period() === p"
+            [class.text-primary-contrast]="period() === p"
+            [class.text-muted-color]="period() !== p"
+            [class.hover:text-color]="period() !== p"
+            (click)="setPeriod(p)"
+          >
+            {{ p }}
+          </button>
+        }
+      </div>
+      <p-button
+        icon="pi pi-refresh"
+        severity="secondary"
+        variant="text"
+        size="small"
+        [rounded]="true"
+        styleClass="!h-7 !w-7"
+        pTooltip="Refresh"
+        tooltipPosition="bottom"
+        aria-label="Refresh"
+      />
+      <p-button label="New trade" icon="pi pi-plus" size="small" routerLink="/trade" />
+    </div>
   </header>
-  <div class="border-surface-200 bg-surface-50 rounded-md border p-4 text-[12px]">
-    KPIs, chart, top movers, and news strip land here in Phase 2.
-  </div>
+
+  <!-- KPIs -->
+  <section class="grid grid-cols-2 gap-2 lg:grid-cols-4">
+    @if (isLoading()) {
+      @for (i of [0, 1, 2, 3]; track i) {
+        <div class="border-surface bg-surface-50 dark:bg-surface-900 rounded-md border p-3">
+          <p-skeleton width="60%" height="0.625rem" />
+          <p-skeleton width="80%" height="1.25rem" styleClass="!mt-2" />
+          <p-skeleton width="40%" height="0.625rem" styleClass="!mt-2" />
+        </div>
+      }
+    } @else {
+      @for (k of kpis; track k.id) {
+        <div class="border-surface bg-surface-50 dark:bg-surface-900 rounded-md border p-3">
+          <div class="flex items-center justify-between">
+            <p class="text-muted-color text-[10px] font-semibold uppercase tracking-wider leading-none">{{ k.label }}</p>
+            <i class="{{ k.icon }} text-muted-color !text-[11px] opacity-60"></i>
+          </div>
+          <div class="mt-2 flex items-end justify-between gap-2">
+            <p class="font-mono text-[18px] font-semibold leading-none tabular-nums">{{ k.value }}</p>
+            <svg
+              width="60"
+              height="20"
+              viewBox="0 0 60 20"
+              class="shrink-0"
+              [class.text-emerald-500]="k.tone === 'positive'"
+              [class.text-rose-500]="k.tone === 'negative'"
+              [class.text-muted-color]="k.tone === 'neutral'"
+              aria-hidden="true"
+            >
+              <polyline [attr.points]="k.spark" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round" stroke-linecap="round" />
+            </svg>
+          </div>
+          <p
+            class="mt-2 font-mono text-[11px] tabular-nums"
+            [class.text-emerald-500]="k.tone === 'positive'"
+            [class.text-rose-500]="k.tone === 'negative'"
+            [class.text-muted-color]="k.tone === 'neutral'"
+          >
+            {{ k.deltaLabel }} · {{ formatChange(k.delta) }}
+          </p>
+        </div>
+      }
+    }
+  </section>
+
+  <!-- Performance chart + sectors -->
+  <section class="grid grid-cols-1 gap-2 lg:h-[420px] lg:grid-cols-3">
+    <!-- Performance chart -->
+    <div class="border-surface bg-surface-50 dark:bg-surface-900 flex flex-col rounded-md border p-3 lg:col-span-2">
+      <div class="mb-2 flex items-center justify-between">
+        <div>
+          <p class="text-[13px] font-semibold leading-none">Performance</p>
+          <p class="text-muted-color mt-1 text-[11px]">vs S&amp;P 500 · {{ period() }}</p>
+        </div>
+        <div class="flex items-center gap-3 text-[11px]">
+          <span class="flex items-center gap-1.5">
+            <span class="bg-emerald-500 h-1.5 w-1.5 rounded-full"></span>
+            <span class="text-muted-color">Portfolio</span>
+            <span class="text-emerald-500 font-mono font-semibold tabular-nums">+9.62%</span>
+          </span>
+          <span class="flex items-center gap-1.5">
+            <span class="bg-zinc-500 h-1.5 w-1.5 rounded-full"></span>
+            <span class="text-muted-color">S&amp;P 500</span>
+            <span class="text-muted-color font-mono tabular-nums">+5.00%</span>
+          </span>
+        </div>
+      </div>
+      @if (isLoading()) {
+        <p-skeleton width="100%" height="100%" styleClass="!flex-1" />
+      } @else {
+        <div class="min-h-0 flex-1">
+          <p-chart type="line" [data]="chartData()" [options]="chartOptions" />
+        </div>
+      }
+    </div>
+
+    <!-- Sector allocation -->
+    <div class="border-surface bg-surface-50 dark:bg-surface-900 flex flex-col rounded-md border p-3">
+      <div class="mb-2 flex items-center justify-between">
+        <div>
+          <p class="text-[13px] font-semibold leading-none">Sector allocation</p>
+          <p class="text-muted-color mt-1 text-[11px]">% of portfolio value</p>
+        </div>
+        <span class="text-muted-color font-mono text-[10px] tabular-nums">{{ sectors.length }} sectors</span>
+      </div>
+      @if (isLoading()) {
+        <p-skeleton shape="circle" size="6rem" styleClass="!mx-auto !my-2" />
+        <p-skeleton width="100%" height="0.625rem" styleClass="!mt-3" />
+        <p-skeleton width="100%" height="0.625rem" styleClass="!mt-1" />
+        <p-skeleton width="100%" height="0.625rem" styleClass="!mt-1" />
+        <p-skeleton width="100%" height="0.625rem" styleClass="!mt-1" />
+      } @else {
+        <div class="flex min-h-0 flex-1 flex-col items-center justify-between">
+          <!-- Donut chart -->
+          <div class="h-[110px] w-[110px] shrink-0">
+            <p-chart type="doughnut" [data]="sectorChartData()" [options]="sectorChartOptions" />
+          </div>
+
+          <!-- Top sector callout, below the chart -->
+          <div class="mt-2 text-center">
+            <p class="text-muted-color text-[9px] font-semibold uppercase tracking-wider leading-none">Top sector</p>
+            <p class="mt-1 flex items-center justify-center gap-1.5 text-[12px] font-semibold leading-none">
+              <span class="h-2 w-2 rounded-sm" [style.background]="sectors[0].color"></span>
+              {{ sectors[0].label }}
+              <span class="text-emerald-500 font-mono text-[11px] tabular-nums">{{ sectors[0].value }}%</span>
+            </p>
+          </div>
+
+          <!-- Compact legend -->
+          <ul class="mt-3 grid w-full min-h-0 grid-cols-2 gap-x-3 gap-y-1 overflow-y-auto text-[11px]">
+            @for (s of sectors; track s.label) {
+              <li class="flex items-center justify-between gap-1">
+                <span class="flex min-w-0 items-center gap-1.5">
+                  <span class="h-1.5 w-1.5 shrink-0 rounded-sm" [style.background]="s.color"></span>
+                  <span class="truncate">{{ s.label }}</span>
+                </span>
+                <span class="font-mono tabular-nums">{{ s.value }}%</span>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Top movers -->
+  <section class="border-surface bg-surface-50 dark:bg-surface-900 overflow-hidden rounded-md border">
+    <div class="flex items-center justify-between px-3 py-2">
+      <div>
+        <p class="text-[13px] font-semibold leading-none">Top movers</p>
+        <p class="text-muted-color mt-1 text-[11px]">By absolute % change · today</p>
+      </div>
+      <a routerLink="/holdings" class="text-primary text-[11px] font-medium hover:underline">View all</a>
+    </div>
+    @if (isLoading()) {
+      <div class="space-y-1 px-3 pb-3">
+        @for (i of [0, 1, 2, 3, 4]; track i) {
+          <p-skeleton width="100%" height="1.75rem" />
+        }
+      </div>
+    } @else {
+      <p-table [value]="movers" styleClass="dashboard-mini-table">
+        <ng-template pTemplate="header">
+          <tr class="border-surface border-t text-[10px] uppercase tracking-wider">
+            <th class="px-3 py-1.5 text-left font-semibold">Ticker</th>
+            <th class="px-3 py-1.5 text-left font-semibold">Sector</th>
+            <th class="px-3 py-1.5 text-right font-semibold">Price</th>
+            <th class="px-3 py-1.5 text-right font-semibold">Change</th>
+            <th class="px-3 py-1.5 text-right font-semibold">Volume</th>
+            <th class="px-3 py-1.5 text-right font-semibold">7d</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-m>
+          <tr class="hover:bg-surface-100 dark:hover:bg-surface-800 border-surface border-t transition-colors">
+            <td class="px-3 py-1.5">
+              <a [routerLink]="['/holdings', m.symbol]" class="hover:text-primary block">
+                <p class="font-mono text-[12px] font-semibold leading-tight">{{ m.symbol }}</p>
+                <p class="text-muted-color text-[10px] leading-tight">{{ m.name }}</p>
+              </a>
+            </td>
+            <td class="px-3 py-1.5">
+              <p-tag [value]="m.sector" size="small" [severity]="sectorSeverity(m.sector)" />
+            </td>
+            <td class="px-3 py-1.5 text-right font-mono text-[12px] tabular-nums">
+              ${{ m.price.toFixed(2) }}
+            </td>
+            <td
+              class="px-3 py-1.5 text-right font-mono text-[12px] font-semibold tabular-nums"
+              [class.text-emerald-500]="m.change > 0"
+              [class.text-rose-500]="m.change < 0"
+            >
+              {{ formatChange(m.change) }}
+            </td>
+            <td class="text-muted-color px-3 py-1.5 text-right font-mono text-[11px] tabular-nums">{{ m.volume }}</td>
+            <td class="px-3 py-1.5 text-right">
+              <svg
+                width="60"
+                height="14"
+                viewBox="0 0 42 12"
+                class="ml-auto"
+                [class.text-emerald-500]="m.change > 0"
+                [class.text-rose-500]="m.change < 0"
+                aria-hidden="true"
+              >
+                <polyline [attr.points]="m.spark" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round" stroke-linecap="round" />
+              </svg>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
+  </section>
+
+  <!-- Market news carousel -->
+  <section class="border-surface bg-surface-50 dark:bg-surface-900 rounded-md border p-3">
+    <div class="mb-2 flex items-center justify-between">
+      <div>
+        <p class="text-[13px] font-semibold leading-none">Market news</p>
+        <p class="text-muted-color mt-1 text-[11px]">Curated feed · refreshes every 60s</p>
+      </div>
+      <a href="#news" class="text-primary text-[11px] font-medium hover:underline">All news</a>
+    </div>
+    @if (isLoading()) {
+      <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        <p-skeleton width="100%" height="6rem" />
+        <p-skeleton width="100%" height="6rem" />
+        <p-skeleton width="100%" height="6rem" />
+      </div>
+    } @else {
+      <p-carousel
+        [value]="news"
+        [numVisible]="3"
+        [numScroll]="1"
+        [circular]="true"
+        [responsiveOptions]="carouselResponsive"
+      >
+        <ng-template let-item pTemplate="item">
+          <div class="border-surface hover:bg-surface-100 dark:hover:bg-surface-800 mx-1 h-full rounded-md border p-3 transition-colors">
+            <div class="flex items-center justify-between gap-2">
+              <span class="bg-surface-100 dark:bg-surface-800 text-muted-color rounded px-1.5 py-px font-mono text-[10px] font-semibold uppercase tracking-wider">{{ item.category }}</span>
+              <p-tag [value]="item.impact" [severity]="impactSeverity(item.impact)" />
+            </div>
+            <p class="mt-2 line-clamp-2 text-[12px] font-medium leading-snug">{{ item.title }}</p>
+            <p class="text-muted-color mt-2 flex items-center gap-1.5 text-[10px]">
+              <span class="font-medium">{{ item.source }}</span>
+              <span>·</span>
+              <span class="font-mono tabular-nums">{{ item.time }}</span>
+            </p>
+          </div>
+        </ng-template>
+      </p-carousel>
+    }
+  </section>
 </div>
