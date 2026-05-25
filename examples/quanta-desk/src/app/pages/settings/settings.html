@@ -1,9 +1,502 @@
 <div class="flex flex-col gap-3">
-  <header>
-    <h1 class="text-lg font-semibold tracking-tight">Settings</h1>
-    <p class="text-muted-color mt-0.5 text-[12px]">Profile, trading prefs, notifications, API keys, billing.</p>
+  <!-- Header -->
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <h1 class="text-lg font-semibold tracking-tight">Settings</h1>
+      <p class="text-muted-color mt-0.5 text-[12px]">
+        Profile, trading prefs, notifications, API keys, billing.
+      </p>
+    </div>
   </header>
-  <div class="border-surface-200 bg-surface-50 rounded-md border p-4 text-[12px]">
-    Tabs + every remaining form control. Phase 7.
-  </div>
+
+  <p-tabs [(value)]="activeTab">
+    <p-tablist class="border-surface border-b">
+      <p-tab value="profile"><i class="pi pi-user text-[12px]!"></i>&nbsp;Profile</p-tab>
+      <p-tab value="trading"><i class="pi pi-sliders-h text-[12px]!"></i>&nbsp;Trading prefs</p-tab>
+      <p-tab value="notifications"><i class="pi pi-bell text-[12px]!"></i>&nbsp;Notifications</p-tab>
+      <p-tab value="keys"><i class="pi pi-key text-[12px]!"></i>&nbsp;API keys</p-tab>
+      <p-tab value="billing"><i class="pi pi-credit-card text-[12px]!"></i>&nbsp;Billing</p-tab>
+    </p-tablist>
+
+    <p-tabpanels>
+      <!-- =============== PROFILE =============== -->
+      <p-tabpanel value="profile">
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="flex flex-col gap-4 pt-3 text-[12px]">
+          <!-- Avatar row -->
+          <div class="border-surface bg-surface-50 dark:bg-surface-900 flex items-center mb-4 gap-3 rounded-md border p-3">
+            <p-avatar label="MJ" shape="circle" size="large" styleClass="!h-12 !w-12 !text-[13px]" />
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px] font-semibold leading-tight">Mofiro Jean</p>
+              <p class="text-muted-color mt-0.5 text-[11px]">JPG or PNG, max 2 MB.</p>
+            </div>
+            <p-button label="Upload" icon="pi pi-upload" size="small" severity="secondary" variant="outlined" />
+            <p-button label="Remove" severity="secondary" variant="text" size="small" styleClass="!text-rose-500" />
+          </div>
+
+          <div class="grid gap-3 sm:grid-cols-2">
+            <p-floatlabel>
+              <input pInputText id="full-name" formControlName="fullName" size="small" class="!w-full" />
+              <label for="full-name">Full name</label>
+            </p-floatlabel>
+            <p-floatlabel>
+              <input pInputText id="email" type="email" formControlName="email" size="small" class="!w-full" />
+              <label for="email">Email</label>
+            </p-floatlabel>
+          </div>
+
+          <p-iftalabel>
+            <p-inputMask
+              id="phone"
+              size="small"
+              formControlName="phone"
+              mask="(999) 999-9999"
+              styleClass="!w-full"
+            />
+            <label for="phone">Phone</label>
+          </p-iftalabel>
+
+          <div>
+            <div class="mb-1 flex items-center justify-between">
+              <label class="text-muted-color text-[10px] font-semibold uppercase tracking-wider">Bio</label>
+              <span class="font-mono text-[10px] tabular-nums">{{ bioLength() }} / 280</span>
+            </div>
+            <textarea
+              pTextarea
+              formControlName="bio"
+              rows="3"
+              [autoResize]="true"
+              placeholder="Tell your workspace about yourself"
+              class="!w-full text-[12px]"
+            ></textarea>
+          </div>
+
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label class="text-muted-color mb-1 block text-[10px] font-semibold uppercase tracking-wider">Language</label>
+              <p-select
+                size="small"
+                formControlName="locale"
+                [options]="locales"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+                styleClass="!w-full"
+              />
+            </div>
+            <div>
+              <label class="text-muted-color mb-1 block text-[10px] font-semibold uppercase tracking-wider">Timezone</label>
+              <p-select
+                size="small"
+                formControlName="timezone"
+                [options]="timezones"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+                styleClass="!w-full"
+              />
+            </div>
+          </div>
+
+          <!-- Theme + accent color -->
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label class="text-muted-color mb-2 block text-[10px] font-semibold uppercase tracking-wider">Theme</label>
+              <div class="space-y-1.5">
+                @for (t of [{ v: 'system', l: 'Match system', d: 'Follow OS' }, { v: 'light', l: 'Light', d: 'Always bright' }, { v: 'dark', l: 'Dark', d: 'Always dark' }]; track t.v) {
+                  <label class="hover:bg-surface-100 dark:hover:bg-surface-800 border-surface flex cursor-pointer items-center gap-2.5 rounded-md border p-2 transition-colors">
+                    <p-radioButton [value]="t.v" formControlName="theme" [inputId]="'theme-' + t.v" />
+                    <div class="flex-1">
+                      <p class="text-[12px] font-medium leading-tight">{{ t.l }}</p>
+                      <p class="text-muted-color text-[10px] leading-tight">{{ t.d }}</p>
+                    </div>
+                  </label>
+                }
+              </div>
+            </div>
+
+            <div>
+              <label class="text-muted-color mb-2 block text-[10px] font-semibold uppercase tracking-wider">Accent color</label>
+              <div class="border-surface bg-surface-0 dark:bg-surface-950 flex items-center gap-3 rounded-md border p-3">
+                <p-colorpicker formControlName="accent" appendTo="body" />
+                <div class="min-w-0 flex-1">
+                  <p class="font-mono text-[12px] font-semibold uppercase tracking-wider">{{ profileForm.controls.accent.value }}</p>
+                  <p class="text-muted-color text-[10px]">Used for active states and buttons.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Change password -->
+          <div>
+            <label class="text-muted-color mb-1 block text-[10px] font-semibold uppercase tracking-wider">Change password</label>
+            <p-password
+              formControlName="newPassword"
+              [feedback]="true"
+              [toggleMask]="true"
+              promptLabel="Choose a new password"
+              placeholder="New password"
+              styleClass="!w-full"
+              inputStyleClass="!w-full"
+            />
+          </div>
+
+          <div class="border-surface flex items-center justify-end gap-1.5 border-t pt-3">
+            <p-button label="Discard" severity="secondary" variant="text" size="small" type="button" />
+            <p-button label="Save changes" icon="pi pi-check" size="small" type="submit" />
+          </div>
+        </form>
+      </p-tabpanel>
+
+      <!-- =============== TRADING PREFS =============== -->
+      <p-tabpanel value="trading">
+        <form [formGroup]="tradingForm" (ngSubmit)="saveTrading()" class="flex flex-col gap-4 pt-3 text-[12px]">
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label class="text-muted-color mb-1.5 block text-[10px] font-semibold uppercase tracking-wider">Default order type</label>
+              <p-selectButton
+                size="small"
+                formControlName="defaultOrderType"
+                [options]="orderTypeOptions"
+                optionLabel="label"
+                optionValue="value"
+                [allowEmpty]="false"
+              />
+            </div>
+            <div>
+              <label class="text-muted-color mb-1.5 block text-[10px] font-semibold uppercase tracking-wider">Sizing mode</label>
+              <p-selectButton
+                size="small"
+                formControlName="sizingMode"
+                [options]="sizingOptions"
+                optionLabel="label"
+                optionValue="value"
+                [allowEmpty]="false"
+              />
+            </div>
+          </div>
+
+          <!-- Risk knob + slider -->
+          <div class="border-surface bg-surface-50 dark:bg-surface-900 grid grid-cols-1 gap-4 rounded-md border p-3 sm:grid-cols-2">
+            <div class="flex flex-col items-center">
+              <p class="text-muted-color mb-2 text-[10px] font-semibold uppercase tracking-wider">Risk score</p>
+              <p-knob
+                [ngModel]="tradingForm.controls.riskScore.value"
+                (ngModelChange)="tradingForm.controls.riskScore.setValue($event)"
+                [ngModelOptions]="{ standalone: true }"
+                [min]="0"
+                [max]="100"
+                [step]="1"
+                [size]="100"
+                [strokeWidth]="10"
+                valueColor="var(--p-primary-color)"
+                rangeColor="var(--p-surface-200)"
+              />
+              <p class="text-muted-color mt-2 text-[10px]">Sets default position-sizing aggressiveness.</p>
+            </div>
+
+            <div class="flex flex-col">
+              <div class="mb-1 flex items-center justify-between">
+                <label class="text-muted-color text-[10px] font-semibold uppercase tracking-wider">Default % of cash</label>
+                <span class="font-mono text-[11px] font-semibold tabular-nums">{{ tradingForm.controls.defaultRisk.value }}%</span>
+              </div>
+              <p-slider
+                [ngModel]="tradingForm.controls.defaultRisk.value"
+                (ngModelChange)="tradingForm.controls.defaultRisk.setValue($event)"
+                [ngModelOptions]="{ standalone: true }"
+                [min]="1"
+                [max]="100"
+                [step]="1"
+              />
+              <div class="text-muted-color mt-1 flex justify-between text-[9px]">
+                <span>1%</span>
+                <span>50%</span>
+                <span>100%</span>
+              </div>
+
+              <div class="border-surface mt-4 border-t pt-3">
+                <p class="text-muted-color mb-1 text-[10px] font-semibold uppercase tracking-wider">Confidence to auto-submit</p>
+                <p-rating
+                  [ngModel]="tradingForm.controls.confidenceLevel.value"
+                  (ngModelChange)="tradingForm.controls.confidenceLevel.setValue($event)"
+                  [ngModelOptions]="{ standalone: true }"
+                  [stars]="5"
+                />
+                <p class="text-muted-color mt-1 text-[10px]">Higher = fewer confirmation prompts.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Toggles + checkboxes -->
+          <div class="border-surface bg-surface-50 dark:bg-surface-900 rounded-md border">
+            <label class="hover:bg-surface-100 dark:hover:bg-surface-800 flex cursor-pointer items-center gap-3 px-3 py-2 transition-colors">
+              <p-toggleswitch formControlName="confirmBeforeSubmit" />
+              <div class="flex-1">
+                <p class="text-[12px] font-medium leading-tight">Confirm before submit</p>
+                <p class="text-muted-color text-[10px] leading-tight">Show a confirmation dialog on every trade.</p>
+              </div>
+            </label>
+            <label class="hover:bg-surface-100 dark:hover:bg-surface-800 border-surface flex cursor-pointer items-center gap-3 border-t px-3 py-2 transition-colors">
+              <p-checkbox formControlName="confirmLargeOnly" [binary]="true" inputId="large-only" />
+              <div class="flex-1">
+                <p class="text-[12px] font-medium leading-tight">Only confirm for trades > 5% of portfolio</p>
+                <p class="text-muted-color text-[10px] leading-tight">Skip the dialog on small orders.</p>
+              </div>
+            </label>
+            <label class="hover:bg-surface-100 dark:hover:bg-surface-800 border-surface flex cursor-pointer items-center gap-3 border-t px-3 py-2 transition-colors">
+              <p-checkbox formControlName="autofillLast" [binary]="true" inputId="autofill" />
+              <div class="flex-1">
+                <p class="text-[12px] font-medium leading-tight">Autofill with last order</p>
+                <p class="text-muted-color text-[10px] leading-tight">Pre-populate the ticket from your previous trade.</p>
+              </div>
+            </label>
+            <label class="hover:bg-surface-100 dark:hover:bg-surface-800 border-surface flex cursor-pointer items-center gap-3 border-t px-3 py-2 transition-colors">
+              <p-checkbox formControlName="rememberSize" [binary]="true" inputId="remember-size" />
+              <div class="flex-1">
+                <p class="text-[12px] font-medium leading-tight">Remember sizing per instrument</p>
+                <p class="text-muted-color text-[10px] leading-tight">Use the last quantity you traded for each ticker.</p>
+              </div>
+            </label>
+          </div>
+
+          <div class="border-surface flex items-center justify-end gap-1.5 border-t pt-3">
+            <p-button label="Reset to defaults" severity="secondary" variant="text" size="small" type="button" />
+            <p-button label="Save preferences" icon="pi pi-check" size="small" type="submit" />
+          </div>
+        </form>
+      </p-tabpanel>
+
+      <!-- =============== NOTIFICATIONS =============== -->
+      <p-tabpanel value="notifications">
+        <div class="flex flex-col gap-3 pt-3">
+          <p class="text-muted-color text-[11px]">
+            Pick how each event should reach you. Channels with nothing selected are silenced.
+          </p>
+
+          <div class="border-surface bg-surface-50 dark:bg-surface-900 overflow-hidden rounded-md border">
+            <!-- header row -->
+            <div class="border-surface bg-surface-100 dark:bg-surface-800 hidden border-b text-[10px] font-semibold uppercase tracking-wider sm:grid sm:grid-cols-[1fr_64px_64px_64px]">
+              <div class="px-3 py-2">Event</div>
+              @for (ch of channels; track ch.id) {
+                <div class="text-muted-color px-2 py-2 text-center">{{ ch.label }}</div>
+              }
+            </div>
+
+            <ul class="divide-surface divide-y">
+              @for (event of notifChannels; track event.id) {
+                <li class="grid items-center gap-3 px-3 py-2.5 sm:grid-cols-[1fr_64px_64px_64px]">
+                  <div class="flex items-start gap-3">
+                    <div class="bg-surface-100 dark:bg-surface-800 text-muted-color flex h-8 w-8 shrink-0 items-center justify-center rounded">
+                      <i class="{{ event.icon }} text-[13px]!"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <p class="text-[12px] font-medium leading-tight">{{ event.label }}</p>
+                      <p class="text-muted-color mt-0.5 text-[10px] leading-tight">{{ event.description }}</p>
+                    </div>
+                  </div>
+                  @for (ch of channels; track ch.id) {
+                    <div class="flex justify-center">
+                      <p-toggleswitch
+                        [ngModel]="notifications()[event.id][ch.id]"
+                        (ngModelChange)="toggleNotif(event.id, ch.id, $event)"
+                        [attr.aria-label]="event.label + ' on ' + ch.label"
+                      />
+                    </div>
+                  }
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+      </p-tabpanel>
+
+      <!-- =============== API KEYS =============== -->
+      <p-tabpanel value="keys">
+        <div class="flex flex-col gap-3 pt-3 text-[12px]">
+          <!-- New key form -->
+          <form [formGroup]="newKeyForm" (ngSubmit)="createKey()" class="border-surface bg-surface-50 dark:bg-surface-900 flex flex-wrap items-end gap-2 rounded-md border p-3">
+            <div class="min-w-[200px] flex-1">
+              <label class="text-muted-color mb-1 block text-[10px] font-semibold uppercase tracking-wider">Key name</label>
+              <p-iconField iconPosition="left">
+                <p-inputicon class="pi pi-key text-[12px]!" />
+                <input pInputText size="small" formControlName="name" placeholder="Reporting service" class="!w-full" />
+              </p-iconField>
+            </div>
+            <div class="min-w-[150px]">
+              <label class="text-muted-color mb-1 block text-[10px] font-semibold uppercase tracking-wider">Environment</label>
+              <p-select
+                size="small"
+                formControlName="env"
+                [options]="envOptions"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+                styleClass="!w-full"
+              />
+            </div>
+            <p-button label="Create key" icon="pi pi-plus" size="small" type="submit" [disabled]="newKeyForm.invalid" />
+          </form>
+
+          <!-- Keys table -->
+          <div class="border-surface bg-surface-50 dark:bg-surface-900 overflow-hidden rounded-md border">
+            <p-table [value]="apiKeys()">
+              <ng-template pTemplate="header">
+                <tr class="text-[10px] uppercase tracking-wider">
+                  <th class="px-3 py-1.5 text-left">Name</th>
+                  <th class="px-3 py-1.5 text-left">Key</th>
+                  <th class="px-3 py-1.5 text-left">Env</th>
+                  <th class="px-3 py-1.5 text-left">Scope</th>
+                  <th class="px-3 py-1.5 text-left">Last used</th>
+                  <th class="px-3 py-1.5 text-right">Actions</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-key>
+                <tr class="border-surface border-t">
+                  <td class="px-3 py-1.5">
+                    <p class="text-[12px] font-medium leading-tight">{{ key.name }}</p>
+                    <p class="text-muted-color text-[10px] leading-tight">Created {{ key.created }}</p>
+                  </td>
+                  <td class="px-3 py-1.5">
+                    <code class="bg-surface-100 dark:bg-surface-800 rounded px-1.5 py-0.5 font-mono text-[11px]">{{ key.key }}</code>
+                  </td>
+                  <td class="px-3 py-1.5">
+                    <p-tag [value]="key.env" [severity]="envSeverity(key.env)" />
+                  </td>
+                  <td class="text-muted-color px-3 py-1.5 font-mono text-[11px]">{{ key.scope }}</td>
+                  <td class="text-muted-color px-3 py-1.5 text-[11px]">{{ key.lastUsed }}</td>
+                  <td class="px-3 py-1.5 text-right">
+                    <p-button
+                      icon="pi pi-copy"
+                      severity="secondary"
+                      variant="text"
+                      size="small"
+                      [rounded]="true"
+                      styleClass="!h-7 !w-7"
+                      pTooltip="Copy"
+                      tooltipPosition="left"
+                      (onClick)="copyKey(key)"
+                      aria-label="Copy"
+                    />
+                    <p-button
+                      icon="pi pi-trash"
+                      severity="secondary"
+                      variant="text"
+                      size="small"
+                      [rounded]="true"
+                      styleClass="!h-7 !w-7 hover:!text-rose-500"
+                      pTooltip="Revoke"
+                      tooltipPosition="left"
+                      (onClick)="revokeKey(key)"
+                      aria-label="Revoke"
+                    />
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </div>
+      </p-tabpanel>
+
+      <!-- =============== BILLING =============== -->
+      <p-tabpanel value="billing">
+        <div class="flex flex-col gap-3 pt-3 text-[12px]">
+          <!-- Plan card -->
+          <div class="border-primary/30 from-primary/5 to-transparent flex items-center justify-between gap-3 rounded-md border bg-gradient-to-br px-4 py-3">
+            <div class="flex items-center gap-3">
+              <div class="bg-primary text-primary-contrast flex h-10 w-10 items-center justify-center rounded">
+                <i class="pi pi-sparkles text-[14px]!"></i>
+              </div>
+              <div>
+                <p class="text-muted-color text-[9px] font-semibold uppercase tracking-wider leading-none">Current plan</p>
+                <div class="flex items-baseline gap-1.5">
+                  <span class="text-[18px] font-semibold leading-none">{{ plan.name }}</span>
+                  <span class="text-muted-color text-[12px]">${{ plan.price }}/{{ plan.cycle }}</span>
+                </div>
+                <p class="text-muted-color mt-1 text-[10px]">Renews {{ plan.renews }}</p>
+              </div>
+            </div>
+            <div class="flex gap-1.5">
+              <p-button label="Change plan" severity="secondary" variant="outlined" size="small" />
+              <p-button label="Cancel" severity="secondary" variant="text" size="small" styleClass="!text-rose-500" />
+            </div>
+          </div>
+
+          <!-- Usage -->
+          <div class="border-surface bg-surface-50 dark:bg-surface-900 rounded-md border p-3">
+            <div class="mb-3 flex items-center justify-between">
+              <div>
+                <p class="text-[13px] font-semibold leading-none">Usage this month</p>
+                <p class="text-muted-color mt-1 text-[11px]">Resets {{ plan.renews }}.</p>
+              </div>
+            </div>
+
+            <p-meterGroup [value]="meterValue()" [max]="100">
+              <ng-template pTemplate="label" let-value="value">
+                <ul class="mt-3 space-y-2.5">
+                  @for (u of usage; track u.label; let i = $index) {
+                    <li>
+                      <div class="mb-0.5 flex items-center justify-between text-[11px]">
+                        <span class="flex items-center gap-2">
+                          <span class="h-2 w-2 rounded-sm" [style.background]="u.color"></span>
+                          <span class="font-medium">{{ u.label }}</span>
+                        </span>
+                        <span class="text-muted-color font-mono tabular-nums">
+                          <span class="text-color font-semibold">{{ u.used.toLocaleString() }}</span>{{ u.unit }}
+                          / {{ u.max.toLocaleString() }}{{ u.unit }}
+                        </span>
+                      </div>
+                      <p-progressBar [value]="usagePct(u)" [showValue]="false" [style]="{ height: '4px' }" />
+                    </li>
+                  }
+                </ul>
+              </ng-template>
+            </p-meterGroup>
+          </div>
+
+          <!-- Invoices -->
+          <div class="border-surface bg-surface-50 dark:bg-surface-900 overflow-hidden rounded-md border">
+            <div class="flex items-center justify-between p-3">
+              <div>
+                <p class="text-[13px] font-semibold leading-none">Invoice history</p>
+                <p class="text-muted-color mt-1 text-[11px]">Last 6 invoices · download PDFs anytime.</p>
+              </div>
+            </div>
+            <p-table [value]="invoices">
+              <ng-template pTemplate="header">
+                <tr class="text-[10px] uppercase tracking-wider">
+                  <th class="px-3 py-1.5 text-left">Date</th>
+                  <th class="px-3 py-1.5 text-left">Description</th>
+                  <th class="px-3 py-1.5 text-right">Amount</th>
+                  <th class="px-3 py-1.5 text-left">Status</th>
+                  <th class="px-3 py-1.5 text-right">Actions</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-inv>
+                <tr class="hover:bg-surface-100 dark:hover:bg-surface-800 border-surface border-t transition-colors">
+                  <td class="px-3 py-1.5 font-mono text-[11px] tabular-nums">{{ inv.date }}</td>
+                  <td class="text-muted-color px-3 py-1.5 text-[12px]">{{ inv.description }}</td>
+                  <td class="px-3 py-1.5 text-right font-mono text-[12px] tabular-nums">${{ inv.amount.toFixed(2) }}</td>
+                  <td class="px-3 py-1.5">
+                    <p-tag [value]="inv.status" [severity]="invoiceSeverity(inv.status)" />
+                  </td>
+                  <td class="px-3 py-1.5 text-right">
+                    <p-button
+                      icon="pi pi-download"
+                      severity="secondary"
+                      variant="text"
+                      size="small"
+                      [rounded]="true"
+                      styleClass="!h-7 !w-7"
+                      pTooltip="Download PDF"
+                      tooltipPosition="left"
+                      aria-label="Download"
+                    />
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
 </div>
