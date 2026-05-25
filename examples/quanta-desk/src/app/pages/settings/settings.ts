@@ -89,7 +89,6 @@ export class Settings {
 
   protected readonly activeTab = signal<'profile' | 'trading' | 'notifications' | 'keys' | 'billing'>('profile');
 
-  // ----- Profile form -----
   protected readonly profileForm = this.fb.nonNullable.group({
     fullName: ['Mofiro Jean', [Validators.required, Validators.minLength(2)]],
     email: ['mofiro@example.com', [Validators.required, Validators.email]],
@@ -107,7 +106,6 @@ export class Settings {
   protected readonly locales = [...LOCALES];
   protected readonly timezones = [...TIMEZONES];
 
-  // ----- Trading prefs -----
   protected readonly tradingForm = this.fb.nonNullable.group({
     defaultOrderType: ['market' as 'market' | 'limit' | 'stop'],
     sizingMode: ['shares' as 'shares' | 'dollars' | 'percent'],
@@ -132,7 +130,6 @@ export class Settings {
     { label: '% of cash', value: 'percent' },
   ];
 
-  // ----- Notifications matrix -----
   protected readonly notifChannels = NOTIFICATION_CHANNELS;
   protected readonly channels: { id: Channel; label: string }[] = [
     { id: 'email', label: 'Email' },
@@ -150,7 +147,6 @@ export class Settings {
     }, {} as NotifMatrix),
   );
 
-  // ----- API keys -----
   protected readonly apiKeys = signal<ApiKey[]>([...API_KEYS]);
 
   protected readonly newKeyForm = this.fb.nonNullable.group({
@@ -164,7 +160,6 @@ export class Settings {
     { label: 'Sandbox', value: 'Sandbox' },
   ];
 
-  // ----- Billing -----
   protected readonly plan = { name: 'Pro', price: 49, cycle: 'month', renews: 'Jun 01, 2025' };
   protected readonly usage = USAGE;
   protected readonly invoices: Invoice[] = [...INVOICES];
@@ -173,9 +168,7 @@ export class Settings {
     this.usage.map((u) => ({ label: u.label, value: (u.used / u.max) * 100, color: u.color })),
   );
 
-  // ----- Handlers -----
-
-  protected saveProfile(): void {
+protected saveProfile(): void {
     if (this.profileForm.invalid) {
       this.profileForm.markAllAsTouched();
       this.toast.add({ severity: 'warn', summary: 'Fix the highlighted fields', life: 1800 });

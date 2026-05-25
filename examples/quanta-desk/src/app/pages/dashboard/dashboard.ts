@@ -160,7 +160,6 @@ export class Dashboard {
   ];
 
   constructor() {
-    // Simulated load, lets Skeleton placeholders show briefly
     setTimeout(() => this.isLoading.set(false), 450);
   }
 

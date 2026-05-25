@@ -1,5 +1,4 @@
 <div class="flex flex-col gap-3">
-  <!-- Header -->
   <header class="flex flex-wrap items-end justify-between gap-3">
     <div>
       <h1 class="text-lg font-semibold tracking-tight">Holdings</h1>
@@ -47,7 +46,6 @@
     </div>
   </header>
 
-  <!-- Filter bar -->
   <section class="border-surface bg-surface-50 dark:bg-surface-900 flex flex-wrap items-center gap-2 rounded-md border p-2">
     <p-autocomplete
       class="min-w-[200px] flex-1"
@@ -115,7 +113,6 @@
     </div>
   </section>
 
-  <!-- Bulk action toolbar -->
   @if (selection().length > 0) {
     <section class="border-primary/40 bg-primary/5 flex items-center gap-2 rounded-md border px-3 py-1.5 text-[12px]">
       <span class="bg-primary text-primary-contrast flex h-5 min-w-5 items-center justify-center rounded px-1 font-mono text-[10px] font-semibold tabular-nums">
@@ -136,7 +133,6 @@
     </section>
   }
 
-  <!-- Table -->
   <section class="border-surface bg-surface-50 dark:bg-surface-900 overflow-hidden rounded-md border">
     @if (isLoading()) {
       <div class="space-y-1 p-3">
@@ -357,13 +353,10 @@
   </section>
 </div>
 
-<!-- Row overflow menu (shared between rows) -->
 <p-menu #rowMenu [model]="rowMenuItems" [popup]="true" appendTo="body" />
 
-<!-- Context menu on right-click -->
 <p-contextmenu #rowContextMenu [model]="rowMenuItems" appendTo="body" />
 
-<!-- Add holding drawer -->
 <p-drawer
   [(visible)]="drawerOpen"
   position="right"
@@ -396,9 +389,7 @@
   </ng-template>
 
   <form [formGroup]="addForm" (ngSubmit)="submitAdd()" class="flex h-full flex-col text-[12px]">
-    <!-- Scrollable body -->
     <div class="min-h-0 flex-1 space-y-5 overflow-y-auto px-4 py-4">
-      <!-- Section: Instrument -->
       <section>
         <div class="mb-2 flex items-center gap-1.5">
           <i class="pi pi-search text-muted-color !text-[10px]"></i>
@@ -430,7 +421,6 @@
         }
       </section>
 
-      <!-- Section: Sizing -->
       <section>
         <div class="mb-2 flex items-center gap-1.5">
           <i class="pi pi-calculator text-muted-color !text-[10px]"></i>
@@ -454,7 +444,6 @@
         }
       </section>
 
-      <!-- Section: Position -->
       <section>
         <div class="mb-2 flex items-center gap-1.5">
           <i class="pi pi-arrows-h text-muted-color !text-[10px]"></i>
@@ -488,7 +477,6 @@
       </section>
     </div>
 
-    <!-- Sticky footer -->
     <div class="border-surface bg-surface-50 dark:bg-surface-900 flex items-center justify-between gap-2 border-t px-4 py-3">
       <div class="text-muted-color text-[10px]">
         @if (estimatedCost() !== null && formTicker()) {

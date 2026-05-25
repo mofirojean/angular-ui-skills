@@ -108,7 +108,6 @@ export class Trade {
   protected readonly chartData = computed(() => {
     const t = this.ticker();
     if (!t) return null;
-    // synthesize a 60-point intraday series from the ticker price
     const len = 60;
     const base = t.price;
     const arr = Array.from({ length: len }, (_, i) => {

@@ -48,7 +48,6 @@ export class CommandPalette {
   protected readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
 
   private readonly commands: Command[] = [
-    // Navigation
     { id: 'nav-dashboard', label: 'Go to Dashboard', icon: 'pi pi-home', group: 'Navigation', shortcut: 'G D', keywords: 'home overview', run: () => this.navigate('/') },
     { id: 'nav-holdings', label: 'Go to Holdings', icon: 'pi pi-briefcase', group: 'Navigation', shortcut: 'G H', keywords: 'positions portfolio', run: () => this.navigate('/holdings') },
     { id: 'nav-watchlist', label: 'Go to Watchlist', icon: 'pi pi-eye', group: 'Navigation', shortcut: 'G W', keywords: 'tracked', run: () => this.navigate('/watchlist') },
@@ -57,18 +56,15 @@ export class CommandPalette {
     { id: 'nav-research', label: 'Go to Research', icon: 'pi pi-book', group: 'Navigation', shortcut: 'G R', keywords: 'notes', run: () => this.navigate('/research') },
     { id: 'nav-settings', label: 'Go to Settings', icon: 'pi pi-cog', group: 'Navigation', shortcut: 'G S', keywords: 'profile billing keys', run: () => this.navigate('/settings') },
 
-    // Actions
     { id: 'act-new-trade', label: 'New trade', icon: 'pi pi-plus', group: 'Actions', shortcut: 'N T', keywords: 'place order buy sell', run: () => this.navigate('/trade') },
     { id: 'act-new-note', label: 'New research note', icon: 'pi pi-pencil', group: 'Actions', shortcut: 'N R', keywords: 'compose write', run: () => this.navigate('/research') },
     { id: 'act-watch', label: 'Add to watchlist', icon: 'pi pi-star', group: 'Actions', shortcut: 'A W', keywords: 'track', run: () => this.navigate('/watchlist') },
     { id: 'act-export', label: 'Export current page', icon: 'pi pi-download', group: 'Actions', keywords: 'csv pdf download', run: () => this.flash('Export started') },
     { id: 'act-refresh', label: 'Refresh data', icon: 'pi pi-refresh', group: 'Actions', shortcut: 'R', keywords: 'reload sync', run: () => this.flash('Data refreshed') },
 
-    // Theme
     { id: 'theme-light', label: 'Switch to light mode', icon: 'pi pi-sun', group: 'Theme', keywords: 'theme bright', run: () => this.setTheme('light') },
     { id: 'theme-dark', label: 'Switch to dark mode', icon: 'pi pi-moon', group: 'Theme', keywords: 'theme noir', run: () => this.setTheme('dark') },
 
-    // Help
     { id: 'help-shortcuts', label: 'Show keyboard shortcuts', icon: 'pi pi-key', group: 'Help', shortcut: '?', keywords: 'keys hotkeys', run: () => this.flash('See PLAN.md for the keymap') },
     { id: 'help-docs', label: 'Open documentation', icon: 'pi pi-book', group: 'Help', keywords: 'docs help', run: () => this.flash('Docs would open here') },
   ];
@@ -96,7 +92,6 @@ export class CommandPalette {
   );
 
   constructor() {
-    // Global keydown handler for Cmd/Ctrl+K and Esc
     this.document.addEventListener('keydown', (event: KeyboardEvent) => {
       const isMod = event.metaKey || event.ctrlKey;
       if (isMod && event.key.toLowerCase() === 'k') {
@@ -107,13 +102,11 @@ export class CommandPalette {
       }
     });
 
-    // Reset active index whenever filter results change
     effect(() => {
       this.flatItems();
       this.activeIndex.set(0);
     });
 
-    // Autofocus input when opened
     effect(() => {
       if (this.open()) {
         queueMicrotask(() => this.searchInput()?.nativeElement.focus());

@@ -1,5 +1,4 @@
 <div class="flex h-full min-h-0 flex-col gap-3">
-  <!-- Header strip -->
   <header class="flex flex-wrap items-end justify-between gap-3">
     <div>
       <h1 class="text-lg font-semibold tracking-tight">Order ticket</h1>
@@ -15,17 +14,14 @@
     </div>
   </header>
 
-  <!-- Splitter: instrument (left) + ticket (right) -->
   <p-splitter
     [panelSizes]="[60, 40]"
     [minSizes]="[30, 30]"
     layout="horizontal"
     styleClass="!min-h-0 !flex-1 !border-0 !bg-transparent"
   >
-    <!-- LEFT: instrument workspace -->
     <ng-template #panel>
       <div class="flex h-full min-h-0 flex-col gap-2 pr-2">
-        <!-- Ticker search -->
         <div class="border-surface bg-surface-50 dark:bg-surface-900 rounded-md border p-3">
           <label class="text-muted-color mb-1.5 block text-[10px] font-semibold uppercase tracking-wider">Instrument</label>
           <p-autocomplete
@@ -54,10 +50,8 @@
           </p-autocomplete>
         </div>
 
-        <!-- Live instrument card with chart -->
         @if (ticker(); as t) {
           <div class="border-surface bg-surface-50 dark:bg-surface-900 flex min-h-0 flex-1 flex-col rounded-md border p-3">
-            <!-- Top: symbol + price + change -->
             <div class="flex items-start justify-between gap-3">
               <div class="flex items-center gap-3">
                 <div class="bg-primary text-primary-contrast flex h-10 w-10 shrink-0 items-center justify-center rounded font-mono text-[12px] font-semibold">
@@ -86,7 +80,6 @@
               </div>
             </div>
 
-            <!-- Bid / Ask / Range strip -->
             <div class="border-surface bg-surface-0 dark:bg-surface-950 mt-3 grid grid-cols-4 divide-x divide-zinc-200 dark:divide-zinc-800 rounded-md border text-center">
               <div class="px-2 py-1.5">
                 <p class="text-muted-color text-[9px] font-semibold uppercase tracking-wider leading-none">Bid</p>
@@ -106,7 +99,6 @@
               </div>
             </div>
 
-            <!-- Chart -->
             <div class="mt-3 min-h-0 flex-1">
               @if (chartData(); as data) {
                 <p-chart type="line" [data]="data" [options]="chartOptions" />
@@ -124,11 +116,9 @@
       </div>
     </ng-template>
 
-    <!-- RIGHT: order ticket -->
     <ng-template #panel>
       <div class="ml-2 flex h-full min-h-0 flex-col">
         <form [formGroup]="form" class="border-surface bg-surface-50 dark:bg-surface-900 flex h-full min-h-0 flex-col rounded-md border">
-          <!-- Side toggle (Buy / Sell big) -->
           <div class="border-surface grid grid-cols-2 gap-1.5 border-b p-3">
             <button
               type="button"
@@ -158,9 +148,7 @@
             </button>
           </div>
 
-          <!-- Form body, scrollable if needed -->
           <div class="min-h-0 flex-1 space-y-4 overflow-y-auto p-3">
-            <!-- Order type chips -->
             <div>
               <label class="text-muted-color mb-1.5 block text-[10px] font-semibold uppercase tracking-wider">Order type</label>
               <div class="border-surface bg-surface-0 dark:bg-surface-950 flex items-center gap-px rounded-md border p-0.5">
@@ -180,7 +168,6 @@
               </div>
             </div>
 
-            <!-- Conditional limit/stop price -->
             @if (orderType() === 'limit' || orderType() === 'stop') {
               <div>
                 <label class="text-muted-color mb-1 block text-[10px] font-semibold uppercase tracking-wider">
@@ -200,7 +187,6 @@
               </div>
             }
 
-            <!-- Quantity -->
             <div>
               <label class="text-muted-color mb-1 block text-[10px] font-semibold uppercase tracking-wider">Quantity</label>
               <p-inputNumber
@@ -211,7 +197,6 @@
                 styleClass="!w-full"
                 inputStyleClass="!w-full !text-right !text-[16px] !font-mono !font-semibold !tabular-nums"
               />
-              <!-- Quick % buttons -->
               <div class="mt-1.5 grid grid-cols-5 gap-1">
                 @for (pct of quickPercents; track pct) {
                   <button
@@ -228,7 +213,6 @@
               </div>
             </div>
 
-            <!-- Slider -->
             <div>
               <div class="mb-1 flex items-center justify-between">
                 <label class="text-muted-color text-[10px] font-semibold uppercase tracking-wider">% of cash</label>
@@ -244,7 +228,6 @@
               />
             </div>
 
-            <!-- Time in force -->
             <div>
               <label class="text-muted-color mb-1.5 block text-[10px] font-semibold uppercase tracking-wider">Time in force</label>
               <p-selectButton
@@ -258,7 +241,6 @@
             </div>
           </div>
 
-          <!-- Sticky bottom: live total + CTA -->
           <div class="border-surface bg-surface-0 dark:bg-surface-950 border-t px-3 py-3">
             <div class="mb-2 flex items-baseline justify-between">
               <span class="text-muted-color text-[10px] font-semibold uppercase tracking-wider">Estimated total</span>

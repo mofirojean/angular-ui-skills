@@ -1,10 +1,6 @@
 import { definePreset } from '@primeuix/themes';
 import Aura from '@primeuix/themes/aura';
 
-/**
- * Quanta Desk preset, noir feel via zinc primary.
- * Everything else inherits Aura defaults, which already use zinc in dark mode.
- */
 export const QuantaPreset = definePreset(Aura, {
   semantic: {
     primary: {

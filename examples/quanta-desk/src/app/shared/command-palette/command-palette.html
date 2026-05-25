@@ -11,7 +11,6 @@
   styleClass="command-palette-dialog"
 >
   <div class="bg-surface-0 dark:bg-surface-900 flex flex-col overflow-hidden rounded-md">
-    <!-- Search input -->
     <div class="border-surface flex items-center gap-2 border-b px-3 py-2">
       <i class="pi pi-search text-muted-color text-[12px]!"></i>
       <input
@@ -26,7 +25,6 @@
       <kbd class="border-surface bg-surface-100 dark:bg-surface-800 text-muted-color rounded border px-1.5 py-0.5 font-mono text-[10px]">esc</kbd>
     </div>
 
-    <!-- Results -->
     <div class="max-h-[60vh] overflow-y-auto py-1">
       @if (flatItems().length === 0) {
         <div class="px-4 py-10 text-center">
@@ -66,7 +64,6 @@
       }
     </div>
 
-    <!-- Footer hint -->
     <div class="border-surface text-muted-color flex items-center justify-between border-t px-3 py-1.5 text-[10px]">
       <div class="flex items-center gap-3">
         <span class="flex items-center gap-1">

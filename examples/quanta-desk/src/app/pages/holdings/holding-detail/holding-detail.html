@@ -1,5 +1,4 @@
 <div class="flex h-full min-h-0 flex-col gap-3">
-  <!-- Breadcrumb + header -->
   <header class="flex flex-col gap-2">
     <p-breadcrumb [model]="breadcrumb()" [home]="breadcrumbHome" />
 
@@ -60,7 +59,6 @@
     }
   </header>
 
-  <!-- Splitter content -->
   @if (isLoading() || !holding()) {
     <div class="grid flex-1 grid-cols-1 gap-2 lg:grid-cols-5">
       <p-skeleton width="100%" height="100%" styleClass="!flex-1 lg:!col-span-3" />
@@ -73,7 +71,6 @@
       layout="horizontal"
       styleClass="!min-h-0 !flex-1 !border-0 !bg-transparent"
     >
-      <!-- LEFT: chart + fundamentals -->
       <ng-template #panel>
         <div class="flex h-full min-h-0 flex-col gap-2 pr-2">
           <div class="border-surface bg-surface-50 dark:bg-surface-900 flex min-h-0 flex-1 flex-col rounded-md border p-3">
@@ -96,7 +93,6 @@
               </div>
             </div>
 
-            <!-- Period selector -->
             <div class="border-surface bg-surface-0 dark:bg-surface-950 mb-2 flex items-center gap-px self-start rounded-md border p-0.5">
               @for (p of periods; track p) {
                 <button
@@ -113,13 +109,11 @@
               }
             </div>
 
-            <!-- Chart -->
             <div class="min-h-0 flex-1">
               <p-chart type="line" [data]="chartData()" [options]="chartOptions" />
             </div>
           </div>
 
-          <!-- Fundamentals grid -->
           <div class="border-surface bg-surface-50 dark:bg-surface-900 rounded-md border p-3">
             <div class="mb-2 flex items-center justify-between">
               <p class="text-[13px] font-semibold leading-none">Fundamentals</p>
@@ -140,7 +134,6 @@
         </div>
       </ng-template>
 
-      <!-- RIGHT: tabs -->
       <ng-template #panel>
         <div class="border-surface bg-surface-50 dark:bg-surface-900 ml-2 flex h-full min-h-0 flex-col rounded-md border">
           <p-tabs [(value)]="activeTab" class="flex h-full min-h-0 flex-col">
@@ -153,7 +146,6 @@
             </p-tablist>
 
             <p-tabpanels class="min-h-0 flex-1 overflow-y-auto">
-              <!-- Overview -->
               <p-tabpanel value="overview">
                 <div class="flex flex-col gap-3 p-3 text-[12px]">
                   <div>
@@ -227,7 +219,6 @@
                 </div>
               </p-tabpanel>
 
-              <!-- Tax lots -->
               <p-tabpanel value="taxlots">
                 <div class="p-3">
                   <p-treetable [value]="taxLotTree()" styleClass="dense-table">
@@ -267,7 +258,6 @@
                 </div>
               </p-tabpanel>
 
-              <!-- Notes -->
               <p-tabpanel value="notes">
                 <div class="flex flex-col gap-3 p-3">
                   <div>
@@ -305,10 +295,8 @@
                 </div>
               </p-tabpanel>
 
-              <!-- Documents -->
               <p-tabpanel value="documents">
                 <div class="flex flex-col gap-3 p-3">
-                  <!-- Upload zone with drag-and-drop -->
                   <p-fileupload
                     name="docs[]"
                     [multiple]="true"
@@ -332,7 +320,6 @@
                     </ng-template>
                   </p-fileupload>
 
-                  <!-- Document list -->
                   <div>
                     <div class="mb-2 flex items-center justify-between">
                       <p class="text-muted-color text-[10px] font-semibold uppercase tracking-wider">
@@ -408,7 +395,6 @@
                 </div>
               </p-tabpanel>
 
-              <!-- Alerts -->
               <p-tabpanel value="alerts">
                 <div class="flex flex-col gap-2 p-3">
                   @for (a of alerts(); track a.id) {

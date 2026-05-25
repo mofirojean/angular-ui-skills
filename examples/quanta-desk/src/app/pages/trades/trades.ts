@@ -47,7 +47,6 @@ export class Trades {
   protected readonly isLoading = signal(true);
   protected readonly all = signal<Trade[]>([...TRADES]);
 
-  // filters
   protected readonly dateRange = signal<Date[] | null>(null);
   protected readonly statusFilter = signal<Status[]>([]);
   protected readonly sideFilter = signal<Side | 'All'>('All');
@@ -59,7 +58,6 @@ export class Trades {
   protected readonly statusOptions = TRADE_STATUSES;
   protected readonly sideOptions = TRADE_SIDES;
 
-  // pagination
   protected readonly first = signal(0);
   protected readonly rows = signal(20);
 

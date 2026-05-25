@@ -185,7 +185,6 @@ export const NEWS: readonly NewsItem[] = [
   },
 ];
 
-// 30-day performance series, portfolio vs S&P 500 benchmark
 const days = Array.from({ length: 30 }, (_, i) => i + 1);
 const portfolioBase = 100;
 const portfolioSeries = [

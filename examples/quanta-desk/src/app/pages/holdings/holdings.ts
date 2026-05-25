@@ -58,7 +58,6 @@ export class Holdings {
   protected readonly tickerIndex = TICKER_INDEX;
   protected readonly tickerSuggestions = signal<typeof TICKER_INDEX>([]);
 
-  // filters
   protected readonly searchSymbol = signal<{ symbol: string; name: string } | null>(null);
   protected readonly sectorOptions = [
     { label: 'All sectors', value: null as Sector | null },
@@ -72,12 +71,10 @@ export class Holdings {
   ];
   protected readonly statusFilter = signal<StatusFilter>('All');
 
-  // table state
   protected readonly selection = signal<Holding[]>([]);
   protected expandedRowKeys: Record<string, boolean> = {};
   protected readonly activeRow = signal<Holding | null>(null);
 
-  // drawer
   protected readonly drawerOpen = signal(false);
   protected readonly addForm = this.fb.nonNullable.group({
     ticker: this.fb.nonNullable.control<{ symbol: string; name: string } | null>(null, Validators.required),
@@ -118,7 +115,6 @@ export class Holdings {
     return { marketValue, totalPL, longCount, shortCount };
   });
 
-  // row menu (overflow + context menu share the same items)
   protected readonly rowMenuItems: MenuItem[] = [
     { label: 'Buy more', icon: 'pi pi-plus', command: () => this.fireToast('Open buy ticket', 'info') },
     { label: 'Sell', icon: 'pi pi-minus', command: () => this.fireToast('Open sell ticket', 'info') },

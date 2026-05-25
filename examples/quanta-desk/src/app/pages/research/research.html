@@ -1,5 +1,4 @@
 <div class="flex flex-col gap-3">
-  <!-- Header -->
   <header class="flex flex-wrap items-end justify-between gap-3">
     <div>
       <h1 class="text-lg font-semibold tracking-tight">Research</h1>
@@ -28,7 +27,6 @@
     </div>
   </header>
 
-  <!-- MegaMenu (browse by theme) -->
   <p-megamenu [model]="megaMenuModel" class="block">
     <ng-template let-item pTemplate="item">
       <a class="hover:bg-surface-100 dark:hover:bg-surface-800 flex items-center gap-2 rounded-md px-2 py-1 text-[12px]" pRipple>
@@ -40,7 +38,6 @@
     </ng-template>
   </p-megamenu>
 
-  <!-- Theme chips for quick filtering -->
   <section class="border-surface bg-surface-50 dark:bg-surface-900 flex flex-wrap items-center gap-1.5 rounded-md border px-2 py-2">
     <button
       type="button"
@@ -98,7 +95,6 @@
     </div>
   </section>
 
-  <!-- Notes -->
   @if (isLoading()) {
     <div class="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
       @for (i of [0, 1, 2, 3, 4, 5]; track i) {
@@ -185,7 +181,6 @@
   }
 </div>
 
-<!-- Compose dialog -->
 <p-dialog
   [(visible)]="composeOpen"
   header="New research note"

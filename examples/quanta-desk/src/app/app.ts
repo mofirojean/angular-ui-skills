@@ -8,6 +8,7 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Drawer } from 'primeng/drawer';
 import { Menu } from 'primeng/menu';
 import { OverlayBadge } from 'primeng/overlaybadge';
+import { Popover } from 'primeng/popover';
 import { Toast } from 'primeng/toast';
 import { Tooltip } from 'primeng/tooltip';
 
@@ -43,6 +44,16 @@ interface ResourceItem {
   readonly badge?: string;
 }
 
+interface Notification {
+  readonly id: string;
+  readonly icon: string;
+  readonly tone: 'success' | 'warn' | 'info' | 'danger';
+  readonly title: string;
+  readonly detail: string;
+  readonly time: string;
+  readonly unread: boolean;
+}
+
 @Component({
   selector: 'app-root',
   imports: [
@@ -56,6 +67,7 @@ interface ResourceItem {
     Drawer,
     Menu,
     OverlayBadge,
+    Popover,
     Toast,
     Tooltip,
     CommandPalette,
@@ -79,6 +91,73 @@ export class App {
 
   protected openPalette(): void {
     this.palette()?.show();
+  }
+
+  protected readonly notifications = signal<Notification[]>([
+    {
+      id: 'n1',
+      icon: 'pi pi-check-circle',
+      tone: 'success',
+      title: 'Order filled',
+      detail: 'BUY 100 NVDA @ $872.45 filled in full.',
+      time: '2m ago',
+      unread: true,
+    },
+    {
+      id: 'n2',
+      icon: 'pi pi-exclamation-triangle',
+      tone: 'warn',
+      title: 'Margin at 72%',
+      detail: 'Approaching maintenance threshold on Acme Capital.',
+      time: '14m ago',
+      unread: true,
+    },
+    {
+      id: 'n3',
+      icon: 'pi pi-bolt',
+      tone: 'info',
+      title: 'Price alert: TSLA',
+      detail: 'TSLA crossed below $250.00 (last $248.91).',
+      time: '38m ago',
+      unread: true,
+    },
+    {
+      id: 'n4',
+      icon: 'pi pi-times-circle',
+      tone: 'danger',
+      title: 'Order rejected',
+      detail: 'LIMIT 50 AMD: insufficient buying power.',
+      time: '1h ago',
+      unread: false,
+    },
+    {
+      id: 'n5',
+      icon: 'pi pi-sparkles',
+      tone: 'info',
+      title: 'Weekly research digest',
+      detail: '4 new analyst notes on your watchlist.',
+      time: '5h ago',
+      unread: false,
+    },
+  ]);
+
+  protected readonly unreadCount = computed(
+    () => this.notifications().filter((n) => n.unread).length,
+  );
+
+  protected readonly hasUnread = computed(() => this.unreadCount() > 0);
+
+  protected markAllRead(): void {
+    this.notifications.update((list) => list.map((n) => ({ ...n, unread: false })));
+  }
+
+  protected toneClasses(tone: Notification['tone']): string {
+    switch (tone) {
+      case 'success': return 'text-emerald-500 bg-emerald-500/10';
+      case 'warn': return 'text-amber-500 bg-amber-500/10';
+      case 'danger': return 'text-rose-500 bg-rose-500/10';
+      case 'info': return 'text-primary bg-primary/10';
+    }
   }
 
   constructor() {

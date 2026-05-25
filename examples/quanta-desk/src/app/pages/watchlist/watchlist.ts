@@ -62,7 +62,6 @@ export class Watchlist {
   }
 
   protected onMove(direction: 'toTarget' | 'toSource'): void {
-    // Sync the watched signal with the picklist target after mutations
     this.watchedSignal.set([...this.watched]);
     this.toast.add({
       severity: direction === 'toTarget' ? 'success' : 'info',
