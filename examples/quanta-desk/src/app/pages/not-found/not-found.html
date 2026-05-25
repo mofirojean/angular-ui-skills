@@ -1,10 +1,103 @@
-<div class="mx-auto flex max-w-md flex-col items-center justify-center gap-3 py-16 text-center">
-  <div class="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-lg">
-    <i class="pi pi-compass !text-xl"></i>
+<div class="relative flex min-h-[calc(100vh-3.5rem)] items-center justify-center overflow-hidden px-6 py-10">
+  <!-- Decorative grid backdrop -->
+  <div
+    class="pointer-events-none absolute inset-0 opacity-[0.18] dark:opacity-[0.10]"
+    style="background-image: linear-gradient(to right, var(--p-surface-300) 1px, transparent 1px), linear-gradient(to bottom, var(--p-surface-300) 1px, transparent 1px); background-size: 28px 28px;"
+  ></div>
+  <!-- Radial vignette -->
+  <div
+    class="pointer-events-none absolute inset-0"
+    style="background: radial-gradient(ellipse at center, transparent 0%, transparent 40%, var(--p-content-background) 95%);"
+  ></div>
+
+  <div class="relative z-10 flex w-full max-w-xl flex-col items-center text-center">
+
+    <!-- Big 404 -->
+    <div class="relative mt-6">
+      <h1
+        class="from-primary to-color bg-gradient-to-b bg-clip-text font-mono text-[120px] font-bold leading-none tracking-tighter text-transparent sm:text-[180px]"
+        aria-hidden="true"
+      >
+        404
+      </h1>
+      <!-- Glitch shadow -->
+      <span
+        class="text-primary/10 dark:text-primary/15 pointer-events-none absolute left-[2px] top-[2px] -z-10 font-mono text-[120px] font-bold leading-none tracking-tighter sm:text-[180px]"
+        aria-hidden="true"
+      >404</span>
+    </div>
+
+    <!-- Title + subtitle -->
+    <h2 class="text-color mt-2 text-[16px] font-semibold tracking-tight">
+      This page is off the chart
+    </h2>
+    <p class="text-muted-color mx-auto mt-1.5 max-w-sm text-[12px] leading-relaxed">
+      The route you requested could not be resolved. It may have been moved, archived, or never existed in this workspace.
+    </p>
+
+    <!-- Suggestions card -->
+    <div class="border-surface bg-surface-0/60 dark:bg-surface-900/60 mt-6 w-full max-w-md rounded-md border p-3 text-left backdrop-blur">
+      <p class="text-muted-color mb-2 text-[9px] font-semibold uppercase tracking-wider">
+        Try one of these
+      </p>
+      <ul class="divide-surface divide-y">
+        <li>
+          <a
+            routerLink="/"
+            class="hover:bg-surface-100 dark:hover:bg-surface-800 group flex items-center gap-2.5 rounded px-2 py-1.5 text-[12px] transition-colors"
+          >
+            <i class="pi pi-home text-muted-color text-[12px]!"></i>
+            <span class="flex-1">Dashboard</span>
+            <i class="pi pi-arrow-right text-muted-color text-[10px]! opacity-0 transition-opacity group-hover:opacity-100"></i>
+          </a>
+        </li>
+        <li>
+          <a
+            routerLink="/holdings"
+            class="hover:bg-surface-100 dark:hover:bg-surface-800 group flex items-center gap-2.5 rounded px-2 py-1.5 text-[12px] transition-colors"
+          >
+            <i class="pi pi-briefcase text-muted-color text-[12px]!"></i>
+            <span class="flex-1">Holdings</span>
+            <i class="pi pi-arrow-right text-muted-color text-[10px]! opacity-0 transition-opacity group-hover:opacity-100"></i>
+          </a>
+        </li>
+        <li>
+          <a
+            routerLink="/watchlist"
+            class="hover:bg-surface-100 dark:hover:bg-surface-800 group flex items-center gap-2.5 rounded px-2 py-1.5 text-[12px] transition-colors"
+          >
+            <i class="pi pi-eye text-muted-color text-[12px]!"></i>
+            <span class="flex-1">Watchlist</span>
+            <i class="pi pi-arrow-right text-muted-color text-[10px]! opacity-0 transition-opacity group-hover:opacity-100"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Cmd+K hint -->
+    <div class="text-muted-color mt-4 inline-flex items-center gap-1.5 text-[11px]">
+      Or press
+      <kbd class="border-surface bg-surface-100 dark:bg-surface-800 rounded border px-1.5 py-0.5 font-mono text-[10px] leading-none">⌘</kbd>
+      <kbd class="border-surface bg-surface-100 dark:bg-surface-800 rounded border px-1.5 py-0.5 font-mono text-[10px] leading-none">K</kbd>
+      to jump anywhere
+    </div>
+
+    <!-- CTA buttons -->
+    <div class="mt-5 flex items-center gap-2">
+      <p-button
+        label="Go back"
+        icon="pi pi-arrow-left"
+        size="small"
+        severity="secondary"
+        variant="outlined"
+        (onClick)="goBack()"
+      />
+      <p-button
+        label="Open dashboard"
+        icon="pi pi-home"
+        size="small"
+        routerLink="/"
+      />
+    </div>
   </div>
-  <div>
-    <h1 class="text-xl font-semibold tracking-tight">404</h1>
-    <p class="text-muted-color mt-1 text-[12px]">The page you're looking for doesn't exist.</p>
-  </div>
-  <p-button label="Back to dashboard" icon="pi pi-arrow-left" size="small" routerLink="/" />
 </div>

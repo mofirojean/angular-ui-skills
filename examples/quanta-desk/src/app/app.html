@@ -325,6 +325,7 @@
         type="button"
         class="border-surface text-muted-color hover:bg-surface-100 bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-800 flex h-7 max-w-md flex-1 items-center gap-2 rounded-md border px-2.5 text-left text-[12px] transition-colors"
         aria-label="Open command palette"
+        (click)="openPalette()"
       >
         <i class="pi pi-search !text-[11px]"></i>
         <span class="flex-1 truncate">Search tickers, runs, settings…</span>
@@ -380,3 +381,4 @@
 <p-menu #userMenu [model]="userMenuModel" [popup]="true" appendTo="body" />
 <p-toast position="top-right" />
 <p-confirmdialog />
+<app-command-palette />

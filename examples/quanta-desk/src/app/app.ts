@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DOCUMENT, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DOCUMENT, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MenuItem } from 'primeng/api';
@@ -10,6 +10,8 @@ import { Menu } from 'primeng/menu';
 import { OverlayBadge } from 'primeng/overlaybadge';
 import { Toast } from 'primeng/toast';
 import { Tooltip } from 'primeng/tooltip';
+
+import { CommandPalette } from './shared/command-palette/command-palette';
 
 interface NavItem {
   readonly label: string;
@@ -56,6 +58,7 @@ interface ResourceItem {
     OverlayBadge,
     Toast,
     Tooltip,
+    CommandPalette,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -71,6 +74,12 @@ export class App {
   protected readonly sidebarToggleIcon = computed(() =>
     this.sidebarCollapsed() ? 'pi pi-angles-right' : 'pi pi-angles-left',
   );
+
+  protected readonly palette = viewChild(CommandPalette);
+
+  protected openPalette(): void {
+    this.palette()?.show();
+  }
 
   constructor() {
     this.document.documentElement.classList.toggle('dark', this.mode() === 'dark');

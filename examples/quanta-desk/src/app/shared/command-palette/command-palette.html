@@ -1,0 +1,85 @@
+<p-dialog
+  [(visible)]="open"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [showHeader]="false"
+  [closable]="false"
+  [dismissableMask]="true"
+  [style]="{ width: 'min(560px, 92vw)', top: '10vh' }"
+  position="top"
+  styleClass="command-palette-dialog"
+>
+  <div class="bg-surface-0 dark:bg-surface-900 flex flex-col overflow-hidden rounded-md">
+    <!-- Search input -->
+    <div class="border-surface flex items-center gap-2 border-b px-3 py-2">
+      <i class="pi pi-search text-muted-color text-[12px]!"></i>
+      <input
+        #searchInput
+        type="text"
+        class="text-color placeholder:text-muted-color w-full bg-transparent text-[13px] outline-none"
+        placeholder="Search commands, navigate, run actions..."
+        [value]="query()"
+        (input)="onQueryInput($event)"
+        (keydown)="onKeydown($event)"
+      />
+      <kbd class="border-surface bg-surface-100 dark:bg-surface-800 text-muted-color rounded border px-1.5 py-0.5 font-mono text-[10px]">esc</kbd>
+    </div>
+
+    <!-- Results -->
+    <div class="max-h-[60vh] overflow-y-auto py-1">
+      @if (flatItems().length === 0) {
+        <div class="px-4 py-10 text-center">
+          <i class="pi pi-search text-muted-color text-2xl!"></i>
+          <p class="text-muted-color mt-2 text-[12px]">No commands match "{{ query() }}"</p>
+        </div>
+      } @else {
+        @for (group of filteredGroups(); track group.label) {
+          <div>
+            <p class="text-muted-color px-3 pb-1 pt-2 text-[9px] font-semibold uppercase tracking-wider">
+              {{ group.label }}
+            </p>
+            <ul>
+              @for (cmd of group.items; track cmd.id) {
+                <li>
+                  <button
+                    type="button"
+                    class="group flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[12px] transition-colors"
+                    [class.bg-primary]="indexOf(cmd) === activeIndex()"
+                    [class.text-primary-contrast]="indexOf(cmd) === activeIndex()"
+                    [class.hover:bg-surface-100]="indexOf(cmd) !== activeIndex()"
+                    [class.dark:hover:bg-surface-800]="indexOf(cmd) !== activeIndex()"
+                    (mouseenter)="activeIndex.set(indexOf(cmd))"
+                    (click)="runCommand(cmd)"
+                  >
+                    <i class="{{ cmd.icon }} text-[12px]!"></i>
+                    <span class="flex-1 truncate">{{ cmd.label }}</span>
+                    @if (cmd.shortcut) {
+                      <span class="font-mono text-[10px] tabular-nums opacity-70">{{ cmd.shortcut }}</span>
+                    }
+                  </button>
+                </li>
+              }
+            </ul>
+          </div>
+        }
+      }
+    </div>
+
+    <!-- Footer hint -->
+    <div class="border-surface text-muted-color flex items-center justify-between border-t px-3 py-1.5 text-[10px]">
+      <div class="flex items-center gap-3">
+        <span class="flex items-center gap-1">
+          <kbd class="border-surface bg-surface-100 dark:bg-surface-800 rounded border px-1 py-0 font-mono text-[9px]">↑</kbd>
+          <kbd class="border-surface bg-surface-100 dark:bg-surface-800 rounded border px-1 py-0 font-mono text-[9px]">↓</kbd>
+          to navigate
+        </span>
+        <span class="flex items-center gap-1">
+          <kbd class="border-surface bg-surface-100 dark:bg-surface-800 rounded border px-1 py-0 font-mono text-[9px]">↵</kbd>
+          to select
+        </span>
+      </div>
+      <span>{{ flatItems().length }} commands</span>
+    </div>
+  </div>
+</p-dialog>
