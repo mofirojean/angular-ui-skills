@@ -100,9 +100,9 @@ export class App {
   protected readonly themeIcon = computed(() => (this.mode() === 'light' ? 'lucideMoon' : 'lucideSun'));
 
   protected readonly workspace: Workspace = {
-    name: 'Acme Corp',
+    name: 'Northstar Labs',
     tier: 'Production · US-East',
-    initials: 'AC',
+    initials: 'NL',
   };
 
   protected readonly user: AppUser = {

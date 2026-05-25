@@ -11,9 +11,9 @@ export const TEAM_MEMBERS: readonly TeamMember[] = [
 ];
 
 export const INTEGRATIONS: readonly Integration[] = [
-  { id: 'int-slack', name: 'Slack', description: 'Post run summaries and alerts to your channels.', icon: 'lucideMessageSquare', connected: true, category: 'communication', accountLabel: 'acme.slack.com' },
+  { id: 'int-slack', name: 'Slack', description: 'Post run summaries and alerts to your channels.', icon: 'lucideMessageSquare', connected: true, category: 'communication', accountLabel: 'northstar.slack.com' },
   { id: 'int-github', name: 'GitHub', description: 'Trigger agents from PR comments and issue events.', icon: 'lucideGithub', connected: true, category: 'developer', accountLabel: 'mofirojean/angular-ui-skills' },
-  { id: 'int-linear', name: 'Linear', description: 'Create issues from failed runs automatically.', icon: 'lucideZap', connected: true, category: 'productivity', accountLabel: 'Acme · ENG' },
+  { id: 'int-linear', name: 'Linear', description: 'Create issues from failed runs automatically.', icon: 'lucideZap', connected: true, category: 'productivity', accountLabel: 'Northstar · ENG' },
   { id: 'int-notion', name: 'Notion', description: 'Push standup digests and meeting notes to a database.', icon: 'lucideBookOpen', connected: false, category: 'productivity' },
   { id: 'int-stripe', name: 'Stripe', description: 'Reconcile payouts and run finance agents.', icon: 'lucideCircleDollarSign', connected: true, category: 'finance', accountLabel: 'acct_1Nh***' },
   { id: 'int-s3', name: 'AWS S3', description: 'Read and write artifacts from S3 buckets.', icon: 'lucideDatabase', connected: false, category: 'storage' },

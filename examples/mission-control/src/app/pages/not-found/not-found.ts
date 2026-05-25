@@ -1,14 +1,22 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Location } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { NgIcon } from '@ng-icons/core';
+import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
-import { HlmEmptyImports } from '@spartan-ng/helm/empty';
+import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmIcon } from '@spartan-ng/helm/icon';
 
 @Component({
   selector: 'app-not-found',
-  imports: [RouterLink, NgIcon, HlmButtonImports, HlmEmptyImports, HlmIcon],
+  imports: [RouterLink, NgIcon, HlmBadgeImports, HlmButtonImports, HlmCardImports, HlmIcon],
   templateUrl: './not-found.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NotFound {}
+export class NotFound {
+  private readonly location = inject(Location);
+
+  protected goBack(): void {
+    this.location.back();
+  }
+}
