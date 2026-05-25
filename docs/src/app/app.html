@@ -1,0 +1,625 @@
+<div class="min-h-screen overflow-x-hidden">
+  <header class="border-b border-[var(--color-line)] dark:border-[var(--color-line-dark)] sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-[var(--color-ink)]/80">
+    <div class="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3 sm:px-8">
+      <a href="#top" class="flex items-center gap-2.5">
+        <span class="shield h-6 w-5 shrink-0"></span>
+        <span class="text-[15px] font-semibold tracking-tight">Angular UI Skills</span>
+        <span class="hidden text-[10px] font-mono uppercase tracking-wider text-zinc-500 sm:inline">v1</span>
+      </a>
+      <nav class="ml-auto hidden items-center gap-1 text-[13px] md:flex">
+        <a href="#skills" class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] rounded-md px-3 py-1.5 transition-colors">Skills</a>
+        <a href="#examples" class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] rounded-md px-3 py-1.5 transition-colors">Examples</a>
+        <a href="#install" class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] rounded-md px-3 py-1.5 transition-colors">Install</a>
+        <a href="#architecture" class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] rounded-md px-3 py-1.5 transition-colors">Architecture</a>
+        <a href="#faq" class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] rounded-md px-3 py-1.5 transition-colors">FAQ</a>
+      </nav>
+      <div class="ml-auto flex items-center gap-1.5 md:ml-0">
+        <button
+          type="button"
+          (click)="toggleTheme()"
+          class="hover:bg-zinc-100 dark:hover:bg-zinc-800 flex h-8 w-8 items-center justify-center rounded-md text-[14px] transition-colors"
+          [attr.aria-label]="mode() === 'light' ? 'Switch to dark mode' : 'Switch to light mode'"
+        >
+          <span>{{ modeIcon() }}</span>
+        </button>
+        <a
+          href="https://github.com/mofirojean/angular-ui-skills"
+          target="_blank"
+          rel="noopener"
+          class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] hover:bg-zinc-100 dark:hover:bg-zinc-800 hidden h-8 items-center gap-1.5 rounded-md border px-3 text-[12px] font-medium transition-colors sm:inline-flex"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.03c-3.2.7-3.87-1.37-3.87-1.37-.52-1.32-1.28-1.67-1.28-1.67-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.84 1.18 3.1 0 4.42-2.7 5.4-5.27 5.68.41.36.78 1.06.78 2.13v3.16c0 .31.21.66.79.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5Z"/>
+          </svg>
+          GitHub
+        </a>
+        <a
+          href="#install"
+          class="bg-[var(--color-ng-red-600)] hover:bg-[var(--color-ng-red-700)] flex h-8 items-center rounded-md px-3 text-[12px] font-medium text-white transition-colors"
+        >
+          Get started
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <section id="top" class="relative overflow-hidden">
+    <div class="bg-grid pointer-events-none absolute inset-0 opacity-60"></div>
+    <div class="bg-radial-fade pointer-events-none absolute inset-0"></div>
+
+    <div class="relative mx-auto max-w-7xl px-5 pt-16 pb-20 sm:px-8 sm:pt-24 sm:pb-28">
+      <div class="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
+        <div>
+          <a
+            href="https://github.com/mofirojean/angular-ui-skills"
+            target="_blank"
+            rel="noopener"
+            class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] bg-white/70 dark:bg-[var(--color-ink-2)]/70 mb-6 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-medium backdrop-blur"
+          >
+            <span class="relative flex h-1.5 w-1.5">
+              <span class="bg-emerald-500 animate-pulse-ring absolute inline-flex h-full w-full rounded-full"></span>
+              <span class="bg-emerald-500 relative inline-flex h-1.5 w-1.5 rounded-full"></span>
+            </span>
+            <span class="font-mono uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Open source</span>
+            <span class="bg-[var(--color-line)] dark:bg-[var(--color-line-dark)] h-3 w-px"></span>
+            <span>spartan-ng-developer is ready</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+
+          <h1 class="text-[42px] font-semibold leading-[1.05] tracking-tight sm:text-[56px]">
+            Teach your agent
+            <br />
+            <span class="text-gradient-ng">Angular UI libraries</span>
+          </h1>
+
+          <p class="mt-5 max-w-xl text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400 sm:text-[17px]">
+            Per-library agent skills that compose with the
+            <code class="bg-zinc-100 dark:bg-zinc-800 rounded px-1.5 py-0.5 font-mono text-[13px]">angular-developer</code>
+            base skill. Specialized for Spartan/ng, PrimeNG, NG-ZORRO and Material, validated by reference apps, multi-runtime.
+          </p>
+
+          <div class="mt-7 flex flex-wrap items-center gap-3">
+            <a
+              href="#install"
+              class="bg-[var(--color-ng-red-600)] hover:bg-[var(--color-ng-red-700)] inline-flex items-center gap-2 rounded-lg px-5 py-3 text-[14px] font-semibold text-white shadow-lg shadow-[var(--color-ng-red-600)]/20 transition-colors"
+            >
+              Install a skill
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a
+              href="https://github.com/mofirojean/angular-ui-skills"
+              target="_blank"
+              rel="noopener"
+              class="border-[var(--color-line-strong)] dark:border-[var(--color-line-dark-strong)] hover:bg-zinc-100 dark:hover:bg-zinc-800 inline-flex items-center gap-2 rounded-lg border px-5 py-3 text-[14px] font-semibold transition-colors"
+            >
+              View on GitHub
+            </a>
+          </div>
+
+          <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] text-zinc-500 dark:text-zinc-400">
+            <span class="flex items-center gap-1.5"><span class="bg-emerald-500 h-1.5 w-1.5 rounded-full"></span>MIT licensed</span>
+            <span class="flex items-center gap-1.5"><span class="bg-emerald-500 h-1.5 w-1.5 rounded-full"></span>14+ agent runtimes</span>
+            <span class="flex items-center gap-1.5"><span class="bg-emerald-500 h-1.5 w-1.5 rounded-full"></span>Angular v21</span>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div class="bg-gradient-to-br from-[var(--color-ng-red-600)] via-[var(--color-ng-pink)] to-[var(--color-ng-purple)] absolute -inset-2 rounded-2xl opacity-30 blur-2xl"></div>
+          <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] bg-[var(--color-ink-2)] relative overflow-hidden rounded-xl border shadow-2xl">
+            <div class="border-[var(--color-line-dark)] flex items-center gap-1.5 border-b px-4 py-2.5">
+              <span class="bg-red-500/80 h-2.5 w-2.5 rounded-full"></span>
+              <span class="bg-yellow-500/80 h-2.5 w-2.5 rounded-full"></span>
+              <span class="bg-emerald-500/80 h-2.5 w-2.5 rounded-full"></span>
+              <span class="ml-3 font-mono text-[10px] text-zinc-500 uppercase tracking-wider">terminal</span>
+            </div>
+            <div class="code-block px-5 py-4 text-zinc-200">
+              @for (l of heroSnippet; track $index) {
+                @switch (l.kind) {
+                  @case ('com') { <div class="code-line"><span class="tk-com">{{ l.text }}</span></div> }
+                  @case ('cmd') { <div class="code-line"><span class="text-zinc-500">$</span> <span class="text-zinc-200">{{ l.text }}</span></div> }
+                  @case ('out') { <div class="code-line"><span class="text-emerald-400">{{ l.text }}</span></div> }
+                  @case ('prompt') { <div class="code-line"><span class="tk-fn">{{ l.text }}</span></div> }
+                  @default { <div class="code-line">&nbsp;</div> }
+                }
+              }
+            </div>
+          </div>
+          <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] bg-white/80 dark:bg-[var(--color-ink-2)]/80 absolute -bottom-6 -left-6 hidden items-center gap-3 rounded-xl border p-3 shadow-xl backdrop-blur sm:flex animate-float">
+            <div class="bg-[var(--color-ng-red-600)] flex h-9 w-9 items-center justify-center rounded-md text-[16px] font-bold text-white">S</div>
+            <div>
+              <p class="text-[12px] font-semibold leading-tight">Spartan/ng</p>
+              <p class="text-[10px] text-zinc-500">{{ '@spartan-ng/brain · ready' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] border-y bg-zinc-50/50 dark:bg-[var(--color-ink-2)]/50">
+    <div class="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
+      <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        @for (f of features; track f.title) {
+          <div class="group">
+            <div class="bg-[var(--color-ng-red-600)]/10 text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] flex h-10 w-10 items-center justify-center rounded-lg transition-colors group-hover:bg-[var(--color-ng-red-600)] group-hover:text-white">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path [attr.d]="f.icon"/>
+              </svg>
+            </div>
+            <h3 class="mt-4 text-[15px] font-semibold tracking-tight">{{ f.title }}</h3>
+            <p class="mt-1.5 text-[13px] leading-relaxed text-zinc-600 dark:text-zinc-400">{{ f.body }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section id="skills" class="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
+    <div class="mb-12 max-w-2xl">
+      <p class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] mb-3 font-mono text-[11px] font-semibold uppercase tracking-wider">Skills</p>
+      <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">One skill per library, built right</h2>
+      <p class="mt-3 text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+        A single "Angular UI" skill would either be a vague compromise or balloon past a usable context window. Specialized skills mean the agent activates the right one and generates code that matches its conventions.
+      </p>
+    </div>
+
+    <div class="grid gap-4 lg:grid-cols-2">
+      @for (s of skills; track s.slug) {
+        <article class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] hover:border-[var(--color-line-strong)] dark:hover:border-[var(--color-line-dark-strong)] group relative overflow-hidden rounded-2xl border bg-white dark:bg-[var(--color-ink-2)] p-6 transition-all">
+          <div class="relative flex items-start justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border p-2 {{ s.logoBg }}">
+                <img [src]="s.logo" [alt]="s.library + ' logo'" loading="lazy" decoding="async" class="h-full w-full object-contain" />
+              </div>
+              <div>
+                <p class="text-[10px] font-mono uppercase tracking-wider text-zinc-500">{{ s.library }}</p>
+                <h3 class="font-mono text-[14px] font-semibold">{{ s.name }}</h3>
+              </div>
+            </div>
+
+            @switch (s.status) {
+              @case ('ready') {
+                <span class="border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium">
+                  <span class="bg-emerald-500 h-1.5 w-1.5 rounded-full"></span>
+                  {{ statusLabel(s.status) }}
+                </span>
+              }
+              @case ('in-progress') {
+                <span class="border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium">
+                  <span class="bg-amber-500 h-1.5 w-1.5 rounded-full"></span>
+                  {{ statusLabel(s.status) }}
+                </span>
+              }
+              @case ('planned') {
+                <span class="border-[var(--color-line-strong)] dark:border-[var(--color-line-dark-strong)] text-zinc-500 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium">
+                  <span class="bg-zinc-400 h-1.5 w-1.5 rounded-full"></span>
+                  {{ statusLabel(s.status) }}
+                </span>
+              }
+            }
+          </div>
+
+          <p class="relative mt-4 text-[13px] leading-relaxed text-zinc-600 dark:text-zinc-400">{{ s.description }}</p>
+
+          <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] relative mt-5 flex items-center justify-between gap-3 border-t pt-4">
+            <div>
+              <p class="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Targets</p>
+              <p class="font-mono text-[11px] text-zinc-700 dark:text-zinc-300">{{ s.tracks }}</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <a
+                [href]="s.site"
+                target="_blank"
+                rel="noopener"
+                class="text-zinc-600 dark:text-zinc-400 hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] text-[12px] font-medium"
+              >
+                {{ s.library }} docs
+              </a>
+              @if (s.status === 'ready' || s.status === 'in-progress') {
+                <a
+                  [href]="'https://github.com/mofirojean/angular-ui-skills/tree/master/skills/' + s.slug"
+                  target="_blank"
+                  rel="noopener"
+                  class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] hover:underline inline-flex items-center gap-1 text-[12px] font-medium"
+                >
+                  Source
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                </a>
+              }
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section id="examples" class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] border-y bg-zinc-50/50 dark:bg-[var(--color-ink-2)]/50">
+    <div class="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
+      <div class="mb-12 max-w-2xl">
+        <p class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] mb-3 font-mono text-[11px] font-semibold uppercase tracking-wider">Reference apps</p>
+        <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">Skills you can see in action</h2>
+        <p class="mt-3 text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+          Every skill ships with a complete example app that exercises the real component surface. If the app builds and looks right, the skill is right.
+        </p>
+      </div>
+
+      <div class="grid gap-6 lg:grid-cols-2">
+        @for (ex of examples; track ex.slug) {
+          <article class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] group relative overflow-hidden rounded-2xl border bg-white dark:bg-[var(--color-ink-3)] transition-all hover:shadow-2xl hover:shadow-[var(--color-ng-red-600)]/5 hover:-translate-y-0.5">
+            <a
+              [href]="ex.demo ?? '#'"
+              target="_blank"
+              rel="noopener"
+              class="block aspect-[16/10] relative overflow-hidden bg-gradient-to-br"
+              [class]="ex.accent"
+              [attr.aria-label]="'Open ' + ex.name + ' live demo'"
+            >
+              <img
+                [src]="ex.image"
+                [alt]="ex.name + ' screenshot'"
+                loading="lazy"
+                decoding="async"
+                class="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.02]"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+              <div class="absolute right-3 top-3 flex items-center gap-1.5">
+                <span class="bg-black/60 text-white border-white/10 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium backdrop-blur">
+                  <span class="relative flex h-1.5 w-1.5">
+                    <span class="bg-emerald-400 animate-pulse-ring absolute inline-flex h-full w-full rounded-full"></span>
+                    <span class="bg-emerald-400 relative inline-flex h-1.5 w-1.5 rounded-full"></span>
+                  </span>
+                  Live demo
+                </span>
+              </div>
+              <div class="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/60 border border-white/10 px-2.5 py-1 backdrop-blur">
+                <p class="text-[10px] font-mono uppercase tracking-wider text-white/90">{{ ex.tagline }}</p>
+              </div>
+            </a>
+
+            <div class="p-6">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <h3 class="text-xl font-semibold tracking-tight">{{ ex.name }}</h3>
+                  <p class="mt-1 text-[13px] text-zinc-600 dark:text-zinc-400">{{ ex.description }}</p>
+                </div>
+              </div>
+
+              <div class="mt-4 flex flex-wrap gap-1.5">
+                @for (b of ex.badges; track b) {
+                  <span class="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded px-2 py-0.5 text-[10px] font-medium">{{ b }}</span>
+                }
+              </div>
+
+              <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] mt-5 border-t pt-4">
+                <p class="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Stack</p>
+                <p class="mt-1 font-mono text-[11px] text-zinc-700 dark:text-zinc-300">{{ ex.stack.join(' · ') }}</p>
+              </div>
+
+              <div class="mt-4 flex items-center justify-between gap-3">
+                <span class="text-[11px] text-zinc-500">Validates <code class="font-mono text-zinc-700 dark:text-zinc-300">{{ ex.skill }}</code></span>
+                <div class="flex items-center gap-3">
+                  <a
+                    [href]="'https://github.com/mofirojean/angular-ui-skills/tree/master/' + ex.path"
+                    target="_blank"
+                    rel="noopener"
+                    class="text-zinc-600 dark:text-zinc-400 hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] inline-flex items-center gap-1 text-[12px] font-medium"
+                  >
+                    Source
+                  </a>
+                  <a
+                    [href]="ex.demo ?? '#'"
+                    target="_blank"
+                    rel="noopener"
+                    class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] hover:underline inline-flex items-center gap-1 text-[12px] font-medium"
+                  >
+                    Open demo
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section id="install" class="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
+    <div class="grid gap-12 lg:grid-cols-[1fr_1.4fr]">
+      <div>
+        <p class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] mb-3 font-mono text-[11px] font-semibold uppercase tracking-wider">Install</p>
+        <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">Three commands. Any agent.</h2>
+        <p class="mt-3 text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+          The recommended path is the
+          <code class="bg-zinc-100 dark:bg-zinc-800 rounded px-1.5 py-0.5 font-mono text-[12px]">skills</code>
+          CLI. It walks you through picking which skills to install and which agent runtime to target. Works with Claude Code, Cursor, Codex, GitHub Copilot, Gemini CLI, and more.
+        </p>
+
+        <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] mt-8 space-y-3 rounded-xl border bg-zinc-50/50 dark:bg-[var(--color-ink-2)]/50 p-4">
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">After install</p>
+          <ol class="space-y-2 text-[13px]">
+            <li class="flex items-start gap-2.5">
+              <span class="bg-[var(--color-ng-red-600)] mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white">1</span>
+              <span>Restart your AI agent so it picks up the new skill folder.</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="bg-[var(--color-ng-red-600)] mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white">2</span>
+              <span>Ask it to build something using your chosen library.</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="bg-[var(--color-ng-red-600)] mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white">3</span>
+              <span>The skill loads automatically when relevant. No invocation needed.</span>
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <div>
+        <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex gap-1 border-b">
+          @for (key of tabKeys; track key) {
+            <button
+              type="button"
+              (click)="selectTab(key)"
+              class="-mb-px border-b-2 px-4 py-2.5 text-[13px] font-medium transition-colors"
+              [style.border-color]="installTab() === key ? 'var(--color-ng-red-600)' : 'transparent'"
+              [style.color]="installTab() === key ? 'var(--color-ng-red-600)' : ''"
+              [class.text-zinc-500]="installTab() !== key"
+              [class.hover:text-zinc-900]="installTab() !== key"
+              [class.dark:hover:text-zinc-100]="installTab() !== key"
+            >
+              {{ installCommands[key].label }}
+            </button>
+          }
+        </div>
+
+        <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] relative overflow-hidden rounded-b-xl rounded-tr-xl border border-t-0 bg-[var(--color-ink-2)]">
+          <div class="absolute right-3 top-3">
+            <button
+              type="button"
+              (click)="copy(installBlock(), 'install-' + installTab())"
+              class="border-zinc-700 hover:bg-zinc-800 inline-flex items-center gap-1.5 rounded-md border bg-zinc-900 px-2.5 py-1 text-[11px] font-medium text-zinc-300 transition-colors"
+            >
+              @if (copiedKey() === 'install-' + installTab()) {
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                Copied
+              } @else {
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy
+              }
+            </button>
+          </div>
+          <div class="code-block px-5 py-5 text-zinc-200">
+            @for (l of installCommands[installTab()].lines; track $index) {
+              @switch (l.tk) {
+                @case ('com') { <div class="code-line"><span class="tk-com">{{ l.text }}</span></div> }
+                @case ('cmd') { <div class="code-line"><span class="text-zinc-500 select-none">$ </span><span>{{ l.text }}</span></div> }
+              }
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="architecture" class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] border-y bg-zinc-50/50 dark:bg-[var(--color-ink-2)]/50">
+    <div class="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
+      <div class="mb-12 max-w-2xl">
+        <p class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] mb-3 font-mono text-[11px] font-semibold uppercase tracking-wider">Anatomy</p>
+        <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">What's inside a skill</h2>
+        <p class="mt-3 text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+          A skill is a folder of markdown. <code class="bg-zinc-200 dark:bg-zinc-800 rounded px-1.5 py-0.5 font-mono text-[12px]">SKILL.md</code> is a short router that tells the agent what's available and when to use it. The detail lives in topic-scoped reference files that get loaded on demand.
+        </p>
+      </div>
+
+      <div class="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
+        <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] overflow-hidden rounded-2xl border bg-[var(--color-ink-2)]">
+          <div class="border-[var(--color-line-dark)] flex items-center justify-between border-b px-4 py-2.5">
+            <div class="flex items-center gap-1.5">
+              <span class="bg-red-500/80 h-2.5 w-2.5 rounded-full"></span>
+              <span class="bg-yellow-500/80 h-2.5 w-2.5 rounded-full"></span>
+              <span class="bg-emerald-500/80 h-2.5 w-2.5 rounded-full"></span>
+              <span class="ml-3 font-mono text-[10px] text-zinc-500 uppercase tracking-wider">skills tree</span>
+            </div>
+            <a href="https://github.com/mofirojean/angular-ui-skills/tree/master/skills/spartan-ng-developer" target="_blank" rel="noopener" class="font-mono text-[10px] text-zinc-500 hover:text-zinc-300 transition-colors">github →</a>
+          </div>
+          <pre class="code-block overflow-x-auto px-5 py-4 text-zinc-200"><code>@for (row of skillTree; track $index) {<div class="code-line flex items-baseline gap-4"><span [class.text-zinc-100]="$index === 0" [class.text-zinc-400]="$index !== 0">{{ row.line }}</span>@if (row.tag) {<span class="ml-auto whitespace-nowrap text-[10px] text-zinc-500 italic"># {{ row.tag }}</span>}</div>}</code></pre>
+        </div>
+
+        <div class="flex flex-col gap-5">
+          <div>
+            <p class="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Why this shape</p>
+            <h3 class="mt-1 text-[17px] font-semibold tracking-tight">Routers and references, not one big file</h3>
+            <p class="mt-2 text-[13.5px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+              An always-loaded <code class="bg-zinc-100 dark:bg-zinc-800 rounded px-1 font-mono text-[12px]">SKILL.md</code> stays under a few hundred lines. References are pulled in only for the task at hand, so context stays focused and the agent doesn't see (or repeat) patterns it isn't using.
+            </p>
+          </div>
+
+          <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] rounded-xl border bg-white dark:bg-[var(--color-ink-3)] p-4">
+            <p class="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Stack at runtime</p>
+            <div class="mt-3 space-y-2">
+              <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex items-center gap-3 rounded-lg border bg-zinc-50/70 dark:bg-[var(--color-ink-2)] px-3 py-2">
+                <span class="font-mono text-[10px] text-zinc-500 w-6">L3</span>
+                <span class="bg-[var(--color-ng-red-600)] h-4 w-1 rounded-full"></span>
+                <div class="min-w-0 flex-1">
+                  <p class="font-mono text-[12px] font-semibold">angular-ui-skills/&lt;library&gt;-developer</p>
+                  <p class="text-[11px] text-zinc-500">Library idioms: theming, components, version-pinned APIs.</p>
+                </div>
+              </div>
+              <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex items-center gap-3 rounded-lg border bg-zinc-50/70 dark:bg-[var(--color-ink-2)] px-3 py-2">
+                <span class="font-mono text-[10px] text-zinc-500 w-6">L2</span>
+                <span class="bg-blue-500 h-4 w-1 rounded-full"></span>
+                <div class="min-w-0 flex-1">
+                  <p class="font-mono text-[12px] font-semibold">angular-developer</p>
+                  <p class="text-[11px] text-zinc-500">Google's base skill: signals, DI, routing, forms, SSR, a11y.</p>
+                </div>
+              </div>
+              <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex items-center gap-3 rounded-lg border bg-zinc-50/70 dark:bg-[var(--color-ink-2)] px-3 py-2">
+                <span class="font-mono text-[10px] text-zinc-500 w-6">L1</span>
+                <span class="bg-zinc-400 h-4 w-1 rounded-full"></span>
+                <div class="min-w-0 flex-1">
+                  <p class="font-mono text-[12px] font-semibold">your agent runtime</p>
+                  <p class="text-[11px] text-zinc-500">Claude Code, Cursor, Codex, Copilot, Gemini CLI, etc.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] mt-6 overflow-hidden rounded-2xl border bg-white dark:bg-[var(--color-ink-3)]">
+        <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex items-center justify-between border-b px-5 py-3">
+          <div>
+            <p class="text-[10px] font-mono uppercase tracking-wider text-zinc-500">A real run</p>
+            <p class="text-[13px] font-semibold tracking-tight">From prompt to generated code, end to end</p>
+          </div>
+          <span class="border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hidden items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium sm:inline-flex">
+            <span class="bg-emerald-500 h-1.5 w-1.5 rounded-full"></span>
+            verbatim
+          </span>
+        </div>
+        <ol class="divide-[var(--color-line)] dark:divide-[var(--color-line-dark)] divide-y">
+          @for (step of skillRun; track step.label; let i = $index) {
+            <li class="grid gap-3 px-5 py-4 sm:grid-cols-[180px_1fr]">
+              <div class="flex items-baseline gap-2">
+                <span class="font-mono text-[10px] text-zinc-400 tabular-nums">0{{ i + 1 }}</span>
+                <p class="font-mono text-[11.5px] font-semibold text-zinc-700 dark:text-zinc-300">{{ step.label }}</p>
+              </div>
+              <p
+                class="text-[13px] leading-relaxed"
+                [class.text-zinc-600]="!step.mono"
+                [class.dark:text-zinc-400]="!step.mono"
+                [class.font-mono]="step.mono"
+                [class.text-zinc-700]="step.mono"
+                [class.dark:text-zinc-300]="step.mono"
+              >
+                {{ step.detail }}
+              </p>
+            </li>
+          }
+        </ol>
+        <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex flex-wrap items-center justify-between gap-2 border-t bg-zinc-50/50 dark:bg-[var(--color-ink-2)]/50 px-5 py-3">
+          <p class="text-[11px] text-zinc-500">
+            Versions pinned at the top of <code class="font-mono">SKILL.md</code>, agent compares to your installed deps before generating.
+          </p>
+          <a
+            href="https://github.com/mofirojean/angular-ui-skills/blob/master/skills/spartan-ng-developer/SKILL.md"
+            target="_blank"
+            rel="noopener"
+            class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] hover:underline inline-flex items-center gap-1 text-[11px] font-medium"
+          >
+            Read a real SKILL.md
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" class="mx-auto max-w-3xl px-5 py-20 sm:px-8 sm:py-28">
+    <div class="mb-10">
+      <p class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] mb-3 font-mono text-[11px] font-semibold uppercase tracking-wider">FAQ</p>
+      <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">Questions, answered</h2>
+    </div>
+
+    <div class="divide-[var(--color-line)] dark:divide-[var(--color-line-dark)] divide-y">
+      <details class="group py-5">
+        <summary class="flex cursor-pointer items-center justify-between gap-4 text-[15px] font-semibold tracking-tight">
+          Why per-library skills instead of one Angular UI skill?
+          <span class="text-zinc-500 transition-transform group-open:rotate-45">+</span>
+        </summary>
+        <p class="mt-3 text-[14px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+          Angular UI libraries differ significantly in their architecture, theming model, and conventions. A single skill would either be a vague compromise or balloon past a usable context window. Specialized skills mean the agent activates the right one for your project and learns its specific idioms.
+        </p>
+      </details>
+
+      <details class="group py-5">
+        <summary class="flex cursor-pointer items-center justify-between gap-4 text-[15px] font-semibold tracking-tight">
+          Do I need the angular-developer base skill?
+          <span class="text-zinc-500 transition-transform group-open:rotate-45">+</span>
+        </summary>
+        <p class="mt-3 text-[14px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+          Strongly recommended. The base skill from Google covers Angular fundamentals: signals, dependency injection, routing, forms, SSR, accessibility. Our skills assume that foundation and focus on the component library on top.
+        </p>
+      </details>
+
+      <details class="group py-5">
+        <summary class="flex cursor-pointer items-center justify-between gap-4 text-[15px] font-semibold tracking-tight">
+          Which agent runtimes are supported?
+          <span class="text-zinc-500 transition-transform group-open:rotate-45">+</span>
+        </summary>
+        <p class="mt-3 text-[14px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+          Anything that loads markdown-based skills. The CLI ships adapters for 14+ runtimes including Claude Code, Cursor, Codex, GitHub Copilot, Gemini CLI, Continue, Cline, Roo Code, and more. You can also drop the skill folder into any agent that reads a skills directory.
+        </p>
+      </details>
+
+      <details class="group py-5">
+        <summary class="flex cursor-pointer items-center justify-between gap-4 text-[15px] font-semibold tracking-tight">
+          How do you keep skills from drifting from the upstream?
+          <span class="text-zinc-500 transition-transform group-open:rotate-45">+</span>
+        </summary>
+        <p class="mt-3 text-[14px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+          Every skill is paired with a reference example app. When the upstream library releases, we update the example, fix anything that broke, and fold the findings back into the skill. The example builds and runs, or the skill update doesn't land.
+        </p>
+      </details>
+
+      <details class="group py-5">
+        <summary class="flex cursor-pointer items-center justify-between gap-4 text-[15px] font-semibold tracking-tight">
+          Can I contribute a skill for another library?
+          <span class="text-zinc-500 transition-transform group-open:rotate-45">+</span>
+        </summary>
+        <p class="mt-3 text-[14px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+          Yes. Open an issue describing the library you want to cover. The pattern is one folder under <code class="font-mono text-[12px] bg-zinc-100 dark:bg-zinc-800 rounded px-1">skills/&lt;library&gt;-developer/</code> with a SKILL.md router plus topic-scoped references, plus a reference example app that exercises the surface.
+        </p>
+      </details>
+    </div>
+  </section>
+
+  <section class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] border-t bg-zinc-50/50 dark:bg-[var(--color-ink-2)]/50">
+    <div class="mx-auto max-w-4xl px-5 py-20 text-center sm:px-8 sm:py-28">
+      <h2 class="text-3xl font-semibold tracking-tight sm:text-5xl">
+        Ship Angular apps,
+        <span class="text-gradient-ng">at agent speed</span>
+      </h2>
+      <p class="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+        Install the skill for the library you actually use. Your AI assistant will start producing code that compiles, themes correctly, and matches the framework's conventions.
+      </p>
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <a
+          href="#install"
+          class="bg-[var(--color-ng-red-600)] hover:bg-[var(--color-ng-red-700)] inline-flex items-center gap-2 rounded-lg px-6 py-3 text-[14px] font-semibold text-white shadow-lg shadow-[var(--color-ng-red-600)]/20 transition-colors"
+        >
+          Install a skill
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <a
+          href="https://github.com/mofirojean/angular-ui-skills"
+          target="_blank"
+          rel="noopener"
+          class="border-[var(--color-line-strong)] dark:border-[var(--color-line-dark-strong)] hover:bg-white dark:hover:bg-zinc-800 inline-flex items-center gap-2 rounded-lg border px-6 py-3 text-[14px] font-semibold transition-colors"
+        >
+          Star on GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] border-t">
+    <div class="mx-auto max-w-7xl px-5 py-10 sm:px-8">
+      <div class="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+        <div class="flex items-center gap-2.5">
+          <span class="shield h-6 w-5 shrink-0"></span>
+          <div>
+            <p class="text-[13px] font-semibold tracking-tight">Angular UI Skills</p>
+            <p class="text-[11px] text-zinc-500">MIT licensed · © {{ year }}</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-[12px]">
+          <a href="https://github.com/mofirojean/angular-ui-skills" target="_blank" rel="noopener" class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] text-zinc-600 dark:text-zinc-400 transition-colors">GitHub</a>
+          <a href="https://github.com/mofirojean/angular-ui-skills/issues" target="_blank" rel="noopener" class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] text-zinc-600 dark:text-zinc-400 transition-colors">Issues</a>
+          <a href="https://github.com/mofirojean/angular-ui-skills/blob/master/LICENSE" target="_blank" rel="noopener" class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] text-zinc-600 dark:text-zinc-400 transition-colors">License</a>
+          <a href="https://angular.dev" target="_blank" rel="noopener" class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] text-zinc-600 dark:text-zinc-400 transition-colors">angular.dev</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>

@@ -1,0 +1,145 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Inter var', 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  --font-display: 'Inter var', 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink: #0b0f17;
+  --color-ink-2: #11151d;
+  --color-ink-3: #1a2030;
+  --color-paper: #ffffff;
+  --color-paper-2: #fafafa;
+  --color-line: rgba(15, 23, 42, 0.08);
+  --color-line-strong: rgba(15, 23, 42, 0.16);
+  --color-line-dark: rgba(255, 255, 255, 0.08);
+  --color-line-dark-strong: rgba(255, 255, 255, 0.16);
+
+  --color-ng-red-50: #fff1f3;
+  --color-ng-red-100: #ffe1e6;
+  --color-ng-red-200: #ffc7d0;
+  --color-ng-red-300: #ff95a6;
+  --color-ng-red-400: #ff5c7a;
+  --color-ng-red-500: #ff2d55;
+  --color-ng-red-600: #dd0031;
+  --color-ng-red-700: #c3002f;
+  --color-ng-red-800: #9a0026;
+  --color-ng-red-900: #5e0017;
+
+  --color-ng-pink: #ff4081;
+  --color-ng-blue: #1976d2;
+  --color-ng-purple: #a259ff;
+
+  --color-spartan: #000000;
+  --color-primeng: #10b981;
+
+  --radius-card: 1rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.dark body {
+  background: var(--color-ink);
+  color: #e6e7ea;
+}
+
+.font-mono {
+  font-variant-ligatures: contextual;
+  font-feature-settings: 'cv02', 'cv03', 'cv04';
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(to right, var(--color-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-line) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+.dark .bg-grid {
+  background-image:
+    linear-gradient(to right, var(--color-line-dark) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-line-dark) 1px, transparent 1px);
+}
+
+.bg-radial-fade {
+  background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(221, 0, 49, 0.10), transparent 70%);
+}
+
+.dark .bg-radial-fade {
+  background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255, 64, 129, 0.12), transparent 70%);
+}
+
+.text-gradient-ng {
+  background: linear-gradient(135deg, #dd0031 0%, #ff2d55 30%, #ff4081 60%, #a259ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.shield {
+  background: linear-gradient(180deg, #dd0031 0%, #c3002f 100%);
+  clip-path: polygon(50% 0, 100% 18%, 88% 90%, 50% 100%, 12% 90%, 0 18%);
+}
+
+.code-block {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+  letter-spacing: -0.005em;
+}
+
+.code-line .tk-kw { color: #ff7b9c; }
+.code-line .tk-fn { color: #b388ff; }
+.code-line .tk-str { color: #98e07a; }
+.code-line .tk-mut { color: #ffb86c; }
+.code-line .tk-com { color: #6b7280; font-style: italic; }
+.code-line .tk-flag { color: #82aaff; }
+
+@keyframes pulseRing {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.6); opacity: 0; }
+}
+
+.animate-pulse-ring {
+  animation: pulseRing 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-line-strong);
+  border-radius: 999px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--color-line-dark-strong);
+}
