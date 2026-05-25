@@ -1,9 +1,511 @@
 <div class="flex flex-col gap-3">
-  <header>
-    <h1 class="text-lg font-semibold tracking-tight">Holdings</h1>
-    <p class="text-muted-color mt-0.5 text-[12px]">All positions, expandable tax lots, inline target weights.</p>
+  <!-- Header -->
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <h1 class="text-lg font-semibold tracking-tight">Holdings</h1>
+      <p class="text-muted-color mt-0.5 text-[12px]">
+        <span class="font-mono tabular-nums">{{ filtered().length }}</span>
+        of
+        <span class="font-mono tabular-nums">{{ holdings().length }}</span>
+        positions ·
+        Total value
+        <span class="text-color font-mono font-semibold tabular-nums">{{ formatCurrency(totals().marketValue) }}</span>
+        · P/L
+        <span
+          class="font-mono font-semibold tabular-nums"
+          [class.text-emerald-500]="totals().totalPL > 0"
+          [class.text-rose-500]="totals().totalPL < 0"
+        >
+          {{ formatCurrency(totals().totalPL) }}
+        </span>
+      </p>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <p-button
+        icon="pi pi-download"
+        severity="secondary"
+        variant="text"
+        size="small"
+        [rounded]="true"
+        styleClass="!h-7 !w-7"
+        pTooltip="Export CSV"
+        tooltipPosition="bottom"
+        aria-label="Export"
+      />
+      <p-button
+        icon="pi pi-refresh"
+        severity="secondary"
+        variant="text"
+        size="small"
+        [rounded]="true"
+        styleClass="!h-7 !w-7"
+        pTooltip="Refresh"
+        tooltipPosition="bottom"
+        aria-label="Refresh"
+      />
+      <p-button label="Add holding" icon="pi pi-plus" size="small" (onClick)="drawerOpen.set(true)" />
+    </div>
   </header>
-  <div class="border-surface-200 bg-surface-50 rounded-md border p-4 text-[12px]">
-    Holdings Table with sort / filter / virtual-scroll / row expansion lands in Phase 3.
-  </div>
+
+  <!-- Filter bar -->
+  <section class="border-surface bg-surface-50 dark:bg-surface-900 flex flex-wrap items-center gap-2 rounded-md border p-2">
+    <p-autocomplete
+      class="min-w-[200px] flex-1"
+      size="small"
+      [suggestions]="tickerSuggestions()"
+      optionLabel="symbol"
+      placeholder="Search ticker..."
+      [forceSelection]="true"
+      [dropdown]="true"
+      (completeMethod)="searchTicker($event)"
+      (ngModelChange)="onSearchChange($event)"
+      [ngModel]="searchSymbol()"
+      [showEmptyMessage]="true"
+      emptyMessage="No tickers found"
+    >
+      <ng-template let-t pTemplate="item">
+        <div class="flex items-center justify-between gap-3">
+          <span class="font-mono text-[12px] font-semibold">{{ t.symbol }}</span>
+          <span class="text-muted-color text-[11px]">{{ t.name }}</span>
+        </div>
+      </ng-template>
+    </p-autocomplete>
+
+    <p-select
+      size="small"
+      [options]="sectorOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="selectedSector()"
+      (ngModelChange)="selectedSector.set($event)"
+      placeholder="All sectors"
+      class="min-w-[140px]"
+    />
+
+    <p-selectButton
+      size="small"
+      [options]="statusOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="statusFilter()"
+      (ngModelChange)="statusFilter.set($event)"
+      [allowEmpty]="false"
+    />
+
+    @if (searchSymbol() || selectedSector() || statusFilter() !== 'All') {
+      <p-button
+        label="Clear"
+        icon="pi pi-times"
+        severity="secondary"
+        variant="text"
+        size="small"
+        (onClick)="clearFilters()"
+      />
+    }
+
+    <div class="text-muted-color ml-auto flex items-center gap-3 text-[11px]">
+      <span class="flex items-center gap-1">
+        <span class="bg-emerald-500 h-1.5 w-1.5 rounded-full"></span>
+        <span class="font-mono tabular-nums">{{ totals().longCount }}</span> long
+      </span>
+      <span class="flex items-center gap-1">
+        <span class="bg-rose-500 h-1.5 w-1.5 rounded-full"></span>
+        <span class="font-mono tabular-nums">{{ totals().shortCount }}</span> short
+      </span>
+    </div>
+  </section>
+
+  <!-- Bulk action toolbar -->
+  @if (selection().length > 0) {
+    <section class="border-primary/40 bg-primary/5 flex items-center gap-2 rounded-md border px-3 py-1.5 text-[12px]">
+      <span class="bg-primary text-primary-contrast flex h-5 min-w-5 items-center justify-center rounded px-1 font-mono text-[10px] font-semibold tabular-nums">
+        {{ selection().length }}
+      </span>
+      <span class="font-medium">selected</span>
+      <span class="border-surface mx-1 h-4 border-l"></span>
+      <p-button label="Sell all" icon="pi pi-minus" severity="secondary" variant="outlined" size="small" (onClick)="bulkAction('sell')" />
+      <p-button label="Tag" icon="pi pi-tag" severity="secondary" variant="outlined" size="small" (onClick)="bulkAction('tag')" />
+      <p-button label="Export" icon="pi pi-download" severity="secondary" variant="outlined" size="small" (onClick)="bulkAction('export')" />
+      <button
+        type="button"
+        class="text-muted-color hover:text-color ml-auto text-[11px] font-medium transition-colors"
+        (click)="selection.set([])"
+      >
+        Clear selection
+      </button>
+    </section>
+  }
+
+  <!-- Table -->
+  <section class="border-surface bg-surface-50 dark:bg-surface-900 overflow-hidden rounded-md border">
+    @if (isLoading()) {
+      <div class="space-y-1 p-3">
+        @for (i of [0, 1, 2, 3, 4, 5, 6, 7]; track i) {
+          <p-skeleton width="100%" height="2rem" />
+        }
+      </div>
+    } @else {
+      <p-table
+        [value]="filtered()"
+        [paginator]="true"
+        [rows]="19"
+        [rowsPerPageOptions]="[19, 25, 50]"
+        [(selection)]="selection"
+        [expandedRowKeys]="expandedRowKeys"
+        dataKey="symbol"
+        selectionMode="multiple"
+        [scrollable]="true"
+        scrollHeight="flex"
+        sortMode="multiple"
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        [contextMenu]="rowContextMenu"
+        (onContextMenuSelect)="onRowContextMenu($event)"
+        styleClass="dense-table"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="w-[2.5rem]" pFrozenColumn>
+              <p-tableHeaderCheckbox />
+            </th>
+            <th class="w-[2.5rem]" pFrozenColumn></th>
+            <th pFrozenColumn pSortableColumn="symbol" pResizableColumn>
+              Ticker <p-sortIcon field="symbol" />
+            </th>
+            <th pSortableColumn="sector" pResizableColumn>
+              Sector <p-sortIcon field="sector" />
+            </th>
+            <th pSortableColumn="status" pResizableColumn>
+              Status <p-sortIcon field="status" />
+            </th>
+            <th pSortableColumn="qty" pResizableColumn class="text-right">
+              Qty <p-sortIcon field="qty" />
+            </th>
+            <th pSortableColumn="avgCost" pResizableColumn class="text-right">
+              Avg cost <p-sortIcon field="avgCost" />
+            </th>
+            <th pSortableColumn="price" pResizableColumn class="text-right">
+              Price <p-sortIcon field="price" />
+            </th>
+            <th pSortableColumn="dayChangePct" pResizableColumn class="text-right">
+              Day % <p-sortIcon field="dayChangePct" />
+            </th>
+            <th pSortableColumn="marketValue" pResizableColumn class="text-right">
+              Market value <p-sortIcon field="marketValue" />
+            </th>
+            <th pSortableColumn="totalPL" pResizableColumn class="text-right">
+              Total P/L <p-sortIcon field="totalPL" />
+            </th>
+            <th pSortableColumn="targetWeight" pResizableColumn class="text-right">
+              Target % <p-sortIcon field="targetWeight" />
+            </th>
+            <th class="w-[2.5rem]"></th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-row let-expanded="expanded">
+          <tr [pSelectableRow]="row" [pContextMenuRow]="row" class="group">
+            <td pFrozenColumn>
+              <p-tableCheckbox [value]="row" />
+            </td>
+            <td pFrozenColumn>
+              <button
+                type="button"
+                [pRowToggler]="row"
+                class="text-muted-color hover:text-color flex h-6 w-6 items-center justify-center rounded transition-transform"
+                [class.rotate-90]="expanded"
+                [attr.aria-label]="expanded ? 'Collapse' : 'Expand'"
+              >
+                <i class="pi pi-chevron-right text-[10px]!"></i>
+              </button>
+            </td>
+            <td pFrozenColumn>
+              <a [routerLink]="['/holdings', row.symbol]" class="hover:text-primary block">
+                <p class="font-mono text-[12px] font-semibold leading-tight">{{ row.symbol }}</p>
+                <p class="text-muted-color text-[10px] leading-tight">{{ row.name }}</p>
+              </a>
+            </td>
+            <td>
+              <p-tag [value]="row.sector" [severity]="sectorSeverity(row.sector)" />
+            </td>
+            <td>
+              <p-tag [value]="row.status" [severity]="statusSeverity(row.status)" />
+            </td>
+            <td class="text-right font-mono text-[12px] tabular-nums">
+              {{ row.qty.toLocaleString() }}
+            </td>
+            <td class="text-muted-color text-right font-mono text-[12px] tabular-nums">
+              ${{ row.avgCost.toFixed(2) }}
+            </td>
+            <td class="text-right font-mono text-[12px] font-semibold tabular-nums">
+              ${{ row.price.toFixed(2) }}
+            </td>
+            <td
+              class="text-right font-mono text-[12px] font-semibold tabular-nums"
+              [class.text-emerald-500]="row.dayChangePct > 0"
+              [class.text-rose-500]="row.dayChangePct < 0"
+            >
+              {{ formatChange(row.dayChangePct) }}
+            </td>
+            <td class="text-right font-mono text-[12px] tabular-nums">
+              {{ formatCurrency(row.marketValue) }}
+            </td>
+            <td
+              class="text-right font-mono text-[12px] font-semibold tabular-nums"
+              [class.text-emerald-500]="row.totalPL > 0"
+              [class.text-rose-500]="row.totalPL < 0"
+            >
+              {{ formatCurrency(row.totalPL) }}
+              <span class="text-muted-color ml-1 font-normal">{{ formatChange(row.totalPLPct) }}</span>
+            </td>
+            <td pEditableColumn [pEditableColumnField]="'targetWeight'" class="text-right font-mono text-[12px] tabular-nums">
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <p-inputNumber
+                    size="small"
+                    [ngModel]="row.targetWeight"
+                    (ngModelChange)="onWeightChange(row, $event)"
+                    [min]="0"
+                    [max]="100"
+                    [step]="0.1"
+                    suffix="%"
+                    [maxFractionDigits]="2"
+                    inputStyleClass="!w-20 !text-right"
+                  />
+                </ng-template>
+                <ng-template pTemplate="output">
+                  <span class="hover:bg-primary/10 cursor-text rounded px-1 py-0.5">
+                    {{ row.targetWeight.toFixed(1) }}%
+                  </span>
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td class="text-right" (click)="$event.stopPropagation()">
+              <p-button
+                icon="pi pi-ellipsis-v"
+                severity="secondary"
+                variant="text"
+                size="small"
+                [rounded]="true"
+                styleClass="!h-6 !w-6"
+                (onClick)="openRowMenu(rowMenu, $event, row)"
+                aria-label="Row actions"
+              />
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="expandedrow" let-row>
+          <tr>
+            <td colspan="13" class="bg-surface-0 dark:bg-surface-950 !p-0">
+              <div class="border-surface border-t border-l-2 border-l-primary/40 px-4 py-3">
+                <div class="mb-2 flex items-center justify-between">
+                  <p class="text-muted-color text-[10px] font-semibold uppercase tracking-wider">
+                    Tax lots for {{ row.symbol }} · {{ row.taxLots.length }} lots
+                  </p>
+                  <span class="text-muted-color text-[10px]">Click a lot to view detail</span>
+                </div>
+                <table class="w-full text-[11px]">
+                  <thead>
+                    <tr class="text-muted-color border-surface border-b text-[10px] uppercase tracking-wider">
+                      <th class="px-2 py-1 text-left font-semibold">Acquired</th>
+                      <th class="px-2 py-1 text-right font-semibold">Qty</th>
+                      <th class="px-2 py-1 text-right font-semibold">Cost basis</th>
+                      <th class="px-2 py-1 text-right font-semibold">Current value</th>
+                      <th class="px-2 py-1 text-right font-semibold">Gain</th>
+                      <th class="px-2 py-1 text-right font-semibold">Term</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (lot of row.taxLots; track lot.id) {
+                      <tr class="hover:bg-surface-100 dark:hover:bg-surface-800 border-surface border-b transition-colors">
+                        <td class="px-2 py-1 font-mono tabular-nums">{{ lot.acquired }}</td>
+                        <td class="px-2 py-1 text-right font-mono tabular-nums">{{ lot.qty }}</td>
+                        <td class="text-muted-color px-2 py-1 text-right font-mono tabular-nums">{{ formatCurrency(lot.costBasis) }}</td>
+                        <td class="px-2 py-1 text-right font-mono font-semibold tabular-nums">{{ formatCurrency(lot.currentValue) }}</td>
+                        <td
+                          class="px-2 py-1 text-right font-mono font-semibold tabular-nums"
+                          [class.text-emerald-500]="lot.gain > 0"
+                          [class.text-rose-500]="lot.gain < 0"
+                        >
+                          {{ formatCurrency(lot.gain) }}
+                          <span class="text-muted-color ml-1 font-normal">{{ formatChange(lot.gainPct) }}</span>
+                        </td>
+                        <td class="px-2 py-1 text-right">
+                          <p-tag [value]="lot.term" [severity]="lot.term === 'Long' ? 'success' : 'warn'" />
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="13" class="p-8 text-center">
+              <i class="pi pi-search text-muted-color !text-2xl"></i>
+              <p class="text-muted-color mt-2 text-[12px]">No positions match your filters.</p>
+              <p-button label="Clear filters" severity="secondary" variant="text" size="small" (onClick)="clearFilters()" />
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
+  </section>
 </div>
+
+<!-- Row overflow menu (shared between rows) -->
+<p-menu #rowMenu [model]="rowMenuItems" [popup]="true" appendTo="body" />
+
+<!-- Context menu on right-click -->
+<p-contextmenu #rowContextMenu [model]="rowMenuItems" appendTo="body" />
+
+<!-- Add holding drawer -->
+<p-drawer
+  [(visible)]="drawerOpen"
+  position="right"
+  [style]="{ width: '26rem' }"
+  styleClass="!p-0"
+  [showCloseIcon]="false"
+>
+  <ng-template pTemplate="header">
+    <div class="flex w-full items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <div class="bg-primary text-primary-contrast flex h-7 w-7 items-center justify-center rounded">
+          <i class="pi pi-plus !text-[12px]"></i>
+        </div>
+        <div>
+          <p class="text-[13px] font-semibold leading-none">Add holding</p>
+          <p class="text-muted-color mt-1 text-[10px] leading-none">Open a new long or short position</p>
+        </div>
+      </div>
+      <p-button
+        icon="pi pi-times"
+        severity="secondary"
+        variant="text"
+        size="small"
+        [rounded]="true"
+        styleClass="!h-7 !w-7"
+        (onClick)="drawerOpen.set(false)"
+        aria-label="Close"
+      />
+    </div>
+  </ng-template>
+
+  <form [formGroup]="addForm" (ngSubmit)="submitAdd()" class="flex h-full flex-col text-[12px]">
+    <!-- Scrollable body -->
+    <div class="min-h-0 flex-1 space-y-5 overflow-y-auto px-4 py-4">
+      <!-- Section: Instrument -->
+      <section>
+        <div class="mb-2 flex items-center gap-1.5">
+          <i class="pi pi-search text-muted-color !text-[10px]"></i>
+          <p class="text-muted-color text-[10px] font-semibold uppercase tracking-wider">Instrument</p>
+        </div>
+        <p-autocomplete
+          size="small"
+          formControlName="ticker"
+          [suggestions]="tickerSuggestions()"
+          optionLabel="symbol"
+          placeholder="Search ticker..."
+          [forceSelection]="true"
+          [dropdown]="true"
+          (completeMethod)="searchTicker($event)"
+          styleClass="!w-full"
+          inputStyleClass="!w-full"
+        >
+          <ng-template let-t pTemplate="item">
+            <div class="flex items-center justify-between gap-3">
+              <span class="font-mono text-[12px] font-semibold">{{ t.symbol }}</span>
+              <span class="text-muted-color text-[11px]">{{ t.name }}</span>
+            </div>
+          </ng-template>
+        </p-autocomplete>
+        @if (formTicker()) {
+          <p class="text-muted-color mt-1.5 text-[11px]">
+            <span class="font-mono">{{ formTicker()!.symbol }}</span>, {{ formTicker()!.name }}
+          </p>
+        }
+      </section>
+
+      <!-- Section: Sizing -->
+      <section>
+        <div class="mb-2 flex items-center gap-1.5">
+          <i class="pi pi-calculator text-muted-color !text-[10px]"></i>
+          <p class="text-muted-color text-[10px] font-semibold uppercase tracking-wider">Sizing</p>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-muted-color mb-1 block text-[10px]">Quantity</label>
+            <p-inputNumber size="small" formControlName="qty" [min]="1" placeholder="100" styleClass="!w-full" inputStyleClass="!w-full !text-right" />
+          </div>
+          <div>
+            <label class="text-muted-color mb-1 block text-[10px]">Avg cost</label>
+            <p-inputNumber size="small" formControlName="avgCost" mode="currency" currency="USD" [min]="0.01" placeholder="$0.00" styleClass="!w-full" inputStyleClass="!w-full !text-right" />
+          </div>
+        </div>
+        @if (estimatedCost() !== null) {
+          <div class="border-surface bg-surface-0 dark:bg-surface-950 mt-3 flex items-center justify-between rounded-md border px-3 py-2">
+            <span class="text-muted-color text-[10px] font-semibold uppercase tracking-wider">Estimated cost</span>
+            <span class="font-mono text-[13px] font-semibold tabular-nums">{{ formatCurrency(estimatedCost()!) }}</span>
+          </div>
+        }
+      </section>
+
+      <!-- Section: Position -->
+      <section>
+        <div class="mb-2 flex items-center gap-1.5">
+          <i class="pi pi-arrows-h text-muted-color !text-[10px]"></i>
+          <p class="text-muted-color text-[10px] font-semibold uppercase tracking-wider">Position</p>
+        </div>
+        <div class="space-y-3">
+          <div>
+            <label class="text-muted-color mb-2 block text-[10px]">Side</label>
+            <p-selectButton
+              size="small"
+              formControlName="status"
+              [options]="statusOptions.slice(1)"
+              optionLabel="label"
+              optionValue="value"
+              [allowEmpty]="false"
+            />
+          </div>
+          <div>
+            <div class="mb-1 flex items-center justify-between">
+              <label class="text-muted-color text-[10px]">Target weight</label>
+              <span class="font-mono text-[11px] font-semibold tabular-nums">{{ addForm.controls.targetWeight.value }}%</span>
+            </div>
+            <p-slider formControlName="targetWeight" [min]="0" [max]="20" [step]="0.5" />
+            <div class="text-muted-color mt-1 flex justify-between text-[9px]">
+              <span>0%</span>
+              <span>10%</span>
+              <span>20%</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Sticky footer -->
+    <div class="border-surface bg-surface-50 dark:bg-surface-900 flex items-center justify-between gap-2 border-t px-4 py-3">
+      <div class="text-muted-color text-[10px]">
+        @if (estimatedCost() !== null && formTicker()) {
+          <span class="flex items-center gap-1.5">
+            <i class="pi pi-info-circle !text-[10px]"></i>
+            {{ formStatus() === 'Long' ? 'Buying' : 'Shorting' }}
+            <span class="text-color font-mono font-semibold">{{ formQty() }}</span>
+            <span class="text-color font-mono font-semibold">{{ formTicker()!.symbol }}</span>
+          </span>
+        } @else {
+          <span>Complete the form to continue</span>
+        }
+      </div>
+      <div class="flex shrink-0 gap-1.5">
+        <p-button label="Cancel" severity="secondary" variant="text" size="small" (onClick)="drawerOpen.set(false)" />
+        <p-button label="Add" icon="pi pi-check" size="small" type="submit" [disabled]="addForm.invalid" />
+      </div>
+    </div>
+  </form>
+</p-drawer>
