@@ -1,9 +1,438 @@
-<div class="flex flex-col gap-3">
-  <header>
-    <h1 class="text-lg font-semibold tracking-tight">{{ ticker() || 'Holding' }}</h1>
-    <p class="text-muted-color mt-0.5 text-[12px]">Charts, tax lots, research notes, documents.</p>
+<div class="flex h-full min-h-0 flex-col gap-3">
+  <!-- Breadcrumb + header -->
+  <header class="flex flex-col gap-2">
+    <p-breadcrumb [model]="breadcrumb()" [home]="breadcrumbHome" />
+
+    @if (holding(); as h) {
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="bg-primary text-primary-contrast flex h-10 w-10 shrink-0 items-center justify-center rounded text-[12px] font-mono font-semibold">
+            {{ h.symbol }}
+          </div>
+          <div>
+            <div class="flex flex-wrap items-center gap-1.5">
+              <h1 class="text-lg font-semibold tracking-tight">{{ h.name }}</h1>
+              <p-tag [value]="h.sector" [severity]="sectorSeverity(h.sector)" />
+              <p-tag [value]="h.status" [severity]="h.status === 'Long' ? 'success' : 'danger'" />
+              <p-tag [value]="risk.rating" severity="info" />
+            </div>
+            <p class="text-muted-color mt-1 flex items-center gap-2 text-[12px]">
+              <span class="font-mono text-[15px] font-semibold tabular-nums">${{ h.price.toFixed(2) }}</span>
+              <span
+                class="font-mono font-semibold tabular-nums"
+                [class.text-emerald-500]="h.dayChangePct > 0"
+                [class.text-rose-500]="h.dayChangePct < 0"
+              >
+                {{ formatChange(h.dayChangePct) }}
+              </span>
+              <span class="text-muted-color text-[11px]">today</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-1.5">
+          <p-button label="Buy" icon="pi pi-plus" size="small" />
+          <p-button label="Sell" icon="pi pi-minus" severity="secondary" variant="outlined" size="small" />
+          <p-button
+            icon="pi pi-bell"
+            severity="secondary"
+            variant="text"
+            size="small"
+            [rounded]="true"
+            styleClass="!h-7 !w-7"
+            pTooltip="Configure alerts"
+            tooltipPosition="bottom"
+            aria-label="Alerts"
+          />
+          <p-button
+            icon="pi pi-ellipsis-v"
+            severity="secondary"
+            variant="text"
+            size="small"
+            [rounded]="true"
+            styleClass="!h-7 !w-7"
+            pTooltip="More actions"
+            tooltipPosition="bottom"
+            aria-label="More"
+          />
+        </div>
+      </div>
+    }
   </header>
-  <div class="border-surface-200 bg-surface-50 rounded-md border p-4 text-[12px]">
-    Splitter with chart + Tabs (Overview, Tax Lots, Research, Documents, Alerts) in Phase 4.
-  </div>
+
+  <!-- Splitter content -->
+  @if (isLoading() || !holding()) {
+    <div class="grid flex-1 grid-cols-1 gap-2 lg:grid-cols-5">
+      <p-skeleton width="100%" height="100%" styleClass="!flex-1 lg:!col-span-3" />
+      <p-skeleton width="100%" height="100%" styleClass="!flex-1 lg:!col-span-2" />
+    </div>
+  } @else if (holding(); as h) {
+    <p-splitter
+      [panelSizes]="[58, 42]"
+      [minSizes]="[35, 25]"
+      layout="horizontal"
+      styleClass="!min-h-0 !flex-1 !border-0 !bg-transparent"
+    >
+      <!-- LEFT: chart + fundamentals -->
+      <ng-template #panel>
+        <div class="flex h-full min-h-0 flex-col gap-2 pr-2">
+          <div class="border-surface bg-surface-50 dark:bg-surface-900 flex min-h-0 flex-1 flex-col rounded-md border p-3">
+            <div class="mb-2 flex items-center justify-between gap-2">
+              <div>
+                <p class="text-[13px] font-semibold leading-none">Performance</p>
+                <p class="text-muted-color mt-1 text-[11px]">{{ period() }} · OHLC inferred</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <p-datepicker
+                  size="small"
+                  selectionMode="range"
+                  [(ngModel)]="customRange"
+                  placeholder="Custom range"
+                  [showIcon]="true"
+                  iconDisplay="input"
+                  appendTo="body"
+                  inputStyleClass="!w-44 !text-[11px]"
+                />
+              </div>
+            </div>
+
+            <!-- Period selector -->
+            <div class="border-surface bg-surface-0 dark:bg-surface-950 mb-2 flex items-center gap-px self-start rounded-md border p-0.5">
+              @for (p of periods; track p) {
+                <button
+                  type="button"
+                  class="rounded px-2 py-0.5 text-[11px] font-medium transition-colors"
+                  [class.bg-primary]="period() === p"
+                  [class.text-primary-contrast]="period() === p"
+                  [class.text-muted-color]="period() !== p"
+                  [class.hover:text-color]="period() !== p"
+                  (click)="setPeriod(p)"
+                >
+                  {{ p }}
+                </button>
+              }
+            </div>
+
+            <!-- Chart -->
+            <div class="min-h-0 flex-1">
+              <p-chart type="line" [data]="chartData()" [options]="chartOptions" />
+            </div>
+          </div>
+
+          <!-- Fundamentals grid -->
+          <div class="border-surface bg-surface-50 dark:bg-surface-900 rounded-md border p-3">
+            <div class="mb-2 flex items-center justify-between">
+              <p class="text-[13px] font-semibold leading-none">Fundamentals</p>
+              <span class="text-muted-color text-[10px]">TTM data</span>
+            </div>
+            <div class="grid grid-cols-4 gap-2">
+              @for (f of fundamentals; track f.label) {
+                <div class="border-surface bg-surface-0 dark:bg-surface-950 rounded border px-2 py-1.5">
+                  <p class="text-muted-color text-[9px] font-semibold uppercase tracking-wider leading-none">{{ f.label }}</p>
+                  <p class="mt-1 font-mono text-[12px] font-semibold leading-tight tabular-nums">{{ f.value }}</p>
+                  @if (f.hint) {
+                    <p class="text-muted-color mt-0.5 text-[9px]">{{ f.hint }}</p>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+      <!-- RIGHT: tabs -->
+      <ng-template #panel>
+        <div class="border-surface bg-surface-50 dark:bg-surface-900 ml-2 flex h-full min-h-0 flex-col rounded-md border">
+          <p-tabs [(value)]="activeTab" class="flex h-full min-h-0 flex-col">
+            <p-tablist class="border-surface border-b">
+              <p-tab value="overview"><i class="pi pi-info-circle text-[12px]!"></i>&nbsp;Overview</p-tab>
+              <p-tab value="taxlots"><i class="pi pi-list-check text-[12px]!"></i>&nbsp;Tax lots</p-tab>
+              <p-tab value="notes"><i class="pi pi-pencil text-[12px]!"></i>&nbsp;Notes</p-tab>
+              <p-tab value="documents"><i class="pi pi-folder text-[12px]!"></i>&nbsp;Documents</p-tab>
+              <p-tab value="alerts"><i class="pi pi-bell text-[12px]!"></i>&nbsp;Alerts</p-tab>
+            </p-tablist>
+
+            <p-tabpanels class="min-h-0 flex-1 overflow-y-auto">
+              <!-- Overview -->
+              <p-tabpanel value="overview">
+                <div class="flex flex-col gap-3 p-3 text-[12px]">
+                  <div>
+                    <p class="text-muted-color text-[10px] font-semibold uppercase tracking-wider">Position</p>
+                    <div class="border-surface mt-2 grid grid-cols-2 gap-2">
+                      <div class="border-surface bg-surface-0 dark:bg-surface-950 rounded border px-3 py-2">
+                        <p class="text-muted-color text-[10px] uppercase tracking-wider leading-none">Quantity</p>
+                        <p class="mt-1 font-mono text-[14px] font-semibold tabular-nums">{{ h.qty.toLocaleString() }}</p>
+                      </div>
+                      <div class="border-surface bg-surface-0 dark:bg-surface-950 rounded border px-3 py-2">
+                        <p class="text-muted-color text-[10px] uppercase tracking-wider leading-none">Avg cost</p>
+                        <p class="mt-1 font-mono text-[14px] font-semibold tabular-nums">${{ h.avgCost.toFixed(2) }}</p>
+                      </div>
+                      <div class="border-surface bg-surface-0 dark:bg-surface-950 rounded border px-3 py-2">
+                        <p class="text-muted-color text-[10px] uppercase tracking-wider leading-none">Market value</p>
+                        <p class="mt-1 font-mono text-[14px] font-semibold tabular-nums">{{ formatCurrency(h.marketValue) }}</p>
+                      </div>
+                      <div class="border-surface bg-surface-0 dark:bg-surface-950 rounded border px-3 py-2">
+                        <p class="text-muted-color text-[10px] uppercase tracking-wider leading-none">Total P/L</p>
+                        <p
+                          class="mt-1 font-mono text-[14px] font-semibold tabular-nums"
+                          [class.text-emerald-500]="h.totalPL > 0"
+                          [class.text-rose-500]="h.totalPL < 0"
+                        >
+                          {{ formatCurrency(h.totalPL) }}
+                          <span class="text-muted-color ml-1 text-[10px] font-normal">{{ formatChange(h.totalPLPct) }}</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p class="text-muted-color text-[10px] font-semibold uppercase tracking-wider">Risk profile</p>
+                    <ul class="mt-2 space-y-1">
+                      <li class="flex items-center justify-between text-[12px]">
+                        <span>Beta</span>
+                        <span class="font-mono font-semibold tabular-nums">{{ risk.beta }}</span>
+                      </li>
+                      <li class="flex items-center justify-between text-[12px]">
+                        <span>Volatility</span>
+                        <span class="font-mono font-semibold">{{ risk.volatility }}</span>
+                      </li>
+                      <li class="flex items-center justify-between text-[12px]">
+                        <span>Max drawdown</span>
+                        <span class="text-rose-500 font-mono font-semibold tabular-nums">{{ risk.drawdown }}</span>
+                      </li>
+                      <li class="flex items-center justify-between text-[12px]">
+                        <span>Sharpe ratio</span>
+                        <span class="text-emerald-500 font-mono font-semibold tabular-nums">{{ risk.sharpe }}</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <p class="text-muted-color text-[10px] font-semibold uppercase tracking-wider">Recent analyst notes</p>
+                    <ul class="mt-2 space-y-2">
+                      @for (n of notes.slice(0, 2); track n.id) {
+                        <li class="border-surface bg-surface-0 dark:bg-surface-950 rounded-md border p-2.5">
+                          <div class="flex items-center justify-between gap-2">
+                            <p class="text-[12px] font-medium">{{ n.title }}</p>
+                            <p-tag [value]="n.sentiment" [severity]="sentimentSeverity(n.sentiment)" />
+                          </div>
+                          <p class="text-muted-color mt-1 line-clamp-2 text-[11px] leading-snug">{{ n.snippet }}</p>
+                          <p class="text-muted-color mt-1.5 text-[10px]">
+                            <span class="font-medium">{{ n.author }}</span> · {{ n.date }}
+                          </p>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                </div>
+              </p-tabpanel>
+
+              <!-- Tax lots -->
+              <p-tabpanel value="taxlots">
+                <div class="p-3">
+                  <p-treetable [value]="taxLotTree()" styleClass="dense-table">
+                    <ng-template pTemplate="header">
+                      <tr class="text-[10px] uppercase tracking-wider">
+                        <th class="px-2 py-1 text-left">Acquired</th>
+                        <th class="px-2 py-1 text-right">Qty</th>
+                        <th class="px-2 py-1 text-right">Basis</th>
+                        <th class="px-2 py-1 text-right">Value</th>
+                        <th class="px-2 py-1 text-right">Gain</th>
+                      </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
+                      <tr [class.font-semibold]="rowData.isGroup">
+                        <td class="px-2 py-1">
+                          <p-treetabletoggler [rowNode]="rowNode" />
+                          @if (rowData.isGroup) {
+                            <span class="text-[11px] font-semibold">{{ rowData.label }}</span>
+                          } @else {
+                            <span class="font-mono text-[11px] tabular-nums">{{ rowData.label }}</span>
+                          }
+                        </td>
+                        <td class="px-2 py-1 text-right font-mono text-[11px] tabular-nums">{{ rowData.qty }}</td>
+                        <td class="text-muted-color px-2 py-1 text-right font-mono text-[11px] tabular-nums">{{ formatCurrency(rowData.costBasis) }}</td>
+                        <td class="px-2 py-1 text-right font-mono text-[11px] tabular-nums">{{ formatCurrency(rowData.currentValue) }}</td>
+                        <td
+                          class="px-2 py-1 text-right font-mono text-[11px] font-semibold tabular-nums"
+                          [class.text-emerald-500]="rowData.gain > 0"
+                          [class.text-rose-500]="rowData.gain < 0"
+                        >
+                          {{ formatCurrency(rowData.gain) }}
+                          <span class="text-muted-color ml-1 font-normal">{{ formatChange(rowData.gainPct) }}</span>
+                        </td>
+                      </tr>
+                    </ng-template>
+                  </p-treetable>
+                </div>
+              </p-tabpanel>
+
+              <!-- Notes -->
+              <p-tabpanel value="notes">
+                <div class="flex flex-col gap-3 p-3">
+                  <div>
+                    <p class="text-muted-color mb-2 text-[10px] font-semibold uppercase tracking-wider">Compose</p>
+                    <p-editor
+                      [(ngModel)]="noteDraft"
+                      [style]="{ height: '160px' }"
+                      placeholder="Write a research note..."
+                    />
+                    <div class="mt-2 flex items-center justify-end gap-1.5">
+                      <p-button label="Discard" severity="secondary" variant="text" size="small" (onClick)="noteDraft.set('')" />
+                      <p-button label="Save note" icon="pi pi-check" size="small" (onClick)="saveNote()" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <p class="text-muted-color mb-2 text-[10px] font-semibold uppercase tracking-wider">Past notes</p>
+                    <ul class="space-y-2">
+                      @for (n of notes; track n.id) {
+                        <li class="border-surface bg-surface-0 dark:bg-surface-950 rounded-md border p-3">
+                          <div class="flex items-center justify-between gap-2">
+                            <p class="text-[13px] font-semibold">{{ n.title }}</p>
+                            <p-tag [value]="n.sentiment" [severity]="sentimentSeverity(n.sentiment)" />
+                          </div>
+                          <p class="text-muted-color mt-1.5 text-[12px] leading-snug">{{ n.snippet }}</p>
+                          <p class="text-muted-color mt-2 flex items-center gap-1 text-[10px]">
+                            <span class="font-medium">{{ n.author }}</span>
+                            <span>·</span>
+                            <span class="font-mono tabular-nums">{{ n.date }}</span>
+                          </p>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                </div>
+              </p-tabpanel>
+
+              <!-- Documents -->
+              <p-tabpanel value="documents">
+                <div class="flex flex-col gap-3 p-3">
+                  <!-- Upload zone with drag-and-drop -->
+                  <p-fileupload
+                    name="docs[]"
+                    [multiple]="true"
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
+                    [maxFileSize]="10000000"
+                    mode="advanced"
+                    chooseLabel=""
+                    chooseIcon="pi pi-plus"
+                    [auto]="true"
+                    [customUpload]="true"
+                    [showUploadButton]="false"
+                    [showCancelButton]="false"
+                    (onSelect)="onFilesSelected($event)"
+                  >
+                    <ng-template pTemplate="empty">
+                      <div class="text-muted-color flex flex-col items-center gap-1.5 py-4 text-center">
+                        <i class="pi pi-cloud-upload text-2xl!"></i>
+                        <p class="text-[12px] font-medium">Drop files here</p>
+                        <p class="text-[10px]">PDF, DOC, XLS, PNG up to 10 MB each</p>
+                      </div>
+                    </ng-template>
+                  </p-fileupload>
+
+                  <!-- Document list -->
+                  <div>
+                    <div class="mb-2 flex items-center justify-between">
+                      <p class="text-muted-color text-[10px] font-semibold uppercase tracking-wider">
+                        {{ documents().length }} attached
+                      </p>
+                      <button
+                        type="button"
+                        class="text-muted-color hover:text-color text-[11px] font-medium transition-colors"
+                      >
+                        Sort by date
+                      </button>
+                    </div>
+                    @if (documents().length === 0) {
+                      <p class="text-muted-color border-surface rounded-md border border-dashed py-6 text-center text-[11px]">
+                        No documents yet. Drop a file above to attach.
+                      </p>
+                    } @else {
+                      <ul class="space-y-1.5">
+                        @for (doc of documents(); track doc.id) {
+                          <li class="border-surface bg-surface-0 dark:bg-surface-950 hover:bg-surface-100 dark:hover:bg-surface-800 group flex items-center gap-3 rounded-md border p-2.5 transition-colors">
+                            <div class="bg-surface-100 dark:bg-surface-800 flex h-9 w-9 shrink-0 items-center justify-center rounded">
+                              <i class="{{ docIcon(doc.source) }} {{ docIconTone(doc.source) }} text-[14px]!"></i>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                              <p class="truncate text-[12px] font-medium leading-tight">{{ doc.title }}</p>
+                              <p class="text-muted-color mt-0.5 flex items-center gap-1.5 text-[10px] leading-tight">
+                                <span>{{ doc.source }}</span>
+                                <span>·</span>
+                                <span class="font-mono tabular-nums">{{ doc.date }}</span>
+                              </p>
+                            </div>
+                            <div class="flex shrink-0 items-center opacity-0 transition-opacity group-hover:opacity-100">
+                              <p-button
+                                icon="pi pi-eye"
+                                severity="secondary"
+                                variant="text"
+                                size="small"
+                                [rounded]="true"
+                                styleClass="!h-7 !w-7"
+                                pTooltip="Preview"
+                                tooltipPosition="left"
+                                aria-label="Preview"
+                              />
+                              <p-button
+                                icon="pi pi-download"
+                                severity="secondary"
+                                variant="text"
+                                size="small"
+                                [rounded]="true"
+                                styleClass="!h-7 !w-7"
+                                pTooltip="Download"
+                                tooltipPosition="left"
+                                aria-label="Download"
+                              />
+                              <p-button
+                                icon="pi pi-trash"
+                                severity="secondary"
+                                variant="text"
+                                size="small"
+                                [rounded]="true"
+                                styleClass="!h-7 !w-7 hover:!text-rose-500"
+                                pTooltip="Remove"
+                                tooltipPosition="left"
+                                (onClick)="removeDocument(doc.id)"
+                                aria-label="Remove"
+                              />
+                            </div>
+                          </li>
+                        }
+                      </ul>
+                    }
+                  </div>
+                </div>
+              </p-tabpanel>
+
+              <!-- Alerts -->
+              <p-tabpanel value="alerts">
+                <div class="flex flex-col gap-2 p-3">
+                  @for (a of alerts(); track a.id) {
+                    <div class="border-surface bg-surface-0 dark:bg-surface-950 flex items-center gap-3 rounded-md border p-3">
+                      <div class="bg-surface-100 dark:bg-surface-800 text-muted-color flex h-8 w-8 shrink-0 items-center justify-center rounded">
+                        <i class="{{ a.icon }} !text-[14px]"></i>
+                      </div>
+                      <div class="min-w-0 flex-1">
+                        <p class="text-[13px] font-medium leading-tight">{{ a.label }}</p>
+                        <p class="text-muted-color mt-0.5 text-[11px] leading-tight">{{ a.description }}</p>
+                      </div>
+                      <p-toggleswitch
+                        [ngModel]="a.enabled"
+                        (ngModelChange)="toggleAlert(a.id, $event)"
+                        [attr.aria-label]="a.label"
+                      />
+                    </div>
+                  }
+                </div>
+              </p-tabpanel>
+            </p-tabpanels>
+          </p-tabs>
+        </div>
+      </ng-template>
+    </p-splitter>
+  }
 </div>

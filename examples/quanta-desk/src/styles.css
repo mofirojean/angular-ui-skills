@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tailwindcss-primeui";
 @import "primeicons/primeicons.css";
+@import "quill/dist/quill.snow.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -164,4 +165,29 @@ p-chart,
 }
 :where(.dark) .p-datatable .p-datatable-frozen-column {
   background: var(--p-surface-900);
+}
+
+/* Quill editor placeholder, black in light mode, white in dark.
+   Default Quill placeholder is rgba(0,0,0,0.6) which is invisible against
+   dark backgrounds. */
+.ql-editor.ql-blank::before {
+  color: #000;
+  font-style: normal;
+  opacity: 0.5;
+}
+:where(.dark) .ql-editor.ql-blank::before {
+  color: #fff;
+  opacity: 0.5;
+}
+
+/* FileUpload, drop the choose-button label so we just get an icon affordance
+   next to the drag-and-drop zone. */
+.p-fileupload-choose-button .p-button-label,
+.p-fileupload-header .p-fileupload-choose .p-button-label {
+  display: none;
+}
+.p-fileupload-choose-button {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
 }

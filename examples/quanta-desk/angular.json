@@ -52,6 +52,10 @@
             ],
             "styles": [
               "src/styles.css"
+            ],
+            "allowedCommonJsDependencies": [
+              "quill",
+              "quill-delta"
             ]
           },
           "configurations": {
