@@ -1,9 +1,198 @@
 <div class="flex flex-col gap-3">
-  <header>
-    <h1 class="text-lg font-semibold tracking-tight">Trades</h1>
-    <p class="text-muted-color mt-0.5 text-[12px]">Order ledger. Filter by date range, instrument, side, status.</p>
+  <!-- Header -->
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <h1 class="text-lg font-semibold tracking-tight">Trades</h1>
+      <p class="text-muted-color mt-0.5 text-[12px]">
+        <span class="font-mono tabular-nums">{{ stats().count }}</span> orders ·
+        <span class="font-mono font-semibold tabular-nums">{{ stats().filled }}</span> filled ·
+        Total volume
+        <span class="text-color font-mono font-semibold tabular-nums">{{ formatCurrency(stats().total) }}</span>
+      </p>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <p-button
+        icon="pi pi-download"
+        severity="secondary"
+        variant="text"
+        size="small"
+        [rounded]="true"
+        styleClass="!h-7 !w-7"
+        pTooltip="Export CSV"
+        tooltipPosition="bottom"
+        aria-label="Export"
+      />
+      <p-button label="New trade" icon="pi pi-plus" size="small" routerLink="/trade" />
+    </div>
   </header>
-  <div class="border-surface-200 bg-surface-50 rounded-md border p-4 text-[12px]">
-    Lazy Table + DatePicker range + MultiSelect filters + DynamicDialog row detail in Phase 6.
-  </div>
+
+  <!-- Filter bar -->
+  <section class="border-surface bg-surface-50 dark:bg-surface-900 flex flex-wrap items-center gap-2 rounded-md border p-2">
+    <p-datepicker
+      size="small"
+      selectionMode="range"
+      [ngModel]="dateRange()"
+      (ngModelChange)="dateRange.set($event); first.set(0)"
+      placeholder="Date range"
+      [showIcon]="true"
+      iconDisplay="input"
+      appendTo="body"
+      inputStyleClass="!w-44 !text-[11px]"
+    />
+
+    <p-multiSelect
+      size="small"
+      [options]="statusOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="statusFilter()"
+      (ngModelChange)="statusFilter.set($event); first.set(0)"
+      placeholder="All statuses"
+      display="chip"
+      [maxSelectedLabels]="2"
+      appendTo="body"
+      class="min-w-[160px]"
+    />
+
+    <p-autocomplete
+      size="small"
+      [suggestions]="tickerSuggestions()"
+      optionLabel="symbol"
+      placeholder="Any instrument"
+      [forceSelection]="true"
+      [dropdown]="true"
+      appendTo="body"
+      (completeMethod)="searchTicker($event)"
+      [ngModel]="instrument()"
+      (ngModelChange)="instrument.set($event); first.set(0)"
+      class="min-w-[160px]"
+    >
+      <ng-template let-t pTemplate="item">
+        <div class="flex items-center justify-between gap-3">
+          <span class="font-mono text-[12px] font-semibold">{{ t.symbol }}</span>
+          <span class="text-muted-color text-[11px]">{{ t.name }}</span>
+        </div>
+      </ng-template>
+    </p-autocomplete>
+
+    <p-selectButton
+      size="small"
+      [options]="sideOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="sideFilter()"
+      (ngModelChange)="sideFilter.set($event); first.set(0)"
+      [allowEmpty]="false"
+    />
+
+    @if (hasFilters()) {
+      <p-button
+        label="Clear"
+        icon="pi pi-times"
+        severity="secondary"
+        variant="text"
+        size="small"
+        (onClick)="clearFilters()"
+      />
+    }
+
+    <div class="text-muted-color ml-auto flex items-center gap-3 text-[11px]">
+      <span class="flex items-center gap-1">
+        <span class="bg-emerald-500 h-1.5 w-1.5 rounded-full"></span>
+        <span class="font-mono tabular-nums">{{ stats().buys }}</span> buys
+      </span>
+      <span class="flex items-center gap-1">
+        <span class="bg-rose-500 h-1.5 w-1.5 rounded-full"></span>
+        <span class="font-mono tabular-nums">{{ stats().sells }}</span> sells
+      </span>
+    </div>
+  </section>
+
+  <!-- Table -->
+  <section class="border-surface bg-surface-50 dark:bg-surface-900 overflow-hidden rounded-md border">
+    @if (isLoading()) {
+      <div class="space-y-1 p-3">
+        @for (i of [0, 1, 2, 3, 4, 5, 6, 7]; track i) {
+          <p-skeleton width="100%" height="1.75rem" />
+        }
+      </div>
+    } @else {
+      <p-table [value]="pageRows()" sortMode="multiple">
+        <ng-template pTemplate="header">
+          <tr class="text-[10px] uppercase tracking-wider">
+            <th pSortableColumn="date" class="px-3 py-1.5 text-left">
+              Time <p-sortIcon field="date" />
+            </th>
+            <th pSortableColumn="symbol" class="px-3 py-1.5 text-left">
+              Ticker <p-sortIcon field="symbol" />
+            </th>
+            <th class="px-3 py-1.5 text-left">Side</th>
+            <th class="px-3 py-1.5 text-left">Type</th>
+            <th pSortableColumn="qty" class="px-3 py-1.5 text-right">
+              Qty <p-sortIcon field="qty" />
+            </th>
+            <th pSortableColumn="price" class="px-3 py-1.5 text-right">
+              Price <p-sortIcon field="price" />
+            </th>
+            <th pSortableColumn="total" class="px-3 py-1.5 text-right">
+              Total <p-sortIcon field="total" />
+            </th>
+            <th class="px-3 py-1.5 text-right">Fees</th>
+            <th class="px-3 py-1.5 text-left">Status</th>
+            <th class="px-3 py-1.5 text-left">Venue</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr
+            class="hover:bg-surface-100 dark:hover:bg-surface-800 border-surface cursor-pointer border-t transition-colors"
+            (click)="openDetail(row)"
+          >
+            <td class="text-muted-color px-3 py-1.5 font-mono text-[11px] tabular-nums">{{ row.date | date:'MMM d, HH:mm' }}</td>
+            <td class="px-3 py-1.5">
+              <p class="font-mono text-[12px] font-semibold leading-tight">{{ row.symbol }}</p>
+              <p class="text-muted-color truncate text-[10px] leading-tight">{{ row.name }}</p>
+            </td>
+            <td class="px-3 py-1.5">
+              <p-tag [value]="row.side" [severity]="row.side === 'Buy' ? 'success' : 'danger'" />
+            </td>
+            <td class="text-muted-color px-3 py-1.5 font-mono text-[11px] uppercase">{{ row.orderType }}</td>
+            <td class="px-3 py-1.5 text-right font-mono text-[12px] tabular-nums">
+              {{ row.filledQty }}
+              @if (row.filledQty < row.qty) {
+                <span class="text-muted-color text-[10px]">/{{ row.qty }}</span>
+              }
+            </td>
+            <td class="px-3 py-1.5 text-right font-mono text-[12px] tabular-nums">${{ row.price.toFixed(2) }}</td>
+            <td class="px-3 py-1.5 text-right font-mono text-[12px] font-semibold tabular-nums">{{ formatCurrency(row.total) }}</td>
+            <td class="text-muted-color px-3 py-1.5 text-right font-mono text-[11px] tabular-nums">${{ row.fees.toFixed(2) }}</td>
+            <td class="px-3 py-1.5">
+              <p-tag [value]="row.status" [severity]="statusSeverity(row.status)" />
+            </td>
+            <td class="text-muted-color px-3 py-1.5 font-mono text-[11px]">{{ row.venue }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="10" class="p-8 text-center">
+              <i class="pi pi-inbox text-muted-color text-2xl!"></i>
+              <p class="text-muted-color mt-2 text-[12px]">No trades match your filters.</p>
+              <p-button label="Clear filters" severity="secondary" variant="text" size="small" (onClick)="clearFilters()" />
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
+
+    @if (!isLoading()) {
+      <p-paginator
+        [first]="first()"
+        [rows]="rows()"
+        [totalRecords]="filtered().length"
+        [rowsPerPageOptions]="[20, 50, 100]"
+        (onPageChange)="onPageChange($event)"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+      />
+    }
+  </section>
 </div>

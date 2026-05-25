@@ -1,9 +1,292 @@
-<div class="flex flex-col gap-3">
-  <header>
-    <h1 class="text-lg font-semibold tracking-tight">Place a trade</h1>
-    <p class="text-muted-color mt-0.5 text-[12px]">Instrument, side, size, review. Four-step wizard.</p>
+<div class="flex h-full min-h-0 flex-col gap-3">
+  <!-- Header strip -->
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <h1 class="text-lg font-semibold tracking-tight">Order ticket</h1>
+      <p class="text-muted-color mt-0.5 text-[12px]">
+        Single-pane execution. Live preview, no surprises.
+      </p>
+    </div>
+    <div class="flex items-center gap-3 text-[11px]">
+      <div class="text-right">
+        <p class="text-muted-color text-[9px] font-semibold uppercase tracking-wider leading-none">Cash available</p>
+        <p class="mt-0.5 font-mono text-[13px] font-semibold leading-none tabular-nums">{{ formatCurrency(cashAvailable) }}</p>
+      </div>
+    </div>
   </header>
-  <div class="border-surface-200 bg-surface-50 rounded-md border p-4 text-[12px]">
-    Stepper wizard with Reactive Forms, BlockUI on submit, ConfirmDialog before commit. Phase 5.
-  </div>
+
+  <!-- Splitter: instrument (left) + ticket (right) -->
+  <p-splitter
+    [panelSizes]="[60, 40]"
+    [minSizes]="[30, 30]"
+    layout="horizontal"
+    styleClass="!min-h-0 !flex-1 !border-0 !bg-transparent"
+  >
+    <!-- LEFT: instrument workspace -->
+    <ng-template #panel>
+      <div class="flex h-full min-h-0 flex-col gap-2 pr-2">
+        <!-- Ticker search -->
+        <div class="border-surface bg-surface-50 dark:bg-surface-900 rounded-md border p-3">
+          <label class="text-muted-color mb-1.5 block text-[10px] font-semibold uppercase tracking-wider">Instrument</label>
+          <p-autocomplete
+            size="small"
+            [ngModel]="ticker()"
+            (ngModelChange)="onTickerChange($event)"
+            [suggestions]="tickerSuggestions()"
+            optionLabel="symbol"
+            placeholder="Search ticker or company"
+            [forceSelection]="true"
+            [dropdown]="true"
+            appendTo="body"
+            (completeMethod)="searchTicker($event)"
+            styleClass="!w-full"
+            inputStyleClass="!w-full"
+          >
+            <ng-template let-t pTemplate="item">
+              <div class="flex items-center justify-between gap-3 py-0.5">
+                <div>
+                  <p class="font-mono text-[12px] font-semibold">{{ t.symbol }}</p>
+                  <p class="text-muted-color text-[10px]">{{ t.name }}</p>
+                </div>
+                <span class="font-mono text-[11px] tabular-nums">${{ t.price.toFixed(2) }}</span>
+              </div>
+            </ng-template>
+          </p-autocomplete>
+        </div>
+
+        <!-- Live instrument card with chart -->
+        @if (ticker(); as t) {
+          <div class="border-surface bg-surface-50 dark:bg-surface-900 flex min-h-0 flex-1 flex-col rounded-md border p-3">
+            <!-- Top: symbol + price + change -->
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="bg-primary text-primary-contrast flex h-10 w-10 shrink-0 items-center justify-center rounded font-mono text-[12px] font-semibold">
+                  {{ t.symbol }}
+                </div>
+                <div>
+                  <p class="text-[13px] font-semibold leading-tight">{{ t.name }}</p>
+                  <p class="text-muted-color mt-0.5 text-[10px] leading-tight">{{ t.sector }}</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="flex items-baseline gap-1.5">
+                  <span class="font-mono text-[18px] font-semibold tabular-nums">${{ t.price.toFixed(2) }}</span>
+                  <span class="relative flex h-1.5 w-1.5">
+                    <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-60"></span>
+                    <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                  </span>
+                </div>
+                <p
+                  class="font-mono text-[11px] font-semibold tabular-nums"
+                  [class.text-emerald-500]="t.change > 0"
+                  [class.text-rose-500]="t.change < 0"
+                >
+                  {{ formatChange(t.change) }} today
+                </p>
+              </div>
+            </div>
+
+            <!-- Bid / Ask / Range strip -->
+            <div class="border-surface bg-surface-0 dark:bg-surface-950 mt-3 grid grid-cols-4 divide-x divide-zinc-200 dark:divide-zinc-800 rounded-md border text-center">
+              <div class="px-2 py-1.5">
+                <p class="text-muted-color text-[9px] font-semibold uppercase tracking-wider leading-none">Bid</p>
+                <p class="mt-1 font-mono text-[12px] font-semibold tabular-nums leading-none">${{ bid().toFixed(2) }}</p>
+              </div>
+              <div class="px-2 py-1.5">
+                <p class="text-muted-color text-[9px] font-semibold uppercase tracking-wider leading-none">Ask</p>
+                <p class="mt-1 font-mono text-[12px] font-semibold tabular-nums leading-none">${{ ask().toFixed(2) }}</p>
+              </div>
+              <div class="px-2 py-1.5">
+                <p class="text-muted-color text-[9px] font-semibold uppercase tracking-wider leading-none">Day low</p>
+                <p class="mt-1 font-mono text-[12px] font-semibold tabular-nums leading-none">${{ dayRange().low.toFixed(2) }}</p>
+              </div>
+              <div class="px-2 py-1.5">
+                <p class="text-muted-color text-[9px] font-semibold uppercase tracking-wider leading-none">Day high</p>
+                <p class="mt-1 font-mono text-[12px] font-semibold tabular-nums leading-none">${{ dayRange().high.toFixed(2) }}</p>
+              </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="mt-3 min-h-0 flex-1">
+              @if (chartData(); as data) {
+                <p-chart type="line" [data]="data" [options]="chartOptions" />
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="border-surface bg-surface-50 dark:bg-surface-900 flex flex-1 items-center justify-center rounded-md border p-8 text-center">
+            <div>
+              <i class="pi pi-search text-muted-color text-2xl!"></i>
+              <p class="text-muted-color mt-2 text-[12px]">Pick an instrument above to start.</p>
+            </div>
+          </div>
+        }
+      </div>
+    </ng-template>
+
+    <!-- RIGHT: order ticket -->
+    <ng-template #panel>
+      <div class="ml-2 flex h-full min-h-0 flex-col">
+        <form [formGroup]="form" class="border-surface bg-surface-50 dark:bg-surface-900 flex h-full min-h-0 flex-col rounded-md border">
+          <!-- Side toggle (Buy / Sell big) -->
+          <div class="border-surface grid grid-cols-2 gap-1.5 border-b p-3">
+            <button
+              type="button"
+              class="rounded-md border px-3 py-2 text-[13px] font-semibold transition-all"
+              [class.border-emerald-500]="side() === 'Buy'"
+              [class.bg-emerald-500]="side() === 'Buy'"
+              [class.text-white]="side() === 'Buy'"
+              [class.border-surface]="side() !== 'Buy'"
+              [class.text-muted-color]="side() !== 'Buy'"
+              [class.hover:text-color]="side() !== 'Buy'"
+              (click)="setSide('Buy')"
+            >
+              <i class="pi pi-arrow-up-right text-[10px]!"></i>&nbsp;Buy
+            </button>
+            <button
+              type="button"
+              class="rounded-md border px-3 py-2 text-[13px] font-semibold transition-all"
+              [class.border-rose-500]="side() === 'Sell'"
+              [class.bg-rose-500]="side() === 'Sell'"
+              [class.text-white]="side() === 'Sell'"
+              [class.border-surface]="side() !== 'Sell'"
+              [class.text-muted-color]="side() !== 'Sell'"
+              [class.hover:text-color]="side() !== 'Sell'"
+              (click)="setSide('Sell')"
+            >
+              <i class="pi pi-arrow-down-right text-[10px]!"></i>&nbsp;Sell
+            </button>
+          </div>
+
+          <!-- Form body, scrollable if needed -->
+          <div class="min-h-0 flex-1 space-y-4 overflow-y-auto p-3">
+            <!-- Order type chips -->
+            <div>
+              <label class="text-muted-color mb-1.5 block text-[10px] font-semibold uppercase tracking-wider">Order type</label>
+              <div class="border-surface bg-surface-0 dark:bg-surface-950 flex items-center gap-px rounded-md border p-0.5">
+                @for (o of orderTypeOptions; track o.value) {
+                  <button
+                    type="button"
+                    class="flex-1 rounded px-2 py-1 text-[11px] font-medium transition-colors"
+                    [class.bg-primary]="orderType() === o.value"
+                    [class.text-primary-contrast]="orderType() === o.value"
+                    [class.text-muted-color]="orderType() !== o.value"
+                    [class.hover:text-color]="orderType() !== o.value"
+                    (click)="setOrderType(o.value)"
+                  >
+                    {{ o.label }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Conditional limit/stop price -->
+            @if (orderType() === 'limit' || orderType() === 'stop') {
+              <div>
+                <label class="text-muted-color mb-1 block text-[10px] font-semibold uppercase tracking-wider">
+                  {{ orderType() === 'limit' ? 'Limit price' : 'Stop trigger' }}
+                </label>
+                <p-inputNumber
+                  size="small"
+                  [ngModel]="limitPrice()"
+                  (ngModelChange)="limitPrice.set($event)"
+                  [ngModelOptions]="{ standalone: true }"
+                  mode="currency"
+                  currency="USD"
+                  [min]="0.01"
+                  styleClass="!w-full"
+                  inputStyleClass="!w-full !text-right"
+                />
+              </div>
+            }
+
+            <!-- Quantity -->
+            <div>
+              <label class="text-muted-color mb-1 block text-[10px] font-semibold uppercase tracking-wider">Quantity</label>
+              <p-inputNumber
+                size="small"
+                formControlName="qty"
+                [min]="1"
+                placeholder="0"
+                styleClass="!w-full"
+                inputStyleClass="!w-full !text-right !text-[16px] !font-mono !font-semibold !tabular-nums"
+              />
+              <!-- Quick % buttons -->
+              <div class="mt-1.5 grid grid-cols-5 gap-1">
+                @for (pct of quickPercents; track pct) {
+                  <button
+                    type="button"
+                    class="border-surface hover:bg-surface-100 dark:hover:bg-surface-800 rounded-md border py-0.5 text-[10px] font-medium transition-colors"
+                    [class.bg-primary]="form.controls.sliderPct.value === pct"
+                    [class.text-primary-contrast]="form.controls.sliderPct.value === pct"
+                    [class.text-muted-color]="form.controls.sliderPct.value !== pct"
+                    (click)="setQuickPct(pct)"
+                  >
+                    {{ pct === 100 ? 'MAX' : pct + '%' }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Slider -->
+            <div>
+              <div class="mb-1 flex items-center justify-between">
+                <label class="text-muted-color text-[10px] font-semibold uppercase tracking-wider">% of cash</label>
+                <span class="font-mono text-[11px] font-semibold tabular-nums">{{ form.controls.sliderPct.value }}%</span>
+              </div>
+              <p-slider
+                [ngModel]="form.controls.sliderPct.value"
+                (ngModelChange)="onSliderChange($event)"
+                [ngModelOptions]="{ standalone: true }"
+                [min]="1"
+                [max]="100"
+                [step]="1"
+              />
+            </div>
+
+            <!-- Time in force -->
+            <div>
+              <label class="text-muted-color mb-1.5 block text-[10px] font-semibold uppercase tracking-wider">Time in force</label>
+              <p-selectButton
+                size="small"
+                formControlName="timeInForce"
+                [options]="timeInForceOptions"
+                optionLabel="label"
+                optionValue="value"
+                [allowEmpty]="false"
+              />
+            </div>
+          </div>
+
+          <!-- Sticky bottom: live total + CTA -->
+          <div class="border-surface bg-surface-0 dark:bg-surface-950 border-t px-3 py-3">
+            <div class="mb-2 flex items-baseline justify-between">
+              <span class="text-muted-color text-[10px] font-semibold uppercase tracking-wider">Estimated total</span>
+              <span class="font-mono text-[20px] font-semibold tabular-nums">{{ formatCurrency(estimatedTotal()) }}</span>
+            </div>
+            <div class="bg-surface-100 dark:bg-surface-800 h-1 overflow-hidden rounded-full">
+              <div class="h-full transition-all"
+                [class.bg-emerald-500]="side() === 'Buy'"
+                [class.bg-rose-500]="side() === 'Sell'"
+                [style.width.%]="costPctOfCash()"
+              ></div>
+            </div>
+            <p class="text-muted-color mt-1 text-[9px]">
+              {{ costPctOfCash().toFixed(1) }}% of cash available
+            </p>
+            <p-button
+              [label]="canPlace ? (side() + ' ' + (form.controls.qty.value ?? 0) + ' ' + (ticker()?.symbol ?? '')) : 'Enter quantity'"
+              [icon]="side() === 'Buy' ? 'pi pi-arrow-up-right' : 'pi pi-arrow-down-right'"
+              size="small"
+              [severity]="side() === 'Buy' ? 'success' : 'danger'"
+              styleClass="!mt-3 !w-full !py-2 !text-[13px] !font-semibold"
+              [disabled]="!canPlace || submitting()"
+              [loading]="submitting()"
+              (onClick)="confirmPlace()"
+            />
+          </div>
+        </form>
+      </div>
+    </ng-template>
+  </p-splitter>
 </div>

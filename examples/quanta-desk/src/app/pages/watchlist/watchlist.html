@@ -1,9 +1,234 @@
 <div class="flex flex-col gap-3">
-  <header>
-    <h1 class="text-lg font-semibold tracking-tight">Watchlist</h1>
-    <p class="text-muted-color mt-0.5 text-[12px]">Track instruments before you commit. Reorder, group, alert.</p>
+  <!-- Header -->
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <h1 class="text-lg font-semibold tracking-tight">Watchlist</h1>
+      <p class="text-muted-color mt-0.5 text-[12px]">
+        Track instruments before you commit. Reorder, group, alert.
+      </p>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <p-button
+        icon="pi pi-bell"
+        severity="secondary"
+        variant="text"
+        size="small"
+        [rounded]="true"
+        styleClass="!h-7 !w-7"
+        pTooltip="Configure alerts"
+        tooltipPosition="bottom"
+        aria-label="Alerts"
+      />
+      <p-button label="New trade" icon="pi pi-plus" size="small" routerLink="/trade" />
+    </div>
   </header>
-  <div class="border-surface-200 bg-surface-50 rounded-md border p-4 text-[12px]">
-    PickList + DataView grid/list switcher with sparkline charts in Phase 5.
-  </div>
+
+  <!-- Stats bar -->
+  <section class="border-surface bg-surface-50 dark:bg-surface-900 flex flex-wrap items-center gap-4 rounded-md border px-3 py-2 text-[11px]">
+    <div class="flex items-center gap-1.5">
+      <span class="text-muted-color">Watching</span>
+      <span class="font-mono text-[12px] font-semibold tabular-nums">{{ stats().count }}</span>
+    </div>
+    <span class="border-surface h-3 border-l"></span>
+    <div class="flex items-center gap-1.5">
+      <span class="bg-emerald-500 h-1.5 w-1.5 rounded-full"></span>
+      <span class="text-muted-color">Gainers</span>
+      <span class="font-mono text-[12px] font-semibold tabular-nums">{{ stats().gainers }}</span>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <span class="bg-rose-500 h-1.5 w-1.5 rounded-full"></span>
+      <span class="text-muted-color">Losers</span>
+      <span class="font-mono text-[12px] font-semibold tabular-nums">{{ stats().losers }}</span>
+    </div>
+    <span class="border-surface h-3 border-l"></span>
+    <div class="flex items-center gap-1.5">
+      <span class="text-muted-color">Avg</span>
+      <span
+        class="font-mono text-[12px] font-semibold tabular-nums"
+        [class.text-emerald-500]="stats().avgChange > 0"
+        [class.text-rose-500]="stats().avgChange < 0"
+      >
+        {{ formatChange(stats().avgChange) }}
+      </span>
+    </div>
+  </section>
+
+  <!-- PickList: universe ⇄ watchlist -->
+  <section class="border-surface bg-surface-50 dark:bg-surface-900 rounded-md border p-3">
+    <div class="mb-2 flex items-center justify-between">
+      <div>
+        <p class="text-[13px] font-semibold leading-none">Manage watchlist</p>
+        <p class="text-muted-color mt-1 text-[11px]">Move instruments between universe and your watchlist.</p>
+      </div>
+    </div>
+    @if (isLoading()) {
+      <p-skeleton width="100%" height="280px" />
+    } @else {
+      <p-pickList
+        [source]="universe"
+        [target]="watched"
+        sourceHeader="Universe"
+        targetHeader="My watchlist"
+        [responsive]="true"
+        [showSourceControls]="false"
+        [showTargetControls]="false"
+        [sourceStyle]="{ height: '280px' }"
+        [targetStyle]="{ height: '280px' }"
+        filterBy="symbol,name"
+        sourceFilterPlaceholder="Search universe"
+        targetFilterPlaceholder="Search watchlist"
+        (onMoveToTarget)="onMove('toTarget')"
+        (onMoveToSource)="onMove('toSource')"
+        (onMoveAllToTarget)="onMove('toTarget')"
+        (onMoveAllToSource)="onMove('toSource')"
+      >
+        <ng-template let-item pTemplate="item">
+          <div class="flex w-full items-center gap-2 py-0.5">
+            <div class="min-w-0 flex-1">
+              <p class="font-mono text-[12px] font-semibold leading-tight">{{ item.symbol }}</p>
+              <p class="text-muted-color truncate text-[10px] leading-tight">{{ item.name }}</p>
+            </div>
+            <p-tag [value]="item.sector" [severity]="sectorSeverity(item.sector)" />
+            <span
+              class="font-mono text-[11px] font-semibold tabular-nums"
+              [class.text-emerald-500]="item.change > 0"
+              [class.text-rose-500]="item.change < 0"
+            >
+              {{ formatChange(item.change) }}
+            </span>
+          </div>
+        </ng-template>
+      </p-pickList>
+    }
+  </section>
+
+  <!-- DataView grid/list switcher -->
+  <section class="border-surface bg-surface-50 dark:bg-surface-900 rounded-md border p-3">
+    <div class="mb-2 flex items-center justify-between">
+      <div>
+        <p class="text-[13px] font-semibold leading-none">Live cards</p>
+        <p class="text-muted-color mt-1 text-[11px]">{{ stats().count }} instruments on your watchlist.</p>
+      </div>
+      <div class="border-surface bg-surface-0 dark:bg-surface-950 flex items-center gap-px rounded-md border p-0.5">
+        <button
+          type="button"
+          class="rounded px-2 py-0.5 text-[11px] font-medium transition-colors"
+          [class.bg-primary]="layout() === 'grid'"
+          [class.text-primary-contrast]="layout() === 'grid'"
+          [class.text-muted-color]="layout() !== 'grid'"
+          (click)="setLayout('grid')"
+          aria-label="Grid layout"
+        >
+          <i class="pi pi-th-large text-[10px]!"></i>
+        </button>
+        <button
+          type="button"
+          class="rounded px-2 py-0.5 text-[11px] font-medium transition-colors"
+          [class.bg-primary]="layout() === 'list'"
+          [class.text-primary-contrast]="layout() === 'list'"
+          [class.text-muted-color]="layout() !== 'list'"
+          (click)="setLayout('list')"
+          aria-label="List layout"
+        >
+          <i class="pi pi-list text-[10px]!"></i>
+        </button>
+      </div>
+    </div>
+
+    @if (isLoading()) {
+      <div class="grid grid-cols-2 gap-2 lg:grid-cols-3 xl:grid-cols-4">
+        @for (i of [0, 1, 2, 3, 4, 5]; track i) {
+          <p-skeleton width="100%" height="110px" />
+        }
+      </div>
+    } @else if (watchedSignal().length === 0) {
+      <p class="text-muted-color border-surface rounded-md border border-dashed py-8 text-center text-[11px]">
+        Your watchlist is empty. Move instruments from the universe above.
+      </p>
+    } @else if (layout() === 'grid') {
+      <div class="grid grid-cols-2 gap-2 lg:grid-cols-3 xl:grid-cols-4">
+        @for (item of watchedSignal(); track item.symbol) {
+          <a
+            [routerLink]="['/holdings', item.symbol]"
+            class="border-surface bg-surface-0 dark:bg-surface-950 hover:bg-surface-100 dark:hover:bg-surface-800 group flex flex-col gap-2 rounded-md border p-3 transition-colors"
+          >
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <p class="font-mono text-[13px] font-semibold leading-tight">{{ item.symbol }}</p>
+                <p class="text-muted-color truncate text-[10px] leading-tight">{{ item.name }}</p>
+              </div>
+              <p-tag [value]="item.sector" [severity]="sectorSeverity(item.sector)" />
+            </div>
+            <svg
+              width="100%"
+              height="24"
+              viewBox="0 0 42 12"
+              preserveAspectRatio="none"
+              class="block"
+              [class.text-emerald-500]="item.change > 0"
+              [class.text-rose-500]="item.change < 0"
+              aria-hidden="true"
+            >
+              <polyline [attr.points]="item.spark" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round" stroke-linecap="round" />
+            </svg>
+            <div class="flex items-end justify-between gap-2">
+              <div>
+                <p class="text-muted-color text-[9px] font-semibold uppercase tracking-wider leading-none">Price</p>
+                <p class="mt-0.5 font-mono text-[13px] font-semibold leading-none tabular-nums">
+                  ${{ formatPrice(item.price) }}
+                </p>
+              </div>
+              <div class="text-right">
+                <p class="text-muted-color text-[9px] font-semibold uppercase tracking-wider leading-none">Day</p>
+                <p
+                  class="mt-0.5 font-mono text-[12px] font-semibold leading-none tabular-nums"
+                  [class.text-emerald-500]="item.change > 0"
+                  [class.text-rose-500]="item.change < 0"
+                >
+                  {{ formatChange(item.change) }}
+                </p>
+              </div>
+            </div>
+          </a>
+        }
+      </div>
+    } @else {
+      <ul class="border-surface divide-surface divide-y rounded-md border">
+        @for (item of watchedSignal(); track item.symbol) {
+          <li>
+            <a
+              [routerLink]="['/holdings', item.symbol]"
+              class="hover:bg-surface-100 dark:hover:bg-surface-800 flex items-center gap-3 px-3 py-2 transition-colors"
+            >
+              <div class="min-w-0 flex-1">
+                <p class="font-mono text-[12px] font-semibold leading-tight">{{ item.symbol }}</p>
+                <p class="text-muted-color truncate text-[10px] leading-tight">{{ item.name }}</p>
+              </div>
+              <p-tag [value]="item.sector" [severity]="sectorSeverity(item.sector)" />
+              <svg
+                width="60"
+                height="14"
+                viewBox="0 0 42 12"
+                class="shrink-0"
+                [class.text-emerald-500]="item.change > 0"
+                [class.text-rose-500]="item.change < 0"
+                aria-hidden="true"
+              >
+                <polyline [attr.points]="item.spark" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round" stroke-linecap="round" />
+              </svg>
+              <span class="font-mono text-[12px] font-semibold tabular-nums">${{ formatPrice(item.price) }}</span>
+              <span
+                class="w-16 text-right font-mono text-[12px] font-semibold tabular-nums"
+                [class.text-emerald-500]="item.change > 0"
+                [class.text-rose-500]="item.change < 0"
+              >
+                {{ formatChange(item.change) }}
+              </span>
+              <span class="text-muted-color hidden font-mono text-[10px] tabular-nums sm:inline">{{ item.volume }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  </section>
 </div>

@@ -1,9 +1,222 @@
 <div class="flex flex-col gap-3">
-  <header>
-    <h1 class="text-lg font-semibold tracking-tight">Research</h1>
-    <p class="text-muted-color mt-0.5 text-[12px]">Notes, analyst picks, attachments. Browse by sector or theme.</p>
+  <!-- Header -->
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <h1 class="text-lg font-semibold tracking-tight">Research</h1>
+      <p class="text-muted-color mt-0.5 text-[12px]">
+        <span class="font-mono tabular-nums">{{ stats().count }}</span> notes ·
+        <span class="text-emerald-500 font-mono font-semibold tabular-nums">{{ stats().bullish }}</span> bullish ·
+        <span class="text-rose-500 font-mono font-semibold tabular-nums">{{ stats().bearish }}</span> bearish ·
+        <span class="text-muted-color font-mono tabular-nums">{{ stats().neutral }}</span> neutral
+      </p>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <p-button
+        icon="pi pi-download"
+        severity="secondary"
+        variant="text"
+        size="small"
+        [rounded]="true"
+        styleClass="!h-7 !w-7"
+        (onClick)="exportMenu.toggle($event)"
+        pTooltip="Export"
+        tooltipPosition="bottom"
+        aria-label="Export"
+      />
+      <p-tieredmenu #exportMenu [model]="exportMenuItems" [popup]="true" appendTo="body" />
+      <p-button label="New note" icon="pi pi-pencil" size="small" (onClick)="openCompose()" />
+    </div>
   </header>
-  <div class="border-surface-200 bg-surface-50 rounded-md border p-4 text-[12px]">
-    MegaMenu nav + DataView cards + Editor in Dialog + Galleria attachments in Phase 6.
-  </div>
+
+  <!-- MegaMenu (browse by theme) -->
+  <p-megamenu [model]="megaMenuModel" class="block">
+    <ng-template let-item pTemplate="item">
+      <a class="hover:bg-surface-100 dark:hover:bg-surface-800 flex items-center gap-2 rounded-md px-2 py-1 text-[12px]" pRipple>
+        @if (item.icon) {
+          <i class="{{ item.icon }} text-[12px]!"></i>
+        }
+        <span>{{ item.label }}</span>
+      </a>
+    </ng-template>
+  </p-megamenu>
+
+  <!-- Theme chips for quick filtering -->
+  <section class="border-surface bg-surface-50 dark:bg-surface-900 flex flex-wrap items-center gap-1.5 rounded-md border px-2 py-2">
+    <button
+      type="button"
+      class="rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors"
+      [class.border-primary]="!activeTheme()"
+      [class.bg-primary]="!activeTheme()"
+      [class.text-primary-contrast]="!activeTheme()"
+      [class.border-surface]="activeTheme()"
+      [class.text-muted-color]="activeTheme()"
+      (click)="setTheme(null)"
+    >
+      All
+    </button>
+    @for (t of themeChips; track t) {
+      <button
+        type="button"
+        class="rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors"
+        [class.border-primary]="activeTheme() === t"
+        [class.bg-primary]="activeTheme() === t"
+        [class.text-primary-contrast]="activeTheme() === t"
+        [class.border-surface]="activeTheme() !== t"
+        [class.text-muted-color]="activeTheme() !== t"
+        (click)="setTheme(t)"
+      >
+        {{ t }}
+      </button>
+    }
+
+    <div class="ml-auto flex items-center gap-1.5">
+      <span class="text-muted-color text-[10px]">View</span>
+      <div class="border-surface bg-surface-0 dark:bg-surface-950 flex items-center gap-px rounded-md border p-0.5">
+        <button
+          type="button"
+          class="rounded px-1.5 py-0.5 text-[11px] transition-colors"
+          [class.bg-primary]="layout() === 'grid'"
+          [class.text-primary-contrast]="layout() === 'grid'"
+          [class.text-muted-color]="layout() !== 'grid'"
+          (click)="setLayout('grid')"
+          aria-label="Grid layout"
+        >
+          <i class="pi pi-th-large text-[10px]!"></i>
+        </button>
+        <button
+          type="button"
+          class="rounded px-1.5 py-0.5 text-[11px] transition-colors"
+          [class.bg-primary]="layout() === 'list'"
+          [class.text-primary-contrast]="layout() === 'list'"
+          [class.text-muted-color]="layout() !== 'list'"
+          (click)="setLayout('list')"
+          aria-label="List layout"
+        >
+          <i class="pi pi-list text-[10px]!"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Notes -->
+  @if (isLoading()) {
+    <div class="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
+      @for (i of [0, 1, 2, 3, 4, 5]; track i) {
+        <p-skeleton width="100%" height="200px" />
+      }
+    </div>
+  } @else if (filteredNotes().length === 0) {
+    <p class="text-muted-color border-surface rounded-md border border-dashed py-10 text-center text-[11px]">
+      No notes for this theme yet. Compose one to start.
+    </p>
+  } @else if (layout() === 'grid') {
+    <section class="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
+      @for (note of filteredNotes(); track note.id) {
+        <article class="border-surface bg-surface-50 dark:bg-surface-900 hover:bg-surface-100 dark:hover:bg-surface-800 group flex flex-col overflow-hidden rounded-md border transition-colors">
+          <div class="relative h-[80px] overflow-hidden">
+            <img [src]="note.cover" [alt]="note.title" class="h-full w-full object-cover" />
+            <div class="from-surface-950/80 absolute inset-0 bg-gradient-to-t to-transparent"></div>
+            <div class="absolute left-2 top-2 flex items-center gap-1.5">
+              <span class="bg-surface-0/90 dark:bg-surface-900/90 backdrop-blur text-color rounded px-1.5 py-px font-mono text-[10px] font-semibold uppercase tracking-wider">{{ note.theme }}</span>
+            </div>
+            <div class="absolute right-2 top-2">
+              <p-tag [value]="note.sentiment" [severity]="sentimentSeverity(note.sentiment)" />
+            </div>
+          </div>
+          <div class="flex flex-1 flex-col gap-2 p-3">
+            <p class="line-clamp-2 text-[13px] font-semibold leading-snug">{{ note.title }}</p>
+            <p class="text-muted-color line-clamp-3 flex-1 text-[11px] leading-snug">{{ note.snippet }}</p>
+            <div class="flex flex-wrap items-center gap-1">
+              @for (tag of note.tags; track tag) {
+                <span class="bg-surface-100 dark:bg-surface-800 text-muted-color rounded px-1.5 py-px font-mono text-[10px]">#{{ tag }}</span>
+              }
+            </div>
+            <footer class="border-surface mt-1 flex items-center justify-between gap-2 border-t pt-2">
+              <div class="flex items-center gap-2">
+                <p-avatar [label]="note.authorInitials" shape="circle" size="normal" styleClass="!h-6 !w-6 !text-[10px]" />
+                <div>
+                  <p class="text-[11px] font-medium leading-tight">{{ note.author }}</p>
+                  <p class="text-muted-color font-mono text-[10px] leading-tight tabular-nums">{{ note.date }}</p>
+                </div>
+              </div>
+              <div class="text-muted-color flex items-center gap-2 text-[10px]">
+                <span class="flex items-center gap-1">
+                  <i class="pi pi-paperclip text-[10px]!"></i>
+                  <span class="font-mono tabular-nums">{{ note.attachments }}</span>
+                </span>
+                @for (ticker of note.tickers.slice(0, 2); track ticker) {
+                  <span class="bg-primary/10 text-primary rounded px-1 py-px font-mono text-[10px] font-semibold">{{ ticker }}</span>
+                }
+              </div>
+            </footer>
+          </div>
+        </article>
+      }
+    </section>
+  } @else {
+    <ul class="border-surface bg-surface-50 dark:bg-surface-900 divide-surface divide-y rounded-md border">
+      @for (note of filteredNotes(); track note.id) {
+        <li class="hover:bg-surface-100 dark:hover:bg-surface-800 flex items-center gap-3 p-3 transition-colors">
+          <p-avatar [label]="note.authorInitials" shape="circle" styleClass="!h-7 !w-7 !text-[10px]" />
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+              <p class="truncate text-[12px] font-semibold">{{ note.title }}</p>
+              <p-tag [value]="note.sentiment" [severity]="sentimentSeverity(note.sentiment)" />
+            </div>
+            <p class="text-muted-color mt-0.5 line-clamp-1 text-[11px]">{{ note.snippet }}</p>
+            <div class="text-muted-color mt-1 flex flex-wrap items-center gap-2 text-[10px]">
+              <span class="font-medium">{{ note.author }}</span>
+              <span>·</span>
+              <span class="font-mono tabular-nums">{{ note.date }}</span>
+              <span>·</span>
+              <span class="bg-surface-100 dark:bg-surface-800 text-color rounded px-1.5 py-px font-mono text-[10px] font-semibold uppercase tracking-wider">{{ note.theme }}</span>
+              @for (ticker of note.tickers.slice(0, 3); track ticker) {
+                <span class="bg-primary/10 text-primary rounded px-1 py-px font-mono text-[10px] font-semibold">{{ ticker }}</span>
+              }
+            </div>
+          </div>
+          <span class="text-muted-color flex shrink-0 items-center gap-1 text-[10px]">
+            <i class="pi pi-paperclip text-[10px]!"></i>
+            <span class="font-mono tabular-nums">{{ note.attachments }}</span>
+          </span>
+        </li>
+      }
+    </ul>
+  }
 </div>
+
+<!-- Compose dialog -->
+<p-dialog
+  [(visible)]="composeOpen"
+  header="New research note"
+  [modal]="true"
+  [style]="{ width: '40rem' }"
+  [draggable]="false"
+  [closable]="true"
+>
+  <div class="flex flex-col gap-3 text-[12px]">
+    <div>
+      <label class="text-muted-color mb-1 block text-[10px] font-semibold uppercase tracking-wider">Title</label>
+      <input
+        type="text"
+        class="border-surface bg-surface-0 dark:bg-surface-950 focus:border-primary w-full rounded-md border px-3 py-1.5 text-[13px] font-semibold outline-none transition-colors"
+        placeholder="e.g. AI capex cycle: who actually monetizes the picks and shovels"
+        [ngModel]="composeTitle()"
+        (ngModelChange)="composeTitle.set($event)"
+      />
+    </div>
+    <div>
+      <label class="text-muted-color mb-1 block text-[10px] font-semibold uppercase tracking-wider">Note</label>
+      <p-editor
+        [ngModel]="composeBody()"
+        (ngModelChange)="composeBody.set($event)"
+        [style]="{ height: '200px' }"
+        placeholder="Thesis, catalysts, risks, sizing..."
+      />
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button label="Discard" severity="secondary" variant="text" size="small" (onClick)="composeOpen.set(false)" />
+    <p-button label="Publish" icon="pi pi-check" size="small" (onClick)="publishNote()" />
+  </ng-template>
+</p-dialog>
