@@ -46,28 +46,28 @@
     <div class="bg-grid pointer-events-none absolute inset-0 opacity-60"></div>
     <div class="bg-radial-fade pointer-events-none absolute inset-0"></div>
 
-    <div class="relative mx-auto max-w-7xl px-5 pt-16 pb-20 sm:px-8 sm:pt-24 sm:pb-28">
-      <div class="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
-        <div>
+    <div class="relative mx-auto max-w-7xl px-5 pt-10 pb-14 sm:px-8 sm:pt-16 sm:pb-20 md:pt-24 md:pb-28">
+      <div class="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-12">
+        <div class="flex flex-col items-center text-center lg:items-start lg:text-left">
           <a
             href="https://github.com/mofirojean/angular-ui-skills"
             target="_blank"
             rel="noopener"
-            class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] bg-white/70 dark:bg-[var(--color-ink-2)]/70 mb-6 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-medium backdrop-blur"
+            class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] bg-white/70 dark:bg-[var(--color-ink-2)]/70 mb-5 inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-full border px-3 py-1 text-[10px] font-medium backdrop-blur sm:text-[11px]"
           >
             <span class="font-mono uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Open source</span>
-            <span class="bg-[var(--color-line)] dark:bg-[var(--color-line-dark)] h-3 w-px"></span>
+            <span class="bg-[var(--color-line)] dark:bg-[var(--color-line-dark)] hidden h-3 w-px sm:inline-block"></span>
             <span>spartan-ng + primeng skills are ready</span>
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
           </a>
 
-          <h1 class="text-[42px] font-semibold leading-[1.05] tracking-tight sm:text-[56px]">
+          <h1 class="text-[34px] font-semibold leading-[1.05] tracking-tight sm:text-[46px] lg:text-[56px]">
             Teach your agent
             <br />
             <span class="text-gradient-ng">Angular UI libraries</span>
           </h1>
 
-          <p class="mt-5 max-w-xl text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400 sm:text-[17px]">
+          <p class="mt-4 max-w-xl text-[14px] leading-relaxed text-zinc-600 dark:text-zinc-400 sm:mt-5 sm:text-[15px] lg:text-[17px]">
             Per-library agent skills that compose with the
             <code class="bg-zinc-100 dark:bg-zinc-800 rounded px-1.5 py-0.5 font-mono text-[13px]">angular-developer</code>
             base skill. Specialized for Spartan/ng, PrimeNG, NG-ZORRO and Material, validated by reference apps, multi-runtime.
@@ -107,7 +107,7 @@
               <span class="bg-emerald-500/80 h-2.5 w-2.5 rounded-full"></span>
               <span class="ml-3 font-mono text-[10px] text-zinc-500 uppercase tracking-wider">terminal</span>
             </div>
-            <div class="code-block px-5 py-4 text-zinc-200">
+            <div class="code-block overflow-x-auto px-4 py-3 text-zinc-200 sm:px-5 sm:py-4">
               @for (l of heroSnippet; track $index) {
                 @switch (l.kind) {
                   @case ('com') { <div class="code-line"><span class="tk-com">{{ l.text }}</span></div> }
@@ -119,7 +119,7 @@
               }
             </div>
           </div>
-          <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] bg-white/80 dark:bg-[var(--color-ink-2)]/80 absolute -bottom-6 -left-6 hidden items-center gap-3 rounded-xl border p-3 shadow-xl backdrop-blur sm:flex animate-float">
+          <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] bg-white/80 dark:bg-[var(--color-ink-2)]/80 absolute -bottom-6 -left-6 hidden items-center gap-3 rounded-xl border p-3 shadow-xl backdrop-blur lg:flex animate-float">
             <div class="bg-[var(--color-ng-red-600)] flex h-9 w-9 items-center justify-center rounded-md text-[16px] font-bold text-white">S</div>
             <div>
               <p class="text-[12px] font-semibold leading-tight">Spartan/ng</p>
@@ -156,19 +156,19 @@
       <div class="absolute -left-24 bottom-24 h-[420px] w-[420px] rounded-full bg-sky-500/[0.12] dark:bg-sky-500/[0.05] blur-[120px]"></div>
       <div class="absolute -right-32 bottom-24 h-[420px] w-[420px] rounded-full bg-pink-500/[0.12] dark:bg-pink-500/[0.05] blur-[120px]"></div>
 
-      <img src="logos/spartan-ng.svg" alt="" loading="lazy" decoding="async" class="absolute -left-20 top-32 h-[340px] w-[340px] object-contain opacity-[0.10] saturate-150 dark:opacity-[0.06]" />
-      <img src="logos/primeng.svg" alt="" loading="lazy" decoding="async" class="absolute -right-16 top-40 h-[300px] w-[300px] object-contain opacity-[0.12] saturate-150 dark:opacity-[0.07]" />
-      <img src="logos/ng-zorro.svg" alt="" loading="lazy" decoding="async" class="absolute -left-16 bottom-40 h-[320px] w-[320px] object-contain opacity-[0.10] saturate-150 dark:opacity-[0.06]" />
-      <img src="logos/angular-material.webp" alt="" loading="lazy" decoding="async" class="absolute -right-20 bottom-32 h-[340px] w-[340px] object-contain opacity-[0.12] saturate-150 dark:opacity-[0.07]" />
+      <img src="logos/spartan-ng.svg" alt="" loading="lazy" decoding="async" class="absolute -left-24 top-24 hidden h-[260px] w-[260px] object-contain opacity-[0.10] saturate-150 dark:opacity-[0.06] sm:block md:-left-20 md:top-32 md:h-[340px] md:w-[340px]" />
+      <img src="logos/primeng.svg" alt="" loading="lazy" decoding="async" class="absolute -right-20 top-32 hidden h-[230px] w-[230px] object-contain opacity-[0.12] saturate-150 dark:opacity-[0.07] sm:block md:-right-16 md:top-40 md:h-[300px] md:w-[300px]" />
+      <img src="logos/ng-zorro.svg" alt="" loading="lazy" decoding="async" class="absolute -left-20 bottom-32 hidden h-[240px] w-[240px] object-contain opacity-[0.10] saturate-150 dark:opacity-[0.06] sm:block md:-left-16 md:bottom-40 md:h-[320px] md:w-[320px]" />
+      <img src="logos/angular-material.webp" alt="" loading="lazy" decoding="async" class="absolute -right-24 bottom-24 hidden h-[260px] w-[260px] object-contain opacity-[0.12] saturate-150 dark:opacity-[0.07] sm:block md:-right-20 md:bottom-32 md:h-[340px] md:w-[340px]" />
 
       <div class="absolute inset-0 dark:hidden" style="background: radial-gradient(ellipse at center, transparent 0%, transparent 50%, var(--color-paper) 95%);"></div>
       <div class="absolute inset-0 hidden dark:block" style="background: radial-gradient(ellipse at center, transparent 0%, transparent 45%, var(--color-ink) 95%);"></div>
     </div>
 
-    <div class="relative z-10 mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
+    <div class="relative z-10 mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20 md:py-28">
     <div class="mb-12 max-w-2xl">
       <p class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] mb-3 font-mono text-[11px] font-semibold uppercase tracking-wider">Skills</p>
-      <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">One skill per library, built right</h2>
+      <h2 class="text-[26px] font-semibold tracking-tight sm:text-3xl lg:text-4xl">One skill per library, built right</h2>
       <p class="mt-3 text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400">
         A single "Angular UI" skill would either be a vague compromise or balloon past a usable context window. Specialized skills mean the agent activates the right one and generates code that matches its conventions.
       </p>
@@ -176,7 +176,7 @@
 
     <div class="grid gap-4 lg:grid-cols-2">
       @for (s of skills; track s.slug) {
-        <article class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] hover:border-[var(--color-line-strong)] dark:hover:border-[var(--color-line-dark-strong)] group relative overflow-hidden rounded-2xl border bg-white dark:bg-[var(--color-ink-2)] p-6 transition-all">
+        <article class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] hover:border-[var(--color-line-strong)] dark:hover:border-[var(--color-line-dark-strong)] group relative overflow-hidden rounded-2xl border bg-white dark:bg-[var(--color-ink-2)] p-5 transition-all sm:p-6">
           <img
             [src]="s.logo"
             alt=""
@@ -307,10 +307,10 @@
       ></div>
     </div>
 
-    <div class="relative z-10 mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
+    <div class="relative z-10 mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20 md:py-28">
       <div class="mb-12 max-w-2xl">
         <p class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] mb-3 font-mono text-[11px] font-semibold uppercase tracking-wider">Reference apps</p>
-        <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">Skills you can see in action</h2>
+        <h2 class="text-[26px] font-semibold tracking-tight sm:text-3xl lg:text-4xl">Skills you can see in action</h2>
         <p class="mt-3 text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400">
           Every skill ships with a complete example app that exercises the real component surface. If the app builds and looks right, the skill is right.
         </p>
@@ -349,10 +349,10 @@
               </div>
             </a>
 
-            <div class="p-6">
+            <div class="p-5 sm:p-6">
               <div class="flex items-start justify-between gap-3">
                 <div>
-                  <h3 class="text-xl font-semibold tracking-tight">{{ ex.name }}</h3>
+                  <h3 class="text-lg font-semibold tracking-tight sm:text-xl">{{ ex.name }}</h3>
                   <p class="mt-1 text-[13px] text-zinc-600 dark:text-zinc-400">{{ ex.description }}</p>
                 </div>
               </div>
@@ -397,11 +397,11 @@
     </div>
   </section>
 
-  <section id="install" class="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
+  <section id="install" class="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20 md:py-28">
     <div class="grid gap-12 lg:grid-cols-[1fr_1.4fr]">
       <div>
         <p class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] mb-3 font-mono text-[11px] font-semibold uppercase tracking-wider">Install</p>
-        <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">Three commands. Any agent.</h2>
+        <h2 class="text-[26px] font-semibold tracking-tight sm:text-3xl lg:text-4xl">Three commands. Any agent.</h2>
         <p class="mt-3 text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400">
           The recommended path is the
           <code class="bg-zinc-100 dark:bg-zinc-800 rounded px-1.5 py-0.5 font-mono text-[12px]">skills</code>
@@ -428,12 +428,12 @@
       </div>
 
       <div>
-        <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex gap-1 border-b">
+        <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex gap-1 overflow-x-auto whitespace-nowrap border-b">
           @for (key of tabKeys; track key) {
             <button
               type="button"
               (click)="selectTab(key)"
-              class="-mb-px border-b-2 px-4 py-2.5 text-[13px] font-medium transition-colors"
+              class="-mb-px shrink-0 border-b-2 px-3 py-2.5 text-[12px] font-medium transition-colors sm:px-4 sm:text-[13px]"
               [style.border-color]="installTab() === key ? 'var(--color-ng-red-600)' : 'transparent'"
               [style.color]="installTab() === key ? 'var(--color-ng-red-600)' : ''"
               [class.text-zinc-500]="installTab() !== key"
@@ -461,7 +461,7 @@
               }
             </button>
           </div>
-          <div class="code-block px-5 py-5 text-zinc-200">
+          <div class="code-block overflow-x-auto px-4 py-4 text-zinc-200 sm:px-5 sm:py-5">
             @for (l of installCommands[installTab()].lines; track $index) {
               @switch (l.tk) {
                 @case ('com') { <div class="code-line"><span class="tk-com">{{ l.text }}</span></div> }
@@ -475,10 +475,10 @@
   </section>
 
   <section id="architecture" class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] border-y bg-zinc-50/50 dark:bg-[var(--color-ink-2)]/50">
-    <div class="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
+    <div class="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20 md:py-28">
       <div class="mb-12 max-w-2xl">
         <p class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] mb-3 font-mono text-[11px] font-semibold uppercase tracking-wider">Anatomy</p>
-        <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">What's inside a skill</h2>
+        <h2 class="text-[26px] font-semibold tracking-tight sm:text-3xl lg:text-4xl">What's inside a skill</h2>
         <p class="mt-3 text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400">
           A skill is a folder of markdown. <code class="bg-zinc-200 dark:bg-zinc-800 rounded px-1.5 py-0.5 font-mono text-[12px]">SKILL.md</code> is a short router that tells the agent what's available and when to use it. The detail lives in topic-scoped reference files that get loaded on demand.
         </p>
@@ -495,7 +495,7 @@
             </div>
             <a href="https://github.com/mofirojean/angular-ui-skills/tree/master/skills/spartan-ng-developer" target="_blank" rel="noopener" class="font-mono text-[10px] text-zinc-500 hover:text-zinc-300 transition-colors">github →</a>
           </div>
-          <pre class="code-block overflow-x-auto px-5 py-4 text-zinc-200"><code>@for (row of skillTree; track $index) {<div class="code-line flex items-baseline gap-4"><span [class.text-zinc-100]="$index === 0" [class.text-zinc-400]="$index !== 0">{{ row.line }}</span>@if (row.tag) {<span class="ml-auto whitespace-nowrap text-[10px] text-zinc-500 italic"># {{ row.tag }}</span>}</div>}</code></pre>
+          <pre class="code-block overflow-x-auto px-4 py-3 text-zinc-200 sm:px-5 sm:py-4"><code>@for (row of skillTree; track $index) {<div class="code-line flex items-baseline gap-4"><span [class.text-zinc-100]="$index === 0" [class.text-zinc-400]="$index !== 0">{{ row.line }}</span>@if (row.tag) {<span class="ml-auto whitespace-nowrap text-[10px] text-zinc-500 italic"># {{ row.tag }}</span>}</div>}</code></pre>
         </div>
 
         <div class="flex flex-col gap-5">
@@ -584,10 +584,10 @@
     </div>
   </section>
 
-  <section id="faq" class="mx-auto max-w-3xl px-5 py-20 sm:px-8 sm:py-28">
+  <section id="faq" class="mx-auto max-w-3xl px-5 py-14 sm:px-8 sm:py-20 md:py-28">
     <div class="mb-10">
       <p class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] mb-3 font-mono text-[11px] font-semibold uppercase tracking-wider">FAQ</p>
-      <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">Questions, answered</h2>
+      <h2 class="text-[26px] font-semibold tracking-tight sm:text-3xl lg:text-4xl">Questions, answered</h2>
     </div>
 
     <div class="divide-[var(--color-line)] dark:divide-[var(--color-line-dark)] divide-y">
@@ -644,8 +644,8 @@
   </section>
 
   <section class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] border-t bg-zinc-50/50 dark:bg-[var(--color-ink-2)]/50">
-    <div class="mx-auto max-w-4xl px-5 py-20 text-center sm:px-8 sm:py-28">
-      <h2 class="text-3xl font-semibold tracking-tight sm:text-5xl">
+    <div class="mx-auto max-w-4xl px-5 py-14 text-center sm:px-8 sm:py-20 md:py-28">
+      <h2 class="text-[26px] font-semibold tracking-tight sm:text-4xl lg:text-5xl">
         Ship Angular apps,
         <span class="text-gradient-ng">at agent speed</span>
       </h2>
