@@ -131,7 +131,7 @@ jobs:
         run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Build with Vercel
         run: vercel build --prod --token=$VERCEL_TOKEN
