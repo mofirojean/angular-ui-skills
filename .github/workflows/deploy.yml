@@ -25,12 +25,11 @@ env:
 
 jobs:
   changes:
-    name: Detect changed apps
+    name: Plan deploys
     runs-on: ubuntu-latest
     outputs:
-      docs: ${{ steps.filter.outputs.docs }}
-      mission-control: ${{ steps.filter.outputs.mission-control }}
-      quanta-desk: ${{ steps.filter.outputs.quanta-desk }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+      any: ${{ steps.plan.outputs.any }}
     steps:
       - uses: actions/checkout@v4
 
@@ -48,31 +47,57 @@ jobs:
               - 'examples/quanta-desk/**'
               - '.github/workflows/deploy.yml'
 
+      - name: Build deploy matrix
+        id: plan
+        env:
+          DOCS: ${{ steps.filter.outputs.docs }}
+          MC: ${{ steps.filter.outputs.mission-control }}
+          QD: ${{ steps.filter.outputs.quanta-desk }}
+          EVENT: ${{ github.event_name }}
+          TARGET: ${{ inputs.target }}
+        run: |
+          set -euo pipefail
+
+          should_run() {
+            local app="$1"
+            local changed="$2"
+            if [[ "$EVENT" == "workflow_dispatch" ]]; then
+              if [[ "$TARGET" == "all" || "$TARGET" == "$app" ]]; then return 0; else return 1; fi
+            fi
+            if [[ "$changed" == "true" ]]; then return 0; else return 1; fi
+          }
+
+          items=()
+          if should_run docs "$DOCS"; then
+            items+=('{"app":"docs","path":"docs","project_id_name":"VERCEL_PROJECT_ID_DOCS"}')
+          fi
+          if should_run mission-control "$MC"; then
+            items+=('{"app":"mission-control","path":"examples/mission-control","project_id_name":"VERCEL_PROJECT_ID_MISSION_CONTROL"}')
+          fi
+          if should_run quanta-desk "$QD"; then
+            items+=('{"app":"quanta-desk","path":"examples/quanta-desk","project_id_name":"VERCEL_PROJECT_ID_QUANTA_DESK"}')
+          fi
+
+          if [[ ${#items[@]} -eq 0 ]]; then
+            echo "any=false" >> "$GITHUB_OUTPUT"
+            echo "matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
+            echo "No apps to deploy."
+            exit 0
+          fi
+
+          joined=$(IFS=,; echo "${items[*]}")
+          echo "any=true" >> "$GITHUB_OUTPUT"
+          echo "matrix={\"include\":[$joined]}" >> "$GITHUB_OUTPUT"
+          echo "Planned: [$joined]"
+
   deploy:
     name: Deploy ${{ matrix.app }}
     needs: changes
+    if: ${{ needs.changes.outputs.any == 'true' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - app: docs
-            path: docs
-            project_id_name: VERCEL_PROJECT_ID_DOCS
-            changed: ${{ needs.changes.outputs.docs }}
-          - app: mission-control
-            path: examples/mission-control
-            project_id_name: VERCEL_PROJECT_ID_MISSION_CONTROL
-            changed: ${{ needs.changes.outputs.mission-control }}
-          - app: quanta-desk
-            path: examples/quanta-desk
-            project_id_name: VERCEL_PROJECT_ID_QUANTA_DESK
-            changed: ${{ needs.changes.outputs.quanta-desk }}
-    if: >-
-      ${{
-        (github.event_name == 'push' && matrix.changed == 'true') ||
-        (github.event_name == 'workflow_dispatch' && (inputs.target == 'all' || inputs.target == matrix.app))
-      }}
+      matrix: ${{ fromJson(needs.changes.outputs.matrix) }}
     defaults:
       run:
         working-directory: ${{ matrix.path }}
