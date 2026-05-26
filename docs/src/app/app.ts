@@ -40,7 +40,7 @@ type InstallTab = 'cli' | 'claude' | 'cursor' | 'manual';
 export class App {
   private readonly document = inject(DOCUMENT);
 
-  protected readonly mode = signal<'light' | 'dark'>('light');
+  protected readonly mode = signal<'light' | 'dark'>('dark');
   protected readonly modeIcon = computed(() => (this.mode() === 'light' ? '☾' : '☀'));
   protected readonly installTab = signal<InstallTab>('cli');
   protected readonly copiedKey = signal<string | null>(null);
@@ -67,7 +67,7 @@ export class App {
       site: 'https://primeng.org',
       description:
         'Full-featured PrimeNG v21 with Aura preset customization, definePreset patterns, and tailwindcss-primeui.',
-      status: 'in-progress',
+      status: 'ready',
       tracks: 'PrimeNG v21',
       logo: 'logos/primeng.svg',
       logoBg: 'bg-zinc-100 dark:bg-zinc-900',

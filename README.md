@@ -7,7 +7,7 @@ Agent skills that teach AI coding assistants (Claude Code, Cursor, Codex, GitHub
 | Skill | Library | Status | Tracks |
 |---|---|---|---|
 | [`spartan-ng-developer`](./skills/spartan-ng-developer) | [Spartan/ng](https://spartan.ng) | ✅ Ready | `@spartan-ng/brain` v0.0.1-alpha.696 |
-| `primeng-developer` | [PrimeNG](https://primeng.org) | 🚧 In progress | — |
+| [`primeng-developer`](./skills/primeng-developer) | [PrimeNG](https://primeng.org) | ✅ Ready | PrimeNG v21 |
 | `ng-zorro-developer` | [NG-ZORRO](https://ng.ant.design) | ⏳ Planned | — |
 | `angular-material-developer` | [Angular Material](https://material.angular.dev) | ⏳ Planned | — |
 
