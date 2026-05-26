@@ -1,0 +1,127 @@
+name: Deploy
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Which app to deploy
+        type: choice
+        options:
+          - all
+          - docs
+          - mission-control
+          - quanta-desk
+        default: all
+
+concurrency:
+  group: deploy-${{ github.ref }}-${{ inputs.target || 'auto' }}
+  cancel-in-progress: false
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+jobs:
+  changes:
+    name: Detect changed apps
+    runs-on: ubuntu-latest
+    outputs:
+      docs: ${{ steps.filter.outputs.docs }}
+      mission-control: ${{ steps.filter.outputs.mission-control }}
+      quanta-desk: ${{ steps.filter.outputs.quanta-desk }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            docs:
+              - 'docs/**'
+              - '.github/workflows/deploy.yml'
+            mission-control:
+              - 'examples/mission-control/**'
+              - '.github/workflows/deploy.yml'
+            quanta-desk:
+              - 'examples/quanta-desk/**'
+              - '.github/workflows/deploy.yml'
+
+  deploy:
+    name: Deploy ${{ matrix.app }}
+    needs: changes
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app: docs
+            path: docs
+            project_id_name: VERCEL_PROJECT_ID_DOCS
+            changed: ${{ needs.changes.outputs.docs }}
+          - app: mission-control
+            path: examples/mission-control
+            project_id_name: VERCEL_PROJECT_ID_MISSION_CONTROL
+            changed: ${{ needs.changes.outputs.mission-control }}
+          - app: quanta-desk
+            path: examples/quanta-desk
+            project_id_name: VERCEL_PROJECT_ID_QUANTA_DESK
+            changed: ${{ needs.changes.outputs.quanta-desk }}
+    if: >-
+      ${{
+        (github.event_name == 'push' && matrix.changed == 'true') ||
+        (github.event_name == 'workflow_dispatch' && (inputs.target == 'all' || inputs.target == matrix.app))
+      }}
+    defaults:
+      run:
+        working-directory: ${{ matrix.path }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: ${{ matrix.path }}/package-lock.json
+
+      - name: Install Vercel CLI
+        run: npm i -g vercel@latest
+
+      - name: Resolve Vercel project ID
+        env:
+          VERCEL_PROJECT_ID_DOCS: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
+          VERCEL_PROJECT_ID_MISSION_CONTROL: ${{ secrets.VERCEL_PROJECT_ID_MISSION_CONTROL }}
+          VERCEL_PROJECT_ID_QUANTA_DESK: ${{ secrets.VERCEL_PROJECT_ID_QUANTA_DESK }}
+        run: |
+          case "${{ matrix.app }}" in
+            docs)             echo "VERCEL_PROJECT_ID=$VERCEL_PROJECT_ID_DOCS" >> "$GITHUB_ENV" ;;
+            mission-control)  echo "VERCEL_PROJECT_ID=$VERCEL_PROJECT_ID_MISSION_CONTROL" >> "$GITHUB_ENV" ;;
+            quanta-desk)      echo "VERCEL_PROJECT_ID=$VERCEL_PROJECT_ID_QUANTA_DESK" >> "$GITHUB_ENV" ;;
+          esac
+
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build with Vercel
+        run: vercel build --prod --token=$VERCEL_TOKEN
+
+      - name: Deploy to Vercel
+        id: deploy
+        run: |
+          url=$(vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN)
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "::notice title=${{ matrix.app }} deployed::$url"
+
+      - name: Summary
+        run: |
+          {
+            echo "### ${{ matrix.app }} deployed"
+            echo ""
+            echo ":rocket: ${{ steps.deploy.outputs.url }}"
+          } >> "$GITHUB_STEP_SUMMARY"

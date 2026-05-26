@@ -37,3 +37,9 @@ tmp/
 .env.local
 .env.*.local
 .cache/
+
+# Vercel CLI per-project link data, contains project + org IDs locally
+.vercel/
+
+# Personal deployment notes — kept local, never committed
+DEPLOY.md
