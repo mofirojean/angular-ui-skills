@@ -16,7 +16,7 @@ on:
         default: all
 
 concurrency:
-  group: deploy-${{ github.ref }}-${{ inputs.target || 'auto' }}
+  group: deploy-${{ github.ref }}
   cancel-in-progress: false
 
 env:
@@ -93,7 +93,7 @@ jobs:
   deploy:
     name: Deploy ${{ matrix.app }}
     needs: changes
-    if: ${{ needs.changes.outputs.any == 'true' }}
+    if: needs.changes.outputs.any == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
