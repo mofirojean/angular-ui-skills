@@ -28,7 +28,7 @@ interface Example {
   readonly demo?: string;
 }
 
-type InstallTab = 'cli' | 'claude' | 'cursor' | 'manual';
+type InstallTab = 'auto' | 'cli' | 'claude' | 'gemini' | 'cursor' | 'manual';
 
 @Component({
   selector: 'app-root',
@@ -42,7 +42,7 @@ export class App {
 
   protected readonly mode = signal<'light' | 'dark'>('dark');
   protected readonly modeIcon = computed(() => (this.mode() === 'light' ? '☾' : '☀'));
-  protected readonly installTab = signal<InstallTab>('cli');
+  protected readonly installTab = signal<InstallTab>('auto');
   protected readonly copiedKey = signal<string | null>(null);
 
   protected readonly year = new Date().getFullYear();
@@ -130,52 +130,70 @@ export class App {
   ];
 
   protected readonly heroSnippet = [
-    { kind: 'com', text: '# Install the skills you need' },
-    { kind: 'cmd', text: 'npx skills@latest add mofirojean/angular-ui-skills' },
+    { kind: 'com', text: '# Auto-detects Claude Code and Gemini CLI on your system' },
+    { kind: 'cmd', text: 'curl -fsSL https://raw.githubusercontent.com/\\' },
+    { kind: 'cmd', text: '  mofirojean/angular-ui-skills/master/install.sh | bash' },
     { kind: 'gap', text: '' },
-    { kind: 'com', text: '# Pick which skills, pick which agent runtime' },
-    { kind: 'out', text: '✓ Detected Claude Code, Cursor, Codex' },
-    { kind: 'out', text: '✓ Installed spartan-ng-developer' },
-    { kind: 'out', text: '✓ Installed primeng-developer' },
+    { kind: 'out', text: '✓ spartan-ng-developer → ~/.claude/skills/' },
+    { kind: 'out', text: '✓ primeng-developer   → ~/.claude/skills/' },
+    { kind: 'out', text: '✓ spartan-ng-developer → ~/.gemini/skills/' },
+    { kind: 'out', text: '✓ primeng-developer   → ~/.gemini/skills/' },
     { kind: 'gap', text: '' },
     { kind: 'com', text: '# Then ask your assistant:' },
     { kind: 'prompt', text: '› Build me a Spartan/ng dashboard with a Cmd+K palette' },
   ];
 
-  protected readonly tabKeys: readonly InstallTab[] = ['cli', 'claude', 'cursor', 'manual'];
+  protected readonly tabKeys: readonly InstallTab[] = ['auto', 'cli', 'claude', 'gemini', 'cursor', 'manual'];
 
   protected readonly installCommands: Record<InstallTab, { label: string; lines: { tk: string; text: string }[] }> = {
-    cli: {
-      label: 'Skills CLI',
+    auto: {
+      label: 'Auto (recommended)',
       lines: [
-        { tk: 'com', text: '# Recommended. Works with 14+ agent runtimes.' },
-        { tk: 'cmd', text: 'npx skills@latest add mofirojean/angular-ui-skills' },
+        { tk: 'cmd', text: 'curl -fsSL https://raw.githubusercontent.com/\\' },
+        { tk: 'cmd', text: '  mofirojean/angular-ui-skills/master/install.sh | bash' },
+      ],
+    },
+    cli: {
+      label: 'Vercel skills CLI',
+      lines: [
+        { tk: 'cmd', text: 'npx skills@latest add mofirojean/angular-ui-skills -g' },
       ],
     },
     claude: {
-      label: 'Claude Code',
+      label: 'Claude Code (direct)',
       lines: [
-        { tk: 'com', text: '# Clone and copy a skill folder' },
-        { tk: 'cmd', text: 'git clone https://github.com/mofirojean/angular-ui-skills' },
-        { tk: 'cmd', text: 'cp -r angular-ui-skills/skills/spartan-ng-developer ~/.claude/skills/' },
+        { tk: 'cmd', text: 'mkdir -p ~/.claude/skills && \\' },
+        { tk: 'cmd', text: '  curl -fsSL https://github.com/mofirojean/angular-ui-skills/archive/master.tar.gz | \\' },
+        { tk: 'cmd', text: '  tar -xz --strip-components=2 -C ~/.claude/skills \\' },
+        { tk: 'cmd', text: '    angular-ui-skills-master/skills/spartan-ng-developer \\' },
+        { tk: 'cmd', text: '    angular-ui-skills-master/skills/primeng-developer' },
+      ],
+    },
+    gemini: {
+      label: 'Gemini CLI',
+      lines: [
+        { tk: 'cmd', text: 'mkdir -p ~/.gemini/skills && \\' },
+        { tk: 'cmd', text: '  curl -fsSL https://github.com/mofirojean/angular-ui-skills/archive/master.tar.gz | \\' },
+        { tk: 'cmd', text: '  tar -xz --strip-components=2 -C ~/.gemini/skills \\' },
+        { tk: 'cmd', text: '    angular-ui-skills-master/skills/spartan-ng-developer \\' },
+        { tk: 'cmd', text: '    angular-ui-skills-master/skills/primeng-developer' },
+        { tk: 'cmd', text: '' },
+        { tk: 'cmd', text: '# Then in Gemini CLI:  /skills reload' },
       ],
     },
     cursor: {
       label: 'Cursor / Codex',
       lines: [
-        { tk: 'com', text: '# Use the skills CLI to target your runtime' },
-        { tk: 'cmd', text: 'npx skills@latest add mofirojean/angular-ui-skills --runtime cursor' },
-        { tk: 'com', text: '# Or for OpenAI Codex' },
-        { tk: 'cmd', text: 'npx skills@latest add mofirojean/angular-ui-skills --runtime codex' },
+        { tk: 'cmd', text: 'mkdir -p .cursor/rules && \\' },
+        { tk: 'cmd', text: '  curl -fsSL https://raw.githubusercontent.com/mofirojean/angular-ui-skills/master/skills/primeng-developer/SKILL.md \\' },
+        { tk: 'cmd', text: '  -o .cursor/rules/primeng.md' },
       ],
     },
     manual: {
-      label: 'Manual',
+      label: 'Other agents',
       lines: [
-        { tk: 'com', text: '# Each skill is a folder of markdown.' },
-        { tk: 'com', text: '# Drop it wherever your agent loads skills.' },
-        { tk: 'cmd', text: 'git clone https://github.com/mofirojean/angular-ui-skills' },
-        { tk: 'cmd', text: 'cp -r angular-ui-skills/skills/<skill> <your-agent-skills-dir>/' },
+        { tk: 'cmd', text: 'curl -fsSL https://raw.githubusercontent.com/mofirojean/angular-ui-skills/master/skills/<skill>/SKILL.md \\' },
+        { tk: 'cmd', text: '  >> <your-agent-file>' },
       ],
     },
   };

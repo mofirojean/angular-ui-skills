@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Block analytics pings and dev artifacts
+Disallow: /api/
+
+Sitemap: https://angular-ui-skills-docs.vercel.app/sitemap.xml
