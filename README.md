@@ -18,50 +18,16 @@ Agent skills that teach AI coding assistants (Claude Code, Cursor, Codex, GitHub
 ## Quick start
 
 ```sh
-# macOS / Linux / Git Bash on Windows
-curl -fsSL https://raw.githubusercontent.com/mofirojean/angular-ui-skills/master/install.sh | bash
-
-# Windows PowerShell (uses real curl, not the Invoke-WebRequest alias)
-curl.exe -fsSL https://raw.githubusercontent.com/mofirojean/angular-ui-skills/master/install.sh | bash
+npx skills@latest add mofirojean/angular-ui-skills -g
 ```
 
-That's the headline. The script auto-detects Claude Code and/or Gemini CLI on your system, downloads only the skill folders, and drops them in the right place for each agent. Both skills get installed into every detected agent.
+That's the headline. The rest of this README covers what just happened, alternative install paths, per-agent recipes, and how to verify it worked.
 
-**Customize what gets installed** via environment variables:
+## Install (in depth)
 
-```sh
-# Install just one skill
-curl -fsSL https://raw.githubusercontent.com/mofirojean/angular-ui-skills/master/install.sh | \
-  AUIS_SKILLS="primeng-developer" bash
+### Option 1, the Skills CLI (recommended for most users)
 
-# Install project-scoped (into ./.claude/skills and ./.gemini/skills)
-curl -fsSL https://raw.githubusercontent.com/mofirojean/angular-ui-skills/master/install.sh | \
-  AUIS_SCOPE=workspace bash
-
-# Pin to a specific tag or branch
-curl -fsSL https://raw.githubusercontent.com/mofirojean/angular-ui-skills/master/install.sh | \
-  AUIS_REF=v1.0.0 bash
-```
-
-**Inspect before running** if you don't want to curl-pipe-bash blindly:
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/mofirojean/angular-ui-skills/master/install.sh -o install.sh
-less install.sh
-bash install.sh
-```
-
-After install:
-- **Claude Code**: restart your session
-- **Gemini CLI**: run `/skills reload` then `/skills list` to confirm
-
-The rest of this README covers alternative install paths for other agents (Cursor, Copilot, Codex CLI, etc.), the Vercel `skills` CLI, and how to verify the install worked.
-
-## Install (alternatives and details)
-
-### Option 1, the Vercel `skills` CLI
-
-The [`skills` CLI](https://github.com/vercel-labs/skills) handles a broader set of agent runtimes than the install script: Claude Code, Cursor, Codex CLI, GitHub Copilot, Continue, Cline, Roo Code, Windsurf, Aider, and others. Gemini CLI is *not* in its officially supported runtimes list, but it does auto-discover skills from `~/.agents/skills/`, which is where the CLI stores them.
+The [`skills` CLI](https://github.com/vercel-labs/skills) handles agent runtimes for you. It works with Claude Code, Cursor, Codex CLI, GitHub Copilot, Continue, Cline, Roo Code, Windsurf, Aider, and others. Gemini CLI isn't in the CLI's prompted runtime list, but it auto-discovers skills from `~/.agents/skills/`, which is where the CLI stores them, so a global install still works for Gemini (run `/skills reload` afterwards).
 
 **Global install** (skills available in every project):
 

@@ -28,7 +28,7 @@ interface Example {
   readonly demo?: string;
 }
 
-type InstallTab = 'auto' | 'cli' | 'claude' | 'gemini' | 'cursor' | 'manual';
+type InstallTab = 'cli' | 'claude' | 'gemini' | 'cursor' | 'manual';
 
 @Component({
   selector: 'app-root',
@@ -42,7 +42,7 @@ export class App {
 
   protected readonly mode = signal<'light' | 'dark'>('dark');
   protected readonly modeIcon = computed(() => (this.mode() === 'light' ? '☾' : '☀'));
-  protected readonly installTab = signal<InstallTab>('auto');
+  protected readonly installTab = signal<InstallTab>('cli');
   protected readonly copiedKey = signal<string | null>(null);
 
   protected readonly year = new Date().getFullYear();
@@ -130,29 +130,22 @@ export class App {
   ];
 
   protected readonly heroSnippet = [
-    { kind: 'com', text: '# Auto-detects Claude Code and Gemini CLI on your system' },
-    { kind: 'cmd', text: 'curl -fsSL https://raw.githubusercontent.com/mofirojean/angular-ui-skills/master/install.sh | bash' },
+    { kind: 'com', text: '# Install globally, available in every project' },
+    { kind: 'cmd', text: 'npx skills@latest add mofirojean/angular-ui-skills -g' },
     { kind: 'gap', text: '' },
-    { kind: 'out', text: '✓ spartan-ng-developer → ~/.claude/skills/' },
-    { kind: 'out', text: '✓ primeng-developer   → ~/.claude/skills/' },
-    { kind: 'out', text: '✓ spartan-ng-developer → ~/.gemini/skills/' },
-    { kind: 'out', text: '✓ primeng-developer   → ~/.gemini/skills/' },
+    { kind: 'com', text: '# CLI handles Claude Code, Cursor, Codex, and 10+ others' },
+    { kind: 'out', text: '✓ Installed spartan-ng-developer' },
+    { kind: 'out', text: '✓ Installed primeng-developer' },
     { kind: 'gap', text: '' },
     { kind: 'com', text: '# Then ask your assistant:' },
     { kind: 'prompt', text: '› Build me a Spartan/ng dashboard with a Cmd+K palette' },
   ];
 
-  protected readonly tabKeys: readonly InstallTab[] = ['auto', 'cli', 'claude', 'gemini', 'cursor', 'manual'];
+  protected readonly tabKeys: readonly InstallTab[] = ['cli', 'claude', 'gemini', 'cursor', 'manual'];
 
   protected readonly installCommands: Record<InstallTab, { label: string; lines: { tk: string; text: string }[] }> = {
-    auto: {
-      label: 'Auto (recommended)',
-      lines: [
-        { tk: 'cmd', text: 'curl -fsSL https://raw.githubusercontent.com/mofirojean/angular-ui-skills/master/install.sh | bash' },
-      ],
-    },
     cli: {
-      label: 'Vercel skills CLI',
+      label: 'Skills CLI',
       lines: [
         { tk: 'cmd', text: 'npx skills@latest add mofirojean/angular-ui-skills -g' },
       ],
