@@ -131,8 +131,7 @@ export class App {
 
   protected readonly heroSnippet = [
     { kind: 'com', text: '# Auto-detects Claude Code and Gemini CLI on your system' },
-    { kind: 'cmd', text: 'curl -fsSL https://raw.githubusercontent.com/\\' },
-    { kind: 'cmd', text: '  mofirojean/angular-ui-skills/master/install.sh | bash' },
+    { kind: 'cmd', text: 'curl -fsSL https://raw.githubusercontent.com/mofirojean/angular-ui-skills/master/install.sh | bash' },
     { kind: 'gap', text: '' },
     { kind: 'out', text: '✓ spartan-ng-developer → ~/.claude/skills/' },
     { kind: 'out', text: '✓ primeng-developer   → ~/.claude/skills/' },
@@ -149,8 +148,7 @@ export class App {
     auto: {
       label: 'Auto (recommended)',
       lines: [
-        { tk: 'cmd', text: 'curl -fsSL https://raw.githubusercontent.com/\\' },
-        { tk: 'cmd', text: '  mofirojean/angular-ui-skills/master/install.sh | bash' },
+        { tk: 'cmd', text: 'curl -fsSL https://raw.githubusercontent.com/mofirojean/angular-ui-skills/master/install.sh | bash' },
       ],
     },
     cli: {

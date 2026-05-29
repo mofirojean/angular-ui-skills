@@ -18,7 +18,11 @@ Agent skills that teach AI coding assistants (Claude Code, Cursor, Codex, GitHub
 ## Quick start
 
 ```sh
+# macOS / Linux / Git Bash on Windows
 curl -fsSL https://raw.githubusercontent.com/mofirojean/angular-ui-skills/master/install.sh | bash
+
+# Windows PowerShell (uses real curl, not the Invoke-WebRequest alias)
+curl.exe -fsSL https://raw.githubusercontent.com/mofirojean/angular-ui-skills/master/install.sh | bash
 ```
 
 That's the headline. The script auto-detects Claude Code and/or Gemini CLI on your system, downloads only the skill folders, and drops them in the right place for each agent. Both skills get installed into every detected agent.
