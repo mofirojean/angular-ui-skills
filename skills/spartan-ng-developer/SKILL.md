@@ -11,6 +11,16 @@ metadata:
 
 > **Pairs with `angular-developer`** - that skill provides Angular fundamentals (signals, DI, routing, forms, SSR, accessibility). This skill focuses on Spartan/ng specifics. Install both for the best experience.
 
+## Compatibility
+
+- **Tracks:** `@spartan-ng/brain` v0.0.1-alpha.696 exactly.
+- **Angular:** v18 or newer required. Standalone components, control flow (`@if` / `@for`), and signal-based APIs (`input()` / `output()`) are assumed. Will not generate `NgModule`-based or decorator-based code.
+- **Tailwind:** v3 or v4. The skill detects the major version from `package.json` and adapts.
+- **Not supported:** other Spartan alphas with API drift, Angular v17 or below, projects using `@spartan-ng/ui-*` packages (deprecated, replaced by `@spartan-ng/helm`).
+
+If the project's installed version differs significantly from the tracked one, warn the user before generating code, the API surface may have shifted.
+
+
 1. Always check the project's Spartan/ng version before providing guidance. Spartan is pre-1.0 and conventions evolve - `package.json` is the source of truth.
 
 2. Detect the project layout up front:

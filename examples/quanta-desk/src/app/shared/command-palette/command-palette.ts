@@ -17,7 +17,6 @@ import { Dialog } from 'primeng/dialog';
 interface Command {
   readonly id: string;
   readonly label: string;
-  readonly hint?: string;
   readonly icon: string;
   readonly group: 'Navigation' | 'Actions' | 'Theme' | 'Help';
   readonly shortcut?: string;
@@ -164,10 +163,6 @@ export class CommandPalette {
 
   protected indexOf(cmd: Command): number {
     return this.flatItems().findIndex((c) => c.id === cmd.id);
-  }
-
-  protected groupItemsCount(group: CommandGroup): number {
-    return group.items.length;
   }
 
   private navigate(path: string): void {
