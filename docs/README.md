@@ -1,59 +1,54 @@
-# Docs
+# Angular UI Skills, docs site
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.6.
+The marketing and documentation site for the [`angular-ui-skills`](../) project. Built with Angular v21 + Tailwind v4 + Inter/JetBrains Mono fonts. Single-page landing with anchor navigation.
 
-## Development server
+**Live demo:** https://angular-ui-skills-docs.vercel.app
 
-To start a local development server, run:
+## Run locally
 
-```bash
-ng serve
+```sh
+npm install
+npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Opens at http://localhost:4200.
 
-## Code scaffolding
+## Build
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```sh
+npm run build
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Output lands in `dist/docs/browser/`. The `vercel.json` here configures the Vercel deploy with SPA rewrites and cache headers for static assets.
 
-```bash
-ng generate --help
-```
+## Editing the page
 
-## Building
+The whole landing page is a single Angular component:
 
-To build the project run:
+- **`src/app/app.ts`** holds the data: skills list, examples list, install commands (per agent), FAQ items, architecture steps, feature cards
+- **`src/app/app.html`** holds the template: nav, hero, feature strip, skills grid, examples cards, install tabs, anatomy section, FAQ, CTA, footer
+- **`src/styles.css`** holds theme tokens (Angular brand red gradient, ink/paper surfaces, grid background, shield logo via clip-path)
 
-```bash
-ng build
-```
+To change a section, edit the data in `app.ts` and the template in `app.html`. Most edits are pure data, no template changes needed.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Demo URLs and the repo URL live in **`src/app/site.config.ts`**. Swap them when the custom domain lands.
 
-## Running unit tests
+## Assets
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+- **`public/logos/`** — library logos shown in the skills cards (Spartan/ng, PrimeNG, NG-ZORRO, Angular Material)
+- **`public/projects/`** — example app screenshots (light and dark mode)
+- **`public/favicon.svg`** — the shield logo as a standalone SVG (same gradient as the header)
+- **`public/robots.txt`** and **`public/sitemap.xml`** — SEO essentials
 
-```bash
-ng test
-```
+When the custom domain is set up, update the canonical URL in `src/index.html`, the `og:url` and `og:image` tags, the `<link rel="canonical">`, and the URLs in `robots.txt` and `sitemap.xml`.
 
-## Running end-to-end tests
+## SEO notes
 
-For end-to-end (e2e) testing, run:
+The site ships:
 
-```bash
-ng e2e
-```
+- Full Open Graph + Twitter card meta tags
+- JSON-LD structured data for `WebSite`, `SoftwareApplication`, and `Person` (linked via `@graph`)
+- A canonical URL pointing at the live Vercel deploy (swap when the domain lands)
+- Inter + JetBrains Mono fonts preloaded from rsms.me and jsDelivr
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+The OG image currently points at the Mission Control dark-mode screenshot. Swap to a dedicated 1200×630 branded card when one is designed.

@@ -1,59 +1,62 @@
-# MissionControl
+# Mission Control
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.6.
+A reference Angular application that validates the [`spartan-ng-developer`](../../skills/spartan-ng-developer) skill. Mission Control is an admin dashboard for a fictional AI agent platform: register agents, schedule runs, watch executions, install community agents from a marketplace.
 
-## Development server
+**Live demo:** https://mission-control-drab-six.vercel.app
 
-To start a local development server, run:
+The point of this app is not the app itself, it's that building it proves the skill is correct. Every Spartan/ng component the skill documents has a natural home here; anywhere the generated code drifts from upstream, the skill gets fixed, not the app.
 
-```bash
-ng serve
+## Stack
+
+- **Angular v21+** with standalone components, signals, control flow syntax
+- **Spartan/ng** via `@spartan-ng/brain` (headless primitives) + `@spartan-ng/helm` (styled components, copied into `src/libs/`)
+- **Tailwind v4** with the `hlm-tailwind-preset`
+- **`@ng-icons/lucide`** for iconography
+- **Reactive forms** throughout (Signal Forms when Angular v22 ships)
+
+## Pages
+
+| Route | What it exercises |
+|---|---|
+| `/` (Overview) | Cards, sparkline charts, status badges, list density |
+| `/agents` | DataTable with sort, filter, pagination, inline edit, row expansion |
+| `/agents/:id` | Tabs, dialog, form-field cluster, switches, sliders, file upload |
+| `/runs` | Time-series chart, status pills, virtual-scroll log viewer |
+| `/schedules` | Cron expression builder, weekday picker, date range |
+| `/marketplace` | Carousel, command palette, badges, pagination |
+| `/settings` | Tabbed form with avatar upload, accent picker, notification matrix |
+
+## Run locally
+
+```sh
+npm install
+npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Opens at http://localhost:4200. The dev server hot-reloads on save.
 
-## Code scaffolding
+## Build
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```sh
+npm run build
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Output lands in `dist/mission-control/browser/`. The `vercel.json` at the root of this folder configures the Vercel deploy to use that path with SPA rewrites for client-side routing.
 
-```bash
-ng generate --help
-```
+## Notes for contributors
 
-## Building
+- The Helm components are copied into `src/libs/ui/` via the Spartan CLI (`ng g @spartan-ng/cli:ui`). Don't edit them directly unless you're patching Spartan itself, regenerate.
+- The `command-palette.ts` Cmd+K palette is the shared shell-level navigation primitive. Routes register their own actions via the global commands array.
+- Dark mode is the default. The `mode` signal in `app.ts` is initialised to `'dark'` and persists via the `dark` class on `<html>`.
 
-To build the project run:
+## Why this app exists
 
-```bash
-ng build
-```
+The skill ships green when this app builds and looks right. When `@spartan-ng/brain` releases a new alpha, the workflow is:
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+1. Bump the dep in `package.json` here
+2. Run `npm install && npm run build` and `npm start`
+3. Whatever breaks gets diagnosed against the new API
+4. Fix the affected reference file in [`skills/spartan-ng-developer/references/`](../../skills/spartan-ng-developer/references)
+5. Re-run the build, when it's clean, the skill is back in sync
 
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Without this app, the skill could drift silently. With it, drift becomes a build failure.
