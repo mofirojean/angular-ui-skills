@@ -1,4 +1,4 @@
-<header class="border-border flex items-center gap-2 border-b px-3 py-2">
+<header class="border-border bg-card flex items-center gap-2 border-b px-3 py-2">
   <div class="min-w-0 flex-1">
     <p class="text-muted-foreground font-mono text-[10px] uppercase tracking-wider leading-none">
       {{ typeLabel() }} · artifact
@@ -8,30 +8,28 @@
     </h2>
   </div>
 
-  @if (canPreview()) {
-    <div class="border-border bg-muted/50 flex h-7 items-center gap-px overflow-hidden rounded-md border p-0.5 text-[11px]">
-      <button
-        type="button"
-        (click)="setTab('preview')"
-        [class.bg-background]="activeTab() === 'preview'"
-        [class.text-foreground]="activeTab() === 'preview'"
-        [class.shadow-sm]="activeTab() === 'preview'"
-        class="text-muted-foreground hover:text-foreground rounded-[5px] px-2.5 py-0.5 font-medium transition-colors"
-      >
-        Preview
-      </button>
-      <button
-        type="button"
-        (click)="setTab('code')"
-        [class.bg-background]="activeTab() === 'code'"
-        [class.text-foreground]="activeTab() === 'code'"
-        [class.shadow-sm]="activeTab() === 'code'"
-        class="text-muted-foreground hover:text-foreground rounded-[5px] px-2.5 py-0.5 font-medium transition-colors"
-      >
-        Code
-      </button>
-    </div>
-  }
+  <div class="border-border bg-muted/50 flex h-7 items-center gap-px overflow-hidden rounded-md border p-0.5 text-[11px]">
+    <button
+      type="button"
+      (click)="setTab('preview')"
+      [class.bg-background]="activeTab() === 'preview'"
+      [class.text-foreground]="activeTab() === 'preview'"
+      [class.shadow-sm]="activeTab() === 'preview'"
+      class="text-muted-foreground hover:text-foreground rounded-[5px] px-2.5 py-0.5 font-medium transition-colors"
+    >
+      Preview
+    </button>
+    <button
+      type="button"
+      (click)="setTab('code')"
+      [class.bg-background]="activeTab() === 'code'"
+      [class.text-foreground]="activeTab() === 'code'"
+      [class.shadow-sm]="activeTab() === 'code'"
+      class="text-muted-foreground hover:text-foreground rounded-[5px] px-2.5 py-0.5 font-medium transition-colors"
+    >
+      Code
+    </button>
+  </div>
 
   <button hlmBtn variant="ghost" size="sm" class="h-8 w-8 p-0" type="button" (click)="copy()" aria-label="Copy">
     <ng-icon hlm name="lucideCopy" size="xs" />
@@ -55,28 +53,73 @@
   </button>
 </header>
 
-<div class="min-h-0 flex-1 overflow-hidden">
-  @if (activeTab() === 'preview' && canPreview()) {
+<div class="bg-muted/30 min-h-0 flex-1 overflow-hidden">
+  @if (activeTab() === 'preview') {
     @switch (artifact().type) {
       @case ('html') {
-        <iframe
-          [srcdoc]="previewSrcDoc()"
-          sandbox="allow-same-origin"
-          class="block h-full w-full bg-white"
-          title="Artifact preview"
-        ></iframe>
+        <div class="h-full overflow-hidden p-4">
+          <div class="border-border bg-card relative h-full overflow-hidden rounded-xl border shadow-sm">
+            <div class="border-border bg-card flex h-9 items-center gap-1.5 border-b px-3">
+              <span class="bg-rose-400/60 h-2 w-2 rounded-full"></span>
+              <span class="bg-amber-400/60 h-2 w-2 rounded-full"></span>
+              <span class="bg-emerald-400/60 h-2 w-2 rounded-full"></span>
+              <span class="text-muted-foreground border-border bg-background ml-3 inline-flex h-5 items-center rounded border px-2 font-mono text-[10px]">
+                preview://{{ slug() }}
+              </span>
+            </div>
+            <iframe
+              [srcdoc]="previewSrcDoc()"
+              sandbox="allow-same-origin"
+              class="block h-[calc(100%-2.25rem)] w-full bg-white"
+              title="Artifact preview"
+            ></iframe>
+          </div>
+        </div>
       }
       @case ('markdown') {
         <div class="h-full overflow-y-auto">
-          <div class="apex-prose font-serif text-foreground mx-auto max-w-2xl px-6 py-8 text-[15px] leading-[1.7]">
-            <markdown [data]="artifact().content"></markdown>
+          <div class="bg-card border-border mx-auto my-6 max-w-2xl rounded-2xl border px-8 py-10 shadow-sm">
+            <div class="apex-prose font-serif text-foreground text-[15px] leading-[1.7]">
+              <markdown [data]="artifact().content"></markdown>
+            </div>
           </div>
+        </div>
+      }
+      @default {
+        <div class="flex h-full flex-col items-center justify-center px-8 text-center">
+          <div class="bg-primary/10 text-primary mb-5 flex h-14 w-14 items-center justify-center rounded-2xl">
+            <ng-icon hlm name="lucideSparkles" size="lg" />
+          </div>
+          <p class="text-foreground font-serif text-[20px] font-medium tracking-tight">
+            {{ artifact().title }}
+          </p>
+          <p class="text-muted-foreground mt-2 max-w-sm text-[13px] leading-relaxed">
+            This {{ typeLabel() }} artifact has no rendered preview. Switch to the
+            <span class="text-foreground font-medium">Code</span> tab to read the source, or
+            download it to run locally.
+          </p>
+          <div class="mt-6 flex items-center gap-2">
+            <button hlmBtn size="sm" variant="default" (click)="setTab('code')" type="button">
+              <ng-icon hlm name="lucideArrowRight" size="xs" />
+              View source
+            </button>
+            <button hlmBtn size="sm" variant="outline" (click)="download()" type="button">
+              <ng-icon hlm name="lucideArchive" size="xs" />
+              Download
+            </button>
+          </div>
+          <p class="text-muted-foreground border-border mt-8 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider">
+            {{ lineCount() }} lines · {{ artifact().content.length }} chars · {{ typeLabel() }}
+          </p>
         </div>
       }
     }
   } @else {
-    <div class="h-full overflow-y-auto bg-[#1f1c1a]">
-      <pre class="px-5 py-4 font-mono text-[12.5px] leading-[1.55] text-zinc-100"><code>{{ artifact().content }}</code></pre>
-    </div>
+    <app-code-block
+      [code]="artifact().content"
+      [lang]="artifact().type"
+      [fileName]="fileNameHint()"
+      variant="panel"
+    />
   }
 </div>

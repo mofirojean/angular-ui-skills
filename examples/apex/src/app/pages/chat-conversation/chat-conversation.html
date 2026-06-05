@@ -44,20 +44,7 @@
                           <markdown [data]="b.value"></markdown>
                         }
                         @case ('code') {
-                          <div class="border-border overflow-hidden rounded-xl border bg-[#1f1c1a]">
-                            <div class="border-white/5 flex items-center justify-between border-b px-3 py-1.5">
-                              <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-400">{{ b.lang }}</span>
-                              <button
-                                type="button"
-                                (click)="copy(b.value)"
-                                class="hover:bg-white/5 inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-mono text-[10px] text-zinc-300 transition-colors"
-                              >
-                                <ng-icon hlm name="lucideCopy" size="xs" />
-                                Copy
-                              </button>
-                            </div>
-                            <pre class="overflow-x-auto px-4 py-3 font-mono text-[12.5px] leading-[1.55] text-zinc-100"><code>{{ b.value }}</code></pre>
-                          </div>
+                          <app-code-block [code]="b.value" [lang]="b.lang" variant="inline" />
                         }
                         @case ('artifact') {
                           <app-artifact-card [artifact]="b.value" (open)="showArtifact($event)" />

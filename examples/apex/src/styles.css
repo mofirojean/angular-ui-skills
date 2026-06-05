@@ -4,6 +4,7 @@
 @import 'tailwindcss/utilities.css';
 @import '@spartan-ng/brain/hlm-tailwind-preset.css';
 @import 'tw-animate-css';
+@import 'highlight.js/styles/atom-one-dark.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -211,3 +212,13 @@
   border-top: 1px solid var(--border);
   margin: 1.2em 0;
 }
+
+/* highlight.js: inherit dark panel background, keep token colors */
+code.hljs,
+pre code.hljs {
+  background: transparent;
+  padding: 0;
+  display: block;
+}
+.hljs-comment,
+.hljs-quote { font-style: italic; }

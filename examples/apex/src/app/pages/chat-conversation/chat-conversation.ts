@@ -7,6 +7,7 @@ import { HlmIcon } from '@spartan-ng/helm/icon';
 import { Composer } from '../../shared/composer/composer';
 import { Artifact, ArtifactCard } from '../../shared/artifact-card/artifact-card';
 import { ArtifactPanel } from '../../shared/artifact-panel/artifact-panel';
+import { CodeBlock } from '../../shared/code-block/code-block';
 import { CONVERSATIONS, Conversation, Message } from '../../data/conversations';
 import { MODELS } from '../../data/mock-conversations';
 
@@ -17,7 +18,7 @@ type Block =
 
 @Component({
   selector: 'app-chat-conversation',
-  imports: [NgIcon, MarkdownComponent, HlmButton, HlmIcon, Composer, ArtifactCard, ArtifactPanel],
+  imports: [NgIcon, MarkdownComponent, HlmButton, HlmIcon, Composer, ArtifactCard, ArtifactPanel, CodeBlock],
   templateUrl: './chat-conversation.html',
   host: { class: 'flex min-h-0 flex-1 flex-col' },
   changeDetection: ChangeDetectionStrategy.OnPush,
