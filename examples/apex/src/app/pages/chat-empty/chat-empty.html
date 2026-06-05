@@ -1,0 +1,40 @@
+<div class="flex h-full flex-col items-center justify-center px-6 py-10">
+  <div class="w-full max-w-2xl">
+    <div class="mb-10 text-center">
+      <h1 class="font-serif text-foreground text-[36px] font-medium tracking-tight sm:text-[44px]">
+        {{ greeting() }},
+        <span class="text-primary">{{ user.name.split(' ')[0] }}</span>
+      </h1>
+      <p class="text-muted-foreground mx-auto mt-3 max-w-md text-[14px] leading-relaxed">
+        How can I help you today?
+      </p>
+    </div>
+
+    <app-composer
+      placeholder="Ask anything..."
+      (send)="handleSend($event)"
+    />
+
+    <div class="mt-8 grid gap-2 sm:grid-cols-2">
+      @for (s of suggestions; track s.title) {
+        <button
+          type="button"
+          (click)="pick(s)"
+          class="border-border bg-card hover:bg-accent hover:border-border/80 group flex items-start gap-3 rounded-xl border p-3.5 text-left transition-all hover:-translate-y-0.5"
+        >
+          <span class="bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors">
+            <ng-icon hlm [name]="s.icon" size="xs" />
+          </span>
+          <div class="min-w-0 flex-1">
+            <p class="text-foreground text-[13px] font-medium leading-tight">{{ s.title }}</p>
+            <p class="text-muted-foreground mt-0.5 text-[12px] leading-tight">{{ s.hint }}</p>
+          </div>
+        </button>
+      }
+    </div>
+
+    <p class="text-muted-foreground mt-10 text-center text-[11px]">
+      Apex can make mistakes. This is a portfolio demo with hardcoded responses, nothing is sent to a real model.
+    </p>
+  </div>
+</div>

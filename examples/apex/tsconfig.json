@@ -1,5 +1,3 @@
-/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
-/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
   "compileOnSave": false,
   "compilerOptions": {
@@ -13,7 +11,27 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "ES2022",
-    "module": "preserve"
+    "module": "preserve",
+    "paths": {
+      "@spartan-ng/helm/button": ["./src/libs/ui/button/src/index.ts"],
+      "@spartan-ng/helm/utils": ["./src/libs/ui/utils/src/index.ts"],
+      "@spartan-ng/helm/input": ["./src/libs/ui/input/src/index.ts"],
+      "@spartan-ng/helm/textarea": ["./src/libs/ui/textarea/src/index.ts"],
+      "@spartan-ng/helm/card": ["./src/libs/ui/card/src/index.ts"],
+      "@spartan-ng/helm/avatar": ["./src/libs/ui/avatar/src/index.ts"],
+      "@spartan-ng/helm/dropdown-menu": ["./src/libs/ui/dropdown-menu/src/index.ts"],
+      "@spartan-ng/helm/icon": ["./src/libs/ui/icon/src/index.ts"],
+      "@spartan-ng/helm/select": ["./src/libs/ui/select/src/index.ts"],
+      "@spartan-ng/helm/tooltip": ["./src/libs/ui/tooltip/src/index.ts"],
+      "@spartan-ng/helm/sheet": ["./src/libs/ui/sheet/src/index.ts"],
+      "@spartan-ng/helm/separator": ["./src/libs/ui/separator/src/index.ts"],
+      "@spartan-ng/helm/skeleton": ["./src/libs/ui/skeleton/src/index.ts"],
+      "@spartan-ng/helm/scroll-area": ["./src/libs/ui/scroll-area/src/index.ts"],
+      "@spartan-ng/helm/hover-card": ["./src/libs/ui/hover-card/src/index.ts"],
+      "@spartan-ng/helm/context-menu": ["./src/libs/ui/context-menu/src/index.ts"],
+      "@spartan-ng/helm/spinner": ["./src/libs/ui/spinner/src/index.ts"],
+      "@spartan-ng/helm/kbd": ["./src/libs/ui/kbd/src/index.ts"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

@@ -1,0 +1,84 @@
+<div class="border-border bg-card relative w-full overflow-hidden rounded-2xl border shadow-sm">
+  <textarea
+    #textarea
+    [placeholder]="placeholder()"
+    [ngModel]="draft()"
+    (ngModelChange)="draft.set($event)"
+    (input)="autosize($event)"
+    (keydown)="handleEnter($event)"
+    rows="1"
+    class="text-foreground placeholder:text-muted-foreground/70 block max-h-60 w-full resize-none bg-transparent px-4 pt-4 pb-2 text-[14px] leading-relaxed outline-none"
+  ></textarea>
+
+  <div class="text-muted-foreground flex items-center gap-1 px-2 pb-2 pt-1 text-[11px]">
+    <button
+      hlmBtn
+      variant="ghost"
+      size="sm"
+      type="button"
+      class="h-8 gap-1.5 px-2 text-[12px] font-medium"
+      (click)="toggleModel()"
+      aria-haspopup="listbox"
+      [attr.aria-expanded]="modelOpen()"
+    >
+      <ng-icon hlm name="lucideSparkles" size="xs" class="text-primary" />
+      {{ activeModel().label }}
+      <ng-icon hlm name="lucideChevronDown" size="xs" />
+    </button>
+
+    @if (modelOpen()) {
+      <div
+        role="listbox"
+        class="border-border bg-popover absolute bottom-12 left-3 z-10 w-56 overflow-hidden rounded-md border shadow-lg"
+      >
+        @for (m of models; track m.id) {
+          <button
+            role="option"
+            [attr.aria-selected]="m.id === modelId()"
+            type="button"
+            (click)="setModel(m.id)"
+            class="hover:bg-accent flex w-full items-start gap-2 px-3 py-2 text-left text-[12px] transition-colors"
+          >
+            <span class="text-primary mt-0.5">
+              @if (m.id === modelId()) {
+                <ng-icon hlm name="lucideCheck" size="xs" />
+              } @else {
+                <span class="block h-3 w-3"></span>
+              }
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-foreground font-medium leading-tight">{{ m.label }}</p>
+              <p class="text-muted-foreground mt-0.5 leading-tight">{{ m.description }}</p>
+            </div>
+          </button>
+        }
+      </div>
+    }
+
+    <button
+      hlmBtn
+      variant="ghost"
+      size="sm"
+      type="button"
+      class="h-8 gap-1.5 px-2"
+      title="Attach file"
+      aria-label="Attach file"
+    >
+      <ng-icon hlm name="lucidePaperclip" size="xs" />
+    </button>
+
+    <span class="ml-auto px-2 font-mono text-[10px] tabular-nums">{{ charCount() }}</span>
+
+    <button
+      hlmBtn
+      size="sm"
+      type="button"
+      class="ml-1 h-8 w-8 rounded-full p-0 disabled:opacity-40"
+      [disabled]="!canSend()"
+      (click)="submit()"
+      aria-label="Send message"
+    >
+      <ng-icon hlm name="lucideArrowUp" size="sm" />
+    </button>
+  </div>
+</div>
