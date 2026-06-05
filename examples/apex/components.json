@@ -1,0 +1,5 @@
+{
+  "$schema": "https://spartan.ng/components.schema.json",
+  "componentsPath": "src/libs/ui",
+  "importAlias": "@spartan-ng/helm"
+}

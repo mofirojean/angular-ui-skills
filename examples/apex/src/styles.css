@@ -1,0 +1,114 @@
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+@import 'tailwindcss/utilities.css';
+@import '@spartan-ng/brain/hlm-tailwind-preset.css';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --font-sans: 'Inter var', 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Source Serif 4', 'Source Serif Pro', 'Iowan Old Style', 'Apple Garamond', 'Palatino Linotype', Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+:root {
+  color-scheme: light;
+  --radius: 0.75rem;
+
+  /* Warm cream + coral palette, claude.ai-inspired */
+  --background: oklch(0.965 0.014 84);
+  --foreground: oklch(0.241 0.018 65);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.241 0.018 65);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.241 0.018 65);
+
+  --primary: oklch(0.605 0.137 35);
+  --primary-foreground: oklch(0.985 0 0);
+
+  --secondary: oklch(0.938 0.018 84);
+  --secondary-foreground: oklch(0.241 0.018 65);
+
+  --muted: oklch(0.938 0.018 84);
+  --muted-foreground: oklch(0.514 0.018 80);
+
+  --accent: oklch(0.92 0.025 78);
+  --accent-foreground: oklch(0.241 0.018 65);
+
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+
+  --border: oklch(0.89 0.02 82);
+  --input: oklch(0.89 0.02 82);
+  --ring: oklch(0.605 0.137 35);
+
+  --sidebar: oklch(0.945 0.018 84);
+  --sidebar-foreground: oklch(0.241 0.018 65);
+  --sidebar-primary: oklch(0.605 0.137 35);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.92 0.025 78);
+  --sidebar-accent-foreground: oklch(0.241 0.018 65);
+  --sidebar-border: oklch(0.89 0.02 82);
+  --sidebar-ring: oklch(0.605 0.137 35);
+}
+
+:root.dark {
+  color-scheme: dark;
+
+  --background: oklch(0.186 0.005 60);
+  --foreground: oklch(0.913 0.018 90);
+
+  --card: oklch(0.224 0.008 60);
+  --card-foreground: oklch(0.913 0.018 90);
+
+  --popover: oklch(0.224 0.008 60);
+  --popover-foreground: oklch(0.913 0.018 90);
+
+  --primary: oklch(0.650 0.130 40);
+  --primary-foreground: oklch(0.186 0.005 60);
+
+  --secondary: oklch(0.252 0.010 60);
+  --secondary-foreground: oklch(0.913 0.018 90);
+
+  --muted: oklch(0.252 0.010 60);
+  --muted-foreground: oklch(0.625 0.014 75);
+
+  --accent: oklch(0.275 0.012 60);
+  --accent-foreground: oklch(0.913 0.018 90);
+
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
+
+  --border: oklch(1 0 0 / 0.08);
+  --input: oklch(1 0 0 / 0.10);
+  --ring: oklch(0.650 0.130 40);
+
+  --sidebar: oklch(0.205 0.006 60);
+  --sidebar-foreground: oklch(0.913 0.018 90);
+  --sidebar-primary: oklch(0.650 0.130 40);
+  --sidebar-primary-foreground: oklch(0.186 0.005 60);
+  --sidebar-accent: oklch(0.275 0.012 60);
+  --sidebar-accent-foreground: oklch(0.913 0.018 90);
+  --sidebar-border: oklch(1 0 0 / 0.08);
+  --sidebar-ring: oklch(0.650 0.130 40);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .font-serif {
+    font-feature-settings: 'liga', 'kern';
+    letter-spacing: -0.005em;
+  }
+}

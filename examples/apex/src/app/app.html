@@ -1,0 +1,47 @@
+<div class="bg-background text-foreground flex min-h-screen flex-col items-center justify-center px-6 py-10">
+  <div class="w-full max-w-xl text-center">
+    <div class="bg-primary/10 text-primary mx-auto inline-flex h-12 w-12 items-center justify-center rounded-2xl">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z" />
+      </svg>
+    </div>
+
+    <p class="text-muted-foreground mt-6 font-mono text-[10px] font-semibold uppercase tracking-[0.18em]">
+      Phase 0 · Foundation
+    </p>
+    <h1 class="font-serif text-foreground mt-2 text-4xl font-medium tracking-tight">
+      Apex is taking shape.
+    </h1>
+    <p class="text-muted-foreground mx-auto mt-3 max-w-md text-[14px] leading-relaxed">
+      A chat assistant interface inspired by claude.ai, built to validate the
+      <code class="bg-muted text-foreground rounded px-1.5 py-0.5 font-mono text-[12px]">spartan-ng-developer</code>
+      skill. The chat shell, artifacts panel, projects, and settings ship in upcoming phases.
+    </p>
+
+    <div class="border-border bg-card mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-xl border text-left sm:grid-cols-3">
+      <div class="p-4">
+        <p class="text-muted-foreground font-mono text-[10px] uppercase tracking-wider">Stack</p>
+        <p class="text-foreground mt-1 text-[12px] font-medium">Angular v21 · Spartan/ng · Tailwind v4</p>
+      </div>
+      <div class="bg-background p-4">
+        <p class="text-muted-foreground font-mono text-[10px] uppercase tracking-wider">Theme</p>
+        <p class="text-foreground mt-1 text-[12px] font-medium">Warm cream · coral accent · dark default</p>
+      </div>
+      <div class="p-4">
+        <p class="text-muted-foreground font-mono text-[10px] uppercase tracking-wider">Status</p>
+        <p class="text-foreground mt-1 text-[12px] font-medium">Foundation only · Phase 1 next</p>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      (click)="toggleTheme()"
+      class="text-muted-foreground hover:text-foreground mt-8 inline-flex items-center gap-1.5 text-[11px] font-medium transition-colors"
+    >
+      <span class="h-1.5 w-1.5 rounded-full bg-current opacity-70"></span>
+      Switch to {{ modeLabel() }} mode
+    </button>
+  </div>
+
+  <router-outlet />
+</div>
