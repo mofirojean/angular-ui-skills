@@ -19,6 +19,7 @@ interface PromptSuggestion {
   selector: 'app-chat-empty',
   imports: [NgIcon, HlmIcon, Composer],
   templateUrl: './chat-empty.html',
+  host: { class: 'flex min-h-0 flex-1 flex-col' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatEmpty {

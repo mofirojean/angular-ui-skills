@@ -112,3 +112,102 @@
     letter-spacing: -0.005em;
   }
 }
+
+/* Markdown rendering for assistant messages. Scoped so ngx-markdown output
+   gets typographic treatment without leaking into the rest of the app. */
+.apex-prose markdown > :first-child { margin-top: 0; }
+.apex-prose markdown > :last-child { margin-bottom: 0; }
+
+.apex-prose p { margin: 0.5em 0; }
+
+.apex-prose h1,
+.apex-prose h2,
+.apex-prose h3,
+.apex-prose h4 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  margin: 1.2em 0 0.4em;
+  line-height: 1.25;
+}
+.apex-prose h1 { font-size: 1.4em; }
+.apex-prose h2 { font-size: 1.2em; }
+.apex-prose h3 { font-size: 1.06em; }
+.apex-prose h4 { font-size: 1em; }
+
+.apex-prose strong { font-weight: 600; color: var(--foreground); }
+.apex-prose em { font-style: italic; }
+.apex-prose a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-decoration-thickness: from-font;
+  text-underline-offset: 0.2em;
+}
+.apex-prose a:hover { text-decoration-thickness: 2px; }
+
+.apex-prose ul,
+.apex-prose ol {
+  margin: 0.6em 0;
+  padding-left: 1.5em;
+}
+.apex-prose ul { list-style: disc; }
+.apex-prose ol { list-style: decimal; }
+.apex-prose li { margin: 0.25em 0; }
+.apex-prose li::marker { color: var(--muted-foreground); }
+
+.apex-prose blockquote {
+  border-left: 3px solid var(--border);
+  margin: 0.8em 0;
+  padding: 0.1em 0 0.1em 1em;
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+.apex-prose code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--muted);
+  color: var(--foreground);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+}
+
+.apex-prose pre {
+  background: #1f1c1a;
+  color: #f1f1ef;
+  border-radius: 0.75rem;
+  padding: 0.85em 1em;
+  overflow-x: auto;
+  margin: 0.7em 0;
+  font-size: 0.85em;
+}
+.apex-prose pre code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+.apex-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.8em 0;
+  font-size: 0.92em;
+  font-family: var(--font-sans);
+  letter-spacing: 0;
+}
+.apex-prose th,
+.apex-prose td {
+  border: 1px solid var(--border);
+  padding: 0.45em 0.7em;
+  text-align: left;
+}
+.apex-prose th {
+  background: var(--muted);
+  font-weight: 600;
+}
+.apex-prose hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 1.2em 0;
+}

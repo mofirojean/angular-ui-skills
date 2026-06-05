@@ -1,58 +1,61 @@
 @if (conversation(); as c) {
-  <div class="flex h-full flex-col">
-    <header class="border-border flex items-center justify-between gap-3 border-b px-5 py-2.5">
-      <div class="min-w-0 flex-1">
-        <h1 class="text-foreground truncate text-[14px] font-medium">{{ c.title }}</h1>
-      </div>
-      <div class="flex items-center gap-1">
-        <button hlmBtn variant="ghost" size="sm" class="gap-1.5 text-[12px]" type="button">
-          <ng-icon hlm name="lucideSparkles" size="xs" class="text-primary" />
-          {{ model().label }}
-          <ng-icon hlm name="lucideChevronDown" size="xs" />
-        </button>
-        <button hlmBtn variant="ghost" size="sm" class="h-8 w-8 p-0" type="button" aria-label="Share">
-          <ng-icon hlm name="lucideShare2" size="xs" />
-        </button>
-        <button hlmBtn variant="ghost" size="sm" class="h-8 w-8 p-0" type="button" aria-label="More">
-          <ng-icon hlm name="lucideEllipsisVertical" size="xs" />
-        </button>
-      </div>
-    </header>
+  <header class="border-border flex items-center justify-between gap-3 border-b px-5 py-2.5">
+    <div class="min-w-0 flex-1">
+      <h1 class="text-foreground truncate text-[14px] font-medium">{{ c.title }}</h1>
+    </div>
+    <div class="flex items-center gap-1">
+      <button hlmBtn variant="ghost" size="sm" class="gap-1.5 text-[12px]" type="button">
+        <ng-icon hlm name="lucideSparkles" size="xs" class="text-primary" />
+        {{ model().label }}
+        <ng-icon hlm name="lucideChevronDown" size="xs" />
+      </button>
+      <button hlmBtn variant="ghost" size="sm" class="h-8 w-8 p-0" type="button" aria-label="Share">
+        <ng-icon hlm name="lucideShare2" size="xs" />
+      </button>
+      <button hlmBtn variant="ghost" size="sm" class="h-8 w-8 p-0" type="button" aria-label="More">
+        <ng-icon hlm name="lucideEllipsisVertical" size="xs" />
+      </button>
+    </div>
+  </header>
 
-    <section class="min-h-0 flex-1 overflow-y-auto">
-      <div class="mx-auto max-w-3xl px-6 py-8">
-        @for (m of c.messages; track m.id) {
-          @if (m.role === 'user') {
-            <div class="mb-6 flex justify-end">
-              <div class="bg-secondary text-foreground border-border max-w-[80%] rounded-2xl rounded-br-md border px-4 py-3 text-[14px] leading-relaxed">
-                {{ m.content }}
-              </div>
+  <section class="min-h-0 flex-1 overflow-y-auto">
+    <div class="mx-auto max-w-3xl px-6 py-8">
+      @for (m of c.messages; track m.id) {
+        @if (m.role === 'user') {
+          <div class="mb-6 flex justify-end">
+            <div class="bg-secondary text-foreground border-border max-w-[80%] rounded-2xl rounded-br-md border px-4 py-3 text-[14px] leading-relaxed">
+              {{ m.content }}
             </div>
-          } @else {
-            <div class="mb-8">
-              <div class="font-serif text-foreground space-y-4 text-[15px] leading-[1.7]">
-                @for (b of blocks(m.content); track $index) {
-                  @if (b.kind === 'text') {
-                    <p class="whitespace-pre-line">{{ b.value }}</p>
-                  } @else {
-                    <div class="border-border overflow-hidden rounded-xl border bg-[#1f1c1a]">
-                      <div class="border-white/5 flex items-center justify-between border-b px-3 py-1.5">
-                        <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-400">{{ b.lang }}</span>
-                        <button
-                          type="button"
-                          (click)="copy(b.value)"
-                          class="hover:bg-white/5 inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-mono text-[10px] text-zinc-300 transition-colors"
-                        >
-                          <ng-icon hlm name="lucideCopy" size="xs" />
-                          Copy
-                        </button>
-                      </div>
-                      <pre class="overflow-x-auto px-4 py-3 font-mono text-[12.5px] leading-[1.55] text-zinc-100"><code>{{ b.value }}</code></pre>
+          </div>
+        } @else {
+          <div class="mb-8">
+            <div class="apex-prose font-serif text-foreground space-y-4 text-[15px] leading-[1.7]">
+              @for (b of blocks(visibleContent(m)); track $index) {
+                @if (b.kind === 'text') {
+                  <markdown [data]="b.value"></markdown>
+                } @else {
+                  <div class="border-border overflow-hidden rounded-xl border bg-[#1f1c1a]">
+                    <div class="border-white/5 flex items-center justify-between border-b px-3 py-1.5">
+                      <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-400">{{ b.lang }}</span>
+                      <button
+                        type="button"
+                        (click)="copy(b.value)"
+                        class="hover:bg-white/5 inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-mono text-[10px] text-zinc-300 transition-colors"
+                      >
+                        <ng-icon hlm name="lucideCopy" size="xs" />
+                        Copy
+                      </button>
                     </div>
-                  }
+                    <pre class="overflow-x-auto px-4 py-3 font-mono text-[12.5px] leading-[1.55] text-zinc-100"><code>{{ b.value }}</code></pre>
+                  </div>
                 }
-              </div>
+              }
+              @if (isLastAssistant(m) && isStreaming()) {
+                <span class="bg-primary inline-block h-[14px] w-[3px] -translate-y-px translate-x-1 animate-pulse rounded-sm align-middle"></span>
+              }
+            </div>
 
+            @if (!isLastAssistant(m) || !isStreaming()) {
               <div class="text-muted-foreground mt-3 flex items-center gap-1">
                 <button hlmBtn variant="ghost" size="sm" class="h-7 px-2 gap-1.5 text-[11px]" type="button" (click)="copy(m.content)">
                   <ng-icon hlm name="lucideCopy" size="xs" />
@@ -69,19 +72,19 @@
                   <ng-icon hlm name="lucideThumbsDown" size="xs" />
                 </button>
               </div>
-            </div>
-          }
+            }
+          </div>
         }
-      </div>
-    </section>
+      }
+    </div>
+  </section>
 
-    <div class="bg-background border-border border-t">
-      <div class="mx-auto max-w-3xl px-6 py-4">
-        <app-composer
-          [placeholder]="'Reply to ' + (model().label) + '...'"
-          (send)="handleSend($event)"
-        />
-      </div>
+  <div class="bg-background border-border">
+    <div class="mx-auto max-w-3xl px-6 py-4">
+      <app-composer
+        [placeholder]="'Reply to ' + model().label + '...'"
+        (send)="handleSend($event)"
+      />
     </div>
   </div>
 } @else {

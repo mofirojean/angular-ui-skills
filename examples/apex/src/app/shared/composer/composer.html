@@ -1,4 +1,4 @@
-<div class="border-border bg-card relative w-full overflow-hidden rounded-2xl border shadow-sm">
+<div class="border-border bg-card relative w-full rounded-2xl border shadow-sm">
   <textarea
     #textarea
     [placeholder]="placeholder()"
@@ -29,7 +29,7 @@
     @if (modelOpen()) {
       <div
         role="listbox"
-        class="border-border bg-popover absolute bottom-12 left-3 z-10 w-56 overflow-hidden rounded-md border shadow-lg"
+        class="border-border bg-popover absolute bottom-12 left-3 z-99 w-56 overflow-hidden rounded-md border shadow-lg"
       >
         @for (m of models; track m.id) {
           <button

@@ -1,6 +1,8 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideIcons } from '@ng-icons/core';
+import { provideMarkdown } from 'ngx-markdown';
 import {
   lucideArchive,
   lucideArrowRight,
@@ -47,6 +49,8 @@ import { routes } from './app.routes';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideHttpClient(),
+    provideMarkdown(),
     provideRouter(routes, withComponentInputBinding()),
     provideIcons({
       lucideArchive,
