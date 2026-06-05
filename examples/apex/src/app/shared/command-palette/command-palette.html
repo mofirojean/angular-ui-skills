@@ -1,0 +1,83 @@
+@if (open()) {
+  <div
+    class="fixed inset-0 z-50 flex items-start justify-center px-4 pt-[12vh]"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Command palette"
+  >
+    <div
+      class="bg-background/40 absolute inset-0 backdrop-blur-sm"
+      (click)="close()"
+    ></div>
+
+    <div class="border-border bg-card animate-in fade-in zoom-in-95 relative flex w-full max-w-xl flex-col overflow-hidden rounded-2xl border shadow-2xl">
+      <div class="border-border flex items-center gap-2.5 border-b px-4 py-3">
+        <ng-icon hlm name="lucideSearch" size="xs" class="text-muted-foreground" />
+        <input
+          #searchInput
+          type="text"
+          [value]="query()"
+          (input)="onQuery($event)"
+          (keydown)="onKeydown($event)"
+          placeholder="Search commands, recent chats, projects..."
+          class="text-foreground placeholder:text-muted-foreground w-full bg-transparent text-[13px] outline-none"
+        />
+        <kbd hlmKbd class="h-5 text-[9px]">esc</kbd>
+      </div>
+
+      <div class="max-h-[60vh] overflow-y-auto py-1">
+        @if (flat().length === 0) {
+          <div class="px-4 py-12 text-center">
+            <ng-icon hlm name="lucideSearch" size="md" class="text-muted-foreground mx-auto" />
+            <p class="text-muted-foreground mt-2 text-[12px]">
+              No commands match "{{ query() }}"
+            </p>
+          </div>
+        } @else {
+          @for (group of filtered(); track group.label) {
+            <div class="px-1">
+              <p class="text-muted-foreground px-3 pb-1 pt-2 text-[9px] font-semibold uppercase tracking-wider">
+                {{ group.label }}
+              </p>
+              <ul>
+                @for (cmd of group.items; track cmd.id) {
+                  <li>
+                    <button
+                      type="button"
+                      (mouseenter)="activeIndex.set(indexOf(cmd))"
+                      (click)="runItem(cmd)"
+                      [class.bg-primary]="indexOf(cmd) === activeIndex()"
+                      [class.text-primary-foreground]="indexOf(cmd) === activeIndex()"
+                      class="hover:bg-accent group flex w-full items-center gap-3 rounded-md px-3 py-1.5 text-left text-[12.5px] transition-colors"
+                    >
+                      <ng-icon hlm [name]="cmd.icon" size="xs" />
+                      <span class="flex-1 truncate">{{ cmd.label }}</span>
+                      @if (cmd.shortcut) {
+                        <span class="font-mono text-[10px] opacity-70">{{ cmd.shortcut }}</span>
+                      }
+                    </button>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+        }
+      </div>
+
+      <div class="border-border text-muted-foreground flex items-center justify-between border-t px-3 py-1.5 text-[10px]">
+        <div class="flex items-center gap-3">
+          <span class="flex items-center gap-1">
+            <kbd hlmKbd class="h-4 text-[9px]">↑</kbd>
+            <kbd hlmKbd class="h-4 text-[9px]">↓</kbd>
+            to navigate
+          </span>
+          <span class="flex items-center gap-1">
+            <kbd hlmKbd class="h-4 text-[9px]">↵</kbd>
+            to select
+          </span>
+        </div>
+        <span>{{ flat().length }} commands</span>
+      </div>
+    </div>
+  </div>
+}

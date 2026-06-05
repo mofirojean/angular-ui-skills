@@ -27,4 +27,9 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/settings/settings').then((m) => m.Settings),
     title: 'Settings, Apex',
   },
+  {
+    path: '**',
+    loadComponent: () => import('./pages/not-found/not-found').then((m) => m.NotFound),
+    title: 'Not found, Apex',
+  },
 ];

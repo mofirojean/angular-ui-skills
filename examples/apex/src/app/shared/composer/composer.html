@@ -67,13 +67,11 @@
       <ng-icon hlm name="lucidePaperclip" size="xs" />
     </button>
 
-    <span class="ml-auto px-2 font-mono text-[10px] tabular-nums">{{ charCount() }}</span>
-
     <button
       hlmBtn
       size="sm"
       type="button"
-      class="ml-1 h-8 w-8 rounded-full p-0 disabled:opacity-40"
+      class="ml-auto h-8 w-8 rounded-full p-0 disabled:opacity-40"
       [disabled]="!canSend()"
       (click)="submit()"
       aria-label="Send message"

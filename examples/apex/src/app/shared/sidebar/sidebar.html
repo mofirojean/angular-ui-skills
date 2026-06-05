@@ -36,17 +36,16 @@
   </nav>
 
   <div class="px-3 pb-2">
-    <label class="border-border bg-background hover:bg-card focus-within:ring-ring/40 flex h-9 items-center gap-2 rounded-md border px-2.5 text-[12px] transition-all focus-within:ring-2">
-      <ng-icon hlm name="lucideSearch" size="xs" class="text-muted-foreground" />
-      <input
-        type="text"
-        [value]="query()"
-        (input)="onQuery($event)"
-        placeholder="Search chats"
-        class="text-foreground placeholder:text-muted-foreground flex-1 bg-transparent outline-none"
-      />
+    <button
+      type="button"
+      (click)="openPalette.emit()"
+      class="border-border bg-background hover:bg-card text-muted-foreground flex h-9 w-full items-center gap-2 rounded-md border px-2.5 text-left text-[12px] transition-all"
+      aria-label="Open command palette"
+    >
+      <ng-icon hlm name="lucideSearch" size="xs" />
+      <span class="flex-1">Search chats</span>
       <kbd hlmKbd class="h-5 text-[9px]">⌘K</kbd>
-    </label>
+    </button>
   </div>
 
   <div class="flex-1 overflow-y-auto px-3 pb-3">

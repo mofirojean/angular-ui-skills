@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NgIcon } from '@ng-icons/core';
 import { HlmAvatar, HlmAvatarFallback } from '@spartan-ng/helm/avatar';
@@ -30,6 +30,7 @@ const BUCKET_ORDER: readonly ConversationBucket[] = [
 })
 export class Sidebar {
   readonly mode = input<'light' | 'dark'>('dark');
+  readonly openPalette = output<void>();
 
   protected readonly user = MOCK_USER;
   protected readonly workspace = MOCK_WORKSPACE;

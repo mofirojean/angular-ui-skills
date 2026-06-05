@@ -1,16 +1,69 @@
 <div class="bg-background text-foreground flex h-screen w-screen overflow-hidden">
-  <app-sidebar [mode]="mode()" />
+  <!-- Desktop sidebar -->
+  <div class="hidden md:block">
+    <app-sidebar [mode]="mode()" (openPalette)="openPalette()" />
+  </div>
+
+  <!-- Mobile sidebar in a sheet -->
+  @if (mobileSidebarOpen()) {
+    <div class="fixed inset-0 z-40 md:hidden" role="dialog" aria-modal="true" aria-label="Navigation">
+      <div
+        class="bg-background/40 absolute inset-0 backdrop-blur-sm animate-in fade-in"
+        (click)="closeMobileSidebar()"
+      ></div>
+      <div class="animate-in slide-in-from-left relative h-full w-[280px]">
+        <app-sidebar [mode]="mode()" (openPalette)="openPalette()" />
+        <button
+          type="button"
+          (click)="closeMobileSidebar()"
+          aria-label="Close navigation"
+          class="bg-card border-border text-muted-foreground hover:text-foreground absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border shadow-sm"
+        >
+          <ng-icon hlm name="lucideX" size="xs" />
+        </button>
+      </div>
+    </div>
+  }
 
   <main class="flex min-w-0 flex-1 flex-col">
+    <!-- Mobile-only top bar with hamburger + palette trigger -->
+    <div class="border-border flex items-center gap-2 border-b px-3 py-2 md:hidden">
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        type="button"
+        class="h-8 w-8 p-0"
+        (click)="openMobileSidebar()"
+        aria-label="Open navigation"
+      >
+        <ng-icon hlm name="lucidePanelLeft" size="sm" />
+      </button>
+      <span class="font-serif text-foreground text-[14px] font-medium tracking-tight">Apex</span>
+      <button
+        type="button"
+        (click)="openPalette()"
+        aria-label="Open command palette"
+        class="border-border hover:bg-accent text-muted-foreground ml-auto flex h-8 items-center gap-1.5 rounded-md border px-2.5 text-[11px] transition-colors"
+      >
+        <ng-icon hlm name="lucideSearch" size="xs" />
+        Search
+      </button>
+    </div>
+
     <router-outlet />
   </main>
 
+  <!-- Floating theme toggle FAB, desktop only (mobile uses settings page) -->
   <button
     type="button"
     (click)="toggleTheme()"
     [attr.aria-label]="modeLabel()"
-    class="border-border bg-card hover:bg-accent text-muted-foreground hover:text-foreground fixed bottom-4 right-4 z-50 flex h-9 w-9 items-center justify-center rounded-full border shadow-sm transition-colors"
+    class="border-border bg-card hover:bg-accent text-muted-foreground hover:text-foreground fixed bottom-4 right-4 z-30 hidden h-9 w-9 items-center justify-center rounded-full border shadow-sm transition-colors md:flex"
   >
     <ng-icon hlm [name]="modeIcon()" size="sm" />
   </button>
+
+  <!-- ⌘K palette, always mounted, opens on Cmd+K or via openPalette() -->
+  <app-command-palette />
 </div>
