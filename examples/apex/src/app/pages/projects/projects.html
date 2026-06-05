@@ -1,0 +1,88 @@
+<div class="border-border flex items-center justify-between gap-4 border-b px-6 py-3">
+  <div class="min-w-0">
+    <h1 class="font-serif text-foreground text-[20px] font-medium leading-none tracking-tight">Projects</h1>
+    <p class="text-muted-foreground mt-1 text-[12px]">
+      Bundle conversations, files, and custom instructions under a shared context.
+    </p>
+  </div>
+  <button hlmBtn size="sm" class="gap-1.5" type="button">
+    <ng-icon hlm name="lucidePlus" size="xs" />
+    New project
+  </button>
+</div>
+
+<div class="bg-muted/30 min-h-0 flex-1 overflow-y-auto">
+  <div class="mx-auto max-w-5xl px-6 py-8">
+    <div class="mb-6">
+      <label class="border-border bg-background hover:bg-card focus-within:ring-ring/40 flex h-10 max-w-md items-center gap-2 rounded-lg border px-3 text-[13px] transition-all focus-within:ring-2">
+        <ng-icon hlm name="lucideSearch" size="xs" class="text-muted-foreground" />
+        <input
+          type="text"
+          [value]="query()"
+          (input)="onQuery($event)"
+          placeholder="Search projects"
+          class="text-foreground placeholder:text-muted-foreground flex-1 bg-transparent outline-none"
+        />
+      </label>
+    </div>
+
+    @if (projects().length > 0) {
+      <div class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+        @for (p of projects(); track p.id) {
+          <a
+            [routerLink]="['/projects', p.id]"
+            class="border-border bg-card hover:border-border/80 hover:shadow-md group block overflow-hidden rounded-2xl border p-5 transition-all hover:-translate-y-0.5"
+          >
+            <div class="flex items-start gap-3">
+              <div
+                class="bg-gradient-to-br shadow-sm text-white flex h-11 w-11 shrink-0 items-center justify-center rounded-xl {{ p.accent }}"
+              >
+                <ng-icon hlm [name]="p.icon" size="sm" />
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="text-foreground truncate text-[14px] font-semibold leading-tight">
+                  {{ p.name }}
+                </p>
+                <p class="text-muted-foreground mt-0.5 truncate text-[11px]">
+                  Updated {{ p.updatedAt }}
+                </p>
+              </div>
+            </div>
+
+            <p class="text-muted-foreground mt-4 line-clamp-2 text-[12.5px] leading-relaxed">
+              {{ p.description }}
+            </p>
+
+            <div class="border-border text-muted-foreground mt-5 flex items-center gap-4 border-t pt-3 text-[11px]">
+              <span class="flex items-center gap-1.5">
+                <ng-icon hlm name="lucideMessageCircle" size="xs" />
+                {{ p.conversationCount }} {{ p.conversationCount === 1 ? 'chat' : 'chats' }}
+              </span>
+              <span class="flex items-center gap-1.5">
+                <ng-icon hlm name="lucideFileText" size="xs" />
+                {{ p.fileCount }} files
+              </span>
+              <span class="text-muted-foreground/60 ml-auto inline-flex items-center gap-0.5 transition-colors group-hover:text-primary">
+                Open
+                <ng-icon hlm name="lucideArrowRight" size="xs" />
+              </span>
+            </div>
+          </a>
+        }
+      </div>
+    } @else {
+      <div class="border-border bg-card mt-8 flex flex-col items-center justify-center gap-3 rounded-2xl border px-6 py-16 text-center">
+        <div class="bg-muted text-muted-foreground flex h-12 w-12 items-center justify-center rounded-2xl">
+          <ng-icon hlm name="lucideFolder" size="md" />
+        </div>
+        <p class="font-serif text-foreground text-[16px] font-medium">No projects match that search</p>
+        <p class="text-muted-foreground max-w-sm text-[12.5px] leading-relaxed">
+          Try a shorter query, or start a new project to organise a thread of related conversations.
+        </p>
+        <button hlmBtn size="sm" variant="outline" class="mt-2 gap-1.5" type="button" (click)="query.set('')">
+          Clear search
+        </button>
+      </div>
+    }
+  </div>
+</div>

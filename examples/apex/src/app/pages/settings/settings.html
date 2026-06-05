@@ -1,0 +1,456 @@
+<div class="border-border flex items-center gap-3 border-b px-6 py-3">
+  <div class="bg-muted text-muted-foreground flex h-8 w-8 items-center justify-center rounded-lg">
+    <ng-icon hlm name="lucideSettings" size="sm" />
+  </div>
+  <div class="min-w-0">
+    <h1 class="font-serif text-foreground text-[18px] font-medium leading-none tracking-tight">Settings</h1>
+    <p class="text-muted-foreground mt-1 text-[11px]">
+      Account, appearance, models, and data preferences.
+    </p>
+  </div>
+</div>
+
+<div class="bg-muted/30 flex min-h-0 flex-1">
+  <aside class="border-border bg-card hidden w-56 shrink-0 border-r md:block">
+    <nav class="flex flex-col gap-0.5 p-2">
+      @for (item of nav; track item.id) {
+        <button
+          type="button"
+          (click)="setSection(item.id)"
+          [class.bg-accent]="section() === item.id"
+          [class.text-foreground]="section() === item.id"
+          [class.text-muted-foreground]="section() !== item.id"
+          class="hover:bg-accent hover:text-foreground flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left text-[13px] transition-colors"
+        >
+          <ng-icon hlm [name]="item.icon" size="xs" />
+          {{ item.label }}
+        </button>
+      }
+    </nav>
+  </aside>
+
+  <div class="min-w-0 flex-1 overflow-y-auto">
+    <div class="mx-auto max-w-2xl px-6 py-8">
+      @switch (section()) {
+        @case ('account') {
+          <h2 class="font-serif text-foreground text-[18px] font-medium tracking-tight">Account</h2>
+          <p class="text-muted-foreground mt-1 text-[12px]">
+            Your basic identity. Used in conversation headers and the sidebar pill.
+          </p>
+
+          <div class="border-border bg-card mt-6 flex items-center gap-4 rounded-2xl border p-5">
+            <hlm-avatar class="h-14 w-14">
+              <span hlmAvatarFallback class="bg-accent text-foreground text-[14px] font-semibold">
+                {{ user.initials }}
+              </span>
+            </hlm-avatar>
+            <div class="flex-1">
+              <p class="text-foreground text-[13px] font-medium">{{ user.name }}</p>
+              <p class="text-muted-foreground text-[11px]">{{ user.plan }} · {{ user.email }}</p>
+            </div>
+            <button hlmBtn variant="outline" size="sm" type="button">
+              <ng-icon hlm name="lucidePencil" size="xs" />
+              Change photo
+            </button>
+          </div>
+
+          <div class="border-border bg-card mt-3 grid grid-cols-1 gap-4 rounded-2xl border p-5 sm:grid-cols-2">
+            <label class="flex flex-col gap-1.5">
+              <span class="text-foreground text-[12px] font-medium">Full name</span>
+              <input
+                type="text"
+                [ngModel]="fullName()"
+                (ngModelChange)="fullName.set($event)"
+                class="border-border bg-background text-foreground h-9 rounded-md border px-3 text-[13px] outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+              />
+            </label>
+            <label class="flex flex-col gap-1.5">
+              <span class="text-foreground text-[12px] font-medium">Email</span>
+              <input
+                type="email"
+                [ngModel]="email()"
+                (ngModelChange)="email.set($event)"
+                class="border-border bg-background text-foreground h-9 rounded-md border px-3 text-[13px] outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+              />
+            </label>
+          </div>
+
+          <div class="border-destructive/30 bg-destructive/5 mt-3 flex items-center justify-between gap-3 rounded-2xl border p-5">
+            <div>
+              <p class="text-foreground text-[13px] font-medium">Delete account</p>
+              <p class="text-muted-foreground mt-1 max-w-md text-[11.5px] leading-relaxed">
+                Permanently delete your account and every conversation. There is no undo.
+              </p>
+            </div>
+            <button hlmBtn variant="destructive" size="sm" type="button">Delete</button>
+          </div>
+        }
+
+        @case ('appearance') {
+          <h2 class="font-serif text-foreground text-[18px] font-medium tracking-tight">Appearance</h2>
+          <p class="text-muted-foreground mt-1 text-[12px]">
+            Theme, density, and font size. Saved per device.
+          </p>
+
+          <div class="border-border bg-card mt-6 rounded-2xl border p-5">
+            <p class="text-foreground text-[13px] font-medium">Theme</p>
+            <p class="text-muted-foreground mt-0.5 text-[11px]">Choose how Apex looks.</p>
+            <div class="mt-3 grid grid-cols-3 gap-2">
+              @for (t of themeOptions; track t.v) {
+                <button
+                  type="button"
+                  (click)="setTheme(t.v)"
+                  [class.border-primary]="themeChoice() === t.v"
+                  [class.ring-2]="themeChoice() === t.v"
+                  [class.ring-primary]="themeChoice() === t.v"
+                  class="border-border hover:border-border/80 rounded-xl border p-3 text-left transition-all"
+                >
+                  <span class="text-foreground block text-[13px] font-medium">{{ t.l }}</span>
+                  <span class="text-muted-foreground mt-0.5 block text-[11px]">{{ t.d }}</span>
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="border-border bg-card mt-3 rounded-2xl border p-5">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-foreground text-[13px] font-medium">Density</p>
+                <p class="text-muted-foreground mt-0.5 text-[11px]">Spacing between sidebar and chat elements.</p>
+              </div>
+              <div class="border-border bg-muted/50 flex h-8 items-center gap-px overflow-hidden rounded-md border p-0.5 text-[12px]">
+                <button
+                  type="button"
+                  (click)="setDensity('cozy')"
+                  [class.bg-background]="density() === 'cozy'"
+                  [class.text-foreground]="density() === 'cozy'"
+                  [class.shadow-sm]="density() === 'cozy'"
+                  class="text-muted-foreground rounded-[5px] px-2.5 py-1 font-medium"
+                >
+                  Cozy
+                </button>
+                <button
+                  type="button"
+                  (click)="setDensity('compact')"
+                  [class.bg-background]="density() === 'compact'"
+                  [class.text-foreground]="density() === 'compact'"
+                  [class.shadow-sm]="density() === 'compact'"
+                  class="text-muted-foreground rounded-[5px] px-2.5 py-1 font-medium"
+                >
+                  Compact
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="border-border bg-card mt-3 rounded-2xl border p-5">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-foreground text-[13px] font-medium">Font size</p>
+                <p class="text-muted-foreground mt-0.5 text-[11px]">{{ fontScale() }}% of the default.</p>
+              </div>
+              <span class="font-mono text-[10px] text-muted-foreground tabular-nums">{{ fontScale() }}%</span>
+            </div>
+            <input
+              type="range"
+              min="80"
+              max="140"
+              step="10"
+              [value]="fontScale()"
+              (input)="onFontScale($event)"
+              class="accent-primary mt-4 w-full"
+            />
+          </div>
+        }
+
+        @case ('profile') {
+          <h2 class="font-serif text-foreground text-[18px] font-medium tracking-tight">Profile</h2>
+          <p class="text-muted-foreground mt-1 text-[12px]">
+            Things Apex remembers about you across every conversation.
+          </p>
+
+          <div class="border-border bg-card mt-6 rounded-2xl border p-5">
+            <label class="flex flex-col gap-1.5">
+              <span class="text-foreground text-[12px] font-medium">What should Apex call you?</span>
+              <input
+                type="text"
+                [ngModel]="nickname()"
+                (ngModelChange)="nickname.set($event)"
+                placeholder="Your preferred name"
+                class="border-border bg-background text-foreground h-9 rounded-md border px-3 text-[13px] outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+              />
+            </label>
+          </div>
+
+          <div class="border-border bg-card mt-3 rounded-2xl border p-5">
+            <div class="mb-3 flex items-center justify-between">
+              <div>
+                <p class="text-foreground text-[13px] font-medium">Custom instructions</p>
+                <p class="text-muted-foreground mt-0.5 text-[11px]">
+                  Apex follows these on every reply, across all projects.
+                </p>
+              </div>
+              <span class="font-mono text-[10px] text-muted-foreground tabular-nums">
+                {{ customInstructions().length }} / 1500
+              </span>
+            </div>
+            <textarea
+              [ngModel]="customInstructions()"
+              (ngModelChange)="customInstructions.set($event)"
+              rows="6"
+              maxlength="1500"
+              class="border-border bg-background text-foreground w-full resize-none rounded-lg border px-3 py-2.5 text-[13px] leading-relaxed outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+            ></textarea>
+          </div>
+        }
+
+        @case ('models') {
+          <h2 class="font-serif text-foreground text-[18px] font-medium tracking-tight">Models</h2>
+          <p class="text-muted-foreground mt-1 text-[12px]">
+            Default model, creativity, and reply behaviour.
+          </p>
+
+          <div class="border-border bg-card mt-6 rounded-2xl border p-5">
+            <p class="text-foreground text-[13px] font-medium">Default model</p>
+            <p class="text-muted-foreground mt-0.5 text-[11px]">
+              Used for new conversations. You can switch per-chat from the composer.
+            </p>
+            <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+              @for (m of models; track m.id) {
+                <button
+                  type="button"
+                  (click)="setDefaultModel(m.id)"
+                  [class.border-primary]="defaultModelId() === m.id"
+                  [class.ring-2]="defaultModelId() === m.id"
+                  [class.ring-primary]="defaultModelId() === m.id"
+                  class="border-border hover:border-border/80 rounded-xl border p-3 text-left transition-all"
+                >
+                  <div class="flex items-center gap-1.5">
+                    <ng-icon hlm name="lucideSparkles" size="xs" class="text-primary" />
+                    <span class="text-foreground text-[13px] font-medium">{{ m.label }}</span>
+                  </div>
+                  <p class="text-muted-foreground mt-1 text-[11px]">{{ m.description }}</p>
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="border-border bg-card mt-3 rounded-2xl border p-5">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-foreground text-[13px] font-medium">Temperature</p>
+                <p class="text-muted-foreground mt-0.5 text-[11px]">
+                  Lower = more deterministic. Higher = more creative.
+                </p>
+              </div>
+              <span class="font-mono text-[10px] text-muted-foreground tabular-nums">{{ temperatureLabel() }}</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="5"
+              [value]="temperature()"
+              (input)="onTemperature($event)"
+              class="accent-primary mt-4 w-full"
+            />
+          </div>
+
+          <div class="border-border bg-card mt-3 flex items-center justify-between gap-3 rounded-2xl border p-5">
+            <div>
+              <p class="text-foreground text-[13px] font-medium">Suggest follow-ups</p>
+              <p class="text-muted-foreground mt-0.5 max-w-md text-[11.5px] leading-relaxed">
+                After each response, surface 3 likely next questions you might ask.
+              </p>
+            </div>
+            <button
+              type="button"
+              (click)="autoFollowUp.set(!autoFollowUp())"
+              [class.bg-primary]="autoFollowUp()"
+              [class.bg-muted]="!autoFollowUp()"
+              class="relative h-6 w-11 shrink-0 rounded-full transition-colors"
+              role="switch"
+              [attr.aria-checked]="autoFollowUp()"
+            >
+              <span
+                [class.translate-x-5]="autoFollowUp()"
+                [class.translate-x-0.5]="!autoFollowUp()"
+                class="bg-background absolute top-0.5 inline-block h-5 w-5 rounded-full shadow transition-transform"
+              ></span>
+            </button>
+          </div>
+        }
+
+        @case ('data') {
+          <h2 class="font-serif text-foreground text-[18px] font-medium tracking-tight">Data controls</h2>
+          <p class="text-muted-foreground mt-1 text-[12px]">
+            What Apex retains and how it can be used.
+          </p>
+
+          <div class="border-border bg-card mt-6 flex items-center justify-between gap-3 rounded-2xl border p-5">
+            <div>
+              <p class="text-foreground text-[13px] font-medium">Chat history</p>
+              <p class="text-muted-foreground mt-0.5 max-w-md text-[11.5px] leading-relaxed">
+                Save your conversations so they show up in the sidebar. Disabling clears existing history.
+              </p>
+            </div>
+            <button
+              type="button"
+              (click)="historyEnabled.set(!historyEnabled())"
+              [class.bg-primary]="historyEnabled()"
+              [class.bg-muted]="!historyEnabled()"
+              class="relative h-6 w-11 shrink-0 rounded-full transition-colors"
+              role="switch"
+              [attr.aria-checked]="historyEnabled()"
+            >
+              <span
+                [class.translate-x-5]="historyEnabled()"
+                [class.translate-x-0.5]="!historyEnabled()"
+                class="bg-background absolute top-0.5 inline-block h-5 w-5 rounded-full shadow transition-transform"
+              ></span>
+            </button>
+          </div>
+
+          <div class="border-border bg-card mt-3 flex items-center justify-between gap-3 rounded-2xl border p-5">
+            <div>
+              <p class="text-foreground text-[13px] font-medium">Opt out of model improvement</p>
+              <p class="text-muted-foreground mt-0.5 max-w-md text-[11.5px] leading-relaxed">
+                Apex will not use your conversations to train future models. Default is on.
+              </p>
+            </div>
+            <button
+              type="button"
+              (click)="trainingOptOut.set(!trainingOptOut())"
+              [class.bg-primary]="trainingOptOut()"
+              [class.bg-muted]="!trainingOptOut()"
+              class="relative h-6 w-11 shrink-0 rounded-full transition-colors"
+              role="switch"
+              [attr.aria-checked]="trainingOptOut()"
+            >
+              <span
+                [class.translate-x-5]="trainingOptOut()"
+                [class.translate-x-0.5]="!trainingOptOut()"
+                class="bg-background absolute top-0.5 inline-block h-5 w-5 rounded-full shadow transition-transform"
+              ></span>
+            </button>
+          </div>
+
+          <div class="border-border bg-card mt-3 flex items-center justify-between gap-3 rounded-2xl border p-5">
+            <div>
+              <p class="text-foreground text-[13px] font-medium">Export all data</p>
+              <p class="text-muted-foreground mt-0.5 max-w-md text-[11.5px] leading-relaxed">
+                Download every conversation, project, file, and setting as a JSON archive.
+              </p>
+            </div>
+            <button hlmBtn variant="outline" size="sm" type="button">
+              <ng-icon hlm name="lucideArchive" size="xs" />
+              Export
+            </button>
+          </div>
+        }
+
+        @case ('notifications') {
+          <h2 class="font-serif text-foreground text-[18px] font-medium tracking-tight">Notifications</h2>
+          <p class="text-muted-foreground mt-1 text-[12px]">
+            Choose where Apex reaches you, by event type and channel.
+          </p>
+
+          <div class="border-border bg-card mt-6 overflow-hidden rounded-2xl border">
+            <div class="border-border grid grid-cols-[1fr_60px_60px_60px] items-center gap-3 border-b bg-muted/30 px-5 py-2">
+              <span class="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">Event</span>
+              @for (ch of notificationChannels; track ch.id) {
+                <span class="text-muted-foreground text-center text-[10px] font-semibold uppercase tracking-wider">
+                  {{ ch.label }}
+                </span>
+              }
+            </div>
+            <ul class="divide-border divide-y">
+              @for (cat of notificationCategories; track cat.id) {
+                <li class="grid grid-cols-[1fr_60px_60px_60px] items-center gap-3 px-5 py-3">
+                  <div class="min-w-0">
+                    <p class="text-foreground text-[13px] font-medium leading-tight">{{ cat.label }}</p>
+                    <p class="text-muted-foreground mt-0.5 text-[11px] leading-tight">{{ cat.description }}</p>
+                  </div>
+                  @for (ch of notificationChannels; track ch.id) {
+                    <div class="flex justify-center">
+                      <button
+                        type="button"
+                        (click)="toggleNotify(cat.id, ch.id)"
+                        [class.bg-primary]="isNotify(cat.id, ch.id)"
+                        [class.bg-muted]="!isNotify(cat.id, ch.id)"
+                        class="relative h-5 w-9 shrink-0 rounded-full transition-colors"
+                        role="switch"
+                        [attr.aria-checked]="isNotify(cat.id, ch.id)"
+                        [attr.aria-label]="cat.label + ' on ' + ch.label"
+                      >
+                        <span
+                          [class.translate-x-4]="isNotify(cat.id, ch.id)"
+                          [class.translate-x-0.5]="!isNotify(cat.id, ch.id)"
+                          class="bg-background absolute top-0.5 inline-block h-4 w-4 rounded-full shadow transition-transform"
+                        ></span>
+                      </button>
+                    </div>
+                  }
+                </li>
+              }
+            </ul>
+          </div>
+        }
+
+        @case ('keys') {
+          <h2 class="font-serif text-foreground text-[18px] font-medium tracking-tight">API keys</h2>
+          <p class="text-muted-foreground mt-1 text-[12px]">
+            Use these to call Apex from scripts, CI, or third-party tools.
+          </p>
+
+          <div class="border-amber-500/30 bg-amber-500/5 mt-6 flex items-start gap-3 rounded-2xl border p-4 text-[12px]">
+            <ng-icon hlm name="lucideShield" size="xs" class="text-amber-600 mt-0.5 shrink-0" />
+            <p class="text-foreground leading-relaxed">
+              Treat keys like passwords. Apex shows the full key only once at creation time.
+              Rotate any key that has been shared in plain text or committed to a repo.
+            </p>
+          </div>
+
+          <div class="border-border bg-card mt-3 flex items-center justify-between gap-3 rounded-2xl border p-4">
+            <div>
+              <p class="text-foreground text-[13px] font-medium">{{ apiKeys().length }} active keys</p>
+              <p class="text-muted-foreground mt-0.5 text-[11px]">
+                Pro plan allows up to 10 active keys.
+              </p>
+            </div>
+            <button hlmBtn size="sm" class="gap-1.5" type="button">
+              <ng-icon hlm name="lucidePlus" size="xs" />
+              New key
+            </button>
+          </div>
+
+          <ul class="border-border bg-card divide-border mt-3 divide-y overflow-hidden rounded-2xl border">
+            @for (k of apiKeys(); track k.id) {
+              <li class="flex items-center gap-3 px-4 py-3">
+                <div class="bg-muted text-muted-foreground flex h-8 w-8 items-center justify-center rounded-lg">
+                  <ng-icon hlm name="lucideKey" size="xs" />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-foreground truncate text-[13px] font-medium leading-tight">{{ k.name }}</p>
+                  <p class="text-muted-foreground mt-0.5 truncate font-mono text-[11px]">
+                    {{ k.prefix }}<span class="text-muted-foreground/60">·····</span>
+                  </p>
+                </div>
+                <div class="text-muted-foreground hidden text-right text-[10px] sm:block">
+                  <p>Created {{ k.created }}</p>
+                  <p class="mt-0.5">Used {{ k.lastUsed }}</p>
+                </div>
+                <button hlmBtn variant="ghost" size="sm" class="h-8 w-8 p-0" type="button" aria-label="Copy">
+                  <ng-icon hlm name="lucideCopy" size="xs" />
+                </button>
+                <button hlmBtn variant="ghost" size="sm" class="h-8 w-8 p-0" type="button" aria-label="Revoke">
+                  <ng-icon hlm name="lucideTrash2" size="xs" />
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      }
+    </div>
+  </div>
+</div>

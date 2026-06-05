@@ -24,6 +24,17 @@
     </button>
   </div>
 
+  <nav class="flex flex-col gap-0.5 px-3 pb-2 text-[12px]">
+    <a
+      routerLink="/projects"
+      routerLinkActive="bg-sidebar-accent text-foreground"
+      class="hover:bg-sidebar-accent text-muted-foreground hover:text-foreground flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors"
+    >
+      <ng-icon hlm name="lucideFolder" size="xs" />
+      Projects
+    </a>
+  </nav>
+
   <div class="px-3 pb-2">
     <label class="border-border bg-background hover:bg-card focus-within:ring-ring/40 flex h-9 items-center gap-2 rounded-md border px-2.5 text-[12px] transition-all focus-within:ring-2">
       <ng-icon hlm name="lucideSearch" size="xs" class="text-muted-foreground" />
@@ -93,8 +104,9 @@
   </div>
 
   <div class="border-border bg-sidebar border-t px-2 py-2">
-    <button
-      type="button"
+    <a
+      routerLink="/settings"
+      routerLinkActive="bg-sidebar-accent"
       class="hover:bg-sidebar-accent flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors"
     >
       <hlm-avatar size="sm" class="h-7 w-7">
@@ -106,7 +118,7 @@
         <p class="text-foreground truncate text-[12px] font-medium leading-tight">{{ user.name }}</p>
         <p class="text-muted-foreground truncate text-[10px] leading-tight">{{ user.plan }} plan</p>
       </div>
-      <ng-icon hlm name="lucideEllipsisVertical" class="text-muted-foreground" size="xs" />
-    </button>
+      <ng-icon hlm name="lucideSettings" class="text-muted-foreground" size="xs" />
+    </a>
   </div>
 </aside>

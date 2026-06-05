@@ -1,0 +1,187 @@
+@if (project(); as p) {
+  <div class="border-border border-b">
+    <div class="flex items-center gap-3 px-6 pt-3 pb-1">
+      <a
+        routerLink="/projects"
+        class="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-[12px] transition-colors"
+      >
+        <ng-icon hlm name="lucideArrowLeft" size="xs" />
+        Projects
+      </a>
+    </div>
+    <div class="flex items-start justify-between gap-4 px-6 pb-3">
+      <div class="flex min-w-0 items-start gap-3">
+        <div class="bg-gradient-to-br text-white flex h-12 w-12 shrink-0 items-center justify-center rounded-xl {{ p.accent }}">
+          <ng-icon hlm [name]="p.icon" size="sm" />
+        </div>
+        <div class="min-w-0">
+          <h1 class="font-serif text-foreground text-[22px] font-medium leading-tight tracking-tight">
+            {{ p.name }}
+          </h1>
+          <p class="text-muted-foreground mt-1 max-w-2xl text-[12.5px] leading-relaxed">
+            {{ p.description }}
+          </p>
+        </div>
+      </div>
+      <div class="flex shrink-0 items-center gap-1">
+        <button hlmBtn variant="ghost" size="sm" class="h-8 w-8 p-0" type="button" aria-label="Edit">
+          <ng-icon hlm name="lucidePencil" size="xs" />
+        </button>
+        <button hlmBtn variant="ghost" size="sm" class="h-8 w-8 p-0" type="button" aria-label="More">
+          <ng-icon hlm name="lucideEllipsisVertical" size="xs" />
+        </button>
+      </div>
+    </div>
+
+    <div class="px-6">
+      <nav class="flex items-center gap-1 -mb-px">
+        <button
+          type="button"
+          (click)="setTab('conversations')"
+          [class.text-foreground]="activeTab() === 'conversations'"
+          [class.border-foreground]="activeTab() === 'conversations'"
+          [class.text-muted-foreground]="activeTab() !== 'conversations'"
+          [class.border-transparent]="activeTab() !== 'conversations'"
+          class="hover:text-foreground border-b-2 px-3 py-2 text-[13px] font-medium transition-colors"
+        >
+          Conversations
+          <span class="bg-muted text-muted-foreground ml-1.5 inline-flex items-center justify-center rounded-full px-1.5 text-[10px]">
+            {{ p.conversationCount }}
+          </span>
+        </button>
+        <button
+          type="button"
+          (click)="setTab('knowledge')"
+          [class.text-foreground]="activeTab() === 'knowledge'"
+          [class.border-foreground]="activeTab() === 'knowledge'"
+          [class.text-muted-foreground]="activeTab() !== 'knowledge'"
+          [class.border-transparent]="activeTab() !== 'knowledge'"
+          class="hover:text-foreground border-b-2 px-3 py-2 text-[13px] font-medium transition-colors"
+        >
+          Knowledge
+          <span class="bg-muted text-muted-foreground ml-1.5 inline-flex items-center justify-center rounded-full px-1.5 text-[10px]">
+            {{ p.files.length }}
+          </span>
+        </button>
+        <button
+          type="button"
+          (click)="setTab('instructions')"
+          [class.text-foreground]="activeTab() === 'instructions'"
+          [class.border-foreground]="activeTab() === 'instructions'"
+          [class.text-muted-foreground]="activeTab() !== 'instructions'"
+          [class.border-transparent]="activeTab() !== 'instructions'"
+          class="hover:text-foreground border-b-2 px-3 py-2 text-[13px] font-medium transition-colors"
+        >
+          Instructions
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <div class="min-h-0 flex-1 overflow-y-auto">
+    <div class="mx-auto max-w-3xl px-6 py-6">
+      @switch (activeTab()) {
+        @case ('conversations') {
+          <ul class="border-border bg-card divide-border divide-y overflow-hidden rounded-2xl border">
+            @for (c of conversations(); track c.id) {
+              <li>
+                <a
+                  [routerLink]="['/c', c.id]"
+                  class="hover:bg-accent flex items-center gap-3 px-4 py-3 transition-colors"
+                >
+                  <ng-icon hlm name="lucideMessageCircle" size="xs" class="text-muted-foreground" />
+                  <div class="min-w-0 flex-1">
+                    <p class="text-foreground truncate text-[13px] font-medium leading-tight">
+                      {{ c.title }}
+                    </p>
+                    <p class="text-muted-foreground mt-0.5 truncate text-[11px]">
+                      {{ c.messages.length }} messages · {{ c.bucket }}
+                    </p>
+                  </div>
+                  @if (c.starred) {
+                    <ng-icon hlm name="lucideStar" size="xs" class="text-primary" />
+                  }
+                  <ng-icon hlm name="lucideArrowRight" size="xs" class="text-muted-foreground" />
+                </a>
+              </li>
+            }
+          </ul>
+        }
+
+        @case ('knowledge') {
+          <div class="border-border bg-card mb-4 flex items-center justify-between gap-3 rounded-2xl border p-4">
+            <div class="flex items-center gap-3">
+              <div class="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-lg">
+                <ng-icon hlm name="lucideUpload" size="sm" />
+              </div>
+              <div>
+                <p class="text-foreground text-[13px] font-medium">Drag files here or click to upload</p>
+                <p class="text-muted-foreground mt-0.5 text-[11px]">
+                  Text, markdown, PDF, code · up to 20 MB each
+                </p>
+              </div>
+            </div>
+            <button hlmBtn size="sm" variant="outline" class="gap-1.5" type="button">
+              <ng-icon hlm name="lucidePlus" size="xs" />
+              Add files
+            </button>
+          </div>
+
+          <ul class="border-border bg-card divide-border divide-y overflow-hidden rounded-2xl border">
+            @for (f of p.files; track f.id) {
+              <li class="hover:bg-accent flex items-center gap-3 px-4 py-3 transition-colors">
+                <ng-icon hlm name="lucideFileText" size="xs" class="text-muted-foreground" />
+                <div class="min-w-0 flex-1">
+                  <p class="text-foreground truncate text-[13px] font-medium leading-tight">
+                    {{ f.name }}
+                  </p>
+                  <p class="text-muted-foreground mt-0.5 truncate text-[11px]">
+                    {{ f.size }} · added {{ f.addedAt }}
+                  </p>
+                </div>
+                <button hlmBtn variant="ghost" size="sm" class="h-7 w-7 p-0" type="button" aria-label="Remove">
+                  <ng-icon hlm name="lucideX" size="xs" />
+                </button>
+              </li>
+            }
+          </ul>
+        }
+
+        @case ('instructions') {
+          <div class="border-border bg-card rounded-2xl border p-5">
+            <div class="mb-3 flex items-center justify-between">
+              <div>
+                <p class="text-foreground text-[13px] font-medium">Custom instructions</p>
+                <p class="text-muted-foreground mt-0.5 text-[11px]">
+                  Apex follows these on every reply inside this project.
+                </p>
+              </div>
+              <span class="font-mono text-[10px] text-muted-foreground tabular-nums">
+                {{ instructionsDraft().length }} / 2000
+              </span>
+            </div>
+            <textarea
+              [ngModel]="instructionsDraft()"
+              (ngModelChange)="instructionsDraft.set($event)"
+              rows="10"
+              maxlength="2000"
+              class="border-border bg-background text-foreground placeholder:text-muted-foreground w-full resize-none rounded-lg border px-3.5 py-2.5 text-[13px] leading-relaxed outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+              placeholder="Tell Apex how it should behave inside this project..."
+            ></textarea>
+            <div class="mt-3 flex items-center justify-end gap-2">
+              <button hlmBtn size="sm" variant="ghost" type="button">Discard</button>
+              <button hlmBtn size="sm" type="button">
+                <ng-icon hlm name="lucideCheck" size="xs" />
+                Save instructions
+              </button>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+} @else {
+  <div class="flex h-full items-center justify-center">
+    <p class="text-muted-foreground text-[13px]">Project not found.</p>
+  </div>
+}

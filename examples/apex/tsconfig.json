@@ -32,7 +32,13 @@
       "@spartan-ng/helm/spinner": ["./src/libs/ui/spinner/src/index.ts"],
       "@spartan-ng/helm/kbd": ["./src/libs/ui/kbd/src/index.ts"],
       "@spartan-ng/helm/resizable": ["./src/libs/ui/resizable/src/index.ts"],
-      "@spartan-ng/helm/tabs": ["./src/libs/ui/tabs/src/index.ts"]
+      "@spartan-ng/helm/tabs": ["./src/libs/ui/tabs/src/index.ts"],
+      "@spartan-ng/helm/switch": ["./src/libs/ui/switch/src/index.ts"],
+      "@spartan-ng/helm/radio-group": ["./src/libs/ui/radio-group/src/index.ts"],
+      "@spartan-ng/helm/slider": ["./src/libs/ui/slider/src/index.ts"],
+      "@spartan-ng/helm/progress": ["./src/libs/ui/progress/src/index.ts"],
+      "@spartan-ng/helm/label": ["./src/libs/ui/label/src/index.ts"],
+      "@spartan-ng/helm/field": ["./src/libs/ui/field/src/index.ts"]
     }
   },
   "angularCompilerOptions": {
