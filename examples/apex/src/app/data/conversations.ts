@@ -248,6 +248,66 @@ export const CONVERSATIONS: readonly Conversation[] = [
     ],
   },
   {
+    id: 'c-013',
+    title: 'Sketch a hero gradient component',
+    bucket: 'Today',
+    starred: true,
+    modelId: 'apex-sonnet',
+    messages: [
+      {
+        id: 'm-013-1',
+        role: 'user',
+        content: 'Give me a self-contained HTML demo of a warm hero gradient I could drop into a landing page.',
+      },
+      {
+        id: 'm-013-2',
+        role: 'assistant',
+        content:
+          'Here\'s a single self-contained page. Warm coral fading into deep cream, with a subtle animated radial highlight that drifts on a long loop. Drop it in an iframe or paste into a fresh `.html` file.\n\n```artifact:html:Warm hero gradient\n<!doctype html>\n<html>\n<head>\n<style>\n  :root { color-scheme: light; }\n  body {\n    margin: 0;\n    min-height: 100vh;\n    background: linear-gradient(135deg, #f8eee0 0%, #f1d9bd 40%, #d97757 90%);\n    overflow: hidden;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    font: 600 64px/1 \"Iowan Old Style\", "Times New Roman", serif;\n    color: #2b2419;\n    letter-spacing: -0.02em;\n    position: relative;\n  }\n  .glow {\n    position: absolute;\n    inset: -20%;\n    background: radial-gradient(circle at var(--x, 60%) var(--y, 40%), rgba(255, 220, 180, 0.9), transparent 55%);\n    animation: drift 18s ease-in-out infinite;\n    pointer-events: none;\n  }\n  h1 { position: relative; z-index: 1; max-width: 12ch; text-align: center; }\n  @keyframes drift {\n    0%, 100% { --x: 30%; --y: 30%; }\n    50%      { --x: 75%; --y: 60%; }\n  }\n</style>\n</head>\n<body>\n  <div class="glow"></div>\n  <h1>Move thoughtfully, finish things.</h1>\n</body>\n</html>\n```\n\nReplace the headline copy with whatever fits your brand. The drift is intentionally slow, ~18s per loop, so it reads as ambient rather than animated.',
+      },
+    ],
+  },
+  {
+    id: 'c-014',
+    title: 'Document the artifacts feature',
+    bucket: 'Today',
+    starred: false,
+    modelId: 'apex-opus',
+    messages: [
+      {
+        id: 'm-014-1',
+        role: 'user',
+        content: 'Write me a one-page internal doc explaining how the artifacts panel works.',
+      },
+      {
+        id: 'm-014-2',
+        role: 'assistant',
+        content:
+          'Here is a short internal doc, written for an engineer who is new to the team but already familiar with the chat UI.\n\n```artifact:markdown:Artifacts panel · internal docs\n# Artifacts panel\n\nWhen an assistant response contains a self-contained artifact (HTML, markdown doc, code component), the message stream renders an inline card linking to it. Clicking the card opens a right-side panel split 60/40 with the conversation.\n\n## When to emit an artifact\n\nEmit one when:\n\n- The response is **a thing the user might save, edit, or share** (a working HTML page, a one-pager doc, a code file)\n- It is **self-contained** (runs or reads on its own, no external dependencies the user has to wire up)\n- It is **at least 20 lines** (shorter responses belong inline)\n\nDo *not* emit an artifact for:\n\n- A short code snippet (keep it inline, the user is reading along)\n- A multi-step explanation where the prose is the point\n- Diagrams or images (not yet supported)\n\n## Supported types\n\n| Type | Renders as |\n|---|---|\n| `html` | sandboxed iframe with `srcdoc` |\n| `markdown` | rendered via the same markdown renderer the assistant messages use |\n| `react`, `code` | code-only view with syntax highlighting |\n\n## Lifecycle\n\n1. Author the artifact in the response using the `artifact:<type>:<title>` fence.\n2. The parser hoists it out of the prose flow and renders an artifact card inline.\n3. User clicks the card → panel opens with the Preview tab active.\n4. User can switch to the Code tab, copy the source, or download it.\n5. User can expand to fullscreen or close back to the message stream.\n\n## Constraints\n\n- One artifact per response right now. Multi-artifact responses ship later.\n- The HTML preview is sandboxed; no `allow-scripts` until we wire CSP nonces.\n- Markdown artifacts render with the same `.apex-prose` styles as message bodies.\n```\n\nFeel free to remove the closing constraints section if you don\'t want to expose the in-flight limitations yet.',
+      },
+    ],
+  },
+  {
+    id: 'c-015',
+    title: 'Refactor button to use Angular signal inputs',
+    bucket: 'Yesterday',
+    starred: false,
+    modelId: 'apex-opus',
+    messages: [
+      {
+        id: 'm-015-1',
+        role: 'user',
+        content: 'Refactor this Angular Button component to use signal inputs and output instead of decorators.',
+      },
+      {
+        id: 'm-015-2',
+        role: 'assistant',
+        content:
+          'Sure. Here\'s the refactored component using `input()` and `output()` (Angular v17.3+) plus signal-driven CSS classes. The public API stays identical, callers don\'t need to change.\n\n```artifact:typescript:Button component (signal-based)\nimport { ChangeDetectionStrategy, Component, computed, input, output } from \'@angular/core\';\n\ntype Variant = \'primary\' | \'secondary\' | \'ghost\' | \'destructive\';\ntype Size = \'sm\' | \'md\' | \'lg\';\n\n@Component({\n  selector: \'app-button\',\n  template: `\n    <button\n      [type]="type()"\n      [disabled]="disabled()"\n      [class]="classes()"\n      (click)="press.emit($event)"\n    >\n      <ng-content />\n    </button>\n  `,\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class Button {\n  readonly variant = input<Variant>(\'primary\');\n  readonly size = input<Size>(\'md\');\n  readonly type = input<\'button\' | \'submit\'>(\'button\');\n  readonly disabled = input<boolean>(false);\n\n  readonly press = output<MouseEvent>();\n\n  protected readonly classes = computed(() => {\n    const base = \'inline-flex items-center justify-center gap-2 font-medium transition-colors\';\n    const v: Record<Variant, string> = {\n      primary:     \'bg-primary text-primary-foreground hover:opacity-90\',\n      secondary:   \'bg-secondary text-secondary-foreground hover:bg-secondary/80\',\n      ghost:       \'hover:bg-accent text-foreground\',\n      destructive: \'bg-destructive text-destructive-foreground hover:opacity-90\',\n    };\n    const s: Record<Size, string> = {\n      sm: \'h-8 px-3 text-[12px] rounded-md\',\n      md: \'h-9 px-4 text-[13px] rounded-md\',\n      lg: \'h-10 px-5 text-[14px] rounded-lg\',\n    };\n    return `${base} ${v[this.variant()]} ${s[this.size()]} disabled:opacity-50 disabled:pointer-events-none`;\n  });\n}\n```\n\nA few things worth noting:\n\n- **No `@Input()` / `@Output()` decorators.** Signal-based APIs (`input()`, `output()`) replace them. Templates read them via the call syntax: `variant()`, not `variant`.\n- **No `@HostBinding`.** The class string is a `computed()` signal bound via `[class]`.\n- **OnPush stays the default.** Signal-based inputs auto-mark for check; there is no `markForCheck()` call to remember.\n- **`output()` returns an `OutputEmitterRef`,** not an `EventEmitter`. Most ergonomics match, but if you have subscribers that depended on `EventEmitter` methods like `complete()`, you will need to adapt.',
+      },
+    ],
+  },
+  {
     id: 'c-012',
     title: 'Old Q about RxJS vs signals',
     bucket: 'Older',

@@ -18,74 +18,106 @@
     </div>
   </header>
 
-  <section class="min-h-0 flex-1 overflow-y-auto">
-    <div class="mx-auto max-w-3xl px-6 py-8">
-      @for (m of c.messages; track m.id) {
-        @if (m.role === 'user') {
-          <div class="mb-6 flex justify-end">
-            <div class="bg-secondary text-foreground border-border max-w-[80%] rounded-2xl rounded-br-md border px-4 py-3 text-[14px] leading-relaxed">
-              {{ m.content }}
-            </div>
-          </div>
-        } @else {
-          <div class="mb-8">
-            <div class="apex-prose font-serif text-foreground space-y-4 text-[15px] leading-[1.7]">
-              @for (b of blocks(visibleContent(m)); track $index) {
-                @if (b.kind === 'text') {
-                  <markdown [data]="b.value"></markdown>
-                } @else {
-                  <div class="border-border overflow-hidden rounded-xl border bg-[#1f1c1a]">
-                    <div class="border-white/5 flex items-center justify-between border-b px-3 py-1.5">
-                      <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-400">{{ b.lang }}</span>
-                      <button
-                        type="button"
-                        (click)="copy(b.value)"
-                        class="hover:bg-white/5 inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-mono text-[10px] text-zinc-300 transition-colors"
-                      >
+  <div class="flex min-h-0 flex-1">
+    @let openA = openArtifact();
+    @if (!openA || !artifactFullscreen()) {
+      <div
+        class="flex min-h-0 min-w-0 flex-col transition-all"
+        [class.flex-1]="!openA"
+        [class.basis-3/5]="!!openA"
+      >
+        <section class="min-h-0 flex-1 overflow-y-auto">
+          <div class="mx-auto max-w-3xl px-6 py-8">
+            @for (m of c.messages; track m.id) {
+              @if (m.role === 'user') {
+                <div class="mb-6 flex justify-end">
+                  <div class="bg-secondary text-foreground border-border max-w-[80%] rounded-2xl rounded-br-md border px-4 py-3 text-[14px] leading-relaxed">
+                    {{ m.content }}
+                  </div>
+                </div>
+              } @else {
+                <div class="mb-8">
+                  <div class="apex-prose font-serif text-foreground space-y-4 text-[15px] leading-[1.7]">
+                    @for (b of blocks(visibleContent(m), m.id); track $index) {
+                      @switch (b.kind) {
+                        @case ('text') {
+                          <markdown [data]="b.value"></markdown>
+                        }
+                        @case ('code') {
+                          <div class="border-border overflow-hidden rounded-xl border bg-[#1f1c1a]">
+                            <div class="border-white/5 flex items-center justify-between border-b px-3 py-1.5">
+                              <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-400">{{ b.lang }}</span>
+                              <button
+                                type="button"
+                                (click)="copy(b.value)"
+                                class="hover:bg-white/5 inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-mono text-[10px] text-zinc-300 transition-colors"
+                              >
+                                <ng-icon hlm name="lucideCopy" size="xs" />
+                                Copy
+                              </button>
+                            </div>
+                            <pre class="overflow-x-auto px-4 py-3 font-mono text-[12.5px] leading-[1.55] text-zinc-100"><code>{{ b.value }}</code></pre>
+                          </div>
+                        }
+                        @case ('artifact') {
+                          <app-artifact-card [artifact]="b.value" (open)="showArtifact($event)" />
+                        }
+                      }
+                    }
+                    @if (isLastAssistant(m) && isStreaming()) {
+                      <span class="bg-primary inline-block h-[14px] w-[3px] -translate-y-px translate-x-1 animate-pulse rounded-sm align-middle"></span>
+                    }
+                  </div>
+
+                  @if (!isLastAssistant(m) || !isStreaming()) {
+                    <div class="text-muted-foreground mt-3 flex items-center gap-1">
+                      <button hlmBtn variant="ghost" size="sm" class="h-7 px-2 gap-1.5 text-[11px]" type="button" (click)="copy(m.content)">
                         <ng-icon hlm name="lucideCopy" size="xs" />
                         Copy
                       </button>
+                      <button hlmBtn variant="ghost" size="sm" class="h-7 px-2 gap-1.5 text-[11px]" type="button">
+                        <ng-icon hlm name="lucideRefreshCw" size="xs" />
+                        Retry
+                      </button>
+                      <button hlmBtn variant="ghost" size="sm" class="h-7 w-7 p-0" type="button" aria-label="Good response">
+                        <ng-icon hlm name="lucideThumbsUp" size="xs" />
+                      </button>
+                      <button hlmBtn variant="ghost" size="sm" class="h-7 w-7 p-0" type="button" aria-label="Bad response">
+                        <ng-icon hlm name="lucideThumbsDown" size="xs" />
+                      </button>
                     </div>
-                    <pre class="overflow-x-auto px-4 py-3 font-mono text-[12.5px] leading-[1.55] text-zinc-100"><code>{{ b.value }}</code></pre>
-                  </div>
-                }
+                  }
+                </div>
               }
-              @if (isLastAssistant(m) && isStreaming()) {
-                <span class="bg-primary inline-block h-[14px] w-[3px] -translate-y-px translate-x-1 animate-pulse rounded-sm align-middle"></span>
-              }
-            </div>
-
-            @if (!isLastAssistant(m) || !isStreaming()) {
-              <div class="text-muted-foreground mt-3 flex items-center gap-1">
-                <button hlmBtn variant="ghost" size="sm" class="h-7 px-2 gap-1.5 text-[11px]" type="button" (click)="copy(m.content)">
-                  <ng-icon hlm name="lucideCopy" size="xs" />
-                  Copy
-                </button>
-                <button hlmBtn variant="ghost" size="sm" class="h-7 px-2 gap-1.5 text-[11px]" type="button">
-                  <ng-icon hlm name="lucideRefreshCw" size="xs" />
-                  Retry
-                </button>
-                <button hlmBtn variant="ghost" size="sm" class="h-7 w-7 p-0" type="button" aria-label="Good response">
-                  <ng-icon hlm name="lucideThumbsUp" size="xs" />
-                </button>
-                <button hlmBtn variant="ghost" size="sm" class="h-7 w-7 p-0" type="button" aria-label="Bad response">
-                  <ng-icon hlm name="lucideThumbsDown" size="xs" />
-                </button>
-              </div>
             }
           </div>
-        }
-      }
-    </div>
-  </section>
+        </section>
 
-  <div class="bg-background border-border">
-    <div class="mx-auto max-w-3xl px-6 py-4">
-      <app-composer
-        [placeholder]="'Reply to ' + model().label + '...'"
-        (send)="handleSend($event)"
-      />
-    </div>
+        <div class="bg-background border-border border-t">
+          <div class="mx-auto max-w-3xl px-6 py-4">
+            <app-composer
+              [placeholder]="'Reply to ' + model().label + '...'"
+              (send)="handleSend($event)"
+            />
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (openA) {
+      <div
+        class="border-border bg-card flex min-h-0 min-w-0 flex-col border-l"
+        [class.basis-2/5]="!artifactFullscreen()"
+        [class.flex-1]="artifactFullscreen()"
+      >
+        <app-artifact-panel
+          [artifact]="openA"
+          [fullscreen]="artifactFullscreen()"
+          (close)="closeArtifact()"
+          (toggleFullscreen)="toggleArtifactFullscreen()"
+        />
+      </div>
+    }
   </div>
 } @else {
   <div class="flex h-full items-center justify-center">

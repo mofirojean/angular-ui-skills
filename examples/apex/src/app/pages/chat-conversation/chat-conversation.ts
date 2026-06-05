@@ -5,18 +5,19 @@ import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmIcon } from '@spartan-ng/helm/icon';
 
 import { Composer } from '../../shared/composer/composer';
+import { Artifact, ArtifactCard } from '../../shared/artifact-card/artifact-card';
+import { ArtifactPanel } from '../../shared/artifact-panel/artifact-panel';
 import { CONVERSATIONS, Conversation, Message } from '../../data/conversations';
 import { MODELS } from '../../data/mock-conversations';
 
-interface Block {
-  readonly kind: 'text' | 'code';
-  readonly value: string;
-  readonly lang?: string;
-}
+type Block =
+  | { kind: 'text'; value: string }
+  | { kind: 'code'; value: string; lang: string }
+  | { kind: 'artifact'; value: Artifact };
 
 @Component({
   selector: 'app-chat-conversation',
-  imports: [NgIcon, MarkdownComponent, HlmButton, HlmIcon, Composer],
+  imports: [NgIcon, MarkdownComponent, HlmButton, HlmIcon, Composer, ArtifactCard, ArtifactPanel],
   templateUrl: './chat-conversation.html',
   host: { class: 'flex min-h-0 flex-1 flex-col' },
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -33,7 +34,6 @@ export class ChatConversation implements OnDestroy {
     return MODELS.find((m) => m.id === c?.modelId) ?? MODELS[1];
   });
 
-  /** ID of the last assistant message in this conversation, or undefined if none. */
   protected readonly streamingMessageId = computed<string | undefined>(() => {
     const c = this.conversation();
     if (!c) return undefined;
@@ -43,18 +43,22 @@ export class ChatConversation implements OnDestroy {
     return undefined;
   });
 
-  /** Currently revealed prefix of the streaming message's content. */
   protected readonly streamedContent = signal('');
   protected readonly isStreaming = signal(false);
   private intervalId: number | undefined;
 
+  protected readonly openArtifact = signal<Artifact | undefined>(undefined);
+  protected readonly artifactFullscreen = signal<boolean>(false);
+
   constructor() {
-    // Re-trigger the streaming reveal whenever the conversation changes.
     effect(() => {
       const c = this.conversation();
       const streamingId = this.streamingMessageId();
       this.stopStreaming();
       this.streamedContent.set('');
+      // Close any artifact when conversation changes.
+      this.openArtifact.set(undefined);
+      this.artifactFullscreen.set(false);
       if (!c || !streamingId) return;
       const msg = c.messages.find((m) => m.id === streamingId);
       if (!msg) return;
@@ -67,7 +71,6 @@ export class ChatConversation implements OnDestroy {
   }
 
   private startStreaming(content: string): void {
-    // Split into word + whitespace chunks so the eye registers progress.
     const tokens = content.match(/\S+\s*|\s+/g) ?? [content];
     let i = 0;
     this.isStreaming.set(true);
@@ -90,10 +93,6 @@ export class ChatConversation implements OnDestroy {
     this.isStreaming.set(false);
   }
 
-  /**
-   * Returns the content to render for a given message, honouring the streaming animation
-   * for the most recent assistant message.
-   */
   protected visibleContent(m: Message): string {
     if (m.id === this.streamingMessageId() && this.isStreaming()) {
       return this.streamedContent();
@@ -102,20 +101,38 @@ export class ChatConversation implements OnDestroy {
   }
 
   /**
-   * Split content into paragraph blocks and code-fence blocks. Code blocks render in a
-   * custom dark panel with a copy button; prose blocks render via ngx-markdown.
+   * Parse content into text / code / artifact blocks.
+   * Artifact fence syntax: ```artifact:<type>:<title>\n<content>\n```
+   * Regular code fence: ```<lang>\n<content>\n```
    */
-  protected blocks(content: string): readonly Block[] {
+  protected blocks(content: string, messageId: string): readonly Block[] {
     const out: Block[] = [];
-    const fence = /```(\w+)?\n([\s\S]*?)(?:```|$)/g;
+    const fence = /```([^\n]*)\n([\s\S]*?)(?:```|$)/g;
     let lastIndex = 0;
     let match: RegExpExecArray | null;
+    let artifactIdx = 0;
     while ((match = fence.exec(content)) !== null) {
       if (match.index > lastIndex) {
         const text = content.slice(lastIndex, match.index).trim();
         if (text) out.push({ kind: 'text', value: text });
       }
-      out.push({ kind: 'code', value: match[2], lang: match[1] || 'plain' });
+      const header = (match[1] ?? '').trim();
+      const body = match[2];
+      if (header.startsWith('artifact:')) {
+        const [, type = 'code', title = 'Artifact'] = header.split(':');
+        out.push({
+          kind: 'artifact',
+          value: {
+            id: `${messageId}-a${artifactIdx}`,
+            type: (type as Artifact['type']) ?? 'code',
+            title,
+            content: body.trimEnd(),
+          },
+        });
+        artifactIdx++;
+      } else {
+        out.push({ kind: 'code', value: body, lang: header || 'plain' });
+      }
       lastIndex = fence.lastIndex;
     }
     if (lastIndex < content.length) {
@@ -133,7 +150,20 @@ export class ChatConversation implements OnDestroy {
     void navigator.clipboard?.writeText(content);
   }
 
+  protected showArtifact(a: Artifact): void {
+    this.openArtifact.set(a);
+  }
+
+  protected closeArtifact(): void {
+    this.openArtifact.set(undefined);
+    this.artifactFullscreen.set(false);
+  }
+
+  protected toggleArtifactFullscreen(): void {
+    this.artifactFullscreen.update((v) => !v);
+  }
+
   protected handleSend(_payload: { text: string; modelId: string }): void {
-    // Mock-only: no new-message wiring this slice. The composer clears its draft.
+    // Mock-only.
   }
 }
