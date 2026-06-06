@@ -54,15 +54,27 @@
     <router-outlet />
   </main>
 
-  <!-- Floating theme toggle FAB, desktop only (mobile uses settings page) -->
-  <button
-    type="button"
-    (click)="toggleTheme()"
-    [attr.aria-label]="modeLabel()"
-    class="border-border bg-card hover:bg-accent text-muted-foreground hover:text-foreground fixed bottom-4 right-4 z-30 hidden h-9 w-9 items-center justify-center rounded-full border shadow-sm transition-colors md:flex"
-  >
-    <ng-icon hlm [name]="modeIcon()" size="sm" />
-  </button>
+  <!-- Floating GitHub + theme toggle FABs, desktop only (mobile uses settings page) -->
+  <div class="fixed bottom-4 right-4 z-30 hidden flex-col gap-2 md:flex">
+    <a
+      href="https://github.com/mofirojean/angular-ui-skills"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="View source on GitHub"
+      title="View source on GitHub"
+      class="border-border bg-card hover:bg-accent text-muted-foreground hover:text-foreground flex h-9 w-9 items-center justify-center rounded-full border shadow-sm transition-colors"
+    >
+      <ng-icon hlm name="lucideGithub" size="sm" />
+    </a>
+    <button
+      type="button"
+      (click)="toggleTheme()"
+      [attr.aria-label]="modeLabel()"
+      class="border-border bg-card hover:bg-accent text-muted-foreground hover:text-foreground flex h-9 w-9 items-center justify-center rounded-full border shadow-sm transition-colors"
+    >
+      <ng-icon hlm [name]="modeIcon()" size="sm" />
+    </button>
+  </div>
 
   <!-- ⌘K palette, always mounted, opens on Cmd+K or via openPalette() -->
   <app-command-palette />
