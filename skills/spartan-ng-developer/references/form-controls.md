@@ -96,6 +96,7 @@ The 19 Helm components for data entry and user input. All follow [helm-conventio
   ```
 - **Multi-select**: use `<hlm-combobox-multiple>` plus `<hlm-combobox-chips>` / `<hlm-combobox-chip>` to render selected values.
 - **Key inputs**: `[(value)]`, `[(search)]`, `itemToString`, `isItemEqualToValue`, `filter`, `filterOptions`.
+- **`forceInvalid`**: available on `<hlm-combobox-input>` and `<hlm-combobox-chips>` (not on `<hlm-combobox>` itself). Use it to drive the invalid visual when wiring to a `FormControl`.
 - **Gotchas**:
   - **No `[items]` input** — items are projected as content. `itemToString` must be a stable reference (declare on the class, don't inline in the template).
   - **`hlm-combobox-input` is a component, NOT a directive on a plain `<input>`.** Use `<hlm-combobox-input placeholder="..." />`, not `<input hlm-combobox-input ...>`. The component wraps a styled `<hlm-input-group>` + `<input hlmInputGroupInput>` + clear button + chevron. The bare-directive form renders an unstyled native input.
@@ -275,6 +276,7 @@ The 19 Helm components for data entry and user input. All follow [helm-conventio
   ```
 - **Multi-select**: use `<hlm-select-multiple>` (separate selector) - value is `T[] | null`. Custom value rendering via `<hlm-select-values>` plus `<ng-template hlmSelectValues>`.
 - **Brain**: composes `BrnSelect` + `BrnPopover` + `BrnSelect*` sub-directives via `hostDirectives`.
+- **`forceInvalid`**: `<hlm-select-trigger [forceInvalid]="emailCtrl.invalid && emailCtrl.touched">` forces the invalid visual state regardless of the underlying validity. The input is on the **trigger**, not on `<hlm-select>`.
 - **Gotcha**: `itemToString` must be a stable reference (class field, never inline).
 
 ### Slider

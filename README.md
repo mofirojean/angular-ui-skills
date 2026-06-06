@@ -6,7 +6,7 @@ Agent skills that teach AI coding assistants (Claude Code, Cursor, Codex, GitHub
 
 | Skill | Library | Status | Tracks |
 |---|---|---|---|
-| [`spartan-ng-developer`](./skills/spartan-ng-developer) | [Spartan/ng](https://spartan.ng) | ✅ Ready | `@spartan-ng/brain` v0.0.1-alpha.696 |
+| [`spartan-ng-developer`](./skills/spartan-ng-developer) | [Spartan/ng](https://spartan.ng) | ✅ Ready | `@spartan-ng/brain` v0.0.1-alpha.704 |
 | [`primeng-developer`](./skills/primeng-developer) | [PrimeNG](https://primeng.org) | ✅ Ready | PrimeNG v21 |
 | `ng-zorro-developer` | [NG-ZORRO](https://ng.ant.design) | ⏳ Planned | — |
 | `angular-material-developer` | [Angular Material](https://material.angular.dev) | ⏳ Planned | — |
@@ -21,7 +21,7 @@ These skills target current versions of each library. They will not gracefully c
 
 | Skill | Tracks | Works for | Will not work for |
 |---|---|---|---|
-| `spartan-ng-developer` | `@spartan-ng/brain` v0.0.1-alpha.696 | The pinned alpha exactly | Other alphas with API drift; `@spartan-ng/ui-*` (deprecated, replaced by `@spartan-ng/helm`) |
+| `spartan-ng-developer` | `@spartan-ng/brain` v0.0.1-alpha.704 | The pinned alpha exactly | Other alphas with API drift; `@spartan-ng/ui-*` (deprecated, replaced by `@spartan-ng/helm`) |
 | `primeng-developer` | PrimeNG v21 with `@primeuix/themes` v2.x | PrimeNG v18 → v21 (the `references/migration.md` covers v18→v21 renames, but v21 is the closest match) | PrimeNG v17 and below (different theming model based on `prime.css`) |
 
 Both skills assume **Angular v18 or newer** with standalone components, control flow syntax (`@if` / `@for`), and signal-based APIs (`input()` / `output()`). They will not generate `NgModule`-based or decorator-based code, even if your project still uses those patterns.
