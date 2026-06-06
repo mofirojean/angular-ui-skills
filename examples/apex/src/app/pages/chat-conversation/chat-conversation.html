@@ -6,7 +6,7 @@
     <div class="flex items-center gap-1">
       <button hlmBtn variant="ghost" size="sm" class="gap-1.5 text-[12px]" type="button">
         <ng-icon hlm name="lucideSparkles" size="xs" class="text-primary" />
-        {{ model().label }}
+        <span class="hidden sm:inline">{{ model().label }}</span>
         <ng-icon hlm name="lucideChevronDown" size="xs" />
       </button>
       <button hlmBtn variant="ghost" size="sm" class="h-8 w-8 p-0" type="button" aria-label="Share">
@@ -22,12 +22,15 @@
     @let openA = openArtifact();
     @if (!openA || !artifactFullscreen()) {
       <div
-        class="flex min-h-0 min-w-0 flex-col transition-all"
+        class="min-h-0 min-w-0 flex-col transition-all"
+        [class.flex]="!openA"
         [class.flex-1]="!openA"
-        [class.basis-3/5]="!!openA"
+        [class.hidden]="!!openA"
+        [class.md:flex]="!!openA"
+        [class.md:basis-3/5]="!!openA"
       >
         <section class="min-h-0 flex-1 overflow-y-auto">
-          <div class="mx-auto max-w-3xl px-6 py-8">
+          <div class="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
             @for (m of c.messages; track m.id) {
               @if (m.role === 'user') {
                 <div class="mb-6 flex justify-end">
@@ -81,7 +84,7 @@
         </section>
 
         <div class="bg-background border-border border-t">
-          <div class="mx-auto max-w-3xl px-6 py-4">
+          <div class="mx-auto max-w-3xl px-4 py-3 sm:px-6 sm:py-4">
             <app-composer
               [placeholder]="'Reply to ' + model().label + '...'"
               (send)="handleSend($event)"
@@ -93,9 +96,10 @@
 
     @if (openA) {
       <div
-        class="border-border bg-card flex min-h-0 min-w-0 flex-col border-l"
-        [class.basis-2/5]="!artifactFullscreen()"
-        [class.flex-1]="artifactFullscreen()"
+        class="border-border bg-card flex min-h-0 min-w-0 flex-1 flex-col md:border-l"
+        [class.md:flex-1]="artifactFullscreen()"
+        [class.md:basis-2/5]="!artifactFullscreen()"
+        [class.md:flex-none]="!artifactFullscreen()"
       >
         <app-artifact-panel
           [artifact]="openA"

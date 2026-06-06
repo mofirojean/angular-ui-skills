@@ -10,7 +10,7 @@
   </div>
 </div>
 
-<div class="bg-muted/30 flex min-h-0 flex-1">
+<div class="bg-muted/30 flex min-h-0 flex-1 flex-col md:flex-row">
   <aside class="border-border bg-card hidden w-56 shrink-0 border-r md:block">
     <nav class="flex flex-col gap-0.5 p-2">
       @for (item of nav; track item.id) {
@@ -28,6 +28,22 @@
       }
     </nav>
   </aside>
+
+  <div class="border-border bg-card flex shrink-0 items-center gap-1 overflow-x-auto border-b px-3 py-2 md:hidden">
+    @for (item of nav; track item.id) {
+      <button
+        type="button"
+        (click)="setSection(item.id)"
+        [class.bg-accent]="section() === item.id"
+        [class.text-foreground]="section() === item.id"
+        [class.text-muted-foreground]="section() !== item.id"
+        class="hover:bg-accent hover:text-foreground inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1.5 text-[12px] font-medium transition-colors"
+      >
+        <ng-icon hlm [name]="item.icon" size="xs" />
+        {{ item.label }}
+      </button>
+    }
+  </div>
 
   <div class="min-w-0 flex-1 overflow-y-auto">
     <div class="mx-auto max-w-2xl px-6 py-8">
