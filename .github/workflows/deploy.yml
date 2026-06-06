@@ -13,6 +13,7 @@ on:
           - docs
           - mission-control
           - quanta-desk
+          - apex
         default: all
 
 concurrency:
@@ -46,6 +47,9 @@ jobs:
             quanta-desk:
               - 'examples/quanta-desk/**'
               - '.github/workflows/deploy.yml'
+            apex:
+              - 'examples/apex/**'
+              - '.github/workflows/deploy.yml'
 
       - name: Build deploy matrix
         id: plan
@@ -53,6 +57,7 @@ jobs:
           DOCS: ${{ steps.filter.outputs.docs }}
           MC: ${{ steps.filter.outputs.mission-control }}
           QD: ${{ steps.filter.outputs.quanta-desk }}
+          APEX: ${{ steps.filter.outputs.apex }}
           EVENT: ${{ github.event_name }}
           TARGET: ${{ inputs.target }}
         run: |
@@ -76,6 +81,9 @@ jobs:
           fi
           if should_run quanta-desk "$QD"; then
             items+=('{"app":"quanta-desk","path":"examples/quanta-desk","project_id_name":"VERCEL_PROJECT_ID_QUANTA_DESK"}')
+          fi
+          if should_run apex "$APEX"; then
+            items+=('{"app":"apex","path":"examples/apex","project_id_name":"VERCEL_PROJECT_ID_APEX"}')
           fi
 
           if [[ ${#items[@]} -eq 0 ]]; then
@@ -120,11 +128,13 @@ jobs:
           VERCEL_PROJECT_ID_DOCS: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
           VERCEL_PROJECT_ID_MISSION_CONTROL: ${{ secrets.VERCEL_PROJECT_ID_MISSION_CONTROL }}
           VERCEL_PROJECT_ID_QUANTA_DESK: ${{ secrets.VERCEL_PROJECT_ID_QUANTA_DESK }}
+          VERCEL_PROJECT_ID_APEX: ${{ secrets.VERCEL_PROJECT_ID_APEX }}
         run: |
           case "${{ matrix.app }}" in
             docs)             echo "VERCEL_PROJECT_ID=$VERCEL_PROJECT_ID_DOCS" >> "$GITHUB_ENV" ;;
             mission-control)  echo "VERCEL_PROJECT_ID=$VERCEL_PROJECT_ID_MISSION_CONTROL" >> "$GITHUB_ENV" ;;
             quanta-desk)      echo "VERCEL_PROJECT_ID=$VERCEL_PROJECT_ID_QUANTA_DESK" >> "$GITHUB_ENV" ;;
+            apex)             echo "VERCEL_PROJECT_ID=$VERCEL_PROJECT_ID_APEX" >> "$GITHUB_ENV" ;;
           esac
 
       - name: Pull Vercel environment

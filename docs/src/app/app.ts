@@ -127,6 +127,20 @@ export class App {
       image: 'projects/quanta-desk-dark-mode.png',
       demo: SITE_CONFIG.demos.quantaDesk,
     },
+    {
+      slug: 'apex',
+      name: 'Apex',
+      tagline: 'Chat assistant interface',
+      description:
+        'A claude.ai-inspired chat UI with sidebar history, streaming reveal, markdown rendering, and a side-by-side artifacts panel. Validates spartan-ng-developer on a non-dashboard layout.',
+      stack: ['Angular v21', 'Spartan/ng', 'Tailwind v4', 'ngx-markdown', 'highlight.js'],
+      skill: 'spartan-ng-developer',
+      path: 'examples/apex',
+      accent: 'from-rose-400/25 via-orange-300/15 to-transparent',
+      badges: ['Warm cream', 'Cmd+K', 'Artifacts panel'],
+      image: 'projects/apex-dark-mode.png',
+      demo: SITE_CONFIG.demos.apex,
+    },
   ];
 
   protected readonly heroSnippet = [
