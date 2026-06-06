@@ -263,21 +263,11 @@
                 After each response, surface 3 likely next questions you might ask.
               </p>
             </div>
-            <button
-              type="button"
-              (click)="autoFollowUp.set(!autoFollowUp())"
-              [class.bg-primary]="autoFollowUp()"
-              [class.bg-muted]="!autoFollowUp()"
-              class="relative h-6 w-11 shrink-0 rounded-full transition-colors"
-              role="switch"
-              [attr.aria-checked]="autoFollowUp()"
-            >
-              <span
-                [class.translate-x-5]="autoFollowUp()"
-                [class.translate-x-0.5]="!autoFollowUp()"
-                class="bg-background absolute top-0.5 inline-block h-5 w-5 rounded-full shadow transition-transform"
-              ></span>
-            </button>
+            <hlm-switch
+              [checked]="autoFollowUp()"
+              (checkedChange)="autoFollowUp.set($event)"
+              aria-label="Suggest follow-ups"
+            />
           </div>
         }
 
@@ -294,21 +284,11 @@
                 Save your conversations so they show up in the sidebar. Disabling clears existing history.
               </p>
             </div>
-            <button
-              type="button"
-              (click)="historyEnabled.set(!historyEnabled())"
-              [class.bg-primary]="historyEnabled()"
-              [class.bg-muted]="!historyEnabled()"
-              class="relative h-6 w-11 shrink-0 rounded-full transition-colors"
-              role="switch"
-              [attr.aria-checked]="historyEnabled()"
-            >
-              <span
-                [class.translate-x-5]="historyEnabled()"
-                [class.translate-x-0.5]="!historyEnabled()"
-                class="bg-background absolute top-0.5 inline-block h-5 w-5 rounded-full shadow transition-transform"
-              ></span>
-            </button>
+            <hlm-switch
+              [checked]="historyEnabled()"
+              (checkedChange)="historyEnabled.set($event)"
+              aria-label="Chat history"
+            />
           </div>
 
           <div class="border-border bg-card mt-3 flex items-center justify-between gap-3 rounded-2xl border p-5">
@@ -318,21 +298,11 @@
                 Apex will not use your conversations to train future models. Default is on.
               </p>
             </div>
-            <button
-              type="button"
-              (click)="trainingOptOut.set(!trainingOptOut())"
-              [class.bg-primary]="trainingOptOut()"
-              [class.bg-muted]="!trainingOptOut()"
-              class="relative h-6 w-11 shrink-0 rounded-full transition-colors"
-              role="switch"
-              [attr.aria-checked]="trainingOptOut()"
-            >
-              <span
-                [class.translate-x-5]="trainingOptOut()"
-                [class.translate-x-0.5]="!trainingOptOut()"
-                class="bg-background absolute top-0.5 inline-block h-5 w-5 rounded-full shadow transition-transform"
-              ></span>
-            </button>
+            <hlm-switch
+              [checked]="trainingOptOut()"
+              (checkedChange)="trainingOptOut.set($event)"
+              aria-label="Opt out of model improvement"
+            />
           </div>
 
           <div class="border-border bg-card mt-3 flex items-center justify-between gap-3 rounded-2xl border p-5">
@@ -373,22 +343,11 @@
                   </div>
                   @for (ch of notificationChannels; track ch.id) {
                     <div class="flex justify-center">
-                      <button
-                        type="button"
-                        (click)="toggleNotify(cat.id, ch.id)"
-                        [class.bg-primary]="isNotify(cat.id, ch.id)"
-                        [class.bg-muted]="!isNotify(cat.id, ch.id)"
-                        class="relative h-5 w-9 shrink-0 rounded-full transition-colors"
-                        role="switch"
-                        [attr.aria-checked]="isNotify(cat.id, ch.id)"
+                      <hlm-switch
+                        [checked]="isNotify(cat.id, ch.id)"
+                        (checkedChange)="toggleNotify(cat.id, ch.id)"
                         [attr.aria-label]="cat.label + ' on ' + ch.label"
-                      >
-                        <span
-                          [class.translate-x-4]="isNotify(cat.id, ch.id)"
-                          [class.translate-x-0.5]="!isNotify(cat.id, ch.id)"
-                          class="bg-background absolute top-0.5 inline-block h-4 w-4 rounded-full shadow transition-transform"
-                        ></span>
-                      </button>
+                      />
                     </div>
                   }
                 </li>

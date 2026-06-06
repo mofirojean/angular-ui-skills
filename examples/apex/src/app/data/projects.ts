@@ -41,7 +41,7 @@ export const PROJECTS: readonly Project[] = [
   },
   {
     id: 'p-002',
-    name: 'Personal — writing',
+    name: 'Personal writing',
     description: 'Long-form drafts, essay outlines, and notes that go through several rounds of editing.',
     icon: 'lucideBookOpen',
     accent: 'from-amber-300 to-rose-300',

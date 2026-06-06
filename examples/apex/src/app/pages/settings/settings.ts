@@ -4,6 +4,7 @@ import { NgIcon } from '@ng-icons/core';
 import { HlmAvatar, HlmAvatarFallback } from '@spartan-ng/helm/avatar';
 import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmIcon } from '@spartan-ng/helm/icon';
+import { HlmSwitch } from '@spartan-ng/helm/switch';
 
 import { MODELS, MOCK_USER } from '../../data/mock-conversations';
 import { API_KEYS, NOTIFICATION_CATEGORIES, NOTIFICATION_CHANNELS } from '../../data/settings-data';
@@ -22,7 +23,7 @@ const DEFAULT_NOTIFY: Record<string, ReadonlyArray<string>> = {
 
 @Component({
   selector: 'app-settings',
-  imports: [FormsModule, NgIcon, HlmAvatar, HlmAvatarFallback, HlmButton, HlmIcon],
+  imports: [FormsModule, NgIcon, HlmAvatar, HlmAvatarFallback, HlmButton, HlmIcon, HlmSwitch],
   templateUrl: './settings.html',
   host: { class: 'flex min-h-0 flex-1 flex-col' },
   changeDetection: ChangeDetectionStrategy.OnPush,
