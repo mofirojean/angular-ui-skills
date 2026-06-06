@@ -15,7 +15,7 @@
       (send)="handleSend($event)"
     />
 
-    <div class="mt-8 grid gap-2 sm:grid-cols-2">
+    <div class="mt-8 hidden gap-2 sm:grid sm:grid-cols-2">
       @for (s of suggestions; track s.title) {
         <button
           type="button"
