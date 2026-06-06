@@ -1,4 +1,39 @@
 <div class="border-border bg-card relative w-full rounded-2xl border shadow-sm">
+  <input
+    #fileInput
+    type="file"
+    multiple
+    (change)="onFilesSelected($event)"
+    class="hidden"
+    aria-hidden="true"
+  />
+
+  @if (attachments().length > 0) {
+    <div class="border-border flex flex-wrap items-center gap-1.5 border-b px-3 pb-2 pt-2.5">
+      @for (a of attachments(); track a.id) {
+        <span class="border-border bg-muted/40 hover:bg-muted/60 group inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-[11px] transition-colors">
+          <ng-icon hlm [name]="attachmentIcon(a.type)" size="xs" class="text-muted-foreground" />
+          <span class="text-foreground max-w-[180px] truncate font-medium">{{ a.name }}</span>
+          <span class="text-muted-foreground font-mono text-[10px] tabular-nums">{{ formatSize(a.size) }}</span>
+          <button
+            type="button"
+            (click)="removeAttachment(a.id)"
+            class="hover:bg-background text-muted-foreground hover:text-foreground -mr-0.5 flex h-4 w-4 items-center justify-center rounded transition-colors"
+            [attr.aria-label]="'Remove ' + a.name"
+          >
+            <ng-icon hlm name="lucideX" size="xs" />
+          </button>
+        </span>
+      }
+    </div>
+  }
+
+  @if (attachmentError(); as err) {
+    <p class="border-border bg-amber-500/5 text-amber-700 dark:text-amber-400 border-b px-4 py-1.5 text-[11px]">
+      {{ err }}
+    </p>
+  }
+
   <textarea
     #textarea
     [placeholder]="placeholder()"
@@ -29,7 +64,7 @@
     @if (modelOpen()) {
       <div
         role="listbox"
-        class="border-border bg-popover absolute bottom-12 left-3 z-99 w-56 overflow-hidden rounded-md border shadow-lg"
+        class="border-border bg-popover absolute bottom-12 left-3 z-50 w-56 overflow-hidden rounded-md border shadow-lg"
       >
         @for (m of models; track m.id) {
           <button
@@ -60,9 +95,11 @@
       variant="ghost"
       size="sm"
       type="button"
-      class="h-8 gap-1.5 px-2"
-      title="Attach file"
-      aria-label="Attach file"
+      class="h-8 gap-1.5 px-2 disabled:opacity-40"
+      [disabled]="attachLimitReached()"
+      (click)="openFilePicker()"
+      [title]="attachLimitReached() ? 'Attachment limit reached' : 'Attach file'"
+      [attr.aria-label]="attachLimitReached() ? 'Attachment limit reached' : 'Attach file'"
     >
       <ng-icon hlm name="lucidePaperclip" size="xs" />
     </button>

@@ -4,7 +4,7 @@ import { inject } from '@angular/core';
 import { NgIcon } from '@ng-icons/core';
 import { HlmIcon } from '@spartan-ng/helm/icon';
 
-import { Composer } from '../../shared/composer/composer';
+import { Composer, SendPayload } from '../../shared/composer/composer';
 import { MOCK_USER } from '../../data/mock-conversations';
 import { CONVERSATIONS } from '../../data/conversations';
 
@@ -68,7 +68,7 @@ export class ChatEmpty {
     void this.router.navigate(['/c', suggestion.seedConversationId]);
   }
 
-  protected handleSend(_payload: { text: string; modelId: string }): void {
+  protected handleSend(_payload: SendPayload): void {
     void this.router.navigate(['/c', CONVERSATIONS[0].id]);
   }
 }

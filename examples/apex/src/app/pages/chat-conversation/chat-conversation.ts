@@ -4,7 +4,7 @@ import { MarkdownComponent } from 'ngx-markdown';
 import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmIcon } from '@spartan-ng/helm/icon';
 
-import { Composer } from '../../shared/composer/composer';
+import { Composer, SendPayload } from '../../shared/composer/composer';
 import { Artifact, ArtifactCard } from '../../shared/artifact-card/artifact-card';
 import { ArtifactPanel } from '../../shared/artifact-panel/artifact-panel';
 import { CodeBlock } from '../../shared/code-block/code-block';
@@ -164,7 +164,7 @@ export class ChatConversation implements OnDestroy {
     this.artifactFullscreen.update((v) => !v);
   }
 
-  protected handleSend(_payload: { text: string; modelId: string }): void {
+  protected handleSend(_payload: SendPayload): void {
     // Mock-only.
   }
 }

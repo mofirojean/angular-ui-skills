@@ -2,7 +2,7 @@
 
 > **Status:** Plan. Not yet scaffolded. See "Next session: where to start" at the bottom.
 
-A reference Angular application that validates the `spartan-ng-developer` skill. Apex is a chat assistant interface inspired by claude.ai — sidebar with conversation history, message stream, side-by-side artifacts panel, account / project / settings pages — built entirely with Spartan/ng and a warm cream-and-coral theme.
+A reference Angular application that validates the `spartan-ng-developer` skill. Apex is a chat assistant interface inspired by claude.ai  sidebar with conversation history, message stream, side-by-side artifacts panel, account / project / settings pages  built entirely with Spartan/ng and a warm cream-and-coral theme.
 
 The point of this app is not the app itself, it's that **building it proves the skill is correct on a fundamentally different layout shape than the existing two examples**. Mission Control validates dashboards. Quanta Desk validates dense data tables. Apex validates conversational UI, long-form content, code-rendering, and split panes.
 
