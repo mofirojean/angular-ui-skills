@@ -138,7 +138,7 @@ export class App {
       path: 'examples/apex',
       accent: 'from-rose-400/25 via-orange-300/15 to-transparent',
       badges: ['Warm cream', 'Cmd+K', 'Artifacts panel'],
-      image: 'projects/apex-dark-mode.png',
+      image: 'projects/apex-chat-dark-mode.png',
       demo: SITE_CONFIG.demos.apex,
     },
   ];

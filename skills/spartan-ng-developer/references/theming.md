@@ -206,12 +206,16 @@ This works because CSS variables cascade. Useful for marketing pages or feature-
 
 ## 7. Tailwind v3 limitations
 
-If the project is locked to Tailwind v3, the following won't work cleanly:
+**Spartan's current position on v3 is "not guaranteed".** Upstream docs (and the maintainers) *"strongly recommend upgrading to Tailwind v4"* because *"some components may not work as expected"* on v3.
 
-- The `@theme inline` directive - v3 doesn't recognize it. Custom-variable colors must be added via `tailwind.config.js` `theme.extend.colors` instead.
-- Some Spartan components may have visual regressions because the preset assumes v4 layer ordering.
+If you're locked to v3 and can't migrate yet:
 
-The Spartan docs are explicit: "spartan/ui is optimized for Tailwind CSS v4. Some theming features may not work correctly with v3." For new projects, start on v4. For existing v3 projects, plan a migration if heavy theming is needed.
+- The `@theme inline` directive does nothing in v3. Custom-variable colors must be declared via `tailwind.config.js` `theme.extend.colors` instead.
+- Several Helm components may have visual regressions because Spartan's preset assumes v4 layer ordering.
+- New Helm components shipped after late 2025 may not be authored with v3 in mind, expect bare unstyled components for some recent additions.
+- Don't file Spartan upstream issues for v3-only bugs, they will be closed as "upgrade to v4".
+
+For any new project, start on v4. For existing v3 projects with significant Spartan usage, plan a migration before adding new Spartan components. The mechanical v3 → v4 migration is documented in Tailwind's own upgrade guide; for the Spartan-specific bits, re-run `init` after the upgrade to write the v4-style styles entry point.
 
 ## 8. Generating a theme via CLI
 

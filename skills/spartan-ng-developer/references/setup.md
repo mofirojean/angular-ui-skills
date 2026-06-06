@@ -19,9 +19,9 @@ The destination directory for generated Helm source is configured by `components
 
 Read `package.json` `dependencies` / `devDependencies` and inspect the `tailwindcss` major version:
 
-- **v4** → Spartan's recommended path. Uses CSS-side configuration (`@theme` directive, layer imports).
-- **v3** → Supported but explicitly marked "Not Recommended" by Spartan. Uses `tailwind.config.js`.
-- **Tailwind not installed yet** → install it first using Tailwind's official docs, then prefer v4.
+- **v4** → Spartan's only documented installation path. Uses CSS-side configuration (`@theme` directive, layer imports).
+- **v3** → **Compatibility is not guaranteed.** Spartan's docs explicitly say "some components may not work as expected" on v3 and "strongly recommend upgrading to Tailwind v4". The v3 config in Step 6 is preserved here from earlier Spartan releases for legacy projects only.
+- **Tailwind not installed yet** → install it first using Tailwind's official docs. **Always pick v4** for new Spartan projects.
 
 Match the rest of this guide to the detected version.
 
@@ -84,9 +84,9 @@ The schematic prompts for application (in multi-project workspaces), styles entr
 
 > ⚠ Re-running `ui-theme` replaces the existing theme block - back up any custom additions first.
 
-## Step 6 - Tailwind v3 setup (legacy - not documented on current installation docs)
+## Step 6 - Tailwind v3 setup (legacy, not officially supported)
 
-> ⚠ The official `/documentation/installation` page covers only Tailwind v4. The v3 config shown below is preserved from earlier Spartan releases; verify against your installed CLI version before relying on it.
+> ⚠ **Spartan's current docs explicitly recommend upgrading to v4.** From upstream: *"some components may not work as expected"* on v3, and the team *"strongly recommends"* the upgrade. Only follow this section if you're maintaining an existing v3 project that can't migrate yet. Verify everything against your installed CLI version before relying on it.
 
 For projects on Tailwind v3, write the config and styles manually.
 
