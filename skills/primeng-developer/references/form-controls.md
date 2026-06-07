@@ -177,6 +177,7 @@ Date picker overlay (was `Calendar` in v17).
 - Markup: `<p-datepicker [showTime]="true" selectionMode="range" formControlName="window" />`
 - Props: `selectionMode` (`'single' | 'multiple' | 'range'`), `[showTime]`, `[timeOnly]`, `dateFormat`, `minDate`, `maxDate`, `[showIcon]`, `[invalid]`
 - Form value: `Date`, `Date[]`, or `[Date, Date]` depending on `selectionMode`. Pick one mode per binding and don't switch at runtime.
+- **Mask input (v21.1.0+):** typed entry is supported via the underlying input's mask pattern. Pair with `dateFormat` so the displayed text and parsed value agree.
 
 ### ColorPicker
 - Import: `import { ColorPicker } from 'primeng/colorpicker';`

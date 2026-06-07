@@ -21,7 +21,7 @@
     "@primeuix/themes": "^2.0.3",
     "chart.js": "^4.5.1",
     "primeicons": "^7.0.0",
-    "primeng": "^21.1.8",
+    "primeng": "^21.1.9",
     "quill": "^2.0.3",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"

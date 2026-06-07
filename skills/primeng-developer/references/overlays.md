@@ -231,9 +231,10 @@ import { Tooltip } from 'primeng/tooltip';
 | `pTooltip` | string | The tooltip text. |
 | `tooltipPosition` | `'top' \| 'bottom' \| 'left' \| 'right'` | Default `'right'`. |
 | `showDelay` / `hideDelay` | number (ms) | Stagger to avoid flicker. |
-| `tooltipEvent` | `'hover' \| 'focus' \| 'both'` | Default `'hover'`. |
+| `tooltipEvent` | `'hover' \| 'focus' \| 'both'` | Default `'hover'`. v21.1.0+ also fires on touch events. |
 | `tooltipStyleClass` | string | Class on the tooltip element. |
 | `[escape]` | boolean | If `false`, content may contain HTML. Treat as `false` only when you fully control the input string. |
+| `[showOnEllipsis]` | boolean | **v21.1.0+.** When `true`, the tooltip only appears if the target's text is actually truncated. Useful for table cells. |
 
 ### Accessibility
 

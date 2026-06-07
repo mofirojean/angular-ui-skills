@@ -13,7 +13,7 @@ metadata:
 
 ## Compatibility
 
-- **Tracks:** PrimeNG v21 (current), with `@primeuix/themes` v2.x and `@primeuix/styles` v1.x.
+- **Tracks:** PrimeNG `21.1.9` (released 2026-06-04), with `@primeuix/themes` and `@primeuix/styles` both `2.x` (currently `2.0.3`).
 - **Works for:** PrimeNG v18 → v21 projects. The skill references include [`migration.md`](references/migration.md) covering the v18 component renames (Calendar→DatePicker, Dropdown→Select, etc.), so v18-v20 projects can use this skill but expect drift on theming and a few component APIs. v21 is the closest match.
 - **Angular:** v18 or newer required. PrimeNG components are standalone since v18. The skill assumes standalone components, control flow (`@if` / `@for`), and signal-based APIs.
 - **Tailwind:** v3 or v4 with `tailwindcss-primeui` plugin (optional, for unstyled mode).
