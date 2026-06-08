@@ -8,7 +8,7 @@ Agent skills that teach AI coding assistants (Claude Code, Cursor, Codex, GitHub
 |---|---|---|---|
 | [`spartan-ng-developer`](./skills/spartan-ng-developer) | [Spartan/ng](https://spartan.ng) | ✅ Ready | `@spartan-ng/brain` v0.0.1-alpha.704 |
 | [`primeng-developer`](./skills/primeng-developer) | [PrimeNG](https://primeng.org) | ✅ Ready | PrimeNG v21 |
-| `ng-zorro-developer` | [NG-ZORRO](https://ng.ant.design) | ⏳ Planned | — |
+| [`ng-zorro-developer`](./skills/ng-zorro-developer) | [NG-ZORRO](https://ng.ant.design) | 🚧 Scaffolded | `ng-zorro-antd@21.3.1` |
 | `angular-material-developer` | [Angular Material](https://material.angular.dev) | ⏳ Planned | — |
 
 > **Update cadence.** Each skill is pinned to a specific upstream library version (see *Tracks*). When the upstream ships a new release, the skill is re-validated against it and the *Tracks* column is bumped. Open an issue if you spot drift between a skill's docs and the version it claims to track.
@@ -23,6 +23,7 @@ These skills target current versions of each library. They will not gracefully c
 |---|---|---|---|
 | `spartan-ng-developer` | `@spartan-ng/brain` v0.0.1-alpha.704 | The pinned alpha exactly | Other alphas with API drift; `@spartan-ng/ui-*` (deprecated, replaced by `@spartan-ng/helm`) |
 | `primeng-developer` | PrimeNG v21 with `@primeuix/themes` v2.x | PrimeNG v18 → v21 (the `references/migration.md` covers v18→v21 renames, but v21 is the closest match) | PrimeNG v17 and below (different theming model based on `prime.css`) |
+| `ng-zorro-developer` | `ng-zorro-antd@21.3.1` aligned with Angular v21 | NG-ZORRO v17 → v21 (the skill assumes the v21 API, but `references/migration.md` covers the standalone shift and the `provideNzI18n` change introduced in v17) | NG-ZORRO v16 and below (NgModule-only, Angular v16 or below) |
 
 Both skills assume **Angular v18 or newer** with standalone components, control flow syntax (`@if` / `@for`), and signal-based APIs (`input()` / `output()`). They will not generate `NgModule`-based or decorator-based code, even if your project still uses those patterns.
 
@@ -87,10 +88,11 @@ mkdir -p ~/.claude/skills && \
   curl -fsSL https://github.com/mofirojean/angular-ui-skills/archive/master.tar.gz | \
   tar -xz --strip-components=2 -C ~/.claude/skills \
     angular-ui-skills-master/skills/spartan-ng-developer \
-    angular-ui-skills-master/skills/primeng-developer
+    angular-ui-skills-master/skills/primeng-developer \
+    angular-ui-skills-master/skills/ng-zorro-developer
 ```
 
-This downloads only the two skill folders from a tarball and extracts them directly into `~/.claude/skills/` with no intermediate clone, no symlinks. The folder lands where Claude Code reads from.
+This downloads only the skill folders from a tarball and extracts them directly into `~/.claude/skills/` with no intermediate clone, no symlinks. Drop any folder name from the list if you only want a subset.
 
 **To install just one skill**, drop the unwanted line from the `tar` command. **To install project-scoped**, swap `~/.claude/skills` for `.claude/skills`. **To install for Gemini CLI**, swap for `~/.gemini/skills`.
 
