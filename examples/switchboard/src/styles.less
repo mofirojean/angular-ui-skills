@@ -1,0 +1,22 @@
+@import "../node_modules/ng-zorro-antd/ng-zorro-antd.less";
+
+// Brand overrides (LESS variables are lazy-evaluated, last definition wins).
+@primary-color: #2563eb;
+@border-radius-base: 6px;
+@font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: @font-family;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Only the outermost shell needs to fill the viewport.
+// Inner layouts (header + content + footer column) get their height from flex.
+#app-shell {
+  min-height: 100vh;
+}

@@ -1,0 +1,106 @@
+<nz-layout id="app-shell">
+  <nz-sider
+    nzCollapsible
+    [nzCollapsed]="collapsed()"
+    (nzCollapsedChange)="collapsed.set($event)"
+    [nzWidth]="220"
+    [nzCollapsedWidth]="64"
+    [nzTrigger]="null"
+    nzTheme="dark"
+  >
+    <a routerLink="/" class="brand">
+      <span class="brand-mark">SB</span>
+      @if (!collapsed()) {
+        <span class="brand-name">Switchboard</span>
+      }
+    </a>
+
+    <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="collapsed()">
+      @for (item of nav; track item.path) {
+        <li
+          nz-menu-item
+          [routerLink]="item.path"
+          routerLinkActive="ant-menu-item-selected"
+          [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+          [nzMatchRouter]="false"
+          nz-tooltip
+          [nzTooltipTitle]="collapsed() ? item.label : ''"
+          nzTooltipPlacement="right"
+        >
+          <nz-icon [nzType]="item.icon" />
+          <span>{{ item.label }}</span>
+        </li>
+      }
+    </ul>
+  </nz-sider>
+
+  <nz-layout>
+    <nz-header class="app-header">
+      <div class="app-header__left">
+        <button nz-button nzType="text" (click)="toggleCollapsed()" aria-label="Toggle navigation">
+          <nz-icon [nzType]="collapsed() ? 'menu-unfold' : 'menu-fold'" />
+        </button>
+        <h1 class="app-header__title">{{ pageTitle() }}</h1>
+      </div>
+
+      <div class="app-header__right">
+        <button
+          nz-button
+          nzType="text"
+          nz-tooltip
+          [nzTooltipTitle]="theme.mode() === 'dark' ? 'Switch to light' : 'Switch to dark'"
+          (click)="theme.toggle()"
+          [attr.aria-label]="theme.mode() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+        >
+          <nz-icon nzType="bulb" />
+        </button>
+
+        <button nz-button nzType="text" aria-label="Notifications">
+          <nz-badge [nzCount]="3" nzSize="small">
+            <nz-icon nzType="bell" />
+          </nz-badge>
+        </button>
+
+        <a
+          href="https://github.com/mofirojean/angular-ui-skills"
+          target="_blank"
+          rel="noopener"
+          nz-button
+          nzType="text"
+          nz-tooltip
+          nzTooltipTitle="View on GitHub"
+          aria-label="View on GitHub"
+        >
+          <nz-icon nzType="question-circle" />
+        </a>
+
+        <a nz-dropdown [nzDropdownMenu]="userMenu" nzTrigger="click">
+          <nz-avatar nzText="{{ user.initial }}" [nzGap]="4"></nz-avatar>
+        </a>
+        <nz-dropdown-menu #userMenu="nzDropdownMenu">
+          <ul nz-menu>
+            <li nz-menu-item>
+              <nz-icon nzType="user" /> Profile
+            </li>
+            <li nz-menu-item>
+              <nz-icon nzType="setting" /> Settings
+            </li>
+            <li nz-menu-divider></li>
+            <li nz-menu-item>
+              <nz-icon nzType="logout" /> Sign out
+            </li>
+          </ul>
+        </nz-dropdown-menu>
+      </div>
+    </nz-header>
+
+    <nz-content class="app-content">
+      <router-outlet />
+    </nz-content>
+
+    <nz-footer class="app-footer">
+      Switchboard, a reference app for the
+      <a href="https://github.com/mofirojean/angular-ui-skills/tree/master/skills/ng-zorro-developer" target="_blank" rel="noopener">ng-zorro-developer skill</a>
+    </nz-footer>
+  </nz-layout>
+</nz-layout>

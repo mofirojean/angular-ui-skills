@@ -1,0 +1,123 @@
+:host {
+  display: block;
+}
+
+// --- Brand block at the top of the sider ---
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  margin-bottom: 4px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  min-height: 56px;
+  box-sizing: border-box;
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
+}
+
+.brand-name {
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// --- Header ---
+
+.app-header {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  height: 56px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.app-header__left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.app-header__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.75);
+  white-space: nowrap;
+}
+
+.app-header__right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+// --- Content ---
+
+.app-content {
+  background: #f5f6f8;
+  padding: 0;
+}
+
+// --- Footer ---
+
+.app-footer {
+  text-align: center;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  background: transparent;
+  padding: 14px 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.app-footer a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+// --- Dark mode overrides ---
+
+:host-context(.theme-dark) {
+  .app-header {
+    background: #141414;
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .app-header__title {
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .app-content {
+    background: #1f1f1f;
+  }
+
+  .app-footer {
+    color: rgba(255, 255, 255, 0.45);
+    border-top-color: rgba(255, 255, 255, 0.04);
+  }
+}
