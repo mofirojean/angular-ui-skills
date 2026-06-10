@@ -2,6 +2,15 @@
   display: block;
 }
 
+// --- Sider, give it explicit chrome separation from the main column ---
+
+::ng-deep .ant-layout-sider {
+  background: #0b1220 !important;
+  box-shadow: 1px 0 0 rgba(0, 0, 0, 0.08), 4px 0 14px rgba(15, 23, 42, 0.08);
+  position: relative;
+  z-index: 2;
+}
+
 // --- Brand block at the top of the sider ---
 
 .brand {
@@ -79,7 +88,7 @@
 // --- Content ---
 
 .app-content {
-  background: #f5f6f8;
+  background: #eef1f5;
   padding: 0;
 }
 
@@ -101,11 +110,19 @@
 }
 
 // --- Dark mode overrides ---
+//
+// Layer order, darkest to lightest, so the content reads as the elevated work surface:
+//   sider (#05080f, deepest) → header (#141821) → content (#1f242e, lightest)
 
 :host-context(.theme-dark) {
+  ::ng-deep .ant-layout-sider {
+    background: #05080f !important;
+    box-shadow: 1px 0 0 rgba(255, 255, 255, 0.04), 4px 0 14px rgba(0, 0, 0, 0.45);
+  }
+
   .app-header {
-    background: #141414;
-    border-bottom-color: rgba(255, 255, 255, 0.08);
+    background: #141821;
+    border-bottom-color: rgba(255, 255, 255, 0.06);
   }
 
   .app-header__title {
@@ -113,7 +130,7 @@
   }
 
   .app-content {
-    background: #1f1f1f;
+    background: #1f242e;
   }
 
   .app-footer {
