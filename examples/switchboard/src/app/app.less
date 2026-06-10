@@ -2,13 +2,20 @@
   display: block;
 }
 
-// --- Sider, give it explicit chrome separation from the main column ---
+// Unified warm-neutral (zinc) palette. One hue family across both themes for a calm,
+// even feel. Sider sits one shade darker than content, separated by a hairline border
+// rather than a heavy shadow.
+
+// --- Sider ---
 
 ::ng-deep .ant-layout-sider {
-  background: #0b1220 !important;
-  box-shadow: 1px 0 0 rgba(0, 0, 0, 0.08), 4px 0 14px rgba(15, 23, 42, 0.08);
-  position: relative;
-  z-index: 2;
+  background: #18181b !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+::ng-deep .ant-layout-sider .ant-menu-dark,
+::ng-deep .ant-layout-sider .ant-menu.ant-menu-dark {
+  background: transparent !important;
 }
 
 // --- Brand block at the top of the sider ---
@@ -19,7 +26,7 @@
   gap: 12px;
   padding: 16px 18px;
   margin-bottom: 4px;
-  color: #fff;
+  color: #fafafa;
   text-decoration: none;
   font-weight: 600;
   letter-spacing: 0.01em;
@@ -40,7 +47,6 @@
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
 }
 
 .brand-name {
@@ -56,9 +62,9 @@
   display: flex !important;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
-  background: #fff;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 0 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #e4e4e7;
   height: 56px;
   line-height: 1;
   flex-shrink: 0;
@@ -75,7 +81,7 @@
   margin: 0;
   font-size: 14px;
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.75);
+  color: #27272a;
   white-space: nowrap;
 }
 
@@ -88,7 +94,7 @@
 // --- Content ---
 
 .app-content {
-  background: #eef1f5;
+  background: #fafafa;
   padding: 0;
 }
 
@@ -97,10 +103,10 @@
 .app-footer {
   text-align: center;
   font-size: 12px;
-  color: rgba(0, 0, 0, 0.45);
+  color: #71717a;
   background: transparent;
   padding: 14px 24px;
-  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  border-top: 1px solid #e4e4e7;
 }
 
 .app-footer a {
@@ -111,30 +117,30 @@
 
 // --- Dark mode overrides ---
 //
-// Layer order, darkest to lightest, so the content reads as the elevated work surface:
-//   sider (#05080f, deepest) → header (#141821) → content (#1f242e, lightest)
+// Layer order, darkest to lightest, in the same zinc family:
+//   sider (#09090b)  →  header (#18181b)  →  content (#27272a)
 
 :host-context(.theme-dark) {
   ::ng-deep .ant-layout-sider {
-    background: #05080f !important;
-    box-shadow: 1px 0 0 rgba(255, 255, 255, 0.04), 4px 0 14px rgba(0, 0, 0, 0.45);
+    background: #09090b !important;
+    border-right-color: rgba(255, 255, 255, 0.06);
   }
 
   .app-header {
-    background: #141821;
+    background: #18181b;
     border-bottom-color: rgba(255, 255, 255, 0.06);
   }
 
   .app-header__title {
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.88);
   }
 
   .app-content {
-    background: #1f242e;
+    background: #27272a;
   }
 
   .app-footer {
-    color: rgba(255, 255, 255, 0.45);
-    border-top-color: rgba(255, 255, 255, 0.04);
+    color: rgba(255, 255, 255, 0.5);
+    border-top-color: rgba(255, 255, 255, 0.06);
   }
 }
