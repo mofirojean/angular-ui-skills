@@ -21,7 +21,12 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
-import { NzDropDownModule, NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
+import {
+  NzDropDownModule,
+  NzContextMenuService,
+  NzDropdownMenuComponent,
+  NzDropdownDirective
+} from 'ng-zorro-antd/dropdown';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
@@ -75,6 +80,7 @@ const STATUS_TAG: Record<TicketStatus, string> = {
     NzDividerModule,
     NzTooltipModule,
     NzBadgeModule,
+    NzDropdownMenuComponent,
   ],
   templateUrl: './tickets.html',
   styleUrl: './tickets.less',
@@ -281,6 +287,18 @@ export class Tickets {
     this.contextRow = row;
     const menu = this.rowMenu();
     if (menu) this.contextMenu.create(event, menu);
+  }
+
+  protected openActionsMenu(event: MouseEvent, row: Ticket): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.contextRow = row;
+    const menu = this.rowMenu();
+    if (menu) this.contextMenu.create(event, menu);
+  }
+
+  protected ctxOpen(): void {
+    if (this.contextRow) this.open(this.contextRow.id);
   }
 
   protected ctxAssignToMe(): void {

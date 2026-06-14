@@ -40,6 +40,46 @@ export interface DailyVolume {
   readonly resolved: number;
 }
 
+export type MessageAuthor = 'customer' | { agentId: string };
+
+export interface Message {
+  readonly id: string;
+  readonly ticketId: string;
+  readonly author: MessageAuthor;
+  readonly authorName: string;
+  readonly initials: string;
+  readonly body: string;
+  readonly createdAt: Date;
+  readonly attachments?: readonly { name: string; size: string }[];
+}
+
+export type ActivityKind =
+  | 'created'
+  | 'assigned'
+  | 'reassigned'
+  | 'replied'
+  | 'status-change'
+  | 'priority-change'
+  | 'tag-added'
+  | 'sla-warning'
+  | 'resolved';
+
+export interface ActivityEvent {
+  readonly id: string;
+  readonly ticketId: string;
+  readonly kind: ActivityKind;
+  readonly actor: string;
+  readonly description: string;
+  readonly createdAt: Date;
+}
+
+export interface KbArticle {
+  readonly id: string;
+  readonly title: string;
+  readonly category: string;
+  readonly readMinutes: number;
+}
+
 const NOW = new Date();
 const minutesAgo = (m: number) => new Date(NOW.getTime() - m * 60_000);
 const hoursAgo = (h: number) => minutesAgo(h * 60);
@@ -114,6 +154,194 @@ export const ANNOUNCEMENTS: readonly Announcement[] = [
     body: 'Lena Voss joins us as agent lead, focused on quality and coaching across all three tiers.',
     publishedAt: hoursAgo(54),
   },
+];
+
+// --- Conversation messages, generated per ticket ---
+
+const CUSTOMER_LINES = [
+  'Hi team, we hit an issue this morning that is blocking a few users on our side. Details below.',
+  'Just upgraded our seat count last week, not sure if that is related. Happy to send logs.',
+  'We can reproduce it consistently in Chrome on macOS 14.5, fails on the staging URL too.',
+  'Any update on this? Several of our customers are waiting on us before they can move on.',
+];
+
+const AGENT_LINES = [
+  'Thanks for the detailed report. I am digging in now and will follow up within the hour with what I find.',
+  'I can reproduce it on our side. Looks related to a deploy that went out late last night, we are rolling back the affected service.',
+  'Quick update, the rollback completed at 14:20 UTC. Could you confirm whether the issue still reproduces on your end?',
+  'Closing this out for now since we have not seen the error recur in the last two hours. Reopen any time if it comes back.',
+];
+
+const AGENT_LOOKUP = new Map(AGENTS.map((a) => [a.id, a]));
+
+function generateMessages(): Message[] {
+  const messages: Message[] = [];
+  for (const ticket of TICKETS) {
+    const baseId = ticket.id;
+    const created = ticket.createdAt.getTime();
+    const isResolved = ticket.status === 'resolved';
+    const agent = ticket.assigneeId ? AGENT_LOOKUP.get(ticket.assigneeId) : undefined;
+
+    messages.push({
+      id: `${baseId}-m1`,
+      ticketId: ticket.id,
+      author: 'customer',
+      authorName: ticket.customer,
+      initials: ticket.customer.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase(),
+      body: `${CUSTOMER_LINES[0]} Subject of the report: ${ticket.subject}.`,
+      createdAt: ticket.createdAt,
+      attachments:
+        ticket.tags.includes('export') || ticket.tags.includes('reports')
+          ? [{ name: 'export-failure.png', size: '212 KB' }]
+          : undefined,
+    });
+
+    if (agent) {
+      messages.push({
+        id: `${baseId}-m2`,
+        ticketId: ticket.id,
+        author: { agentId: agent.id },
+        authorName: agent.name,
+        initials: agent.initials,
+        body: AGENT_LINES[0],
+        createdAt: new Date(created + 12 * 60_000),
+      });
+    }
+
+    messages.push({
+      id: `${baseId}-m3`,
+      ticketId: ticket.id,
+      author: 'customer',
+      authorName: ticket.customer,
+      initials: ticket.customer.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase(),
+      body: CUSTOMER_LINES[2],
+      createdAt: new Date(created + 35 * 60_000),
+    });
+
+    if (agent) {
+      messages.push({
+        id: `${baseId}-m4`,
+        ticketId: ticket.id,
+        author: { agentId: agent.id },
+        authorName: agent.name,
+        initials: agent.initials,
+        body: AGENT_LINES[1],
+        createdAt: new Date(created + 60 * 60_000),
+      });
+    }
+
+    if (isResolved && agent) {
+      messages.push({
+        id: `${baseId}-m5`,
+        ticketId: ticket.id,
+        author: { agentId: agent.id },
+        authorName: agent.name,
+        initials: agent.initials,
+        body: AGENT_LINES[3],
+        createdAt: ticket.updatedAt,
+      });
+    }
+  }
+  return messages;
+}
+
+export const MESSAGES: readonly Message[] = generateMessages();
+
+// --- Activity events, generated per ticket ---
+
+function describeAgent(id: string | null | undefined): string {
+  if (!id) return 'an agent';
+  return AGENT_LOOKUP.get(id)?.name ?? 'an agent';
+}
+
+function generateActivity(): ActivityEvent[] {
+  const events: ActivityEvent[] = [];
+  for (const ticket of TICKETS) {
+    const id = ticket.id;
+    events.push({
+      id: `${id}-a1`,
+      ticketId: id,
+      kind: 'created',
+      actor: ticket.customer,
+      description: `Opened by ${ticket.customer}`,
+      createdAt: ticket.createdAt,
+    });
+
+    if (ticket.assigneeId) {
+      events.push({
+        id: `${id}-a2`,
+        ticketId: id,
+        kind: 'assigned',
+        actor: 'system',
+        description: `Routed to ${describeAgent(ticket.assigneeId)} by auto-routing`,
+        createdAt: new Date(ticket.createdAt.getTime() + 4 * 60_000),
+      });
+
+      events.push({
+        id: `${id}-a3`,
+        ticketId: id,
+        kind: 'replied',
+        actor: describeAgent(ticket.assigneeId),
+        description: `${describeAgent(ticket.assigneeId)} replied`,
+        createdAt: new Date(ticket.createdAt.getTime() + 12 * 60_000),
+      });
+    }
+
+    if (ticket.priority === 'urgent' || ticket.priority === 'high') {
+      events.push({
+        id: `${id}-a4`,
+        ticketId: id,
+        kind: 'priority-change',
+        actor: describeAgent(ticket.assigneeId),
+        description: `Priority bumped to ${ticket.priority}`,
+        createdAt: new Date(ticket.createdAt.getTime() + 18 * 60_000),
+      });
+    }
+
+    if (ticket.slaDueAt.getTime() < Date.now() && ticket.status !== 'resolved') {
+      events.push({
+        id: `${id}-a5`,
+        ticketId: id,
+        kind: 'sla-warning',
+        actor: 'system',
+        description: 'SLA window breached',
+        createdAt: ticket.slaDueAt,
+      });
+    }
+
+    if (ticket.status === 'resolved') {
+      events.push({
+        id: `${id}-a6`,
+        ticketId: id,
+        kind: 'resolved',
+        actor: describeAgent(ticket.assigneeId),
+        description: `Marked as resolved by ${describeAgent(ticket.assigneeId)}`,
+        createdAt: ticket.updatedAt,
+      });
+    } else if (ticket.status === 'waiting') {
+      events.push({
+        id: `${id}-a7`,
+        ticketId: id,
+        kind: 'status-change',
+        actor: describeAgent(ticket.assigneeId),
+        description: 'Moved to "Waiting on customer"',
+        createdAt: ticket.updatedAt,
+      });
+    }
+  }
+  return events.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
+
+export const ACTIVITY: readonly ActivityEvent[] = generateActivity();
+
+// --- Knowledge suggestions ---
+
+export const KB_ARTICLES: readonly KbArticle[] = [
+  { id: 'kb-1', title: 'Resetting two-factor authentication for an end user', category: 'Authentication', readMinutes: 3 },
+  { id: 'kb-2', title: 'Why CSV exports may return empty rows', category: 'Exports', readMinutes: 5 },
+  { id: 'kb-3', title: 'Webhook retry policy and replay window', category: 'API & webhooks', readMinutes: 4 },
+  { id: 'kb-4', title: 'Renewing a custom domain SSL certificate', category: 'Hosting', readMinutes: 6 },
+  { id: 'kb-5', title: 'Tier 2 escalation runbook', category: 'Process', readMinutes: 8 },
 ];
 
 // 14 days of fake volume, recent day last. Numbers drift around a moving baseline so the

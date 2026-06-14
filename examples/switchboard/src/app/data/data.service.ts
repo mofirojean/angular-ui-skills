@@ -1,11 +1,17 @@
 import { Injectable, computed, signal } from '@angular/core';
 
 import {
+  ACTIVITY,
   AGENTS,
   ANNOUNCEMENTS,
+  ActivityEvent,
   Agent,
   Announcement,
   DailyVolume,
+  KB_ARTICLES,
+  KbArticle,
+  MESSAGES,
+  Message,
   Ticket,
   TICKETS,
   VOLUME,
@@ -25,6 +31,9 @@ export class DataService {
   readonly tickets = signal<readonly Ticket[]>(TICKETS);
   readonly announcements = signal<readonly Announcement[]>(ANNOUNCEMENTS);
   readonly volume = signal<readonly DailyVolume[]>(VOLUME);
+  readonly messages = signal<readonly Message[]>(MESSAGES);
+  readonly activity = signal<readonly ActivityEvent[]>(ACTIVITY);
+  readonly kbArticles = signal<readonly KbArticle[]>(KB_ARTICLES);
 
   readonly onlineAgents = computed(() => this.agents().filter((a) => a.online));
 
@@ -60,6 +69,36 @@ export class DataService {
 
   ticketById(id: string): Ticket | undefined {
     return this.tickets().find((t) => t.id === id);
+  }
+
+  messagesFor(ticketId: string): readonly Message[] {
+    return this.messages().filter((m) => m.ticketId === ticketId);
+  }
+
+  activityFor(ticketId: string): readonly ActivityEvent[] {
+    return this.activity().filter((e) => e.ticketId === ticketId);
+  }
+
+  relatedTickets(ticket: Ticket, limit = 5): readonly Ticket[] {
+    return this.tickets()
+      .filter((t) => t.id !== ticket.id && (t.customer === ticket.customer || t.tags.some((tag) => ticket.tags.includes(tag))))
+      .slice(0, limit);
+  }
+
+  addMessage(ticketId: string, body: string, attachments?: { name: string; size: string }[]): void {
+    if (!body.trim() && (!attachments || attachments.length === 0)) return;
+    const next: Message = {
+      id: `${ticketId}-m${this.messages().length + 1}`,
+      ticketId,
+      author: { agentId: 'a-001' },
+      authorName: 'Kasun Perera',
+      initials: 'KP',
+      body: body.trim(),
+      createdAt: new Date(),
+      attachments,
+    };
+    this.messages.update((list) => [...list, next]);
+    this.updateTicket(ticketId, {});
   }
 
   updateTicket(id: string, patch: Partial<Omit<Ticket, 'id'>>): void {

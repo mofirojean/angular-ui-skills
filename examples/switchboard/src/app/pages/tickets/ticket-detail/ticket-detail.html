@@ -1,0 +1,314 @@
+@if (ticket(); as t) {
+  <ng-container *ngTemplateOutlet="sensitive() ? watermarked : content; context: { $implicit: t }" />
+
+  <ng-template #watermarked let-t>
+    <nz-watermark nzContent="Confidential">
+      <ng-container *ngTemplateOutlet="content; context: { $implicit: t }" />
+    </nz-watermark>
+  </ng-template>
+
+  <ng-template #content let-t>
+    <div class="page">
+      <!-- Header -->
+      <header class="page-header">
+        <nz-breadcrumb class="bcrumb">
+          <nz-breadcrumb-item><a routerLink="/">Dashboard</a></nz-breadcrumb-item>
+          <nz-breadcrumb-item><a routerLink="/tickets">Tickets</a></nz-breadcrumb-item>
+          <nz-breadcrumb-item>{{ t.id }}</nz-breadcrumb-item>
+        </nz-breadcrumb>
+
+        <div class="title-row">
+          <button nz-button nzType="text" (click)="close()" aria-label="Back" class="back-btn">
+            <nz-icon nzType="left" />
+          </button>
+          <h1 class="title">{{ t.id }}</h1>
+          <nz-tag [nzColor]="$any(statusTag)[t.status]">{{ t.status }}</nz-tag>
+          <nz-tag [nzColor]="$any(priorityTag)[t.priority]">{{ t.priority }}</nz-tag>
+          @if (sensitive()) {
+            <nz-tag nzColor="red" class="sensitive-tag">
+              <nz-icon nzType="exclamation-circle" /> Sensitive
+            </nz-tag>
+          }
+        </div>
+
+        <p class="subject">{{ t.subject }}</p>
+
+        <div class="actions">
+          <button nz-button nzType="primary" (click)="setStatus('resolved')">
+            <nz-icon nzType="check-circle" /> Resolve
+          </button>
+          <button nz-button (click)="setStatus('waiting')">
+            <nz-icon nzType="clock-circle" /> Wait on customer
+          </button>
+          <button nz-button nz-dropdown [nzDropdownMenu]="moreActions" nzTrigger="click">
+            More <nz-icon nzType="down" />
+          </button>
+          <nz-dropdown-menu #moreActions="nzDropdownMenu">
+            <ul nz-menu>
+              <li nz-menu-item><nz-icon nzType="mail" /> Email customer</li>
+              <li nz-menu-item><nz-icon nzType="tag" /> Add tag</li>
+              <li nz-menu-item><nz-icon nzType="export" /> Export to PDF</li>
+              <li nz-menu-divider></li>
+              <li nz-menu-item nzDanger><nz-icon nzType="delete" /> Archive</li>
+            </ul>
+          </nz-dropdown-menu>
+        </div>
+      </header>
+
+      <!-- Body -->
+      <nz-splitter class="body">
+        <nz-splitter-panel nzDefaultSize="68%" nzMin="40%">
+          <div class="main-pane">
+            <nz-tabs [nzAnimated]="true">
+              <!-- Conversation -->
+              <nz-tab nzTitle="Conversation">
+                <div class="thread">
+                  @for (m of messages(); track m.id) {
+                    <article class="msg" [class.msg--agent]="isAgent(m)">
+                      <div class="msg__avatar">
+                        <nz-avatar [nzText]="m.initials" [nzGap]="4" />
+                      </div>
+                      <div class="msg__body">
+                        <header class="msg__head">
+                          <span class="msg__name">{{ m.authorName }}</span>
+                          @if (isAgent(m)) {
+                            <nz-tag nzColor="blue" class="msg__role">Agent</nz-tag>
+                          } @else {
+                            <nz-tag class="msg__role">Customer</nz-tag>
+                          }
+                          <span class="msg__time">{{ relative(m.createdAt) }}</span>
+                        </header>
+                        <p class="msg__text">{{ m.body }}</p>
+                        @if (m.attachments?.length) {
+                          <div class="msg__attachments">
+                            @for (att of m.attachments; track att.name) {
+                              <a class="attachment">
+                                <nz-icon nzType="profile" />
+                                <span>{{ att.name }}</span>
+                                <span class="attachment__size">{{ att.size }}</span>
+                              </a>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </article>
+                  }
+                </div>
+
+                <!-- Reply composer -->
+                <div class="composer">
+                  <textarea
+                    nz-input
+                    rows="3"
+                    placeholder="Reply to the customer..."
+                    [ngModel]="replyDraft()"
+                    (ngModelChange)="replyDraft.set($event)"
+                  ></textarea>
+
+                  @if (uploaded().length > 0) {
+                    <ul class="composer__attached">
+                      @for (file of uploaded(); track file.uid) {
+                        <li>
+                          <nz-icon nzType="profile" />
+                          <span>{{ file.name }}</span>
+                          <button
+                            type="button"
+                            class="composer__remove"
+                            (click)="removeAttachment(file)"
+                            aria-label="Remove"
+                          >
+                            <nz-icon nzType="close" />
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  }
+
+                  <div class="composer__actions">
+                    <nz-upload [nzBeforeUpload]="uploadHandler" [nzShowUploadList]="false">
+                      <button nz-button nzType="text" type="button">
+                        <nz-icon nzType="profile" /> Attach
+                      </button>
+                    </nz-upload>
+                    <button nz-button nzType="text" type="button" nz-tooltip nzTooltipTitle="Insert macro">
+                      <nz-icon nzType="tag" /> Macro
+                    </button>
+                    <span class="composer__spacer"></span>
+                    <button nz-button nzType="primary" type="button" (click)="sendReply()">
+                      <nz-icon nzType="mail" /> Send reply
+                    </button>
+                  </div>
+                </div>
+              </nz-tab>
+
+              <!-- Activity -->
+              <nz-tab nzTitle="Activity">
+                <div class="activity">
+                  @if (activity().length === 0) {
+                    <nz-empty nzNotFoundContent="No activity yet" />
+                  } @else {
+                    <nz-timeline>
+                      @for (e of activity(); track e.id) {
+                        <nz-timeline-item [nzColor]="activityColor[e.kind]">
+                          <div class="activity__line">
+                            <nz-icon [nzType]="activityIcon[e.kind]" class="activity__icon" />
+                            <div class="activity__meta">
+                              <p class="activity__desc">{{ e.description }}</p>
+                              <p class="activity__time">{{ relative(e.createdAt) }} · {{ e.actor }}</p>
+                            </div>
+                          </div>
+                        </nz-timeline-item>
+                      }
+                    </nz-timeline>
+                  }
+                </div>
+              </nz-tab>
+
+              <!-- Related -->
+              <nz-tab nzTitle="Related">
+                <div class="related">
+                  @if (related().length === 0) {
+                    <nz-empty nzNotFoundContent="No related tickets" />
+                  } @else {
+                    <nz-table
+                      #r
+                      [nzData]="related()"
+                      nzSize="small"
+                      [nzShowPagination]="false"
+                      nzTableLayout="fixed"
+                    >
+                      <thead>
+                        <tr>
+                          <th nzWidth="90px">ID</th>
+                          <th>Subject</th>
+                          <th nzWidth="120px">Status</th>
+                          <th nzWidth="100px">Priority</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (row of r.data; track row.id) {
+                          <tr class="related__row" [routerLink]="['/tickets', row.id]">
+                            <td><span class="mono">{{ row.id }}</span></td>
+                            <td>{{ row.subject }}</td>
+                            <td><nz-tag [nzColor]="$any(statusTag)[row.status]">{{ row.status }}</nz-tag></td>
+                            <td><nz-tag [nzColor]="$any(priorityTag)[row.priority]">{{ row.priority }}</nz-tag></td>
+                          </tr>
+                        }
+                      </tbody>
+                    </nz-table>
+                  }
+                </div>
+              </nz-tab>
+
+              <!-- Customer -->
+              <nz-tab nzTitle="Customer">
+                <div class="customer">
+                  <nz-descriptions nzBordered nzSize="small" [nzColumn]="2">
+                    <nz-descriptions-item nzTitle="Account">{{ t.customer }}</nz-descriptions-item>
+                    <nz-descriptions-item nzTitle="Plan">Business</nz-descriptions-item>
+                    <nz-descriptions-item nzTitle="Primary contact">ops@{{ t.customer.split(' ')[0].toLowerCase() }}.com</nz-descriptions-item>
+                    <nz-descriptions-item nzTitle="Region">EU-West</nz-descriptions-item>
+                    <nz-descriptions-item nzTitle="Open tickets" [nzSpan]="2">{{ related().length + 1 }}</nz-descriptions-item>
+                    <nz-descriptions-item nzTitle="Notes" [nzSpan]="2">
+                      Frequently opens tickets around the EU billing window. Prefers email over chat.
+                    </nz-descriptions-item>
+                  </nz-descriptions>
+                </div>
+              </nz-tab>
+            </nz-tabs>
+          </div>
+        </nz-splitter-panel>
+
+        <nz-splitter-panel nzMin="280px" nzDefaultSize="32%">
+          <aside class="side">
+            <nz-collapse nzGhost [nzExpandIconPosition]="'end'">
+              <nz-collapse-panel nzHeader="Status & ownership" [nzActive]="true">
+                <div class="field">
+                  <label class="field__label">Status</label>
+                  <nz-select [ngModel]="t.status" (ngModelChange)="setStatus($event)" class="field__select">
+                    @for (opt of statusOptions; track opt.value) {
+                      <nz-option [nzValue]="opt.value" [nzLabel]="opt.label" />
+                    }
+                  </nz-select>
+                </div>
+                <div class="field">
+                  <label class="field__label">Priority</label>
+                  <nz-select [ngModel]="t.priority" (ngModelChange)="setPriority($event)" class="field__select">
+                    @for (opt of priorityOptions; track opt.value) {
+                      <nz-option [nzValue]="opt.value" [nzLabel]="opt.label" />
+                    }
+                  </nz-select>
+                </div>
+                <div class="field">
+                  <label class="field__label">Assignee</label>
+                  <nz-select
+                    [ngModel]="t.assigneeId"
+                    (ngModelChange)="setAssignee($event)"
+                    nzAllowClear
+                    nzPlaceHolder="Unassigned"
+                    nzShowSearch
+                    class="field__select"
+                  >
+                    @for (opt of assigneeOptions(); track opt.value) {
+                      <nz-option [nzValue]="opt.value" [nzLabel]="opt.label" />
+                    }
+                  </nz-select>
+                </div>
+              </nz-collapse-panel>
+
+              <nz-collapse-panel nzHeader="SLA" [nzActive]="true">
+                @let info = sla(t.slaDueAt);
+                @if (info.breached) {
+                  <div class="sla-breached">
+                    <nz-icon nzType="exclamation-circle" />
+                    <span>{{ info.text }}</span>
+                  </div>
+                } @else {
+                  <nz-countdown
+                    [nzValue]="slaDeadline()"
+                    nzFormat="HH:mm:ss"
+                    class="sla-countdown"
+                  />
+                  <p class="field__hint">until SLA window closes</p>
+                }
+              </nz-collapse-panel>
+
+              <nz-collapse-panel nzHeader="Tags" [nzActive]="true">
+                <div class="tags">
+                  @for (tag of t.tags; track tag) {
+                    <nz-tag>{{ tag }}</nz-tag>
+                  }
+                  @if (t.tags.length === 0) {
+                    <span class="muted">No tags</span>
+                  }
+                </div>
+                <button nz-button nzType="dashed" nzSize="small" class="tags__add">
+                  <nz-icon nzType="plus" /> Add tag
+                </button>
+              </nz-collapse-panel>
+
+              <nz-collapse-panel nzHeader="Knowledge suggestions" [nzActive]="true">
+                <nz-list nzSize="small">
+                  @for (article of data.kbArticles(); track article.id) {
+                    <nz-list-item class="kb-item">
+                      <nz-list-item-meta
+                        [nzTitle]="article.title"
+                        [nzDescription]="article.category + ' · ' + article.readMinutes + ' min read'"
+                      />
+                    </nz-list-item>
+                  }
+                </nz-list>
+              </nz-collapse-panel>
+            </nz-collapse>
+          </aside>
+        </nz-splitter-panel>
+      </nz-splitter>
+    </div>
+  </ng-template>
+} @else {
+  <div class="page page--missing">
+    <nz-empty nzNotFoundContent="Ticket not found.">
+      <button nz-button nzType="primary" routerLink="/tickets">Back to tickets</button>
+    </nz-empty>
+  </div>
+}

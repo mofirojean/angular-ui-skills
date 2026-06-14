@@ -217,30 +217,11 @@
                 nz-button
                 nzType="text"
                 nzSize="small"
-                nz-dropdown
-                [nzDropdownMenu]="rowActions"
-                nzTrigger="click"
+                (click)="openActionsMenu($event, row)"
                 aria-label="Row actions"
               >
                 <nz-icon nzType="more" />
               </button>
-              <nz-dropdown-menu #rowActions="nzDropdownMenu">
-                <ul nz-menu>
-                  <li nz-menu-item (click)="open(row.id)">
-                    <nz-icon nzType="eye" /> Open
-                  </li>
-                  <li nz-menu-item (click)="data.updateTicket(row.id, { assigneeId: 'a-001', status: 'in-progress' })">
-                    <nz-icon nzType="user-switch" /> Assign to me
-                  </li>
-                  <li nz-menu-item (click)="data.updateTicket(row.id, { status: 'resolved' })">
-                    <nz-icon nzType="check-circle" /> Mark resolved
-                  </li>
-                  <li nz-menu-divider></li>
-                  <li nz-menu-item nzDanger>
-                    <nz-icon nzType="delete" /> Archive
-                  </li>
-                </ul>
-              </nz-dropdown-menu>
             </td>
           </tr>
 
@@ -290,21 +271,27 @@
     </ng-template>
   </nz-card>
 
-  <!-- Right-click row context menu -->
+  <!-- Shared row menu, used for both right-click and the three-dot button. -->
   <nz-dropdown-menu #rowMenu="nzDropdownMenu">
     <ul nz-menu>
+      <li nz-menu-item (click)="ctxOpen()">
+        <nz-icon nzType="eye" /> Open
+      </li>
       <li nz-menu-item (click)="ctxAssignToMe()">
         <nz-icon nzType="user-switch" /> Assign to me
       </li>
       <li nz-menu-item (click)="ctxBumpPriority()">
         <nz-icon nzType="arrow-up" /> Bump priority
       </li>
-      <li nz-menu-divider></li>
       <li nz-menu-item (click)="ctxMarkOpen()">
         <nz-icon nzType="inbox" /> Reopen
       </li>
       <li nz-menu-item (click)="ctxClose()">
         <nz-icon nzType="check-circle" /> Mark resolved
+      </li>
+      <li nz-menu-divider></li>
+      <li nz-menu-item nzDanger>
+        <nz-icon nzType="delete" /> Archive
       </li>
     </ul>
   </nz-dropdown-menu>
