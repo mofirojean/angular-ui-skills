@@ -15,8 +15,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-// Only the outermost shell needs to fill the viewport.
-// Inner layouts (header + content + footer column) get their height from flex.
+// Lock the outer shell to viewport height so the sider doesn't scroll with the page.
+// The inner content area becomes the only scrollable region.
 #app-shell {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }

@@ -92,10 +92,15 @@
 }
 
 // --- Content ---
+//
+// The only scrolling element in the shell. Sider and header stay fixed,
+// only this area scrolls.
 
 .app-content {
   background: #fafafa;
   padding: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 // --- Footer ---
