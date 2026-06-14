@@ -1,14 +1,5 @@
 @if (ticket(); as t) {
-  <ng-container *ngTemplateOutlet="sensitive() ? watermarked : content; context: { $implicit: t }" />
-
-  <ng-template #watermarked let-t>
-    <nz-watermark nzContent="Confidential">
-      <ng-container *ngTemplateOutlet="content; context: { $implicit: t }" />
-    </nz-watermark>
-  </ng-template>
-
-  <ng-template #content let-t>
-    <div class="page">
+  <div class="page" [class.page--sensitive]="sensitive()">
       <!-- Header -->
       <header class="page-header">
         <nz-breadcrumb class="bcrumb">
@@ -304,7 +295,6 @@
         </nz-splitter-panel>
       </nz-splitter>
     </div>
-  </ng-template>
 } @else {
   <div class="page page--missing">
     <nz-empty nzNotFoundContent="Ticket not found.">

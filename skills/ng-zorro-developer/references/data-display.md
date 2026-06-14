@@ -178,7 +178,7 @@ Inline QR generation for share/auth surfaces.
 
 ## Segmented (v15+)
 
-Pill toggle with N options. Lighter than `nz-tabset` for in-content view switches.
+Pill toggle with N options. Lighter than `nz-tabs` for in-content view switches.
 
 - Import: `import { NzSegmentedComponent } from 'ng-zorro-antd/segmented';`
 - Markup: `<nz-segmented [nzOptions]="['Day', 'Week', 'Month']" [(ngModel)]="period" />`

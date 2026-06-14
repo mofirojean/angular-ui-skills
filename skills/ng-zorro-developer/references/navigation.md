@@ -66,13 +66,14 @@ Switch between sibling views without route change.
 - Import: `import { NzTabsModule } from 'ng-zorro-antd/tabs';` (or the standalone classes from the same path)
 - Markup:
   ```html
-  <nz-tabset [nzSelectedIndex]="0" (nzSelectChange)="onTab($event)">
+  <nz-tabs [nzSelectedIndex]="0" (nzSelectChange)="onTab($event)">
     <nz-tab nzTitle="Overview"><app-overview /></nz-tab>
     <nz-tab nzTitle="Performance"><app-performance /></nz-tab>
     <nz-tab nzTitle="Notes"><app-notes /></nz-tab>
-  </nz-tabset>
+  </nz-tabs>
   ```
-- Inputs on `nz-tabset`: `nzType` (`'line' | 'card'`), `nzTabPosition` (`'top' | 'right' | 'bottom' | 'left'`), `[nzCentered]`, `[nzAnimated]`, `(nzSelectedIndexChange)`.
+- Inputs on `nz-tabs`: `nzType` (`'line' | 'card'`), `nzTabPosition` (`'top' | 'right' | 'bottom' | 'left'`), `[nzCentered]`, `[nzAnimated]`, `(nzSelectedIndexChange)`.
+- The element selector is `<nz-tabs>` (the older `nz-tabset` from pre-v21 docs is removed). The `<nz-tab>` child selector is unchanged.
 - Use route-driven tabs for deep-linkable surfaces, bind `nzSelectedIndex` to a signal that mirrors a route param.
 
 ## Pagination
@@ -142,6 +143,6 @@ Sticky-scroll table of contents that highlights the current section.
 ## Common pitfalls
 
 1. **`<nz-menu>` doesn't highlight the active route** , add `routerLinkActive="ant-menu-item-selected"` on each `nz-menu-item`. The directive doesn't auto-sync with the router.
-2. **`nz-tabset` re-creates content on tab change** , default behaviour. To keep state alive across tabs, project content lazily via `<ng-template>` and only render the active tab.
+2. **`nz-tabs` re-creates content on tab change** , default behaviour. To keep state alive across tabs, project content lazily via `<ng-template>` and only render the active tab.
 3. **Dropdown placement is wrong inside `overflow: hidden` parents** , NG-ZORRO overlays use the CDK and append to the body by default; if you've forced `appendTo`, switch back to the default.
 4. **Anchor links don't scroll to target** , the anchor element must have a matching `id` attribute on the page, the `nzHref` is hash-based.
