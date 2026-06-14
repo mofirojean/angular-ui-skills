@@ -159,13 +159,20 @@
   color: rgba(255, 255, 255, 0.88);
 }
 
-.mono {
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 12px;
-  color: #71717a;
+.id-cell {
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.id-cell__text {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: #71717a;
+}
+
+:host-context(.theme-dark) .id-cell__text {
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .expand-btn {

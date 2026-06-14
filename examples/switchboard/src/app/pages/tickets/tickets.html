@@ -143,16 +143,18 @@
               ></label>
             </td>
 
-            <td nzLeft class="mono">
-              <button
-                type="button"
-                class="expand-btn"
-                (click)="$event.stopPropagation(); toggleExpand(row.id)"
-                [attr.aria-label]="isExpanded(row.id) ? 'Collapse' : 'Expand'"
-              >
-                <nz-icon [nzType]="isExpanded(row.id) ? 'down' : 'right'" />
-              </button>
-              {{ row.id }}
+            <td nzLeft>
+              <div class="id-cell">
+                <button
+                  type="button"
+                  class="expand-btn"
+                  (click)="$event.stopPropagation(); toggleExpand(row.id)"
+                  [attr.aria-label]="isExpanded(row.id) ? 'Collapse' : 'Expand'"
+                >
+                  <nz-icon [nzType]="isExpanded(row.id) ? 'down' : 'right'" />
+                </button>
+                <span class="id-cell__text">{{ row.id }}</span>
+              </div>
             </td>
 
             <td>
