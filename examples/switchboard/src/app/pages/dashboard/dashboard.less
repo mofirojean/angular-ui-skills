@@ -1,0 +1,226 @@
+:host {
+  display: block;
+}
+
+.page {
+  padding: 20px 24px 32px;
+}
+
+.row-spacer {
+  margin-top: 16px !important;
+}
+
+// --- KPI cards ---
+
+.kpi {
+  ::ng-deep .ant-card-body {
+    padding: 18px 20px;
+  }
+}
+
+.kpi__hint {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #71717a;
+  line-height: 1.4;
+}
+
+:host-context(.theme-dark) .kpi__hint {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+// --- Volume chart legend ---
+
+.legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 16px;
+  font-size: 12px;
+  color: #71717a;
+}
+
+.legend__swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.legend__swatch--opened { background: #2563eb; }
+.legend__swatch--resolved { background: #10b981; }
+
+:host-context(.theme-dark) .legend { color: rgba(255, 255, 255, 0.55); }
+
+// --- Agents list ---
+
+.agent-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.agent-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.agent-row__meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.agent-row__name {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #18181b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.agent-row__role {
+  margin: 1px 0 0;
+  font-size: 11px;
+  color: #71717a;
+}
+
+.agent-row__resolved {
+  font-size: 12px;
+  font-weight: 600;
+  color: #2563eb;
+  font-variant-numeric: tabular-nums;
+}
+
+:host-context(.theme-dark) {
+  .agent-row__name { color: rgba(255, 255, 255, 0.88); }
+  .agent-row__role { color: rgba(255, 255, 255, 0.45); }
+  .agent-row__resolved { color: #60a5fa; }
+}
+
+.extra-count {
+  font-size: 12px;
+  color: #71717a;
+  font-variant-numeric: tabular-nums;
+}
+
+// --- Tickets table ---
+
+.ticket-row {
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.ticket-row:hover {
+  background: rgba(37, 99, 235, 0.04);
+}
+
+:host-context(.theme-dark) .ticket-row:hover {
+  background: rgba(96, 165, 250, 0.08);
+}
+
+.ticket-row__subject {
+  margin: 0;
+  font-size: 13px;
+  color: #18181b;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ticket-row__customer {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: #71717a;
+}
+
+:host-context(.theme-dark) {
+  .ticket-row__subject { color: rgba(255, 255, 255, 0.88); }
+  .ticket-row__customer { color: rgba(255, 255, 255, 0.45); }
+}
+
+.mono {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: #71717a;
+}
+
+.assignee {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.muted {
+  color: #a1a1aa;
+  font-size: 12px;
+}
+
+.sla {
+  font-size: 12px;
+  color: #71717a;
+  font-variant-numeric: tabular-nums;
+}
+
+.sla--breached {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.link {
+  color: #2563eb;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+// --- Announcements ---
+
+.announcements ::ng-deep .ant-card-body {
+  padding: 12px 8px 32px;
+}
+
+.announcement {
+  padding: 8px 16px 4px;
+}
+
+.announcement__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.announcement__time {
+  font-size: 11px;
+  color: #a1a1aa;
+}
+
+.announcement__title {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #18181b;
+  line-height: 1.4;
+}
+
+.announcement__body {
+  margin: 0;
+  font-size: 12px;
+  color: #52525b;
+  line-height: 1.55;
+}
+
+:host-context(.theme-dark) {
+  .announcement__title { color: rgba(255, 255, 255, 0.88); }
+  .announcement__body { color: rgba(255, 255, 255, 0.62); }
+  .announcement__time { color: rgba(255, 255, 255, 0.4); }
+}

@@ -1,0 +1,189 @@
+<div class="page">
+  @if (!data.ready()) {
+    <div nz-row [nzGutter]="[16, 16]">
+      @for (i of [1, 2, 3, 4]; track i) {
+        <div nz-col [nzXs]="12" [nzMd]="6">
+          <nz-card>
+            <nz-skeleton [nzActive]="true" [nzParagraph]="{ rows: 2 }" />
+          </nz-card>
+        </div>
+      }
+    </div>
+
+    <div nz-row [nzGutter]="[16, 16]" class="row-spacer">
+      <div nz-col [nzXs]="24" [nzLg]="16">
+        <nz-card><nz-skeleton [nzActive]="true" [nzParagraph]="{ rows: 6 }" /></nz-card>
+      </div>
+      <div nz-col [nzXs]="24" [nzLg]="8">
+        <nz-card><nz-skeleton [nzActive]="true" [nzAvatar]="true" [nzParagraph]="{ rows: 4 }" /></nz-card>
+      </div>
+    </div>
+  } @else {
+    <!-- KPI row -->
+    <div nz-row [nzGutter]="[16, 16]">
+      <div nz-col [nzXs]="12" [nzMd]="6">
+        <nz-card class="kpi kpi--open">
+          <nz-statistic [nzValue]="data.kpis().open" nzTitle="Open" [nzValueStyle]="{ color: '#d4a017' }">
+            <span nz-statistic-prefix><nz-icon nzType="inbox" /></span>
+          </nz-statistic>
+          <p class="kpi__hint">Unassigned, waiting for triage</p>
+        </nz-card>
+      </div>
+
+      <div nz-col [nzXs]="12" [nzMd]="6">
+        <nz-card class="kpi kpi--progress">
+          <nz-statistic [nzValue]="data.kpis().inProgress" nzTitle="In progress" [nzValueStyle]="{ color: '#2563eb' }">
+            <span nz-statistic-prefix><nz-icon nzType="clock-circle" /></span>
+          </nz-statistic>
+          <p class="kpi__hint">Actively worked by an agent</p>
+        </nz-card>
+      </div>
+
+      <div nz-col [nzXs]="12" [nzMd]="6">
+        <nz-card class="kpi kpi--resolved">
+          <nz-statistic [nzValue]="data.kpis().resolvedToday" nzTitle="Resolved today" [nzValueStyle]="{ color: '#10b981' }">
+            <span nz-statistic-prefix><nz-icon nzType="check-circle" /></span>
+          </nz-statistic>
+          <p class="kpi__hint">{{ resolutionRate() }}% of today's load closed</p>
+        </nz-card>
+      </div>
+
+      <div nz-col [nzXs]="12" [nzMd]="6">
+        <nz-card class="kpi kpi--breach">
+          <nz-statistic
+            [nzValue]="data.kpis().slaBreaches"
+            nzTitle="SLA breaches"
+            [nzValueStyle]="{ color: '#ef4444' }"
+          >
+            <span nz-statistic-prefix><nz-icon nzType="exclamation-circle" /></span>
+          </nz-statistic>
+          <p class="kpi__hint">Open tickets past their SLA window</p>
+        </nz-card>
+      </div>
+    </div>
+
+    <!-- Volume + agents -->
+    <div nz-row [nzGutter]="[16, 16]" class="row-spacer">
+      <div nz-col [nzXs]="24" [nzLg]="16">
+        <nz-card nzTitle="Ticket volume, last 14 days" [nzExtra]="volumeLegend">
+          <app-sparkline [data]="data.volume()" />
+        </nz-card>
+        <ng-template #volumeLegend>
+          <span class="legend">
+            <span class="legend__swatch legend__swatch--opened"></span> Opened
+          </span>
+          <span class="legend">
+            <span class="legend__swatch legend__swatch--resolved"></span> Resolved
+          </span>
+        </ng-template>
+      </div>
+
+      <div nz-col [nzXs]="24" [nzLg]="8">
+        <nz-card nzTitle="Agents on shift" [nzExtra]="onShiftCount">
+          <ul class="agent-list">
+            @for (agent of data.onlineAgents(); track agent.id) {
+              <li class="agent-row">
+                <nz-badge nzDot [nzStatus]="agent.online ? 'success' : 'default'">
+                  <nz-avatar [nzText]="agent.initials" nzSize="default" [nzGap]="4" />
+                </nz-badge>
+                <div class="agent-row__meta">
+                  <p class="agent-row__name">{{ agent.name }}</p>
+                  <p class="agent-row__role">{{ agent.role }} · {{ agent.loadPct }}% load</p>
+                </div>
+                <span class="agent-row__resolved" nz-tooltip nzTooltipTitle="Resolved this week">
+                  {{ agent.resolvedThisWeek }}
+                </span>
+              </li>
+            }
+          </ul>
+        </nz-card>
+        <ng-template #onShiftCount>
+          <span class="extra-count">{{ data.onlineAgents().length }} / {{ data.agents().length }}</span>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- Recent tickets + announcements -->
+    <div nz-row [nzGutter]="[16, 16]" class="row-spacer">
+      <div nz-col [nzXs]="24" [nzLg]="16">
+        <nz-card nzTitle="Recent tickets" [nzExtra]="ticketsExtra">
+          <nz-table
+            #t
+            [nzData]="data.recentTickets()"
+            [nzShowPagination]="false"
+            nzSize="small"
+            nzTableLayout="fixed"
+          >
+            <thead>
+              <tr>
+                <th nzWidth="84px">ID</th>
+                <th>Subject</th>
+                <th nzWidth="120px">Priority</th>
+                <th nzWidth="130px">Status</th>
+                <th nzWidth="150px">Assignee</th>
+                <th nzWidth="120px">SLA</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of t.data; track row.id) {
+                <tr (click)="goTo(row.id)" class="ticket-row">
+                  <td class="mono">{{ row.id }}</td>
+                  <td>
+                    <p class="ticket-row__subject">{{ row.subject }}</p>
+                    <p class="ticket-row__customer">{{ row.customer }}</p>
+                  </td>
+                  <td><nz-tag [nzColor]="priorityTag[row.priority]">{{ row.priority }}</nz-tag></td>
+                  <td><nz-tag [nzColor]="statusTag[row.status]">{{ row.status }}</nz-tag></td>
+                  <td>
+                    @if (row.assigneeId) {
+                      <div class="assignee">
+                        <nz-avatar [nzText]="agentInitials(row.assigneeId)" nzSize="small" [nzGap]="4" />
+                        <span>{{ agentName(row.assigneeId) }}</span>
+                      </div>
+                    } @else {
+                      <span class="muted">Unassigned</span>
+                    }
+                  </td>
+                  <td>
+                    @let info = sla(row.slaDueAt);
+                    <span class="sla" [class.sla--breached]="info.breached">{{ info.text }}</span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </nz-table>
+        </nz-card>
+        <ng-template #ticketsExtra>
+          <a routerLink="/tickets" class="link">View all <nz-icon nzType="right" /></a>
+        </ng-template>
+      </div>
+
+      <div nz-col [nzXs]="24" [nzLg]="8">
+        <nz-card nzTitle="Announcements" class="announcements">
+          <nz-carousel nzAutoPlay nzEffect="scrollx" [nzDotPosition]="'bottom'">
+            @for (note of data.announcements(); track note.id) {
+              <div nz-carousel-content class="announcement">
+                <div class="announcement__head">
+                  <nz-tag [nzColor]="note.category === 'incident' ? 'red' : note.category === 'product' ? 'blue' : note.category === 'process' ? 'purple' : 'green'">
+                    {{ note.category }}
+                  </nz-tag>
+                  <span class="announcement__time">{{ relative(note.publishedAt) }}</span>
+                </div>
+                <p class="announcement__title">{{ note.title }}</p>
+                <p class="announcement__body">{{ note.body }}</p>
+              </div>
+            }
+          </nz-carousel>
+        </nz-card>
+      </div>
+    </div>
+  }
+</div>
+
+<nz-float-button
+  nzIcon="vertical-align-top"
+  nz-tooltip
+  nzTooltipTitle="Scroll to top"
+  nzTooltipPlacement="left"
+  (nzOnClick)="scrollTop()"
+/>
