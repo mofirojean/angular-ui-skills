@@ -10,6 +10,31 @@
   margin-top: 16px !important;
 }
 
+// Equalize card heights inside the volume + agents row. The longer card sets
+// the row height, and the sparkline stretches to fill its card's body.
+.row-volume {
+  ::ng-deep nz-card,
+  ::ng-deep .ant-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  ::ng-deep .ant-card-body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  app-sparkline {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+}
+
 // --- KPI cards ---
 
 .kpi {

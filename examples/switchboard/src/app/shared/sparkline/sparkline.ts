@@ -40,12 +40,15 @@ interface SeriesPath {
   `,
   styles: `
     :host {
-      display: block;
+      display: flex;
+      flex-direction: column;
       width: 100%;
+      height: 100%;
     }
     .chart {
       width: 100%;
-      height: 180px;
+      flex: 1 1 auto;
+      min-height: 160px;
       display: block;
     }
     .line {

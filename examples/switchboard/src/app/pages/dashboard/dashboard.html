@@ -63,7 +63,7 @@
     </div>
 
     <!-- Volume + agents -->
-    <div nz-row [nzGutter]="[16, 16]" class="row-spacer">
+    <div nz-row [nzGutter]="[16, 16]" class="row-spacer row-volume">
       <div nz-col [nzXs]="24" [nzLg]="16">
         <nz-card nzTitle="Ticket volume, last 14 days" [nzExtra]="volumeLegend">
           <app-sparkline [data]="data.volume()" />
