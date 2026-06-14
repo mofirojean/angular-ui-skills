@@ -1,0 +1,332 @@
+<div class="page">
+  <!-- Page header -->
+  <header class="page-header">
+    <div>
+      <h2 class="page-title">Tickets</h2>
+      <p class="page-sub">
+        {{ filtered().length }} ticket{{ filtered().length === 1 ? '' : 's' }} match
+        @if (hasActiveFilters()) { · <button class="link-btn" (click)="reset()">clear filters</button> }
+      </p>
+    </div>
+    <button nz-button nzType="primary" (click)="openNewTicket()">
+      <nz-icon nzType="plus" /> New ticket
+    </button>
+  </header>
+
+  <!-- Filters bar -->
+  <div class="filters">
+    <nz-input-group [nzPrefix]="filterSearchIcon" class="filters__search">
+      <input
+        type="text"
+        nz-input
+        placeholder="Search ticket ID, subject, or customer"
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+      />
+    </nz-input-group>
+    <ng-template #filterSearchIcon><nz-icon nzType="search" /></ng-template>
+
+    <nz-segmented
+      [nzOptions]="statusOptions"
+      [ngModel]="statusFilter()"
+      (ngModelChange)="statusFilter.set($event)"
+    />
+
+    <nz-select
+      class="filters__select"
+      nzPlaceHolder="Priority"
+      nzAllowClear
+      [ngModel]="priorityFilter()"
+      (ngModelChange)="priorityFilter.set($event)"
+    >
+      @for (opt of priorityOptions; track opt.value) {
+        <nz-option [nzValue]="opt.value" [nzLabel]="opt.label" />
+      }
+    </nz-select>
+
+    <nz-select
+      class="filters__select filters__select--assignee"
+      nzPlaceHolder="Assignee"
+      nzAllowClear
+      nzShowSearch
+      [ngModel]="assigneeFilter()"
+      (ngModelChange)="assigneeFilter.set($event)"
+    >
+      @for (opt of assigneeOptions(); track opt.value) {
+        <nz-option [nzValue]="opt.value" [nzLabel]="opt.label" />
+      }
+    </nz-select>
+
+    <nz-range-picker
+      class="filters__range"
+      [ngModel]="dateRange()"
+      (ngModelChange)="dateRange.set($event)"
+    />
+
+    @if (hasActiveFilters()) {
+      <button nz-button nzType="text" (click)="reset()" class="filters__reset">
+        <nz-icon nzType="close-circle" /> Reset
+      </button>
+    }
+  </div>
+
+  <!-- Bulk action toolbar -->
+  @if (selectedIds().length > 0) {
+    <div class="bulk-bar">
+      <span class="bulk-bar__count">
+        <nz-icon nzType="check-circle" class="bulk-bar__count-icon" />
+        {{ selectedIds().length }} selected
+      </span>
+      <nz-divider nzType="vertical" />
+      <button nz-button nzType="text" nzSize="small" (click)="bulkAssign()">
+        <nz-icon nzType="user-switch" /> Assign to me
+      </button>
+      <button nz-button nzType="text" nzSize="small" (click)="bulkResolve()">
+        <nz-icon nzType="check" /> Resolve
+      </button>
+      <button nz-button nzType="text" nzSize="small" (click)="bulkExport()">
+        <nz-icon nzType="export" /> Export
+      </button>
+      <button nz-button nzType="text" nzSize="small" class="bulk-bar__clear" (click)="clearSelection()">
+        Clear
+      </button>
+    </div>
+  }
+
+  <!-- Table -->
+  <nz-card class="table-card" [nzBordered]="false">
+    <nz-table
+      #t
+      [nzData]="filtered()"
+      [nzPageSize]="10"
+      [nzPageSizeOptions]="[10, 20, 50]"
+      [nzShowSizeChanger]="true"
+      nzShowPagination
+      nzSize="small"
+      nzTableLayout="fixed"
+      [nzScroll]="{ x: '1200px' }"
+      [nzNoResult]="emptyTpl"
+    >
+      <thead>
+        <tr>
+          <th nzWidth="44px" nzLeft class="select-col">
+            <label
+              nz-checkbox
+              [nzChecked]="allOnPageSelected()"
+              [nzIndeterminate]="someSelected()"
+              (nzCheckedChange)="togglePage($event)"
+            ></label>
+          </th>
+          <th nzWidth="92px" nzLeft [nzSortFn]="sortById">ID</th>
+          <th [nzSortFn]="sortBySubject">Subject</th>
+          <th nzWidth="170px" [nzSortFn]="sortByCustomer">Customer</th>
+          <th nzWidth="120px" [nzSortFn]="sortByPriority">Priority</th>
+          <th nzWidth="130px" [nzSortFn]="sortByStatus">Status</th>
+          <th nzWidth="170px">Assignee</th>
+          <th nzWidth="120px" [nzSortFn]="sortByUpdated">Updated</th>
+          <th nzWidth="140px" [nzSortFn]="sortBySla">SLA</th>
+          <th nzWidth="56px" nzRight></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of t.data; track row.id) {
+          <tr
+            class="ticket-row"
+            (click)="open(row.id)"
+            (contextmenu)="onRowContext($event, row)"
+          >
+            <td nzLeft class="select-col" (click)="$event.stopPropagation()">
+              <label
+                nz-checkbox
+                [nzChecked]="isSelected(row.id)"
+                (nzCheckedChange)="toggleRow(row.id, $event)"
+              ></label>
+            </td>
+
+            <td nzLeft class="mono">
+              <button
+                type="button"
+                class="expand-btn"
+                (click)="$event.stopPropagation(); toggleExpand(row.id)"
+                [attr.aria-label]="isExpanded(row.id) ? 'Collapse' : 'Expand'"
+              >
+                <nz-icon [nzType]="isExpanded(row.id) ? 'down' : 'right'" />
+              </button>
+              {{ row.id }}
+            </td>
+
+            <td>
+              <span class="cell-subject">{{ row.subject }}</span>
+            </td>
+
+            <td>{{ row.customer }}</td>
+
+            <td (click)="$event.stopPropagation()">
+              @if (editingPriorityId() === row.id) {
+                <nz-select
+                  class="inline-edit"
+                  nzSize="small"
+                  [ngModel]="row.priority"
+                  (ngModelChange)="savePriority(row.id, $event)"
+                  (nzOpenChange)="!$event && cancelEditPriority()"
+                  nzAutoFocus
+                >
+                  @for (opt of priorityOptions; track opt.value) {
+                    <nz-option [nzValue]="opt.value" [nzLabel]="opt.label" />
+                  }
+                </nz-select>
+              } @else {
+                <button
+                  type="button"
+                  class="priority-edit"
+                  (click)="editPriority(row.id)"
+                  nz-tooltip
+                  nzTooltipTitle="Click to edit"
+                >
+                  <nz-tag [nzColor]="priorityTag[row.priority]">{{ row.priority }}</nz-tag>
+                </button>
+              }
+            </td>
+
+            <td>
+              <nz-tag [nzColor]="statusTag[row.status]">{{ row.status }}</nz-tag>
+            </td>
+
+            <td>
+              @if (row.assigneeId) {
+                <div class="assignee">
+                  <nz-avatar [nzText]="agentInitials(row.assigneeId)" nzSize="small" [nzGap]="4" />
+                  <span>{{ agentName(row.assigneeId) }}</span>
+                </div>
+              } @else {
+                <span class="muted">Unassigned</span>
+              }
+            </td>
+
+            <td class="muted">{{ relative(row.updatedAt) }}</td>
+
+            <td>
+              @let info = sla(row.slaDueAt);
+              <span class="sla" [class.sla--breached]="info.breached">{{ info.text }}</span>
+            </td>
+
+            <td nzRight (click)="$event.stopPropagation()">
+              <button
+                nz-button
+                nzType="text"
+                nzSize="small"
+                nz-dropdown
+                [nzDropdownMenu]="rowActions"
+                nzTrigger="click"
+                aria-label="Row actions"
+              >
+                <nz-icon nzType="more" />
+              </button>
+              <nz-dropdown-menu #rowActions="nzDropdownMenu">
+                <ul nz-menu>
+                  <li nz-menu-item (click)="open(row.id)">
+                    <nz-icon nzType="eye" /> Open
+                  </li>
+                  <li nz-menu-item (click)="data.updateTicket(row.id, { assigneeId: 'a-001', status: 'in-progress' })">
+                    <nz-icon nzType="user-switch" /> Assign to me
+                  </li>
+                  <li nz-menu-item (click)="data.updateTicket(row.id, { status: 'resolved' })">
+                    <nz-icon nzType="check-circle" /> Mark resolved
+                  </li>
+                  <li nz-menu-divider></li>
+                  <li nz-menu-item nzDanger>
+                    <nz-icon nzType="delete" /> Archive
+                  </li>
+                </ul>
+              </nz-dropdown-menu>
+            </td>
+          </tr>
+
+          @if (isExpanded(row.id)) {
+            <tr class="expand-row">
+              <td nzLeft></td>
+              <td [attr.colspan]="9" class="expand-cell">
+                <div class="expand-grid">
+                  <div>
+                    <p class="expand-label">Subject</p>
+                    <p class="expand-value">{{ row.subject }}</p>
+                  </div>
+                  <div>
+                    <p class="expand-label">Customer</p>
+                    <p class="expand-value">{{ row.customer }}</p>
+                  </div>
+                  <div>
+                    <p class="expand-label">Created</p>
+                    <p class="expand-value">{{ relative(row.createdAt) }}</p>
+                  </div>
+                  <div>
+                    <p class="expand-label">Tags</p>
+                    <div class="expand-tags">
+                      @for (tag of row.tags; track tag) {
+                        <nz-tag>{{ tag }}</nz-tag>
+                      }
+                      @if (row.tags.length === 0) {
+                        <span class="muted">No tags</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </nz-table>
+
+    <ng-template #emptyTpl>
+      <div class="table-empty">
+        <nz-empty nzNotFoundContent="No tickets match these filters" />
+        @if (hasActiveFilters()) {
+          <button nz-button nzType="primary" (click)="reset()">Clear filters</button>
+        }
+      </div>
+    </ng-template>
+  </nz-card>
+
+  <!-- Right-click row context menu -->
+  <nz-dropdown-menu #rowMenu="nzDropdownMenu">
+    <ul nz-menu>
+      <li nz-menu-item (click)="ctxAssignToMe()">
+        <nz-icon nzType="user-switch" /> Assign to me
+      </li>
+      <li nz-menu-item (click)="ctxBumpPriority()">
+        <nz-icon nzType="arrow-up" /> Bump priority
+      </li>
+      <li nz-menu-divider></li>
+      <li nz-menu-item (click)="ctxMarkOpen()">
+        <nz-icon nzType="inbox" /> Reopen
+      </li>
+      <li nz-menu-item (click)="ctxClose()">
+        <nz-icon nzType="check-circle" /> Mark resolved
+      </li>
+    </ul>
+  </nz-dropdown-menu>
+</div>
+
+<!-- New ticket drawer (Phase 4 will populate the Steps wizard inside) -->
+<nz-drawer
+  [nzVisible]="drawerOpen()"
+  nzTitle="New ticket"
+  nzPlacement="right"
+  [nzWidth]="520"
+  (nzOnClose)="closeDrawer()"
+>
+  <ng-container *nzDrawerContent>
+    <div class="drawer-placeholder">
+      <div class="drawer-placeholder__icon">
+        <nz-icon nzType="profile" />
+      </div>
+      <p class="drawer-placeholder__title">Coming in Phase 4</p>
+      <p class="drawer-placeholder__hint">
+        The new-ticket wizard runs inside this Drawer as an <code>nz-steps</code> flow with
+        customer → category → priority → review stages.
+      </p>
+      <button nz-button nzType="primary" (click)="closeDrawer()">Got it</button>
+    </div>
+  </ng-container>
+</nz-drawer>

@@ -57,4 +57,22 @@ export class DataService {
     if (!id) return undefined;
     return this.agents().find((a) => a.id === id);
   }
+
+  ticketById(id: string): Ticket | undefined {
+    return this.tickets().find((t) => t.id === id);
+  }
+
+  updateTicket(id: string, patch: Partial<Omit<Ticket, 'id'>>): void {
+    this.tickets.update((list) =>
+      list.map((t) => (t.id === id ? { ...t, ...patch, updatedAt: new Date() } : t)),
+    );
+  }
+
+  bulkUpdateTickets(ids: Iterable<string>, patch: Partial<Omit<Ticket, 'id'>>): void {
+    const idSet = new Set(ids);
+    if (idSet.size === 0) return;
+    this.tickets.update((list) =>
+      list.map((t) => (idSet.has(t.id) ? { ...t, ...patch, updatedAt: new Date() } : t)),
+    );
+  }
 }
