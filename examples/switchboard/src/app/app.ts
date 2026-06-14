@@ -1,8 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
-import { NavigationEnd } from '@angular/router';
 
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
@@ -15,6 +14,7 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 
 import { NAV } from './core/nav';
 import { ThemeService } from './core/theme.service';
+import { DataService } from './data/data.service';
 
 @Component({
   selector: 'app-root',
@@ -37,11 +37,26 @@ import { ThemeService } from './core/theme.service';
 })
 export class App {
   protected readonly theme = inject(ThemeService);
+  protected readonly data = inject(DataService);
   private readonly router = inject(Router);
 
   protected readonly collapsed = signal(false);
   protected readonly nav = NAV;
-  protected readonly user = { name: 'Kasun', initial: 'K' };
+  protected readonly currentAgent = {
+    name: 'Kasun Perera',
+    initials: 'KP',
+    role: 'Senior Agent',
+    online: true,
+  };
+
+  /** Per-item live badge counts. Keys match `NavItem.badgeKey`. */
+  protected readonly badges = computed<Record<string, number>>(() => {
+    const list = this.data.tickets();
+    return {
+      tickets: list.filter((t) => t.status === 'open' || t.status === 'in-progress').length,
+      queues: list.filter((t) => t.status === 'in-progress' || t.status === 'waiting').length,
+    };
+  });
 
   private readonly currentUrl = toSignal(
     this.router.events.pipe(
@@ -53,8 +68,13 @@ export class App {
 
   protected readonly pageTitle = computed(() => {
     const url = this.currentUrl();
-    const match = this.nav.find((n) => n.path === url || (n.path !== '/' && url.startsWith(n.path)));
-    return match?.label ?? 'Switchboard';
+    for (const section of this.nav) {
+      const match = section.items.find(
+        (i) => i.path === url || (i.path !== '/' && url.startsWith(i.path)),
+      );
+      if (match) return match.label;
+    }
+    return 'Switchboard';
   });
 
   protected toggleCollapsed(): void {

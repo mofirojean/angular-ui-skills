@@ -3,35 +3,73 @@
     nzCollapsible
     [nzCollapsed]="collapsed()"
     (nzCollapsedChange)="collapsed.set($event)"
-    [nzWidth]="220"
-    [nzCollapsedWidth]="64"
+    [nzWidth]="232"
+    [nzCollapsedWidth]="68"
     [nzTrigger]="null"
     nzTheme="dark"
+    class="sider"
   >
-    <a routerLink="/" class="brand">
+    <a routerLink="/" class="brand" [class.brand--collapsed]="collapsed()">
       <span class="brand-mark">SB</span>
       @if (!collapsed()) {
-        <span class="brand-name">Switchboard</span>
+        <span class="brand-text">
+          <span class="brand-name">Switchboard</span>
+          <span class="brand-sub">Support Console</span>
+        </span>
       }
     </a>
 
-    <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="collapsed()">
-      @for (item of nav; track item.path) {
-        <li
-          nz-menu-item
-          [routerLink]="item.path"
-          routerLinkActive="ant-menu-item-selected"
-          [routerLinkActiveOptions]="{ exact: item.path === '/' }"
-          [nzMatchRouter]="false"
-          nz-tooltip
-          [nzTooltipTitle]="collapsed() ? item.label : ''"
-          nzTooltipPlacement="right"
-        >
-          <nz-icon [nzType]="item.icon" />
-          <span>{{ item.label }}</span>
-        </li>
-      }
-    </ul>
+    <nav class="sider__nav">
+      <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="collapsed()">
+        @for (section of nav; track section.label) {
+          @if (!collapsed()) {
+            <li class="nav-section">{{ section.label }}</li>
+          }
+          @for (item of section.items; track item.path) {
+            <li
+              nz-menu-item
+              [routerLink]="item.path"
+              routerLinkActive="ant-menu-item-selected"
+              [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+              [nzMatchRouter]="false"
+              nz-tooltip
+              [nzTooltipTitle]="collapsed() ? item.label : ''"
+              nzTooltipPlacement="right"
+              class="nav-item"
+            >
+              <nz-icon [nzType]="item.icon" />
+              <span class="nav-item__label">{{ item.label }}</span>
+              @if (item.badgeKey && !collapsed() && badges()[item.badgeKey]) {
+                <span class="nav-item__badge">{{ badges()[item.badgeKey] }}</span>
+              }
+            </li>
+          }
+        }
+      </ul>
+    </nav>
+
+    <div class="sider__user" [class.sider__user--collapsed]="collapsed()">
+      <a nz-dropdown [nzDropdownMenu]="userMenu" nzTrigger="click" nzPlacement="topRight" class="user-trigger">
+        <nz-badge nzDot [nzStatus]="currentAgent.online ? 'success' : 'default'">
+          <nz-avatar [nzText]="currentAgent.initials" nzSize="default" [nzGap]="4" />
+        </nz-badge>
+        @if (!collapsed()) {
+          <div class="user-meta">
+            <span class="user-name">{{ currentAgent.name }}</span>
+            <span class="user-role">{{ currentAgent.role }}</span>
+          </div>
+          <nz-icon nzType="down" class="user-chevron" />
+        }
+      </a>
+      <nz-dropdown-menu #userMenu="nzDropdownMenu">
+        <ul nz-menu>
+          <li nz-menu-item><nz-icon nzType="user" /> Profile</li>
+          <li nz-menu-item><nz-icon nzType="setting" /> Preferences</li>
+          <li nz-menu-divider></li>
+          <li nz-menu-item><nz-icon nzType="logout" /> Sign out</li>
+        </ul>
+      </nz-dropdown-menu>
+    </div>
   </nz-sider>
 
   <nz-layout>
@@ -73,24 +111,6 @@
         >
           <nz-icon nzType="question-circle" />
         </a>
-
-        <a nz-dropdown [nzDropdownMenu]="userMenu" nzTrigger="click">
-          <nz-avatar nzText="{{ user.initial }}" [nzGap]="4"></nz-avatar>
-        </a>
-        <nz-dropdown-menu #userMenu="nzDropdownMenu">
-          <ul nz-menu>
-            <li nz-menu-item>
-              <nz-icon nzType="user" /> Profile
-            </li>
-            <li nz-menu-item>
-              <nz-icon nzType="setting" /> Settings
-            </li>
-            <li nz-menu-divider></li>
-            <li nz-menu-item>
-              <nz-icon nzType="logout" /> Sign out
-            </li>
-          </ul>
-        </nz-dropdown-menu>
       </div>
     </nz-header>
 
