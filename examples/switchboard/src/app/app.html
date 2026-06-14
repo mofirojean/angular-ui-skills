@@ -81,6 +81,33 @@
         <h1 class="app-header__title">{{ pageTitle() }}</h1>
       </div>
 
+      <div class="app-header__center">
+        <nz-input-group
+          [nzPrefix]="searchPrefix"
+          [nzSuffix]="searchSuffix"
+          class="app-search"
+        >
+          <input
+            #searchInput
+            type="text"
+            nz-input
+            placeholder="Search tickets, agents, articles..."
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+            aria-label="Search"
+          />
+        </nz-input-group>
+        <ng-template #searchPrefix>
+          <nz-icon nzType="search" class="app-search__icon" />
+        </ng-template>
+        <ng-template #searchSuffix>
+          <span class="app-search__kbd" aria-hidden="true">
+            <kbd>{{ isMac ? '⌘' : 'Ctrl' }}</kbd>
+            <kbd>K</kbd>
+          </span>
+        </ng-template>
+      </div>
+
       <div class="app-header__right">
         <button
           nz-button

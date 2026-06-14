@@ -1,7 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  HostListener,
+  computed,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
+import { FormsModule } from '@angular/forms';
 
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
@@ -11,6 +21,7 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzInputModule } from 'ng-zorro-antd/input';
 
 import { NAV } from './core/nav';
 import { ThemeService } from './core/theme.service';
@@ -19,6 +30,7 @@ import { DataService } from './data/data.service';
 @Component({
   selector: 'app-root',
   imports: [
+    FormsModule,
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
@@ -30,6 +42,7 @@ import { DataService } from './data/data.service';
     NzBadgeModule,
     NzTooltipModule,
     NzDropDownModule,
+    NzInputModule,
   ],
   templateUrl: './app.html',
   styleUrl: './app.less',
@@ -41,6 +54,9 @@ export class App {
   private readonly router = inject(Router);
 
   protected readonly collapsed = signal(false);
+  protected readonly searchQuery = signal('');
+  protected readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
+
   protected readonly nav = NAV;
   protected readonly currentAgent = {
     name: 'Kasun Perera',
@@ -49,7 +65,9 @@ export class App {
     online: true,
   };
 
-  /** Per-item live badge counts. Keys match `NavItem.badgeKey`. */
+  protected readonly isMac =
+    typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+
   protected readonly badges = computed<Record<string, number>>(() => {
     const list = this.data.tickets();
     return {
@@ -76,6 +94,18 @@ export class App {
     }
     return 'Switchboard';
   });
+
+  @HostListener('document:keydown', ['$event'])
+  protected onKeydown(event: KeyboardEvent): void {
+    const modifier = this.isMac ? event.metaKey : event.ctrlKey;
+    if (modifier && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      this.searchInput()?.nativeElement.focus();
+    }
+    if (event.key === 'Escape' && document.activeElement === this.searchInput()?.nativeElement) {
+      this.searchInput()?.nativeElement.blur();
+    }
+  }
 
   protected toggleCollapsed(): void {
     this.collapsed.update((v) => !v);
