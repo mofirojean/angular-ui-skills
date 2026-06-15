@@ -1,5 +1,7 @@
 # Angular UI Skills
 
+![Angular UI Skills banner](https://raw.githubusercontent.com/mofirojean/angular-ui-skills/master/docs/public/projects/add-to-readme.png)
+
 Agent skills that teach AI coding assistants (Claude Code, Cursor, Codex, GitHub Copilot, and others) how to build Angular apps with popular UI component libraries. Each skill is specialized per library while staying composable with the `angular-developer` base skill from Google.
 
 ## Install

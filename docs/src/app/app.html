@@ -1,16 +1,15 @@
-<div class="min-h-screen overflow-x-hidden">
-  <header class="border-b border-[var(--color-line)] dark:border-[var(--color-line-dark)] sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-[var(--color-ink)]/80">
-    <div class="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3 sm:px-8">
+<div class="min-h-screen overflow-x-clip">
+  <header class="border-b border-[var(--color-line)] dark:border-[var(--color-line-dark)] sticky top-0 z-50 backdrop-blur-md bg-white/85 dark:bg-[var(--color-ink)]/85">
+    <div class="mx-auto flex max-w-7xl items-center gap-5 px-5 py-3 sm:px-8">
       <a href="#top" class="flex items-center gap-2.5">
         <span class="shield h-6 w-5 shrink-0"></span>
-        <span class="text-[15px] font-semibold tracking-tight">Angular UI Skills</span>
+        <span class="text-[14px] font-semibold tracking-tight">angular-ui-skills</span>
       </a>
-      <nav class="ml-auto hidden items-center gap-1 text-[13px] md:flex">
-        <a href="#skills" class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] rounded-md px-3 py-1.5 transition-colors">Skills</a>
-        <a href="#examples" class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] rounded-md px-3 py-1.5 transition-colors">Examples</a>
-        <a href="#install" class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] rounded-md px-3 py-1.5 transition-colors">Install</a>
-        <a href="#architecture" class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] rounded-md px-3 py-1.5 transition-colors">Architecture</a>
-        <a href="#faq" class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] rounded-md px-3 py-1.5 transition-colors">FAQ</a>
+      <nav class="ml-auto hidden items-center gap-5 text-[12.5px] font-medium md:flex">
+        <a href="#skills" class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Skills</a>
+        <a href="#examples" class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Examples</a>
+        <a href="#install" class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Install</a>
+        <a href="#faq" class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">FAQ</a>
       </nav>
       <div class="ml-auto flex items-center gap-1.5 md:ml-0">
         <button
@@ -25,322 +24,208 @@
           href="https://github.com/mofirojean/angular-ui-skills"
           target="_blank"
           rel="noopener"
-          class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] hover:bg-zinc-100 dark:hover:bg-zinc-800 hidden h-8 items-center gap-1.5 rounded-md border px-3 text-[12px] font-medium transition-colors sm:inline-flex"
+          class="hover:bg-zinc-100 dark:hover:bg-zinc-800 hidden h-8 w-8 items-center justify-center rounded-md transition-colors sm:inline-flex"
+          aria-label="View on GitHub"
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.03c-3.2.7-3.87-1.37-3.87-1.37-.52-1.32-1.28-1.67-1.28-1.67-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.84 1.18 3.1 0 4.42-2.7 5.4-5.27 5.68.41.36.78 1.06.78 2.13v3.16c0 .31.21.66.79.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5Z"/>
           </svg>
-          GitHub
         </a>
         <a
-          href="#install"
-          class="bg-[var(--color-ng-red-600)] hover:bg-[var(--color-ng-red-700)] flex h-8 items-center rounded-md px-3 text-[12px] font-medium text-white transition-colors"
+          href="#top"
+          class="border-zinc-900 dark:border-white bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 dark:text-zinc-900 flex h-8 items-center rounded-md border px-3 font-mono text-[11px] uppercase tracking-wider text-white transition-colors"
         >
-          Get started
+          Install
         </a>
       </div>
     </div>
   </header>
 
   <section id="top" class="relative overflow-hidden">
-    <div class="bg-grid pointer-events-none absolute inset-0 opacity-60"></div>
+    <div class="bg-grid pointer-events-none absolute inset-0 opacity-40"></div>
     <div class="bg-radial-fade pointer-events-none absolute inset-0"></div>
 
-    <div class="relative mx-auto max-w-7xl px-5 pt-10 pb-14 sm:px-8 sm:pt-16 sm:pb-20 md:pt-24 md:pb-28">
-      <div class="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-12">
-        <div class="flex flex-col items-center text-center lg:items-start lg:text-left">
-          <a
-            href="https://github.com/mofirojean/angular-ui-skills"
-            target="_blank"
-            rel="noopener"
-            class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] bg-white/70 dark:bg-[var(--color-ink-2)]/70 mb-5 inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-full border px-3 py-1 text-[10px] font-medium backdrop-blur sm:text-[11px]"
+    <div class="relative mx-auto max-w-3xl px-5 pb-12 pt-14 text-center sm:px-8 sm:pb-16 sm:pt-20 md:pt-24">
+
+      <!-- Library coverage avatars, the visual hook above the title -->
+      <div class="mb-7 flex justify-center">
+        <div class="flex -space-x-2">
+          <span class="border-white dark:border-[var(--color-ink)] flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 bg-rose-50 dark:bg-rose-950/40 shadow-sm" title="Spartan/ng">
+            <img src="logos/spartan-ng.svg" alt="Spartan/ng" class="h-4 w-4 object-contain" />
+          </span>
+          <span class="border-white dark:border-[var(--color-ink)] flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 bg-zinc-100 dark:bg-zinc-900 shadow-sm" title="PrimeNG">
+            <img src="logos/primeng.svg" alt="PrimeNG" class="h-4 w-4 object-contain" />
+          </span>
+          <span class="border-white dark:border-[var(--color-ink)] flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 bg-sky-50 dark:bg-sky-950/30 shadow-sm" title="NG-ZORRO">
+            <img src="logos/ng-zorro.svg" alt="NG-ZORRO" class="h-4 w-4 object-contain" />
+          </span>
+          <span class="border-white dark:border-[var(--color-ink)] flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 bg-pink-50 dark:bg-pink-950/30 shadow-sm" title="Angular Material">
+            <img src="logos/angular-material.webp" alt="Angular Material" class="h-4 w-4 object-contain" />
+          </span>
+        </div>
+      </div>
+
+      <h1 class="text-balance text-[36px] font-semibold leading-[1.05] tracking-tight sm:text-[52px] lg:text-[60px]">
+        The Angular UI skills ecosystem
+      </h1>
+
+      <p class="mx-auto mt-5 max-w-2xl text-balance text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400 sm:text-[16.5px]">
+        Per-library agent skills that teach AI coding assistants how to ship real Angular apps. Install with one command, compose with Google's
+        <code class="bg-zinc-100 dark:bg-zinc-800 rounded px-1.5 py-0.5 font-mono text-[13.5px]">angular-developer</code>
+        base skill, and every skill is validated by a reference app you can deploy.
+      </p>
+
+      <!-- Try it now, the focal install command -->
+      <div class="mx-auto mt-10 max-w-2xl text-left">
+        <div class="mb-2 flex items-baseline justify-between">
+          <p class="font-mono text-[10.5px] uppercase tracking-wider text-zinc-500">Try it now</p>
+          <button
+            type="button"
+            class="hover:text-zinc-900 dark:hover:text-zinc-100 font-mono text-[10.5px] uppercase tracking-wider text-zinc-500 transition-colors"
+            (click)="copyInstall($event)"
+            aria-label="Copy install command"
           >
-            <span class="font-mono uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Open source</span>
-            <span class="bg-[var(--color-line)] dark:bg-[var(--color-line-dark)] hidden h-3 w-px sm:inline-block"></span>
-            <span>3 skills ready, 4 reference apps live</span>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-          </a>
-
-          <h1 class="text-[34px] font-semibold leading-[1.05] tracking-tight sm:text-[46px] lg:text-[56px]">
-            Teach your agent
-            <br />
-            <span class="text-gradient-ng">Angular UI libraries</span>
-          </h1>
-
-          <p class="mt-4 max-w-xl text-[14px] leading-relaxed text-zinc-600 dark:text-zinc-400 sm:mt-5 sm:text-[15px] lg:text-[17px]">
-            Per-library agent skills that compose with the
-            <code class="bg-zinc-100 dark:bg-zinc-800 rounded px-1.5 py-0.5 font-mono text-[13px]">angular-developer</code>
-            base skill. Specialized for Spartan/ng, PrimeNG, NG-ZORRO and Material, validated by reference apps, multi-runtime.
-          </p>
-
-          <div class="mt-7 flex flex-wrap items-center gap-3">
-            <a
-              href="#install"
-              class="bg-[var(--color-ng-red-600)] hover:bg-[var(--color-ng-red-700)] inline-flex items-center gap-2 rounded-lg px-5 py-3 text-[14px] font-semibold text-white shadow-lg shadow-[var(--color-ng-red-600)]/20 transition-colors"
-            >
-              Install a skill
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </a>
-            <a
-              href="https://github.com/mofirojean/angular-ui-skills"
-              target="_blank"
-              rel="noopener"
-              class="border-[var(--color-line-strong)] dark:border-[var(--color-line-dark-strong)] hover:bg-zinc-100 dark:hover:bg-zinc-800 inline-flex items-center gap-2 rounded-lg border px-5 py-3 text-[14px] font-semibold transition-colors"
-            >
-              View on GitHub
-            </a>
+            {{ copiedKey() === 'hero-install' ? 'Copied' : 'Copy' }}
+          </button>
+        </div>
+        <div class="border-[var(--color-line-strong)] dark:border-[var(--color-line-dark-strong)] group relative overflow-hidden rounded-xl border bg-white dark:bg-[var(--color-ink-2)] shadow-lg shadow-zinc-900/[0.06]">
+          <div class="bg-zinc-50 dark:bg-[var(--color-ink-3)] border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex items-center justify-between border-b px-4 py-2.5">
+            <div class="flex items-center gap-1.5">
+              <span class="bg-red-500/60 h-2.5 w-2.5 rounded-full"></span>
+              <span class="bg-yellow-500/60 h-2.5 w-2.5 rounded-full"></span>
+              <span class="bg-emerald-500/60 h-2.5 w-2.5 rounded-full"></span>
+            </div>
+            <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-500">install</span>
           </div>
-
-          <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] text-zinc-500 dark:text-zinc-400">
-            <span class="flex items-center gap-1.5"><span class="bg-emerald-500 h-1.5 w-1.5 rounded-full"></span>MIT licensed</span>
-            <span class="flex items-center gap-1.5"><span class="bg-emerald-500 h-1.5 w-1.5 rounded-full"></span>14+ agent runtimes</span>
-            <span class="flex items-center gap-1.5"><span class="bg-emerald-500 h-1.5 w-1.5 rounded-full"></span>Angular v21</span>
+          <div class="overflow-x-auto px-5 py-4 text-left font-mono text-[13.5px] sm:text-[14.5px]">
+            <span class="text-zinc-400 dark:text-zinc-500">$</span>
+            <span class="ml-2 text-zinc-900 dark:text-zinc-100">npx skills&#64;latest add mofirojean/angular-ui-skills -g</span>
           </div>
         </div>
+        <p class="mt-2 text-[11.5px] text-zinc-500">
+          Registers all 3 skills with your agent. Project-scoped? Drop the
+          <code class="font-mono text-[11.5px]">-g</code>.
+        </p>
+      </div>
 
-        <div class="relative">
-          <div class="bg-gradient-to-br from-[var(--color-ng-red-600)] via-[var(--color-ng-pink)] to-[var(--color-ng-purple)] absolute -inset-2 rounded-2xl opacity-30 blur-2xl"></div>
-          <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] bg-[var(--color-ink-2)] relative overflow-hidden rounded-xl border shadow-2xl">
-            <div class="border-[var(--color-line-dark)] flex items-center gap-1.5 border-b px-4 py-2.5">
-              <span class="bg-red-500/80 h-2.5 w-2.5 rounded-full"></span>
-              <span class="bg-yellow-500/80 h-2.5 w-2.5 rounded-full"></span>
-              <span class="bg-emerald-500/80 h-2.5 w-2.5 rounded-full"></span>
-              <span class="ml-3 font-mono text-[10px] text-zinc-500 uppercase tracking-wider">terminal</span>
-            </div>
-            <div class="code-block overflow-x-auto px-4 py-3 text-zinc-200 sm:px-5 sm:py-4">
-              @for (l of heroSnippet; track $index) {
-                @switch (l.kind) {
-                  @case ('com') { <div class="code-line"><span class="tk-com">{{ l.text }}</span></div> }
-                  @case ('cmd') { <div class="code-line"><span class="text-zinc-500">$</span> <span class="text-zinc-200">{{ l.text }}</span></div> }
-                  @case ('out') { <div class="code-line"><span class="text-emerald-400">{{ l.text }}</span></div> }
-                  @case ('prompt') { <div class="code-line"><span class="tk-fn">{{ l.text }}</span></div> }
-                  @default { <div class="code-line">&nbsp;</div> }
-                }
-              }
-            </div>
-          </div>
-          <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] bg-white/85 dark:bg-[var(--color-ink-2)]/85 absolute -bottom-7 -left-7 hidden items-center gap-3 rounded-xl border p-3 pr-4 shadow-xl backdrop-blur lg:flex animate-float">
-            <div class="flex -space-x-2">
-              <div class="border-white dark:border-[var(--color-ink-2)] flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 bg-rose-50 dark:bg-rose-950/40">
-                <img src="logos/spartan-ng.svg" alt="Spartan/ng" class="h-5 w-5 object-contain" />
-              </div>
-              <div class="border-white dark:border-[var(--color-ink-2)] flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 bg-zinc-100 dark:bg-zinc-900">
-                <img src="logos/primeng.svg" alt="PrimeNG" class="h-5 w-5 object-contain" />
-              </div>
-              <div class="border-white dark:border-[var(--color-ink-2)] flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 bg-sky-50 dark:bg-sky-950/30">
-                <img src="logos/ng-zorro.svg" alt="NG-ZORRO" class="h-5 w-5 object-contain" />
-              </div>
-            </div>
-            <div>
-              <p class="text-[12px] font-semibold leading-tight">3 skills ready</p>
-              <p class="text-[10px] text-zinc-500">Spartan · PrimeNG · NG-ZORRO</p>
-            </div>
-          </div>
-        </div>
+      <!-- Subtle stats line, replaces the big CTAs -->
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11.5px] text-zinc-500 dark:text-zinc-400">
+        <a href="#skills" class="hover:text-zinc-900 dark:hover:text-zinc-100 flex items-center gap-1.5 transition-colors">
+          <span class="bg-emerald-500 h-1.5 w-1.5 rounded-full"></span>3 skills
+        </a>
+        <span class="text-zinc-300 dark:text-zinc-700">·</span>
+        <a href="#examples" class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">4 reference apps</a>
+        <span class="text-zinc-300 dark:text-zinc-700">·</span>
+        <span>20 agent runtimes</span>
+        <span class="text-zinc-300 dark:text-zinc-700">·</span>
+        <span>Angular v21</span>
+        <span class="text-zinc-300 dark:text-zinc-700">·</span>
+        <span>MIT</span>
       </div>
     </div>
   </section>
 
-  <!-- Available for these agents, mirrors the wall on skills.vercel.app -->
+  <!-- Compact text wall, mirrors skills.sh's "Available for these agents" -->
   <section class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] border-t bg-white dark:bg-[var(--color-ink)]">
-    <div class="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
-      <div class="mb-8 flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
-        <div class="max-w-2xl">
-          <p class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] mb-3 font-mono text-[11px] font-semibold uppercase tracking-wider">Compatibility</p>
-          <h2 class="text-[22px] font-semibold tracking-tight sm:text-[26px]">Works with your agent</h2>
-          <p class="mt-2 text-[13.5px] leading-relaxed text-zinc-600 dark:text-zinc-400">
-            One source of truth, many surfaces. The <code class="bg-zinc-100 dark:bg-zinc-800 rounded px-1.5 py-0.5 font-mono text-[12.5px]">npx skills</code> CLI registers the skill with every supported runtime, or grab a single SKILL.md file via the per-agent recipes.
-          </p>
-        </div>
-        <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex items-center gap-3 rounded-lg border bg-zinc-50/70 dark:bg-[var(--color-ink-2)]/70 px-3 py-2 backdrop-blur shrink-0">
-          <span class="font-mono text-[20px] font-semibold tracking-tight">{{ agents.length }}</span>
-          <span class="text-[11px] font-mono uppercase tracking-wider text-zinc-500">Runtimes</span>
-        </div>
-      </div>
+    <div class="mx-auto max-w-3xl px-5 py-10 sm:px-8 sm:py-14 text-center">
+      <p class="font-mono text-[10.5px] uppercase tracking-wider text-zinc-500">Available for these agents</p>
+      <p class="mx-auto mt-3 text-balance text-[14px] leading-relaxed text-zinc-700 dark:text-zinc-300 sm:text-[15px]">
+        @for (a of agents; track a.name; let last = $last) {
+          <span class="inline-block">{{ a.name }}</span>
+          @if (!last) {
+            <span class="text-zinc-300 dark:text-zinc-700 px-1.5" aria-hidden="true">·</span>
+          }
+        }
+      </p>
+    </div>
+  </section>
 
-      <ul class="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-        @for (a of agents; track a.name) {
-          <li class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] hover:border-[var(--color-line-strong)] dark:hover:border-[var(--color-line-dark-strong)] flex items-center gap-2.5 rounded-md border bg-white dark:bg-[var(--color-ink-2)] px-3 py-2.5 transition-colors">
-            <span class="agent-mark agent-mark--{{ a.tone }} flex h-7 w-7 shrink-0 items-center justify-center rounded font-mono text-[10px] font-semibold">
-              {{ a.mark }}
-            </span>
-            <span class="text-[12.5px] font-medium tracking-tight truncate">{{ a.name }}</span>
+  <!-- Why specialise — minimal text-row format inspired by skills.sh -->
+  <section class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] border-t bg-zinc-50/40 dark:bg-[var(--color-ink-2)]/40">
+    <div class="mx-auto max-w-5xl px-5 py-14 sm:px-8 sm:py-18">
+      <p class="text-center font-mono text-[10.5px] uppercase tracking-wider text-zinc-500">Why specialise</p>
+      <h2 class="mt-2 text-center text-[22px] font-semibold tracking-tight sm:text-[26px]">A skill that knows the library</h2>
+
+      <ul class="mx-auto mt-10 max-w-3xl divide-y divide-[var(--color-line)] dark:divide-[var(--color-line-dark)]">
+        @for (f of features; track f.title; let idx = $index) {
+          <li class="grid grid-cols-[28px_1fr] items-baseline gap-6 py-5 sm:grid-cols-[40px_220px_1fr] sm:gap-8">
+            <span class="font-mono text-[11px] text-zinc-400 dark:text-zinc-600">{{ '0' + (idx + 1) }}</span>
+            <h3 class="text-[14.5px] font-semibold tracking-tight col-span-1 sm:col-auto">{{ f.title }}</h3>
+            <p class="text-[13px] leading-relaxed text-zinc-600 dark:text-zinc-400 col-start-2 sm:col-start-3">{{ f.body }}</p>
           </li>
         }
       </ul>
     </div>
   </section>
 
-  <section class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] border-y bg-zinc-50/50 dark:bg-[var(--color-ink-2)]/50">
-    <div class="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
-      <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-        @for (f of features; track f.title) {
-          <div class="group">
-            <div class="bg-[var(--color-ng-red-600)]/10 text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] flex h-10 w-10 items-center justify-center rounded-lg transition-colors group-hover:bg-[var(--color-ng-red-600)] group-hover:text-white">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path [attr.d]="f.icon"/>
-              </svg>
-            </div>
-            <h3 class="mt-4 text-[15px] font-semibold tracking-tight">{{ f.title }}</h3>
-            <p class="mt-1.5 text-[13px] leading-relaxed text-zinc-600 dark:text-zinc-400">{{ f.body }}</p>
-          </div>
-        }
-      </div>
-    </div>
-  </section>
-
-  <section id="skills" class="relative overflow-hidden">
+  <section id="skills" class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] relative overflow-hidden border-t">
     <div aria-hidden="true" class="pointer-events-none absolute inset-0">
-      <div class="absolute -left-32 top-24 h-[420px] w-[420px] rounded-full bg-rose-500/[0.12] dark:bg-rose-500/[0.05] blur-[120px]"></div>
-      <div class="absolute -right-24 top-24 h-[420px] w-[420px] rounded-full bg-red-500/[0.10] dark:bg-red-500/[0.04] blur-[120px]"></div>
-      <div class="absolute -left-24 bottom-24 h-[420px] w-[420px] rounded-full bg-sky-500/[0.12] dark:bg-sky-500/[0.05] blur-[120px]"></div>
-      <div class="absolute -right-32 bottom-24 h-[420px] w-[420px] rounded-full bg-pink-500/[0.12] dark:bg-pink-500/[0.05] blur-[120px]"></div>
+      <div class="absolute -left-32 top-32 hidden h-[320px] w-[320px] rounded-full bg-rose-500/[0.04] dark:bg-rose-500/[0.03] blur-[120px] md:block"></div>
+      <div class="absolute -right-32 bottom-24 hidden h-[320px] w-[320px] rounded-full bg-blue-500/[0.04] dark:bg-blue-500/[0.03] blur-[120px] md:block"></div>
 
-      <img src="logos/spartan-ng.svg" alt="" loading="lazy" decoding="async" class="absolute -left-24 top-24 hidden h-[260px] w-[260px] object-contain opacity-[0.10] saturate-150 dark:opacity-[0.06] sm:block md:-left-20 md:top-32 md:h-[340px] md:w-[340px]" />
-      <img src="logos/primeng.svg" alt="" loading="lazy" decoding="async" class="absolute -right-20 top-32 hidden h-[230px] w-[230px] object-contain opacity-[0.12] saturate-150 dark:opacity-[0.07] sm:block md:-right-16 md:top-40 md:h-[300px] md:w-[300px]" />
-      <img src="logos/ng-zorro.svg" alt="" loading="lazy" decoding="async" class="absolute -left-20 bottom-32 hidden h-[240px] w-[240px] object-contain opacity-[0.10] saturate-150 dark:opacity-[0.06] sm:block md:-left-16 md:bottom-40 md:h-[320px] md:w-[320px]" />
-      <img src="logos/angular-material.webp" alt="" loading="lazy" decoding="async" class="absolute -right-24 bottom-24 hidden h-[260px] w-[260px] object-contain opacity-[0.12] saturate-150 dark:opacity-[0.07] sm:block md:-right-20 md:bottom-32 md:h-[340px] md:w-[340px]" />
-
-      <div class="absolute inset-0 dark:hidden" style="background: radial-gradient(ellipse at center, transparent 0%, transparent 50%, var(--color-paper) 95%);"></div>
-      <div class="absolute inset-0 hidden dark:block" style="background: radial-gradient(ellipse at center, transparent 0%, transparent 45%, var(--color-ink) 95%);"></div>
     </div>
 
-    <div class="relative z-10 mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20 md:py-28">
-    <div class="mb-12 max-w-2xl">
-      <p class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] mb-3 font-mono text-[11px] font-semibold uppercase tracking-wider">Skills</p>
-      <h2 class="text-[26px] font-semibold tracking-tight sm:text-3xl lg:text-4xl">One skill per library, built right</h2>
-      <p class="mt-3 text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400">
-        A single "Angular UI" skill would either be a vague compromise or balloon past a usable context window. Specialized skills mean the agent activates the right one and generates code that matches its conventions.
-      </p>
-    </div>
+    <div class="relative z-10 mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-20 md:py-24">
+      <div class="mb-8 flex flex-col gap-4 md:mb-10 md:flex-row md:items-end md:justify-between md:gap-10">
+        <div class="max-w-xl">
+          <p class="mb-3 font-mono text-[10.5px] uppercase tracking-wider text-zinc-500">Skills Leaderboard</p>
+          <h2 class="text-[24px] font-semibold tracking-tight sm:text-[28px]">One skill per library</h2>
+          <p class="mt-2 text-[13.5px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+            Each skill is pinned to an upstream version and re-validated when the upstream ships. The agent activates the right one based on the project's <code class="bg-zinc-100 dark:bg-zinc-800 rounded px-1.5 py-0.5 font-mono text-[12.5px]">package.json</code>.
+          </p>
+        </div>
+      </div>
 
-    <div class="grid gap-4 lg:grid-cols-2">
-      @for (s of skills; track s.slug) {
-        <article class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] hover:border-[var(--color-line-strong)] dark:hover:border-[var(--color-line-dark-strong)] group relative overflow-hidden rounded-2xl border bg-white dark:bg-[var(--color-ink-2)] p-5 transition-all sm:p-6">
-          <img
-            [src]="s.logo"
-            alt=""
-            aria-hidden="true"
-            loading="lazy"
-            decoding="async"
-            class="pointer-events-none absolute -right-10 -bottom-12 hidden h-56 w-56 object-contain saturate-150 transition-all duration-500 group-hover:-right-6 group-hover:rotate-3 dark:block dark:opacity-[0.10] dark:group-hover:opacity-[0.18]"
-          />
-          <div class="bg-gradient-to-tr pointer-events-none absolute inset-0 hidden from-transparent via-transparent to-[var(--color-ink-2)]/60 dark:block opacity-60"></div>
+      <!-- Leaderboard table -->
+      <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] overflow-hidden rounded-xl border bg-white dark:bg-[var(--color-ink-2)]">
+        <div class="bg-zinc-50/80 dark:bg-[var(--color-ink-3)]/80 border-[var(--color-line)] dark:border-[var(--color-line-dark)] grid grid-cols-[36px_1fr_100px] items-center gap-4 border-b px-5 py-2.5 text-[10.5px] font-mono uppercase tracking-wider text-zinc-500 sm:grid-cols-[36px_1fr_220px_100px] sm:px-6">
+          <span>#</span>
+          <span>Skill</span>
+          <span class="hidden text-right sm:block">Tracks</span>
+          <span class="text-right">Source</span>
+        </div>
 
-          <div class="relative flex items-start justify-between gap-4">
-            <div class="flex items-center gap-3">
-              <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border p-2 {{ s.logoBg }}">
+        @for (s of skills; track s.slug; let idx = $index) {
+          <article class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] hover:bg-zinc-50/60 dark:hover:bg-[var(--color-ink-3)]/40 grid grid-cols-[36px_1fr_100px] items-center gap-4 border-b px-5 py-4 transition-colors last:border-b-0 sm:grid-cols-[36px_1fr_220px_100px] sm:px-6">
+            <span class="font-mono text-[13px] font-semibold text-zinc-400 dark:text-zinc-600">{{ idx + 1 }}</span>
+
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md border p-1.5 {{ s.logoBg }}">
                 <img [src]="s.logo" [alt]="s.library + ' logo'" loading="lazy" decoding="async" class="h-full w-full object-contain" />
               </div>
-              <div>
-                <p class="text-[10px] font-mono uppercase tracking-wider text-zinc-500">{{ s.library }}</p>
-                <h3 class="font-mono text-[14px] font-semibold">{{ s.name }}</h3>
+              <div class="min-w-0">
+                <p class="font-mono text-[13.5px] font-semibold truncate">{{ s.name }}</p>
+                <p class="mt-0.5 text-[11.5px] text-zinc-500 truncate">{{ s.library }} · {{ s.description }}</p>
               </div>
             </div>
 
-            @switch (s.status) {
-              @case ('ready') {
-                <span class="border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-medium">
-                  {{ statusLabel(s.status) }}
-                </span>
-              }
-              @case ('in-progress') {
-                <span class="border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400 inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-medium">
-                  {{ statusLabel(s.status) }}
-                </span>
-              }
-              @case ('planned') {
-                <span class="border-[var(--color-line-strong)] dark:border-[var(--color-line-dark-strong)] text-zinc-500 inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-medium">
-                  {{ statusLabel(s.status) }}
-                </span>
-              }
-            }
-          </div>
+            <p class="hidden text-right font-mono text-[11px] text-zinc-600 dark:text-zinc-400 truncate sm:block" [title]="s.tracks">{{ s.tracks }}</p>
 
-          <p class="relative mt-4 text-[13px] leading-relaxed text-zinc-600 dark:text-zinc-400">{{ s.description }}</p>
-
-          <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] relative mt-5 flex items-center justify-between gap-3 border-t pt-4">
-            <div>
-              <p class="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Targets</p>
-              <p class="font-mono text-[11px] text-zinc-700 dark:text-zinc-300">{{ s.tracks }}</p>
-            </div>
-            <div class="flex items-center gap-3">
-              <a
-                [href]="s.site"
-                target="_blank"
-                rel="noopener"
-                class="text-zinc-600 dark:text-zinc-400 hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] text-[12px] font-medium"
-              >
-                {{ s.library }} docs
-              </a>
+            <div class="flex items-center justify-end gap-3 text-[11.5px]">
               @if (s.status === 'ready' || s.status === 'in-progress') {
                 <a
                   [href]="'https://github.com/mofirojean/angular-ui-skills/tree/master/skills/' + s.slug"
                   target="_blank"
                   rel="noopener"
-                  class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] hover:underline inline-flex items-center gap-1 text-[12px] font-medium"
+                  class="text-zinc-900 dark:text-zinc-100 hover:opacity-70 inline-flex items-center gap-0.5 font-medium"
                 >
-                  Source
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                  Open
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
                 </a>
+              } @else {
+                <span class="text-zinc-400 dark:text-zinc-600">—</span>
               }
             </div>
-          </div>
-        </article>
-      }
-    </div>
+          </article>
+        }
+      </div>
     </div>
   </section>
 
-  <section id="examples" class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] relative overflow-hidden border-y bg-zinc-50/50 dark:bg-[var(--color-ink-2)]/50">
+  <section id="examples" class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] relative overflow-hidden border-y bg-zinc-50/40 dark:bg-[var(--color-ink-2)]/40">
     <div aria-hidden="true" class="pointer-events-none absolute inset-0">
-      <div class="absolute left-1/2 top-1/2 h-[720px] w-[1480px] -translate-x-1/2 -translate-y-1/2">
-        <div class="absolute inset-0 rounded-[3rem] bg-zinc-900/[0.06] blur-[140px] dark:bg-white/[0.07]"></div>
-        <div class="absolute left-1/2 top-1/2 h-[560px] w-[1140px] -translate-x-1/2 -translate-y-1/2 rounded-[2.5rem] bg-blue-500/[0.06] blur-[100px] dark:bg-blue-500/[0.04]"></div>
-      </div>
-      <div
-        class="absolute left-1/2 top-1/2 w-[1080px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[1.5rem] border border-zinc-900/[0.06] shadow-2xl dark:border-white/[0.08]"
-        style="transform: translate(-50%, -50%) perspective(2200px) rotateX(1.4deg);"
-      >
-        <img
-          src="projects/mission-control-light-mode.png"
-          alt=""
-          aria-hidden="true"
-          loading="lazy"
-          decoding="async"
-          class="block w-full opacity-30 dark:hidden"
-          style="filter: blur(1.5px) saturate(1.1);"
-        />
-        <img
-          src="projects/mission-control-dark-mode.png"
-          alt=""
-          aria-hidden="true"
-          loading="lazy"
-          decoding="async"
-          class="hidden w-full opacity-45 dark:block"
-          style="filter: blur(1.5px) saturate(1.1);"
-        />
-        <div
-          class="absolute inset-0 dark:hidden"
-          style="background: radial-gradient(ellipse at center, transparent 0%, transparent 35%, rgba(250, 250, 250, 0.85) 95%);"
-        ></div>
-        <div
-          class="absolute inset-0 hidden dark:block"
-          style="background: radial-gradient(ellipse at center, transparent 0%, transparent 35%, var(--color-ink-2) 95%);"
-        ></div>
-      </div>
-      <div
-        class="absolute inset-x-0 top-0 h-32 dark:hidden"
-        style="background: linear-gradient(to bottom, rgba(250, 250, 250, 1), transparent);"
-      ></div>
-      <div
-        class="absolute inset-x-0 bottom-0 h-32 dark:hidden"
-        style="background: linear-gradient(to top, rgba(250, 250, 250, 1), transparent);"
-      ></div>
-      <div
-        class="absolute inset-x-0 top-0 hidden h-32 dark:block"
-        style="background: linear-gradient(to bottom, var(--color-ink-2), transparent);"
-      ></div>
+      <div class="absolute -right-32 top-32 hidden h-[280px] w-[280px] rounded-full bg-blue-500/[0.05] dark:bg-blue-500/[0.03] blur-[110px] md:block"></div>
+      <div class="absolute -left-32 bottom-24 hidden h-[280px] w-[280px] rounded-full bg-zinc-500/[0.06] dark:bg-zinc-500/[0.04] blur-[110px] md:block"></div>
       <div
         class="absolute inset-x-0 bottom-0 hidden h-32 dark:block"
         style="background: linear-gradient(to top, var(--color-ink-2), transparent);"
@@ -349,33 +234,19 @@
 
     <div class="relative z-10 mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20 md:py-28">
       <div class="mb-10 flex flex-col gap-6 md:mb-12 md:flex-row md:items-end md:justify-between md:gap-10">
-        <div class="max-w-2xl">
-          <p class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] mb-3 font-mono text-[11px] font-semibold uppercase tracking-wider">Reference apps</p>
-          <h2 class="text-[26px] font-semibold tracking-tight sm:text-3xl lg:text-4xl">Skills you can see in action</h2>
-          <p class="mt-3 text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+        <div class="max-w-xl">
+          <p class="mb-3 font-mono text-[10.5px] uppercase tracking-wider text-zinc-500">Reference Apps</p>
+          <h2 class="text-[24px] font-semibold tracking-tight sm:text-[28px]">Skills you can see in action</h2>
+          <p class="mt-2 text-[13.5px] leading-relaxed text-zinc-600 dark:text-zinc-400">
             Every skill ships with a complete example app that exercises the real component surface. If the app builds and looks right, the skill is right.
           </p>
         </div>
 
-        <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] grid shrink-0 grid-cols-3 divide-x divide-[var(--color-line)] dark:divide-[var(--color-line-dark)] overflow-hidden rounded-xl border bg-white/70 dark:bg-[var(--color-ink-3)]/70 backdrop-blur">
-          <div class="px-4 py-3 text-center md:px-5 md:py-3.5">
-            <p class="font-mono text-[22px] font-semibold tracking-tight">{{ examples.length }}</p>
-            <p class="mt-0.5 text-[10px] font-mono uppercase tracking-wider text-zinc-500">Live apps</p>
-          </div>
-          <div class="px-4 py-3 text-center md:px-5 md:py-3.5">
-            <p class="font-mono text-[22px] font-semibold tracking-tight">36</p>
-            <p class="mt-0.5 text-[10px] font-mono uppercase tracking-wider text-zinc-500">Routes</p>
-          </div>
-          <div class="px-4 py-3 text-center md:px-5 md:py-3.5">
-            <p class="font-mono text-[22px] font-semibold tracking-tight">200+</p>
-            <p class="mt-0.5 text-[10px] font-mono uppercase tracking-wider text-zinc-500">Components</p>
-          </div>
-        </div>
       </div>
 
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         @for (ex of examples; track ex.slug) {
-          <article class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] group relative flex flex-col overflow-hidden rounded-xl border bg-white dark:bg-[var(--color-ink-3)] transition-all hover:shadow-lg hover:shadow-[var(--color-ng-red-600)]/5 hover:-translate-y-0.5 hover:border-zinc-300 dark:hover:border-zinc-700">
+          <article class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] group relative flex flex-col overflow-hidden rounded-lg border bg-white dark:bg-[var(--color-ink-3)] transition-all hover:shadow-lg hover:shadow-black/[0.04] hover:-translate-y-0.5 hover:border-zinc-300 dark:hover:border-zinc-700">
             <a
               [href]="ex.demo ?? '#'"
               target="_blank"
@@ -391,14 +262,7 @@
                 decoding="async"
                 class="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
               />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-              <span class="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/65 text-white border border-white/10 px-2 py-0.5 text-[9px] font-medium backdrop-blur">
-                <span class="relative flex h-1.5 w-1.5">
-                  <span class="bg-emerald-400 animate-pulse-ring absolute inline-flex h-full w-full rounded-full"></span>
-                  <span class="bg-emerald-400 relative inline-flex h-1.5 w-1.5 rounded-full"></span>
-                </span>
-                Live
-              </span>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
             </a>
 
             <div class="flex flex-1 flex-col p-4">
@@ -432,7 +296,7 @@
                     [href]="ex.demo ?? '#'"
                     target="_blank"
                     rel="noopener"
-                    class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] inline-flex items-center gap-0.5 font-medium hover:underline"
+                    class="text-zinc-900 dark:text-zinc-100 inline-flex items-center gap-0.5 font-medium hover:opacity-70"
                   >
                     Demo
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
@@ -446,45 +310,43 @@
     </div>
   </section>
 
-  <section id="install" class="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20 md:py-28">
-    <div class="grid gap-12 lg:grid-cols-[1fr_1.4fr]">
+  <section id="install" class="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-20 md:py-24">
+    <div class="grid gap-10 lg:grid-cols-[1fr_1.4fr]">
       <div>
-        <p class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] mb-3 font-mono text-[11px] font-semibold uppercase tracking-wider">Install</p>
-        <h2 class="text-[26px] font-semibold tracking-tight sm:text-3xl lg:text-4xl">Three commands. Any agent.</h2>
-        <p class="mt-3 text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+        <p class="mb-3 font-mono text-[10.5px] uppercase tracking-wider text-zinc-500">Install</p>
+        <h2 class="text-[24px] font-semibold tracking-tight sm:text-[28px]">Pick your agent</h2>
+        <p class="mt-2 text-[13.5px] leading-relaxed text-zinc-600 dark:text-zinc-400">
           The recommended path is the
-          <code class="bg-zinc-100 dark:bg-zinc-800 rounded px-1.5 py-0.5 font-mono text-[12px]">skills</code>
-          CLI. It walks you through picking which skills to install and which agent runtime to target. Works with Claude Code, Cursor, Codex, GitHub Copilot, Gemini CLI, and more.
+          <code class="bg-zinc-100 dark:bg-zinc-800 rounded px-1.5 py-0.5 font-mono text-[12.5px]">skills</code>
+          CLI. It registers the skill with every supported runtime in one command. Need per-agent control? Each tab shows the equivalent manual snippet.
         </p>
 
-        <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] mt-8 space-y-3 rounded-xl border bg-zinc-50/50 dark:bg-[var(--color-ink-2)]/50 p-4">
-          <p class="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">After install</p>
-          <ol class="space-y-2 text-[13px]">
-            <li class="flex items-start gap-2.5">
-              <span class="bg-[var(--color-ng-red-600)] mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white">1</span>
-              <span>Restart your AI agent so it picks up the new skill folder.</span>
-            </li>
-            <li class="flex items-start gap-2.5">
-              <span class="bg-[var(--color-ng-red-600)] mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white">2</span>
-              <span>Ask it to build something using your chosen library.</span>
-            </li>
-            <li class="flex items-start gap-2.5">
-              <span class="bg-[var(--color-ng-red-600)] mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white">3</span>
-              <span>The skill loads automatically when relevant. No invocation needed.</span>
-            </li>
-          </ol>
-        </div>
+        <ol class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] mt-7 divide-y divide-[var(--color-line)] dark:divide-[var(--color-line-dark)] overflow-hidden rounded-lg border bg-white dark:bg-[var(--color-ink-2)]">
+          <li class="grid grid-cols-[24px_1fr] items-baseline gap-3 px-4 py-3">
+            <span class="font-mono text-[10.5px] text-zinc-400">01</span>
+            <span class="text-[13px]">Run the command in the right tab.</span>
+          </li>
+          <li class="grid grid-cols-[24px_1fr] items-baseline gap-3 px-4 py-3">
+            <span class="font-mono text-[10.5px] text-zinc-400">02</span>
+            <span class="text-[13px]">Restart your agent so it picks up the new folder.</span>
+          </li>
+          <li class="grid grid-cols-[24px_1fr] items-baseline gap-3 px-4 py-3">
+            <span class="font-mono text-[10.5px] text-zinc-400">03</span>
+            <span class="text-[13px]">Ask it to build with the library, the skill loads on demand.</span>
+          </li>
+        </ol>
       </div>
 
       <div>
-        <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex gap-1 overflow-x-auto whitespace-nowrap border-b">
+        <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex gap-0.5 overflow-x-auto whitespace-nowrap border-b">
           @for (key of tabKeys; track key) {
             <button
               type="button"
               (click)="selectTab(key)"
-              class="-mb-px shrink-0 border-b-2 px-3 py-2.5 text-[12px] font-medium transition-colors sm:px-4 sm:text-[13px]"
-              [style.border-color]="installTab() === key ? 'var(--color-ng-red-600)' : 'transparent'"
-              [style.color]="installTab() === key ? 'var(--color-ng-red-600)' : ''"
+              class="-mb-px shrink-0 border-b-2 px-3 py-2.5 font-mono text-[11px] uppercase tracking-wider transition-colors sm:px-4 sm:text-[11.5px]"
+              [style.border-color]="installTab() === key ? 'currentColor' : 'transparent'"
+              [class.text-zinc-900]="installTab() === key"
+              [class.dark:text-zinc-100]="installTab() === key"
               [class.text-zinc-500]="installTab() !== key"
               [class.hover:text-zinc-900]="installTab() !== key"
               [class.dark:hover:text-zinc-100]="installTab() !== key"
@@ -523,120 +385,11 @@
     </div>
   </section>
 
-  <section id="architecture" class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] border-y bg-zinc-50/50 dark:bg-[var(--color-ink-2)]/50">
-    <div class="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20 md:py-28">
-      <div class="mb-12 max-w-2xl">
-        <p class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] mb-3 font-mono text-[11px] font-semibold uppercase tracking-wider">Anatomy</p>
-        <h2 class="text-[26px] font-semibold tracking-tight sm:text-3xl lg:text-4xl">What's inside a skill</h2>
-        <p class="mt-3 text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400">
-          A skill is a folder of markdown. <code class="bg-zinc-200 dark:bg-zinc-800 rounded px-1.5 py-0.5 font-mono text-[12px]">SKILL.md</code> is a short router that tells the agent what's available and when to use it. The detail lives in topic-scoped reference files that get loaded on demand.
-        </p>
-      </div>
 
-      <div class="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
-        <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] overflow-hidden rounded-2xl border bg-[var(--color-ink-2)]">
-          <div class="border-[var(--color-line-dark)] flex items-center justify-between border-b px-4 py-2.5">
-            <div class="flex items-center gap-1.5">
-              <span class="bg-red-500/80 h-2.5 w-2.5 rounded-full"></span>
-              <span class="bg-yellow-500/80 h-2.5 w-2.5 rounded-full"></span>
-              <span class="bg-emerald-500/80 h-2.5 w-2.5 rounded-full"></span>
-              <span class="ml-3 font-mono text-[10px] text-zinc-500 uppercase tracking-wider">skills tree</span>
-            </div>
-            <a href="https://github.com/mofirojean/angular-ui-skills/tree/master/skills/spartan-ng-developer" target="_blank" rel="noopener" class="font-mono text-[10px] text-zinc-500 hover:text-zinc-300 transition-colors">github →</a>
-          </div>
-          <pre class="code-block overflow-x-auto px-4 py-3 text-zinc-200 sm:px-5 sm:py-4"><code>@for (row of skillTree; track $index) {<div class="code-line flex items-baseline gap-4"><span [class.text-zinc-100]="$index === 0" [class.text-zinc-400]="$index !== 0">{{ row.line }}</span>@if (row.tag) {<span class="ml-auto whitespace-nowrap text-[10px] text-zinc-500 italic"># {{ row.tag }}</span>}</div>}</code></pre>
-        </div>
-
-        <div class="flex flex-col gap-5">
-          <div>
-            <p class="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Why this shape</p>
-            <h3 class="mt-1 text-[17px] font-semibold tracking-tight">Routers and references, not one big file</h3>
-            <p class="mt-2 text-[13.5px] leading-relaxed text-zinc-600 dark:text-zinc-400">
-              An always-loaded <code class="bg-zinc-100 dark:bg-zinc-800 rounded px-1 font-mono text-[12px]">SKILL.md</code> stays under a few hundred lines. References are pulled in only for the task at hand, so context stays focused and the agent doesn't see (or repeat) patterns it isn't using.
-            </p>
-          </div>
-
-          <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] rounded-xl border bg-white dark:bg-[var(--color-ink-3)] p-4">
-            <p class="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Stack at runtime</p>
-            <div class="mt-3 space-y-2">
-              <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex items-center gap-3 rounded-lg border bg-zinc-50/70 dark:bg-[var(--color-ink-2)] px-3 py-2">
-                <span class="font-mono text-[10px] text-zinc-500 w-6">L3</span>
-                <span class="bg-[var(--color-ng-red-600)] h-4 w-1 rounded-full"></span>
-                <div class="min-w-0 flex-1">
-                  <p class="font-mono text-[12px] font-semibold">angular-ui-skills/&lt;library&gt;-developer</p>
-                  <p class="text-[11px] text-zinc-500">Library idioms: theming, components, version-pinned APIs.</p>
-                </div>
-              </div>
-              <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex items-center gap-3 rounded-lg border bg-zinc-50/70 dark:bg-[var(--color-ink-2)] px-3 py-2">
-                <span class="font-mono text-[10px] text-zinc-500 w-6">L2</span>
-                <span class="bg-blue-500 h-4 w-1 rounded-full"></span>
-                <div class="min-w-0 flex-1">
-                  <p class="font-mono text-[12px] font-semibold">angular-developer</p>
-                  <p class="text-[11px] text-zinc-500">Google's base skill: signals, DI, routing, forms, SSR, a11y.</p>
-                </div>
-              </div>
-              <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex items-center gap-3 rounded-lg border bg-zinc-50/70 dark:bg-[var(--color-ink-2)] px-3 py-2">
-                <span class="font-mono text-[10px] text-zinc-500 w-6">L1</span>
-                <span class="bg-zinc-400 h-4 w-1 rounded-full"></span>
-                <div class="min-w-0 flex-1">
-                  <p class="font-mono text-[12px] font-semibold">your agent runtime</p>
-                  <p class="text-[11px] text-zinc-500">Claude Code, Cursor, Codex, Copilot, Gemini CLI, etc.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] mt-6 overflow-hidden rounded-2xl border bg-white dark:bg-[var(--color-ink-3)]">
-        <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex items-center justify-between border-b px-5 py-3">
-          <div>
-            <p class="text-[10px] font-mono uppercase tracking-wider text-zinc-500">A real run</p>
-            <p class="text-[13px] font-semibold tracking-tight">From prompt to generated code, end to end</p>
-          </div>
-        </div>
-        <ol class="divide-[var(--color-line)] dark:divide-[var(--color-line-dark)] divide-y">
-          @for (step of skillRun; track step.label; let i = $index) {
-            <li class="grid gap-3 px-5 py-4 sm:grid-cols-[180px_1fr]">
-              <div class="flex items-baseline gap-2">
-                <span class="font-mono text-[10px] text-zinc-400 tabular-nums">0{{ i + 1 }}</span>
-                <p class="font-mono text-[11.5px] font-semibold text-zinc-700 dark:text-zinc-300">{{ step.label }}</p>
-              </div>
-              <p
-                class="text-[13px] leading-relaxed"
-                [class.text-zinc-600]="!step.mono"
-                [class.dark:text-zinc-400]="!step.mono"
-                [class.font-mono]="step.mono"
-                [class.text-zinc-700]="step.mono"
-                [class.dark:text-zinc-300]="step.mono"
-              >
-                {{ step.detail }}
-              </p>
-            </li>
-          }
-        </ol>
-        <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex flex-wrap items-center justify-between gap-2 border-t bg-zinc-50/50 dark:bg-[var(--color-ink-2)]/50 px-5 py-3">
-          <p class="text-[11px] text-zinc-500">
-            Versions pinned at the top of <code class="font-mono">SKILL.md</code>, agent compares to your installed deps before generating.
-          </p>
-          <a
-            href="https://github.com/mofirojean/angular-ui-skills/blob/master/skills/spartan-ng-developer/SKILL.md"
-            target="_blank"
-            rel="noopener"
-            class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] hover:underline inline-flex items-center gap-1 text-[11px] font-medium"
-          >
-            Read a real SKILL.md
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="faq" class="mx-auto max-w-3xl px-5 py-14 sm:px-8 sm:py-20 md:py-28">
-    <div class="mb-10">
-      <p class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] mb-3 font-mono text-[11px] font-semibold uppercase tracking-wider">FAQ</p>
-      <h2 class="text-[26px] font-semibold tracking-tight sm:text-3xl lg:text-4xl">Questions, answered</h2>
+  <section id="faq" class="mx-auto max-w-3xl px-5 py-14 sm:px-8 sm:py-20 md:py-24">
+    <div class="mb-8 text-center">
+      <p class="mb-3 font-mono text-[10.5px] uppercase tracking-wider text-zinc-500">FAQ</p>
+      <h2 class="text-[24px] font-semibold tracking-tight sm:text-[28px]">Questions, answered</h2>
     </div>
 
     <div class="divide-[var(--color-line)] dark:divide-[var(--color-line-dark)] divide-y">
@@ -692,31 +445,39 @@
     </div>
   </section>
 
-  <section class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] border-t bg-zinc-50/50 dark:bg-[var(--color-ink-2)]/50">
-    <div class="mx-auto max-w-4xl px-5 py-14 text-center sm:px-8 sm:py-20 md:py-28">
-      <h2 class="text-[26px] font-semibold tracking-tight sm:text-4xl lg:text-5xl">
-        Ship Angular apps,
-        <span class="text-gradient-ng">at agent speed</span>
-      </h2>
-      <p class="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400">
-        Install the skill for the library you actually use. Your AI assistant will start producing code that compiles, themes correctly, and matches the framework's conventions.
+  <!-- End-of-page CTA, mono terminal vibe matching the hero card -->
+  <section class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] border-t bg-zinc-50/40 dark:bg-[var(--color-ink-2)]/40">
+    <div class="mx-auto max-w-3xl px-5 py-14 text-center sm:px-8 sm:py-20">
+      <p class="font-mono text-[10.5px] uppercase tracking-wider text-zinc-500">Ready</p>
+      <h2 class="mt-2 text-[24px] font-semibold tracking-tight sm:text-[28px]">Install in one command</h2>
+      <p class="mx-auto mt-2 max-w-xl text-[13.5px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+        Add the skill bundle to your agent runtime, restart the agent, ask it to build with the library.
       </p>
-      <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
-        <a
-          href="#install"
-          class="bg-[var(--color-ng-red-600)] hover:bg-[var(--color-ng-red-700)] inline-flex items-center gap-2 rounded-lg px-6 py-3 text-[14px] font-semibold text-white shadow-lg shadow-[var(--color-ng-red-600)]/20 transition-colors"
-        >
-          Install a skill
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </a>
+
+      <div class="border-[var(--color-line-strong)] dark:border-[var(--color-line-dark-strong)] mx-auto mt-6 max-w-2xl overflow-hidden rounded-xl border bg-white dark:bg-[var(--color-ink-2)] text-left shadow-sm">
+        <div class="overflow-x-auto px-5 py-4 font-mono text-[13.5px] sm:text-[14px]">
+          <span class="text-zinc-400 dark:text-zinc-500">$</span>
+          <span class="ml-2 text-zinc-900 dark:text-zinc-100">npx skills&#64;latest add mofirojean/angular-ui-skills -g</span>
+        </div>
+      </div>
+
+      <div class="mt-5 flex flex-wrap items-center justify-center gap-3 text-[12px]">
         <a
           href="https://github.com/mofirojean/angular-ui-skills"
           target="_blank"
           rel="noopener"
-          class="border-[var(--color-line-strong)] dark:border-[var(--color-line-dark-strong)] hover:bg-white dark:hover:bg-zinc-800 inline-flex items-center gap-2 rounded-lg border px-6 py-3 text-[14px] font-semibold transition-colors"
-        >
-          Star on GitHub
-        </a>
+          class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-mono uppercase tracking-wider transition-colors"
+        >Star on GitHub</a>
+        <span class="text-zinc-300 dark:text-zinc-700">·</span>
+        <a
+          href="#skills"
+          class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-mono uppercase tracking-wider transition-colors"
+        >Browse skills</a>
+        <span class="text-zinc-300 dark:text-zinc-700">·</span>
+        <a
+          href="#examples"
+          class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-mono uppercase tracking-wider transition-colors"
+        >See examples</a>
       </div>
     </div>
   </section>
@@ -732,39 +493,35 @@
           </div>
         </div>
 
-        <p class="text-[12px] text-zinc-600 dark:text-zinc-400 md:justify-self-center md:text-center">
-          Built with
-          <svg class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] inline-block -mt-0.5 mx-0.5 align-middle" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-          </svg>
-          by
+        <p class="font-mono text-[11px] uppercase tracking-wider text-zinc-500 md:justify-self-center md:text-center">
+          Built by
           <a
             href="https://x.com/mofirojean"
             target="_blank"
             rel="noopener"
-            class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] font-medium text-zinc-700 dark:text-zinc-300 transition-colors"
+            class="hover:text-zinc-900 dark:hover:text-zinc-100 text-zinc-700 dark:text-zinc-300 transition-colors"
           >Mofiro Jean</a>
         </p>
 
         <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] md:justify-self-end">
-          <a href="https://github.com/mofirojean/angular-ui-skills" target="_blank" rel="noopener" class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] text-zinc-600 dark:text-zinc-400 transition-colors" aria-label="GitHub repository">
+          <a href="https://github.com/mofirojean/angular-ui-skills" target="_blank" rel="noopener" class="hover:text-zinc-900 dark:hover:text-zinc-100 text-zinc-600 dark:text-zinc-400 transition-colors" aria-label="GitHub repository">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.03c-3.2.7-3.87-1.37-3.87-1.37-.52-1.32-1.28-1.67-1.28-1.67-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.84 1.18 3.1 0 4.42-2.7 5.4-5.27 5.68.41.36.78 1.06.78 2.13v3.16c0 .31.21.66.79.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5Z"/>
             </svg>
           </a>
-          <a href="https://x.com/mofirojean" target="_blank" rel="noopener" class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] text-zinc-600 dark:text-zinc-400 transition-colors" aria-label="X / Twitter @mofirojean">
+          <a href="https://x.com/mofirojean" target="_blank" rel="noopener" class="hover:text-zinc-900 dark:hover:text-zinc-100 text-zinc-600 dark:text-zinc-400 transition-colors" aria-label="X / Twitter @mofirojean">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
             </svg>
           </a>
-          <a href="https://linkedin.com/in/mofirojean" target="_blank" rel="noopener" class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] text-zinc-600 dark:text-zinc-400 transition-colors" aria-label="LinkedIn @mofirojean">
+          <a href="https://linkedin.com/in/mofirojean" target="_blank" rel="noopener" class="hover:text-zinc-900 dark:hover:text-zinc-100 text-zinc-600 dark:text-zinc-400 transition-colors" aria-label="LinkedIn @mofirojean">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.852 3.37-1.852 3.601 0 4.267 2.37 4.267 5.455v6.288zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
             </svg>
           </a>
           <span class="text-zinc-300 dark:text-zinc-700">·</span>
-          <a href="https://github.com/mofirojean/angular-ui-skills/issues" target="_blank" rel="noopener" class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] text-zinc-600 dark:text-zinc-400 transition-colors">Issues</a>
-          <a href="https://github.com/mofirojean/angular-ui-skills/blob/master/LICENSE" target="_blank" rel="noopener" class="hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] text-zinc-600 dark:text-zinc-400 transition-colors">License</a>
+          <a href="https://github.com/mofirojean/angular-ui-skills/issues" target="_blank" rel="noopener" class="hover:text-zinc-900 dark:hover:text-zinc-100 text-zinc-600 dark:text-zinc-400 transition-colors">Issues</a>
+          <a href="https://github.com/mofirojean/angular-ui-skills/blob/master/LICENSE" target="_blank" rel="noopener" class="hover:text-zinc-900 dark:hover:text-zinc-100 text-zinc-600 dark:text-zinc-400 transition-colors">License</a>
         </div>
       </div>
     </div>

@@ -328,6 +328,11 @@ export class App {
     }
   }
 
+  protected copyInstall(event?: Event): void {
+    event?.preventDefault();
+    void this.copy('npx skills@latest add mofirojean/angular-ui-skills -g', 'hero-install');
+  }
+
   protected installBlock(): string {
     return this.installCommands[this.installTab()].lines
       .filter((l) => l.tk !== 'com')

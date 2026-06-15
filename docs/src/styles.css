@@ -7,26 +7,23 @@
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
   --font-display: 'Inter var', 'Inter', ui-sans-serif, system-ui, sans-serif;
 
-  --color-ink: #0b0f17;
-  --color-ink-2: #11151d;
-  --color-ink-3: #1a2030;
-  --color-paper: #ffffff;
+  /* Vercel-skills neutral palette: pure-black dark surfaces, near-white light. */
+  --color-ink:   #000000;
+  --color-ink-2: #0a0a0a;
+  --color-ink-3: #131313;
+  --color-paper:   #ffffff;
   --color-paper-2: #fafafa;
-  --color-line: rgba(15, 23, 42, 0.08);
-  --color-line-strong: rgba(15, 23, 42, 0.16);
-  --color-line-dark: rgba(255, 255, 255, 0.08);
-  --color-line-dark-strong: rgba(255, 255, 255, 0.16);
+  --color-line:        rgba(0, 0, 0, 0.08);
+  --color-line-strong: rgba(0, 0, 0, 0.18);
+  --color-line-dark:        rgba(255, 255, 255, 0.10);
+  --color-line-dark-strong: rgba(255, 255, 255, 0.20);
 
-  --color-ng-red-50: #fff1f3;
-  --color-ng-red-100: #ffe1e6;
-  --color-ng-red-200: #ffc7d0;
-  --color-ng-red-300: #ff95a6;
+  /* Angular red kept only for the favicon-shield. Tokens preserved so any
+     stragglers still resolve cleanly, but the page no longer paints with them. */
   --color-ng-red-400: #ff5c7a;
   --color-ng-red-500: #ff2d55;
   --color-ng-red-600: #dd0031;
   --color-ng-red-700: #c3002f;
-  --color-ng-red-800: #9a0026;
-  --color-ng-red-900: #5e0017;
 
   --color-ng-pink: #ff4081;
   --color-ng-blue: #1976d2;
@@ -35,7 +32,7 @@
   --color-spartan: #000000;
   --color-primeng: #10b981;
 
-  --radius-card: 1rem;
+  --radius-card: 0.5rem;
 }
 
 html {
@@ -49,11 +46,50 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background: var(--color-paper);
   color: var(--color-ink);
+  position: relative;
 }
 
 .dark body {
   background: var(--color-ink);
   color: #e6e7ea;
+}
+
+/*
+ * Vertical rails that frame the centered content as a true box grid.
+ * Two thin lines sit at the max-w-7xl edges (1280px wide), running top to
+ * bottom of the page. Combined with the existing horizontal section borders,
+ * they form the boxed shelf effect used by Skills.sh / Linear.
+ *
+ * Below 1280px viewport, the rails hide so they don't intersect the content
+ * padding awkwardly on tablets and phones.
+ */
+@media (min-width: 1280px) {
+  body::before,
+  body::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--color-line);
+    /* Sit above the sticky header (z-50) so the rails cut through it cleanly,
+       extending the box grid through every layer of the page. */
+    z-index: 60;
+    pointer-events: none;
+  }
+
+  body::before {
+    left: calc(50% - 640px);
+  }
+
+  body::after {
+    right: calc(50% - 640px);
+  }
+
+  .dark body::before,
+  .dark body::after {
+    background: var(--color-line-dark);
+  }
 }
 
 .font-mono {
@@ -75,23 +111,30 @@ body {
 }
 
 .bg-radial-fade {
-  background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(221, 0, 49, 0.10), transparent 70%);
+  background: radial-gradient(ellipse 60% 45% at 50% 0%, rgba(0, 0, 0, 0.05), transparent 70%);
+}
+.dark .bg-radial-fade {
+  background: radial-gradient(ellipse 60% 45% at 50% 0%, rgba(255, 255, 255, 0.06), transparent 70%);
 }
 
 .dark .bg-radial-fade {
   background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255, 64, 129, 0.12), transparent 70%);
 }
 
+/* Was a rose-purple gradient on the hero subhead; the skills.sh redesign keeps the
+   hero title in solid foreground color, so this class is left in place only as a
+   no-op fallback in case any older copy still references it. */
 .text-gradient-ng {
-  background: linear-gradient(135deg, #dd0031 0%, #ff2d55 30%, #ff4081 60%, #a259ff 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: inherit;
 }
 
 .shield {
-  background: linear-gradient(180deg, #dd0031 0%, #c3002f 100%);
+  background: #000000;
   clip-path: polygon(50% 0, 100% 18%, 88% 90%, 50% 100%, 12% 90%, 0 18%);
+}
+
+.dark .shield {
+  background: #ffffff;
 }
 
 .code-block {
