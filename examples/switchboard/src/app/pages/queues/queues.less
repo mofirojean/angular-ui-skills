@@ -202,18 +202,29 @@
   border: 1px solid #e4e4e7;
   border-radius: 8px;
   padding: 10px 12px 10px 12px;
-  cursor: pointer;
+  cursor: grab;
   transition: box-shadow 140ms ease, transform 140ms ease, border-color 140ms ease;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
   display: flex;
   flex-direction: column;
   gap: 6px;
+  outline: none;
 }
 
 .card:hover {
   border-color: #d4d4d8;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   transform: translateY(-1px);
+}
+
+.card:focus-visible {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16);
+}
+
+.card.cdk-drag-dragging,
+.card:active {
+  cursor: grabbing;
 }
 
 .card--breached {
@@ -313,23 +324,7 @@
   font-size: 12px;
 }
 
-.card__drag {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 16px;
-  height: 16px;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  color: #a1a1aa;
-  cursor: grab;
-  font-size: 12px;
-}
-
-.card:hover .card__drag { display: inline-flex; }
-
-.card__drag:active { cursor: grabbing; }
+// (Drag handle removed, the whole card is now the drag target.)
 
 // --- Table mode ---
 

@@ -57,6 +57,9 @@
                   cdkDrag
                   [class.card--breached]="info.breached"
                   (click)="open(ticket.id)"
+                  role="button"
+                  tabindex="0"
+                  [attr.aria-label]="ticket.id + ': ' + ticket.subject"
                 >
                   <div class="card__head">
                     <span class="card__id">{{ ticket.id }}</span>
@@ -91,10 +94,6 @@
                       </span>
                     }
                   </footer>
-
-                  <div class="card__drag" cdkDragHandle aria-label="Drag handle">
-                    <nz-icon nzType="holder" />
-                  </div>
                 </article>
               }
 
