@@ -7,21 +7,30 @@ NG-ZORRO splits overlay UX into two patterns:
 
 Both use the CDK Overlay underneath, focus management and outside-click handling come for free.
 
-Register the services you use in `app.config.ts`:
+Register the services in `app.config.ts`. **As of v21 there are no `provideNzModal` / `provideNzDrawer` helper functions**, contrary to what some online tutorials show. The pattern is:
+
+- **`NzMessageService` and `NzNotificationService`** , marked `providedIn: 'root'`, **no setup needed**. Inject and use them anywhere.
+- **`NzModalService` and `NzDrawerService`** , provided **only by their respective NgModules**, not at root. For standalone-bootstrapped apps, hoist those module providers into the root injector via `importProvidersFrom`:
 
 ```ts
-import { provideNzModal } from 'ng-zorro-antd/modal';
-import { provideNzMessage } from 'ng-zorro-antd/message';
-import { provideNzNotification } from 'ng-zorro-antd/notification';
-import { provideNzDrawer } from 'ng-zorro-antd/drawer';
+import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 
-providers: [
-  provideNzModal(),
-  provideNzMessage(),
-  provideNzNotification(),
-  provideNzDrawer(),
-];
+export const appConfig: ApplicationConfig = {
+  providers: [
+    // ...other providers (router, animations, NzI18n, NzIcons)...
+    importProvidersFrom(NzModalModule, NzDrawerModule),
+  ],
+};
 ```
+
+Symptom if you forget this:
+```
+ERROR ɵNotFound: NG0201: No provider found for `_NzModalService`. Source: Standalone[_App].
+```
+
+The `_` prefix on the class name is intentional, that's how Angular's standalone error formatter renders the service. The fix is the `importProvidersFrom` block above.
 
 ## Modal
 
