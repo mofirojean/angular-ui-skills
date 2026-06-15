@@ -2,6 +2,17 @@
 
 Agent skills that teach AI coding assistants (Claude Code, Cursor, Codex, GitHub Copilot, and others) how to build Angular apps with popular UI component libraries. Each skill is specialized per library while staying composable with the `angular-developer` base skill from Google.
 
+## Install
+
+```sh
+npx skills@latest add mofirojean/angular-ui-skills -g
+```
+
+That one line registers four skill packages with your agent (Claude Code, Cursor, Codex, Copilot, Continue, Cline, Roo Code, Windsurf, Aider, Gemini, and others). Project-scoped install (drop the `-g`) and per-agent manual recipes are documented in [Install (in depth)](#install-in-depth) below.
+
+- 🌐 **Docs site + live demos**: <https://angular-ui-skills-docs.vercel.app>
+- 🐙 **Source**: <https://github.com/mofirojean/angular-ui-skills>
+
 ## Skills
 
 | Skill | Library | Status | Tracks |
@@ -28,14 +39,6 @@ These skills target current versions of each library. They will not gracefully c
 Both skills assume **Angular v18 or newer** with standalone components, control flow syntax (`@if` / `@for`), and signal-based APIs (`input()` / `output()`). They will not generate `NgModule`-based or decorator-based code, even if your project still uses those patterns.
 
 If you maintain an older Angular project and want skill coverage, open an issue describing your target version. A separate `<library>-developer-legacy` skill is the right shape for that, not a single skill that tries to do both.
-
-## Quick start
-
-```sh
-npx skills@latest add mofirojean/angular-ui-skills -g
-```
-
-That's the headline. The rest of this README covers what just happened, alternative install paths, per-agent recipes, and how to verify it worked.
 
 ## Install (in depth)
 
