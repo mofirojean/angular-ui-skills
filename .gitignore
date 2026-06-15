@@ -44,3 +44,8 @@ tmp/
 # Personal deployment notes — kept local, never committed
 DEPLOY.md
 LAUNCH.md
+
+# Local-only working drafts under .github/ (launch-post templates,
+# vercel-labs/skills issue draft). The workflows directory stays tracked.
+.github/LAUNCH_POSTS.md
+.github/SUBMIT_TO_VERCEL_LABS.md
