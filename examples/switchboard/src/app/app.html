@@ -107,7 +107,7 @@
           (click)="theme.toggle()"
           [attr.aria-label]="theme.mode() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
         >
-          <nz-icon nzType="bulb" />
+          <nz-icon [nzType]="theme.mode() === 'dark' ? 'sun' : 'moon'" />
         </button>
 
         <button
