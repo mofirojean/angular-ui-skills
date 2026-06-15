@@ -22,6 +22,20 @@ body {
   overflow: hidden;
 }
 
+// Cap the agent detail modal body so it never spans the full viewport height.
+// The wrap class is set via nzClassName on the NzModalService.create() call;
+// these styles live at the global level because NG-ZORRO modals are projected
+// to <body> via CDK portal, outside any component's encapsulation.
+.agent-detail-modal .ant-modal {
+  top: 60px;
+  padding-bottom: 60px;
+}
+
+.agent-detail-modal .ant-modal-body {
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+}
+
 // ============================================================================
 // SCROLLBARS, unified across the app and adapting to the active theme
 // ============================================================================
