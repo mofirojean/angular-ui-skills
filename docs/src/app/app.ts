@@ -56,7 +56,7 @@ export class App {
       description:
         'Headless brain primitives + helm components, with theming via CSS variables and the hlm-tailwind-preset.',
       status: 'ready',
-      tracks: '@spartan-ng/brain v0.0.1-alpha.704',
+      tracks: '@spartan-ng/brain v0.0.1-alpha.714',
       logo: 'logos/spartan-ng.svg',
       logoBg: 'bg-rose-50 dark:bg-rose-950/40',
     },

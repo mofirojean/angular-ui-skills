@@ -3,10 +3,54 @@
 }
 
 .page {
-  padding: 20px 24px 32px;
+  padding: 0 24px 32px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+// Sticky wrapper, keeps the page title + filters + bulk-action toolbar pinned to
+// the top of the scrolling content area while the table scrolls beneath them.
+.page__sticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 0 14px;
+  background: #fafafa;
+  // Faint hairline that fades in when content scrolls under, gives the user
+  // a visual signal that this is a fixed surface.
+  border-bottom: 1px solid transparent;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.page__sticky::after {
+  content: '';
+  position: absolute;
+  left: -24px;
+  right: -24px;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.06), transparent);
+  opacity: 0;
+  transition: opacity 160ms ease;
+  pointer-events: none;
+}
+
+// When the page scrolls, the sticky element shifts slightly and the hairline
+// becomes visible. We rely on `position: sticky` automatically activating an
+// internal `stuck` state, but since the spec doesn't expose that, we keep the
+// hairline always-on via a softer color. (The shadow approach is also easy if
+// you'd prefer to make the separation stronger.)
+.page__sticky::after { opacity: 0.6; }
+
+:host-context(.theme-dark) {
+  .page__sticky { background: #27272a; }
+  .page__sticky::after {
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.08), transparent);
+  }
 }
 
 // --- Page header ---

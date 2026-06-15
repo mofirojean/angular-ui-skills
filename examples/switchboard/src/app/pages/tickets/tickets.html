@@ -1,20 +1,21 @@
 <div class="page">
-  <!-- Page header -->
-  <header class="page-header">
-    <div>
-      <h2 class="page-title">Tickets</h2>
-      <p class="page-sub">
-        {{ filtered().length }} ticket{{ filtered().length === 1 ? '' : 's' }} match
-        @if (hasActiveFilters()) { · <button class="link-btn" (click)="reset()">clear filters</button> }
-      </p>
-    </div>
-    <button nz-button nzType="primary" (click)="openNewTicket()">
-      <nz-icon nzType="plus" /> New ticket
-    </button>
-  </header>
+  <div class="page__sticky">
+    <!-- Page header -->
+    <header class="page-header">
+      <div>
+        <h2 class="page-title">Tickets</h2>
+        <p class="page-sub">
+          {{ filtered().length }} ticket{{ filtered().length === 1 ? '' : 's' }} match
+          @if (hasActiveFilters()) { · <button class="link-btn" (click)="reset()">clear filters</button> }
+        </p>
+      </div>
+      <button nz-button nzType="primary" (click)="openNewTicket()">
+        <nz-icon nzType="plus" /> New ticket
+      </button>
+    </header>
 
-  <!-- Filters bar -->
-  <div class="filters">
+    <!-- Filters bar -->
+    <div class="filters">
     <nz-input-group [nzPrefix]="filterSearchIcon" class="filters__search">
       <input
         type="text"
@@ -63,16 +64,16 @@
       (ngModelChange)="dateRange.set($event)"
     />
 
-    @if (hasActiveFilters()) {
-      <button nz-button nzType="text" (click)="reset()" class="filters__reset">
-        <nz-icon nzType="close-circle" /> Reset
-      </button>
-    }
-  </div>
+      @if (hasActiveFilters()) {
+        <button nz-button nzType="text" (click)="reset()" class="filters__reset">
+          <nz-icon nzType="close-circle" /> Reset
+        </button>
+      }
+    </div>
 
-  <!-- Bulk action toolbar -->
-  @if (selectedIds().length > 0) {
-    <div class="bulk-bar">
+    <!-- Bulk action toolbar (sticks with the header + filters) -->
+    @if (selectedIds().length > 0) {
+      <div class="bulk-bar">
       <span class="bulk-bar__count">
         <nz-icon nzType="check-circle" class="bulk-bar__count-icon" />
         {{ selectedIds().length }} selected
@@ -87,11 +88,12 @@
       <button nz-button nzType="text" nzSize="small" (click)="bulkExport()">
         <nz-icon nzType="export" /> Export
       </button>
-      <button nz-button nzType="text" nzSize="small" class="bulk-bar__clear" (click)="clearSelection()">
-        Clear
-      </button>
-    </div>
-  }
+        <button nz-button nzType="text" nzSize="small" class="bulk-bar__clear" (click)="clearSelection()">
+          Clear
+        </button>
+      </div>
+    }
+  </div>
 
   <!-- Table -->
   <nz-card class="table-card" [nzBordered]="false">

@@ -13,7 +13,7 @@ metadata:
 
 ## Compatibility
 
-- **Tracks:** `@spartan-ng/brain` v0.0.1-alpha.704 exactly.
+- **Tracks:** `@spartan-ng/brain` v0.0.1-alpha.714 exactly. Spartan ships near-daily alpha patches, the skill is re-validated each time the tracked version is bumped.
 - **Angular:** v18 or newer required. Standalone components, control flow (`@if` / `@for`), and signal-based APIs (`input()` / `output()`) are assumed. Will not generate `NgModule`-based or decorator-based code.
 - **Tailwind:** v3 or v4. The skill detects the major version from `package.json` and adapts.
 - **Not supported:** other Spartan alphas with API drift, Angular v17 or below, projects using `@spartan-ng/ui-*` packages (deprecated, replaced by `@spartan-ng/helm`).
