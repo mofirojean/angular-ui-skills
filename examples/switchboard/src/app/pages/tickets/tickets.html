@@ -100,13 +100,13 @@
     <nz-table
       #t
       [nzData]="filtered()"
-      [nzPageSize]="10"
+      [nzPageSize]="20"
       [nzPageSizeOptions]="[10, 20, 50]"
       [nzShowSizeChanger]="true"
       nzShowPagination
       nzSize="small"
       nzTableLayout="fixed"
-      [nzScroll]="{ x: '1200px' }"
+      [nzScroll]="tableScroll()"
       [nzNoResult]="emptyTpl"
     >
       <thead>

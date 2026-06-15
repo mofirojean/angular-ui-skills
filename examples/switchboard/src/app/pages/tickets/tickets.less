@@ -172,6 +172,25 @@
   ::ng-deep .ant-card-body {
     padding: 0;
   }
+
+  // When nzScroll.y is set, NG-ZORRO renders a separate fixed header table.
+  // Make sure the header background reads cleanly against the scrolling body
+  // and doesn't bleed light through the column-separator borders.
+  ::ng-deep .ant-table-header {
+    background: #fafafa;
+  }
+
+  ::ng-deep .ant-table-thead > tr > th {
+    background: #fafafa;
+    font-weight: 600;
+  }
+}
+
+:host-context(.theme-dark) .table-card {
+  ::ng-deep .ant-table-header,
+  ::ng-deep .ant-table-thead > tr > th {
+    background: #1f1f23;
+  }
 }
 
 // --- Table cells ---
