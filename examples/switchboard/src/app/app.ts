@@ -59,8 +59,8 @@ export class App {
 
   protected readonly nav = NAV;
   protected readonly currentAgent = {
-    name: 'Kasun Perera',
-    initials: 'KP',
+    name: 'Mofiro Jean',
+    initials: 'MJ',
     role: 'Senior Agent',
     online: true,
   };

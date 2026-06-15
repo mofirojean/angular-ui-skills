@@ -86,7 +86,7 @@ const hoursAgo = (h: number) => minutesAgo(h * 60);
 const hoursAhead = (h: number) => new Date(NOW.getTime() + h * 60 * 60_000);
 
 export const AGENTS: readonly Agent[] = [
-  { id: 'a-001', name: 'Kasun Perera', initials: 'KP', role: 'Senior Agent', online: true, loadPct: 78, resolvedThisWeek: 42, avgResponseMinutes: 6 },
+  { id: 'a-001', name: 'Mofiro Jean', initials: 'MJ', role: 'Senior Agent', online: true, loadPct: 78, resolvedThisWeek: 42, avgResponseMinutes: 6 },
   { id: 'a-002', name: 'Maya Chen', initials: 'MC', role: 'Senior Agent', online: true, loadPct: 64, resolvedThisWeek: 38, avgResponseMinutes: 9 },
   { id: 'a-003', name: 'Joren Bell', initials: 'JB', role: 'Agent', online: true, loadPct: 41, resolvedThisWeek: 27, avgResponseMinutes: 11 },
   { id: 'a-004', name: 'Aisha Karim', initials: 'AK', role: 'Agent', online: true, loadPct: 55, resolvedThisWeek: 31, avgResponseMinutes: 8 },
