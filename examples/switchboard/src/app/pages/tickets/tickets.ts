@@ -193,13 +193,14 @@ export class Tickets {
   });
 
   // Table sizing, the body scrolls vertically so the column header stays pinned.
-  // Y is computed against the viewport minus the app shell + sticky filters + pagination.
-  // Bulk-bar adds ~52px when active, X stays at 1200px so the frozen columns kick in.
+  // The page itself does not scroll, only the table body. Y is computed against the
+  // viewport minus the app shell (header 56 + footer 48) + sticky filters block
+  // (~148, +56 when the bulk-bar is showing) + pagination (~52) + breathing room.
   protected readonly tableScroll = computed(() => {
     const bulkOffset = this.selectedIds().length > 0 ? 56 : 0;
     return {
       x: '1200px',
-      y: `calc(100vh - ${340 + bulkOffset}px)`,
+      y: `calc(100vh - ${320 + bulkOffset}px)`,
     };
   });
 
