@@ -27,11 +27,20 @@
   overflow-y: auto;
   overflow-x: hidden;
   padding: 4px 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 
-  // Thin scrollbar so the sider doesn't get crowded.
+  // The sider chrome is always dark, so it gets its own translucent-white scrollbar
+  // regardless of the active theme, narrower than the global default so it does not
+  // crowd the menu.
   &::-webkit-scrollbar { width: 4px; }
-  &::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 2px; }
-  &::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.16); }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border: 0;
+    border-radius: 2px;
+  }
+  &::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.22); }
 }
 
 // --- Brand block at the top of the sider ---

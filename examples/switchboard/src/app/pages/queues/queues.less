@@ -168,19 +168,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   transition: background 140ms ease;
-
-  // Slim scrollbar so it doesn't crowd the card area.
-  &::-webkit-scrollbar { width: 6px; }
-  &::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.12);
-    border-radius: 3px;
-  }
-  &::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.2); }
-}
-
-:host-context(.theme-dark) .column__body {
-  &::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); }
-  &::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+  // Scrollbar styling comes from the global rule in styles.less.
 }
 
 .column__body.cdk-drop-list-dragging,

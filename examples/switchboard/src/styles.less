@@ -21,3 +21,62 @@ body {
   height: 100vh;
   overflow: hidden;
 }
+
+// ============================================================================
+// SCROLLBARS, unified across the app and adapting to the active theme
+// ============================================================================
+//
+// Light mode: 9px wide, 5px visible thumb (2px transparent border via background-clip),
+// zinc-300 thumb that darkens to zinc-400 on hover. Transparent track.
+// Dark mode: same geometry, translucent-white thumb.
+// Firefox: `scrollbar-width` + `scrollbar-color` (no border trick available, so the
+// thumb is solid in the same tone).
+//
+// The sider has its own narrower scrollbar declared in app.less, this default applies
+// everywhere else in the app.
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.18) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+  transition: background 140ms ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.32);
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.theme-dark,
+.theme-dark * {
+  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+}
+
+.theme-dark *::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  background-clip: padding-box;
+}
+
+.theme-dark *::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+  background-clip: padding-box;
+}
