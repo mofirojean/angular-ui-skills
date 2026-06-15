@@ -161,15 +161,18 @@
 :host-context(.theme-dark) .bulk-bar__count { color: #60a5fa; }
 
 // --- Table card ---
-// Fills the remaining vertical space below the sticky filters; only the
-// table body inside it scrolls (via nzScroll.y).
+// Fills the remaining vertical space below the sticky filters. The card body
+// is a flex column with the table on top and pagination pinned at the bottom.
+// The table body itself scrolls via nzScroll.y. We let CSS flex pick the exact
+// body height so it always fits the card cleanly, regardless of viewport size.
 
 .table-card {
   flex: 1 1 auto;
   min-height: 0;
-  margin: 16px 0 18px;
+  margin: 16px 0 16px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 
   ::ng-deep .ant-card-body {
     padding: 0;
@@ -177,6 +180,7 @@
     min-height: 0;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
 
   ::ng-deep nz-table {
@@ -184,6 +188,7 @@
     flex-direction: column;
     flex: 1 1 auto;
     min-height: 0;
+    overflow: hidden;
   }
 
   ::ng-deep .ant-table-wrapper {
@@ -191,16 +196,66 @@
     display: flex;
     flex-direction: column;
     min-height: 0;
+    overflow: hidden;
   }
 
-  // Fixed header (nzScroll.y) styling.
+  ::ng-deep .ant-spin-nested-loading {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  ::ng-deep .ant-spin-container {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  // The table (header + body) takes all space above the pagination.
+  ::ng-deep .ant-table {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  ::ng-deep .ant-table-container {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  // Lock the column-header row to its natural height.
   ::ng-deep .ant-table-header {
+    flex: 0 0 auto;
     background: #fafafa;
   }
 
   ::ng-deep .ant-table-thead > tr > th {
     background: #fafafa;
     font-weight: 600;
+  }
+
+  // The body fills the remaining space and overrides whatever max-height
+  // nzScroll.y wrote inline, so the body always lines up to the pagination.
+  ::ng-deep .ant-table-body {
+    flex: 1 1 auto !important;
+    max-height: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow-y: auto;
+  }
+
+  // Pagination pinned to the bottom of the card.
+  ::ng-deep .ant-table-pagination,
+  ::ng-deep .ant-pagination.ant-table-pagination {
+    flex: 0 0 auto;
+    margin: 12px 16px !important;
   }
 }
 

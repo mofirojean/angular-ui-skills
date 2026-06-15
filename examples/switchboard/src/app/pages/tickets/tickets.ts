@@ -192,17 +192,11 @@ export class Tickets {
     return all.some((t) => selected.has(t.id)) && !this.allOnPageSelected();
   });
 
-  // Table sizing, the body scrolls vertically so the column header stays pinned.
-  // The page itself does not scroll, only the table body. Y is computed against the
-  // viewport minus the app shell (header 56 + footer 48) + sticky filters block
-  // (~148, +56 when the bulk-bar is showing) + pagination (~52) + breathing room.
-  protected readonly tableScroll = computed(() => {
-    const bulkOffset = this.selectedIds().length > 0 ? 56 : 0;
-    return {
-      x: '1200px',
-      y: `calc(100vh - ${320 + bulkOffset}px)`,
-    };
-  });
+  // Table sizing. nzScroll.y enables NG-ZORRO's fixed-header mode (splits the table
+  // into a separate header + scrollable body); the actual body height is then
+  // overridden by flex CSS in tickets.less so it fills the card cleanly. The
+  // numeric value here is just a non-zero placeholder, the layout is real-flex.
+  protected readonly tableScroll = { x: '1200px', y: '320px' };
 
   // --- Sort functions ---
 
