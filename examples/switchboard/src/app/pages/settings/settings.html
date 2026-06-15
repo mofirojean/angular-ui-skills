@@ -1,0 +1,267 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h2 class="page-title">Settings</h2>
+      <p class="page-sub">Workspace configuration, notifications, automations, and billing.</p>
+    </div>
+    <button nz-button nzType="primary" (click)="save()">
+      <nz-icon nzType="check" /> Save all changes
+    </button>
+  </header>
+
+  <div class="settings-grid">
+    <!-- Anchor side nav -->
+    <aside class="settings-nav">
+      <nz-anchor [nzOffsetTop]="16" nzBounds="40">
+        <nz-link nzHref="#general" nzTitle="General" />
+        <nz-link nzHref="#notifications" nzTitle="Notifications" />
+        <nz-link nzHref="#business-hours" nzTitle="Business hours" />
+        <nz-link nzHref="#integrations" nzTitle="Integrations" />
+        <nz-link nzHref="#billing" nzTitle="Billing" />
+      </nz-anchor>
+    </aside>
+
+    <!-- Sections -->
+    <main class="settings-content">
+      <!-- General -->
+      <section id="general">
+        <nz-card nzTitle="General">
+          <form nz-form nzLayout="vertical" [formGroup]="generalForm">
+            <div class="grid-2">
+              <nz-form-item>
+                <nz-form-label nzRequired nzFor="workspaceName">Workspace name</nz-form-label>
+                <nz-form-control nzErrorTip="Workspace name is required">
+                  <input nz-input id="workspaceName" formControlName="workspaceName" />
+                </nz-form-control>
+              </nz-form-item>
+
+              <nz-form-item>
+                <nz-form-label>Primary color</nz-form-label>
+                <nz-form-control>
+                  <nz-color-picker formControlName="primaryColor" nzFormat="hex" />
+                  <p class="hint">Drives buttons, focus rings, and selected nav items.</p>
+                </nz-form-control>
+              </nz-form-item>
+
+              <nz-form-item>
+                <nz-form-label nzFor="language">Language</nz-form-label>
+                <nz-form-control>
+                  <nz-select id="language" formControlName="language">
+                    <nz-option nzValue="en-US" nzLabel="English (US)" />
+                    <nz-option nzValue="en-GB" nzLabel="English (UK)" />
+                    <nz-option nzValue="de-DE" nzLabel="Deutsch" />
+                    <nz-option nzValue="fr-FR" nzLabel="Français" />
+                    <nz-option nzValue="es-ES" nzLabel="Español" />
+                    <nz-option nzValue="ja-JP" nzLabel="日本語" />
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+
+              <nz-form-item>
+                <nz-form-label nzFor="timezone">Timezone</nz-form-label>
+                <nz-form-control>
+                  <nz-select id="timezone" formControlName="timezone" nzShowSearch>
+                    <nz-option nzValue="UTC" nzLabel="UTC" />
+                    <nz-option nzValue="Europe/London" nzLabel="Europe / London" />
+                    <nz-option nzValue="Europe/Berlin" nzLabel="Europe / Berlin" />
+                    <nz-option nzValue="America/New_York" nzLabel="America / New York" />
+                    <nz-option nzValue="America/Los_Angeles" nzLabel="America / Los Angeles" />
+                    <nz-option nzValue="Asia/Tokyo" nzLabel="Asia / Tokyo" />
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+
+            <nz-divider />
+
+            <nz-form-item>
+              <nz-form-label>Workspace logo</nz-form-label>
+              <nz-form-control>
+                <nz-upload [nzBeforeUpload]="uploadLogo" nzListType="picture" [nzShowUploadList]="true" [nzFileList]="logoFiles()">
+                  <button nz-button type="button">
+                    <nz-icon nzType="profile" /> Choose file
+                  </button>
+                </nz-upload>
+                <p class="hint">PNG or SVG, recommended 256 × 256 pixels.</p>
+              </nz-form-control>
+            </nz-form-item>
+          </form>
+        </nz-card>
+      </section>
+
+      <!-- Notifications -->
+      <section id="notifications">
+        <nz-card nzTitle="Notifications">
+          <nz-list nzSize="small">
+            @for (n of notifications(); track n.key) {
+              <nz-list-item class="pref-item">
+                <nz-list-item-meta [nzTitle]="n.label" [nzDescription]="n.description" />
+                <nz-list-item-action>
+                  <nz-switch
+                    [ngModel]="n.enabled"
+                    (ngModelChange)="toggleNotification(n.key, $event)"
+                    nzSize="small"
+                  />
+                </nz-list-item-action>
+              </nz-list-item>
+            }
+          </nz-list>
+
+          <nz-divider />
+
+          <nz-form-item>
+            <nz-form-label>Alert sound volume</nz-form-label>
+            <nz-form-control>
+              <div class="slider-row">
+                <nz-icon nzType="bell" class="slider-icon" />
+                <nz-slider
+                  class="volume-slider"
+                  [ngModel]="soundVolume()"
+                  (ngModelChange)="soundVolume.set($event)"
+                  [nzMin]="0"
+                  [nzMax]="100"
+                  [nzStep]="10"
+                />
+                <span class="slider-value">{{ soundVolume() }}</span>
+              </div>
+              <p class="hint">Set to 0 to silence in-app alerts.</p>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-card>
+      </section>
+
+      <!-- Business hours -->
+      <section id="business-hours">
+        <nz-card nzTitle="Business hours">
+          <p class="card-hint">SLA timers respect business hours during the week. Outside these windows, SLAs pause.</p>
+
+          <div class="hours-grid">
+            @for (day of weekdays(); track day.key) {
+              <div class="hours-row" [class.hours-row--inactive]="!day.active">
+                <div class="hours-row__day">
+                  <nz-switch
+                    [ngModel]="day.active"
+                    (ngModelChange)="toggleDay(day.key, $event)"
+                    nzSize="small"
+                  />
+                  <span class="hours-row__label">{{ day.label }}</span>
+                </div>
+                <div class="hours-row__range">
+                  <nz-time-picker
+                    [ngModel]="day.open"
+                    (ngModelChange)="setOpen(day.key, $event)"
+                    nzFormat="HH:mm"
+                    [nzDisabled]="!day.active"
+                  />
+                  <span class="hours-row__sep">to</span>
+                  <nz-time-picker
+                    [ngModel]="day.close"
+                    (ngModelChange)="setClose(day.key, $event)"
+                    nzFormat="HH:mm"
+                    [nzDisabled]="!day.active"
+                  />
+                </div>
+              </div>
+            }
+          </div>
+        </nz-card>
+      </section>
+
+      <!-- Integrations -->
+      <section id="integrations">
+        <nz-card nzTitle="Integrations">
+          <div class="integrations-grid">
+            @for (i of integrations(); track i.id) {
+              <div class="integration" [class.integration--connected]="i.connected">
+                <div class="integration__head">
+                  <nz-avatar [nzText]="i.name.charAt(0)" nzSize="default" />
+                  <div class="integration__meta">
+                    <span class="integration__name">{{ i.name }}</span>
+                    @if (i.connected) {
+                      <nz-tag nzColor="success" class="integration__status">Connected</nz-tag>
+                    } @else {
+                      <nz-tag class="integration__status">Not connected</nz-tag>
+                    }
+                  </div>
+                </div>
+                <p class="integration__desc">{{ i.description }}</p>
+                <div class="integration__actions">
+                  @if (i.connected) {
+                    <button
+                      nz-button
+                      nzType="text"
+                      nzSize="small"
+                      nz-popconfirm
+                      nzPopconfirmTitle="Disconnect this integration?"
+                      nzPopconfirmPlacement="top"
+                      (nzOnConfirm)="disconnect(i.id)"
+                    >
+                      <nz-icon nzType="close-circle" /> Disconnect
+                    </button>
+                  } @else {
+                    <button nz-button nzType="primary" nzSize="small" (click)="toggleIntegration(i.id, true)">
+                      <nz-icon nzType="plus" /> Connect
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </nz-card>
+      </section>
+
+      <!-- Billing -->
+      <section id="billing">
+        <nz-card nzTitle="Billing">
+          <div class="billing-stats">
+            <nz-statistic nzTitle="Current plan" [nzValue]="billingPlan" />
+            <nz-statistic nzTitle="Seats" [nzValue]="seatsInUse + ' / ' + seatsTotal" />
+            <nz-statistic nzTitle="Next invoice" [nzValue]="nextInvoiceTotal" />
+          </div>
+
+          <nz-divider />
+
+          <p class="card-hint">Recent invoices</p>
+          <nz-table
+            #invoiceTable
+            [nzData]="invoices"
+            nzSize="small"
+            [nzShowPagination]="false"
+            nzTableLayout="fixed"
+          >
+            <thead>
+              <tr>
+                <th nzWidth="160px">Invoice</th>
+                <th nzWidth="120px">Issued</th>
+                <th nzWidth="120px">Amount</th>
+                <th nzWidth="120px">Status</th>
+                <th nzWidth="64px"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (inv of invoiceTable.data; track inv.id) {
+                <tr>
+                  <td><span class="mono">{{ inv.id }}</span></td>
+                  <td>{{ inv.issuedAt }}</td>
+                  <td>{{ inv.amount }}</td>
+                  <td><nz-tag [nzColor]="invoiceTagColor(inv.status)">{{ inv.status }}</nz-tag></td>
+                  <td>
+                    <button
+                      nz-button
+                      nzType="text"
+                      nzSize="small"
+                      nz-tooltip
+                      nzTooltipTitle="Download PDF"
+                    >
+                      <nz-icon nzType="download" />
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </nz-table>
+        </nz-card>
+      </section>
+    </main>
+  </div>
+</div>

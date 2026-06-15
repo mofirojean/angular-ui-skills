@@ -1,0 +1,152 @@
+<div class="page">
+  <!-- Top bar -->
+  <header class="kb-header">
+    <div class="kb-search">
+      <nz-input-group [nzPrefix]="searchIcon">
+        <input
+          nz-input
+          placeholder="Search articles, tags..."
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          [nzAutocomplete]="searchAuto"
+        />
+      </nz-input-group>
+      <ng-template #searchIcon><nz-icon nzType="search" /></ng-template>
+
+      <nz-autocomplete #searchAuto>
+        @for (hit of searchHits(); track hit.id) {
+          <nz-auto-option [nzValue]="hit.title" (click)="onSearchPick(hit.id)">
+            <div class="search-hit">
+              <p class="search-hit__title">{{ hit.title }}</p>
+              <p class="search-hit__meta">{{ hit.category }} · {{ hit.readMinutes }} min</p>
+            </div>
+          </nz-auto-option>
+        }
+      </nz-autocomplete>
+    </div>
+
+    <nz-cascader
+      class="kb-cascader"
+      [nzOptions]="cascaderOptions()"
+      [nzShowSearch]="true"
+      nzPlaceHolder="Jump to category"
+      (ngModelChange)="onCascaderChange($event)"
+      [ngModel]="null"
+    />
+
+    <button nz-button nzType="primary">
+      <nz-icon nzType="plus" /> New article
+    </button>
+  </header>
+
+  <div class="kb-body">
+    <!-- Left tree -->
+    <aside class="kb-tree">
+      <div class="kb-tree__head">
+        <span>Categories</span>
+        <button
+          nz-button
+          nzType="text"
+          nzSize="small"
+          nz-tooltip
+          nzTooltipTitle="Drag to reorder"
+          aria-label="Reorder"
+        >
+          <nz-icon nzType="drag" />
+        </button>
+      </div>
+      <nz-tree
+        [nzData]="treeNodes()"
+        nzBlockNode
+        nzDraggable
+        [nzSelectedKeys]="selectedCategoryId() ? [selectedCategoryId()!] : []"
+        (nzClick)="onTreeClick($event)"
+      />
+    </aside>
+
+    <!-- Article -->
+    <main class="kb-article">
+      @if (activeArticle(); as article) {
+        <article class="article">
+          <header class="article__head">
+            <div class="article__breadcrumb">
+              <nz-icon nzType="book" /> {{ article.category }}
+            </div>
+            <h1 class="article__title">{{ article.title }}</h1>
+            <p class="article__excerpt">{{ article.excerpt }}</p>
+
+            <div class="article__meta">
+              <span class="article__time">
+                <nz-icon nzType="clock-circle" /> {{ article.readMinutes }} min read
+              </span>
+              <span class="article__divider">·</span>
+              <span class="article__time">Updated {{ relative(article.updatedAt) }}</span>
+              <span class="article__divider">·</span>
+              <div class="article__tags">
+                @for (tag of article.tags; track tag) {
+                  <nz-tag>{{ tag }}</nz-tag>
+                }
+              </div>
+            </div>
+          </header>
+
+          <nz-divider />
+
+          <div class="article__body">
+            @for (section of article.body; track section.heading; let i = $index) {
+              <section [id]="sectionId(article, i)" class="article__section">
+                <h2 class="article__section-title">{{ section.heading }}</h2>
+                <p class="article__paragraph">{{ section.text }}</p>
+              </section>
+            }
+          </div>
+
+          <footer class="article__foot">
+            <div class="rate-block">
+              <p class="rate-block__label">Was this helpful?</p>
+              <nz-rate
+                [ngModel]="userRating()"
+                (ngModelChange)="onRate($event)"
+                nzAllowClear
+              />
+              <p class="rate-block__hint">
+                {{ article.helpfulVotes }} found this helpful · {{ article.unhelpfulVotes }} did not
+              </p>
+            </div>
+
+            @if (otherArticlesInCategory().length > 0) {
+              <div class="more-block">
+                <p class="more-block__label">More in {{ article.category }}</p>
+                <ul class="more-block__list">
+                  @for (other of otherArticlesInCategory(); track other.id) {
+                    <li>
+                      <a (click)="selectedCategoryId.set(other.categoryId)">
+                        <nz-icon nzType="book" /> {{ other.title }}
+                      </a>
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+          </footer>
+        </article>
+      } @else {
+        <div class="empty-state">
+          <nz-empty nzNotFoundContent="Pick an article from the tree on the left" />
+        </div>
+      }
+    </main>
+
+    <!-- TOC -->
+    @if (activeArticle(); as article) {
+      <aside class="kb-toc">
+        <p class="kb-toc__head">On this page</p>
+        <nz-anchor [nzOffsetTop]="16" nzBounds="40">
+          @for (section of article.body; track section.heading; let i = $index) {
+            <nz-link [nzHref]="'#' + sectionId(article, i)" [nzTitle]="section.heading" />
+          }
+        </nz-anchor>
+      </aside>
+    }
+  </div>
+</div>

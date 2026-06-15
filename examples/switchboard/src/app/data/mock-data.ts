@@ -77,7 +77,20 @@ export interface KbArticle {
   readonly id: string;
   readonly title: string;
   readonly category: string;
+  readonly categoryId: string;
+  readonly excerpt: string;
+  readonly body: readonly { heading: string; text: string }[];
+  readonly tags: readonly string[];
   readonly readMinutes: number;
+  readonly helpfulVotes: number;
+  readonly unhelpfulVotes: number;
+  readonly updatedAt: Date;
+}
+
+export interface KbCategory {
+  readonly id: string;
+  readonly title: string;
+  readonly children?: readonly KbCategory[];
 }
 
 const NOW = new Date();
@@ -334,14 +347,227 @@ function generateActivity(): ActivityEvent[] {
 
 export const ACTIVITY: readonly ActivityEvent[] = generateActivity();
 
-// --- Knowledge suggestions ---
+// --- Knowledge base ---
+
+export const KB_CATEGORIES: readonly KbCategory[] = [
+  {
+    id: 'getting-started',
+    title: 'Getting started',
+    children: [
+      { id: 'gs-setup', title: 'First-time setup' },
+      { id: 'gs-invite', title: 'Inviting your team' },
+    ],
+  },
+  {
+    id: 'auth',
+    title: 'Authentication',
+    children: [
+      { id: 'auth-sso', title: 'SSO' },
+      { id: 'auth-2fa', title: 'Two-factor' },
+    ],
+  },
+  {
+    id: 'billing',
+    title: 'Billing',
+    children: [
+      { id: 'billing-invoices', title: 'Invoices' },
+      { id: 'billing-refunds', title: 'Refunds' },
+      { id: 'billing-tax', title: 'Tax & VAT' },
+    ],
+  },
+  {
+    id: 'api',
+    title: 'API & integrations',
+    children: [
+      { id: 'api-webhooks', title: 'Webhooks' },
+      { id: 'api-limits', title: 'Rate limits' },
+      { id: 'api-keys', title: 'Keys & rotation' },
+    ],
+  },
+  {
+    id: 'process',
+    title: 'Process & runbooks',
+    children: [
+      { id: 'process-tier2', title: 'Tier 2 escalation' },
+      { id: 'process-incident', title: 'Incident response' },
+    ],
+  },
+];
+
+const lorem = (lines: number) =>
+  Array.from({ length: lines }, (_, i) =>
+    `Paragraph ${i + 1}. This is mock content for demonstration. It describes the procedure step by step in plain language so a new agent can follow it. ` +
+    `Always confirm the customer's identity before making changes that affect billing, access, or data retention.`,
+  ).join('\n\n');
 
 export const KB_ARTICLES: readonly KbArticle[] = [
-  { id: 'kb-1', title: 'Resetting two-factor authentication for an end user', category: 'Authentication', readMinutes: 3 },
-  { id: 'kb-2', title: 'Why CSV exports may return empty rows', category: 'Exports', readMinutes: 5 },
-  { id: 'kb-3', title: 'Webhook retry policy and replay window', category: 'API & webhooks', readMinutes: 4 },
-  { id: 'kb-4', title: 'Renewing a custom domain SSL certificate', category: 'Hosting', readMinutes: 6 },
-  { id: 'kb-5', title: 'Tier 2 escalation runbook', category: 'Process', readMinutes: 8 },
+  {
+    id: 'kb-1',
+    title: 'Resetting two-factor authentication for an end user',
+    category: 'Authentication',
+    categoryId: 'auth-2fa',
+    excerpt: 'Guides agents through the safe reset of TOTP and backup codes after identity verification.',
+    body: [
+      { heading: 'When to use this', text: 'Use this runbook when a customer has lost their TOTP device and cannot recover their backup codes.' },
+      { heading: 'Identity verification', text: lorem(1) },
+      { heading: 'Steps', text: lorem(2) },
+      { heading: 'Audit trail', text: 'Every reset emits an audit event under the customer record. Confirm the event appears before closing the ticket.' },
+    ],
+    tags: ['auth', '2fa', 'security'],
+    readMinutes: 3,
+    helpfulVotes: 84,
+    unhelpfulVotes: 6,
+    updatedAt: hoursAgo(72),
+  },
+  {
+    id: 'kb-2',
+    title: 'Why CSV exports may return empty rows',
+    category: 'Billing',
+    categoryId: 'billing-invoices',
+    excerpt: 'Common causes for empty CSV exports and how to verify the underlying data source.',
+    body: [
+      { heading: 'Common causes', text: 'Locale-mismatched date filters, recently-deleted records, and pagination cursors all cause empty rows.' },
+      { heading: 'Diagnostic steps', text: lorem(2) },
+      { heading: 'Resolution', text: lorem(1) },
+    ],
+    tags: ['export', 'billing', 'csv'],
+    readMinutes: 5,
+    helpfulVotes: 51,
+    unhelpfulVotes: 4,
+    updatedAt: hoursAgo(120),
+  },
+  {
+    id: 'kb-3',
+    title: 'Webhook retry policy and replay window',
+    category: 'API & integrations',
+    categoryId: 'api-webhooks',
+    excerpt: 'How long failed webhooks are retried, and how to manually replay a delivery from the dashboard.',
+    body: [
+      { heading: 'Retry schedule', text: 'Exponential backoff, 12 retries over 72 hours. After that, the delivery is marked permanently failed.' },
+      { heading: 'Replaying manually', text: lorem(1) },
+      { heading: 'Signature verification', text: lorem(1) },
+    ],
+    tags: ['api', 'webhook', 'retry'],
+    readMinutes: 4,
+    helpfulVotes: 67,
+    unhelpfulVotes: 9,
+    updatedAt: hoursAgo(36),
+  },
+  {
+    id: 'kb-4',
+    title: 'Renewing a custom domain SSL certificate',
+    category: 'API & integrations',
+    categoryId: 'api-keys',
+    excerpt: 'Manual renewal flow for customers whose Let\'s Encrypt auto-renewal failed.',
+    body: [
+      { heading: 'Why renewal fails', text: lorem(1) },
+      { heading: 'Manual renewal', text: lorem(2) },
+    ],
+    tags: ['hosting', 'ssl', 'security'],
+    readMinutes: 6,
+    helpfulVotes: 32,
+    unhelpfulVotes: 2,
+    updatedAt: hoursAgo(96),
+  },
+  {
+    id: 'kb-5',
+    title: 'Tier 2 escalation runbook',
+    category: 'Process & runbooks',
+    categoryId: 'process-tier2',
+    excerpt: 'When and how to escalate to Tier 2, including handoff requirements and SLA expectations.',
+    body: [
+      { heading: 'Criteria', text: 'Escalate when the issue is reproducible, affects more than one customer, or requires changes outside the support tool.' },
+      { heading: 'Handoff template', text: lorem(2) },
+      { heading: 'SLA after escalation', text: 'Tier 2 owns a 4h response window during business hours and 6h overnight.' },
+    ],
+    tags: ['process', 'escalation'],
+    readMinutes: 8,
+    helpfulVotes: 119,
+    unhelpfulVotes: 11,
+    updatedAt: hoursAgo(18),
+  },
+  {
+    id: 'kb-6',
+    title: 'First-time workspace setup',
+    category: 'Getting started',
+    categoryId: 'gs-setup',
+    excerpt: 'Walks a new admin through the first ten minutes of setup: domain, branding, and initial agents.',
+    body: [
+      { heading: 'Welcome', text: 'This article covers the first ten minutes of a fresh workspace. Pair with the inline product tour.' },
+      { heading: 'Steps', text: lorem(3) },
+    ],
+    tags: ['onboarding'],
+    readMinutes: 10,
+    helpfulVotes: 142,
+    unhelpfulVotes: 7,
+    updatedAt: hoursAgo(240),
+  },
+  {
+    id: 'kb-7',
+    title: 'Inviting your team and assigning roles',
+    category: 'Getting started',
+    categoryId: 'gs-invite',
+    excerpt: 'Available roles, what each one can do, and bulk invite via CSV.',
+    body: [
+      { heading: 'Roles available', text: 'Admin, Lead, Agent, Read-only. Each role inherits the permissions of the ones below it.' },
+      { heading: 'Bulk invite', text: lorem(2) },
+    ],
+    tags: ['team', 'roles'],
+    readMinutes: 4,
+    helpfulVotes: 76,
+    unhelpfulVotes: 3,
+    updatedAt: hoursAgo(168),
+  },
+  {
+    id: 'kb-8',
+    title: 'Configuring SAML SSO',
+    category: 'Authentication',
+    categoryId: 'auth-sso',
+    excerpt: 'Step-by-step SAML configuration for Okta, Azure AD, and JumpCloud.',
+    body: [
+      { heading: 'Prerequisites', text: 'Admin access to both your IdP and this workspace. SAML metadata XML from the IdP.' },
+      { heading: 'Okta', text: lorem(2) },
+      { heading: 'Azure AD', text: lorem(2) },
+    ],
+    tags: ['auth', 'sso', 'saml'],
+    readMinutes: 12,
+    helpfulVotes: 58,
+    unhelpfulVotes: 5,
+    updatedAt: hoursAgo(80),
+  },
+  {
+    id: 'kb-9',
+    title: 'Processing a refund',
+    category: 'Billing',
+    categoryId: 'billing-refunds',
+    excerpt: 'Refund eligibility, partial refunds, and the refund queue.',
+    body: [
+      { heading: 'Eligibility', text: 'Refunds are available for 30 days after purchase. After that, only credit notes can be issued.' },
+      { heading: 'Steps', text: lorem(2) },
+      { heading: 'Stripe sync', text: 'Refunds propagate to Stripe within 60 seconds. The payment intent shows the new status after sync.' },
+    ],
+    tags: ['billing', 'refund'],
+    readMinutes: 5,
+    helpfulVotes: 41,
+    unhelpfulVotes: 8,
+    updatedAt: hoursAgo(220),
+  },
+  {
+    id: 'kb-10',
+    title: 'Incident response, severity levels',
+    category: 'Process & runbooks',
+    categoryId: 'process-incident',
+    excerpt: 'Sev1 through Sev4 definitions and who to page for each level.',
+    body: [
+      { heading: 'Severity definitions', text: lorem(2) },
+      { heading: 'Paging tree', text: 'Sev1 pages all of Tier 2 plus engineering on-call. Sev2 pages engineering only. Sev3 routes to a Slack channel. Sev4 is logged and reviewed daily.' },
+    ],
+    tags: ['process', 'incident', 'oncall'],
+    readMinutes: 7,
+    helpfulVotes: 97,
+    unhelpfulVotes: 4,
+    updatedAt: hoursAgo(50),
+  },
 ];
 
 // 14 days of fake volume, recent day last. Numbers drift around a moving baseline so the

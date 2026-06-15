@@ -9,7 +9,9 @@ import {
   Announcement,
   DailyVolume,
   KB_ARTICLES,
+  KB_CATEGORIES,
   KbArticle,
+  KbCategory,
   MESSAGES,
   Message,
   Ticket,
@@ -34,6 +36,7 @@ export class DataService {
   readonly messages = signal<readonly Message[]>(MESSAGES);
   readonly activity = signal<readonly ActivityEvent[]>(ACTIVITY);
   readonly kbArticles = signal<readonly KbArticle[]>(KB_ARTICLES);
+  readonly kbCategories = signal<readonly KbCategory[]>(KB_CATEGORIES);
 
   readonly onlineAgents = computed(() => this.agents().filter((a) => a.online));
 

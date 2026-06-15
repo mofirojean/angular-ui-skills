@@ -1,0 +1,257 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.page {
+  padding: 20px 24px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #18181b;
+}
+
+.page-sub {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #71717a;
+  max-width: 560px;
+}
+
+:host-context(.theme-dark) {
+  .page-title { color: rgba(255, 255, 255, 0.88); }
+  .page-sub { color: rgba(255, 255, 255, 0.5); }
+}
+
+// --- Grid ---
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .settings-grid { grid-template-columns: 1fr; }
+  .settings-nav { display: none; }
+}
+
+.settings-nav {
+  position: sticky;
+  top: 0;
+  height: fit-content;
+}
+
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// --- Shared helpers ---
+
+.hint,
+.card-hint {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  color: #71717a;
+  line-height: 1.5;
+}
+
+.card-hint {
+  margin: 0 0 12px;
+}
+
+:host-context(.theme-dark) {
+  .hint, .card-hint { color: rgba(255, 255, 255, 0.5); }
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+// --- Preferences list ---
+
+.pref-item ::ng-deep .ant-list-item-meta-title { font-size: 13.5px; }
+.pref-item ::ng-deep .ant-list-item-meta-description { font-size: 12px; }
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.slider-icon {
+  color: #71717a;
+  font-size: 14px;
+}
+
+.volume-slider {
+  flex: 1;
+}
+
+.slider-value {
+  width: 28px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: 12.5px;
+  color: #52525b;
+}
+
+// --- Business hours ---
+
+.hours-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+.hours-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 16px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.hours-row:first-child { border-top: none; }
+
+.hours-row--inactive { opacity: 0.55; }
+
+.hours-row__day {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hours-row__label {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #18181b;
+}
+
+.hours-row__range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hours-row__sep {
+  color: #a1a1aa;
+  font-size: 12.5px;
+}
+
+:host-context(.theme-dark) {
+  .hours-row { border-top-color: rgba(255, 255, 255, 0.05); }
+  .hours-row__label { color: rgba(255, 255, 255, 0.88); }
+}
+
+// --- Integrations ---
+
+.integrations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.integration {
+  border: 1px solid #e4e4e7;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 140ms ease, background 140ms ease;
+}
+
+.integration--connected {
+  border-color: rgba(37, 99, 235, 0.18);
+  background: rgba(37, 99, 235, 0.02);
+}
+
+.integration__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.integration__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.integration__name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #18181b;
+}
+
+.integration__status {
+  font-size: 10.5px !important;
+  line-height: 16px !important;
+  padding: 0 6px !important;
+  margin: 0 !important;
+  width: fit-content;
+}
+
+.integration__desc {
+  margin: 0;
+  font-size: 12.5px;
+  color: #71717a;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.integration__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+:host-context(.theme-dark) {
+  .integration {
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  .integration--connected {
+    border-color: rgba(96, 165, 250, 0.24);
+    background: rgba(96, 165, 250, 0.04);
+  }
+  .integration__name { color: rgba(255, 255, 255, 0.88); }
+  .integration__desc { color: rgba(255, 255, 255, 0.55); }
+}
+
+// --- Billing ---
+
+.billing-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 700px) {
+  .billing-stats { grid-template-columns: 1fr; }
+}
+
+.mono {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: #71717a;
+}
