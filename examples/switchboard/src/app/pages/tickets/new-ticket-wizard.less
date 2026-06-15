@@ -1,0 +1,101 @@
+:host {
+  display: block;
+}
+
+.wizard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 100%;
+}
+
+.wizard__body {
+  flex: 1;
+  min-height: 0;
+}
+
+.step-title {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #18181b;
+}
+
+.step-hint {
+  margin: 0 0 18px;
+  font-size: 12.5px;
+  color: #71717a;
+  line-height: 1.55;
+}
+
+:host-context(.theme-dark) {
+  .step-title { color: rgba(255, 255, 255, 0.88); }
+  .step-hint { color: rgba(255, 255, 255, 0.55); }
+}
+
+.priority-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+}
+
+.priority-grid ::ng-deep .ant-radio-button-wrapper {
+  display: flex !important;
+  align-items: flex-start;
+  flex-direction: column;
+  width: 100%;
+  height: auto !important;
+  padding: 10px 12px !important;
+  border-radius: 8px !important;
+  border-left-width: 1px !important;
+
+  &::before { display: none; }
+}
+
+.priority-card {
+  position: relative;
+}
+
+.priority-card__label {
+  font-size: 13px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.priority-card__hint {
+  font-size: 11px;
+  color: #71717a;
+  font-weight: 400;
+  display: block;
+  line-height: 1.35;
+}
+
+:host-context(.theme-dark) .priority-card__hint {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.mock-alert {
+  margin-bottom: 12px;
+}
+
+.review {
+  margin-bottom: 8px;
+}
+
+// --- Footer action bar ---
+
+.wizard__foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #e4e4e7;
+}
+
+.wizard__spacer { flex: 1; }
+
+:host-context(.theme-dark) .wizard__foot {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}

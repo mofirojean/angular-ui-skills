@@ -364,7 +364,15 @@ export const VOLUME: readonly DailyVolume[] = VOLUME_SOURCE.map(([opened, resolv
 
 export function isToday(d: Date): boolean {
   const a = new Date();
-  return d.getFullYear() === a.getFullYear() && d.getMonth() === a.getMonth() && d.getDate() === a.getDate();
+  return isSameDay(d, a);
+}
+
+export function isSameDay(a: Date, b: Date): boolean {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
 }
 
 export function relativeTime(d: Date): string {

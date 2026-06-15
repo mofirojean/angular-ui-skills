@@ -1,0 +1,183 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h2 class="page-title">Queues</h2>
+      <p class="page-sub">
+        {{ visibleCount() }} ticket{{ visibleCount() === 1 ? '' : 's' }} in view
+        @if (onlyMine()) { · scoped to you }
+      </p>
+    </div>
+
+    <div class="header-controls">
+      <label class="switch-label">
+        <nz-switch
+          [ngModel]="onlyMine()"
+          (ngModelChange)="onlyMine.set($event)"
+          nzSize="small"
+        />
+        <span>Show only mine</span>
+      </label>
+
+      <nz-segmented
+        [nzOptions]="modeOptions"
+        [ngModel]="mode()"
+        (ngModelChange)="mode.set($event)"
+      />
+    </div>
+  </header>
+
+  <!-- Kanban -->
+  @if (mode() === 'kanban') {
+    @if (visibleCount() === 0) {
+      <div class="empty-state">
+        <nz-empty nzNotFoundContent="No tickets match this view" />
+      </div>
+    } @else {
+      <div class="kanban" cdkDropListGroup>
+        @for (column of columns(); track column.status) {
+          <section class="column">
+            <header class="column__head" [style.--accent]="column.accent">
+              <span class="column__dot"></span>
+              <h3 class="column__label">{{ column.label }}</h3>
+              <span class="column__count">{{ column.tickets.length }}</span>
+            </header>
+
+            <div
+              class="column__body"
+              cdkDropList
+              [cdkDropListData]="column.tickets"
+              [cdkDropListConnectedTo]="dropListIds()"
+              [id]="column.status"
+              (cdkDropListDropped)="onDrop($event)"
+            >
+              @for (ticket of column.tickets; track ticket.id) {
+                @let info = sla(ticket.slaDueAt);
+                <article
+                  class="card"
+                  cdkDrag
+                  [class.card--breached]="info.breached"
+                  (click)="open(ticket.id)"
+                >
+                  <div class="card__head">
+                    <span class="card__id">{{ ticket.id }}</span>
+                    <nz-tag [nzColor]="priorityTag[ticket.priority]">{{ ticket.priority }}</nz-tag>
+                  </div>
+                  <p class="card__subject">{{ ticket.subject }}</p>
+                  <div class="card__meta">
+                    <span class="card__customer">{{ ticket.customer }}</span>
+                    @if (info.breached) {
+                      <span class="card__sla card__sla--breached" nz-tooltip [nzTooltipTitle]="info.text">
+                        <nz-icon nzType="exclamation-circle" />
+                      </span>
+                    }
+                  </div>
+                  <footer class="card__foot">
+                    <div class="card__tags">
+                      @for (tag of ticket.tags.slice(0, 2); track tag) {
+                        <nz-tag nzColor="default">{{ tag }}</nz-tag>
+                      }
+                    </div>
+                    @if (ticket.assigneeId) {
+                      <nz-avatar
+                        [nzText]="agentInitials(ticket.assigneeId)"
+                        nzSize="small"
+                        [nzGap]="4"
+                        nz-tooltip
+                        [nzTooltipTitle]="agentName(ticket.assigneeId)"
+                      />
+                    } @else {
+                      <span class="card__unassigned" nz-tooltip nzTooltipTitle="Unassigned">
+                        <nz-icon nzType="user" />
+                      </span>
+                    }
+                  </footer>
+
+                  <div class="card__drag" cdkDragHandle aria-label="Drag handle">
+                    <nz-icon nzType="holder" />
+                  </div>
+                </article>
+              }
+
+              @if (column.tickets.length === 0) {
+                <div class="column__empty">
+                  <nz-icon nzType="inbox" />
+                  <p>Drop a ticket here</p>
+                </div>
+              }
+            </div>
+          </section>
+        }
+      </div>
+    }
+  }
+
+  <!-- Table -->
+  @if (mode() === 'table') {
+    <nz-table
+      #qt
+      [nzData]="visible()"
+      [nzPageSize]="15"
+      nzShowPagination
+      nzSize="small"
+    >
+      <thead>
+        <tr>
+          <th nzWidth="100px">ID</th>
+          <th>Subject</th>
+          <th nzWidth="170px">Customer</th>
+          <th nzWidth="120px">Status</th>
+          <th nzWidth="100px">Priority</th>
+          <th nzWidth="140px">Assignee</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of qt.data; track row.id) {
+          <tr class="table-row" (click)="open(row.id)">
+            <td><span class="mono">{{ row.id }}</span></td>
+            <td>{{ row.subject }}</td>
+            <td>{{ row.customer }}</td>
+            <td><nz-tag [nzColor]="statusTag[row.status]">{{ row.status }}</nz-tag></td>
+            <td><nz-tag [nzColor]="priorityTag[row.priority]">{{ row.priority }}</nz-tag></td>
+            <td>
+              @if (row.assigneeId) {
+                <span class="assignee-inline">
+                  <nz-avatar [nzText]="agentInitials(row.assigneeId)" nzSize="small" [nzGap]="4" />
+                  {{ agentName(row.assigneeId) }}
+                </span>
+              } @else {
+                <span class="muted">Unassigned</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </nz-table>
+  }
+
+  <!-- Calendar -->
+  @if (mode() === 'calendar') {
+    <div class="calendar-wrap">
+      <nz-calendar
+        [ngModel]="selectedDate()"
+        (ngModelChange)="selectedDate.set($event)"
+      >
+        <ng-container *nzDateCell="let date">
+          @let dateTickets = ticketsOn(date);
+          @if (dateTickets.length > 0) {
+            <ul class="date-cell">
+              @for (t of dateTickets.slice(0, 3); track t.id) {
+                <li class="date-cell__row" [class.date-cell__row--breached]="sla(t.slaDueAt).breached" (click)="$event.stopPropagation(); open(t.id)">
+                  <span class="date-cell__dot" [style.background]="priorityTag[t.priority] === 'red' ? '#ef4444' : priorityTag[t.priority] === 'volcano' ? '#f97316' : priorityTag[t.priority] === 'blue' ? '#2563eb' : '#a1a1aa'"></span>
+                  <span class="date-cell__id">{{ t.id }}</span>
+                </li>
+              }
+              @if (dateTickets.length > 3) {
+                <li class="date-cell__more">+{{ dateTickets.length - 3 }} more</li>
+              }
+            </ul>
+          }
+        </ng-container>
+      </nz-calendar>
+    </div>
+  }
+</div>

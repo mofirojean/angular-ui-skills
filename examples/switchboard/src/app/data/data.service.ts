@@ -114,4 +114,32 @@ export class DataService {
       list.map((t) => (idSet.has(t.id) ? { ...t, ...patch, updatedAt: new Date() } : t)),
     );
   }
+
+  addTicket(input: {
+    subject: string;
+    customer: string;
+    priority: Ticket['priority'];
+    assigneeId: string | null;
+    tags: readonly string[];
+  }): Ticket {
+    const nextNumber = this.tickets().reduce((max, t) => {
+      const n = parseInt(t.id.replace(/^T-/, ''), 10);
+      return Number.isNaN(n) ? max : Math.max(max, n);
+    }, 2000) + 1;
+    const now = new Date();
+    const ticket: Ticket = {
+      id: `T-${nextNumber}`,
+      subject: input.subject,
+      customer: input.customer,
+      priority: input.priority,
+      status: input.assigneeId ? 'in-progress' : 'open',
+      assigneeId: input.assigneeId,
+      createdAt: now,
+      updatedAt: now,
+      slaDueAt: new Date(now.getTime() + 24 * 60 * 60_000),
+      tags: input.tags,
+    };
+    this.tickets.update((list) => [ticket, ...list]);
+    return ticket;
+  }
 }

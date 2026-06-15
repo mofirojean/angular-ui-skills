@@ -1,0 +1,159 @@
+<div class="wizard">
+  <nz-steps [nzCurrent]="step()" nzSize="small" nzProgressDot>
+    @for (s of stepDefs; track s.title) {
+      <nz-step [nzTitle]="s.title" />
+    }
+  </nz-steps>
+
+  <div class="wizard__body">
+    @switch (step()) {
+      @case (0) {
+        <form nz-form nzLayout="vertical" [formGroup]="customerForm">
+          <h3 class="step-title">{{ stepDefs[0].subtitle }}</h3>
+          <p class="step-hint">Pick an existing customer or type a new one.</p>
+
+          <nz-form-item>
+            <nz-form-label nzRequired nzFor="customer">Customer</nz-form-label>
+            <nz-form-control nzErrorTip="Customer is required and must be at least 2 characters">
+              <input
+                nz-input
+                id="customer"
+                formControlName="customer"
+                placeholder="Northwind Logistics"
+                [nzAutocomplete]="customerAuto"
+              />
+              <nz-autocomplete #customerAuto>
+                @for (c of customerOptions(); track c) {
+                  <nz-auto-option [nzValue]="c">{{ c }}</nz-auto-option>
+                }
+              </nz-autocomplete>
+            </nz-form-control>
+          </nz-form-item>
+        </form>
+      }
+
+      @case (1) {
+        <form nz-form nzLayout="vertical" [formGroup]="categoryForm">
+          <h3 class="step-title">{{ stepDefs[1].subtitle }}</h3>
+          <p class="step-hint">Categorise the issue so the right macros and runbooks suggest themselves.</p>
+
+          <nz-form-item>
+            <nz-form-label nzRequired nzFor="category">Category</nz-form-label>
+            <nz-form-control nzErrorTip="Pick a category">
+              <nz-select id="category" formControlName="category" nzPlaceHolder="Pick a category" nzShowSearch>
+                @for (c of categories; track c.value) {
+                  <nz-option [nzValue]="c.value" [nzLabel]="c.label" />
+                }
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item>
+            <nz-form-label nzRequired nzFor="subject">Subject</nz-form-label>
+            <nz-form-control nzErrorTip="Subject must be at least 6 characters">
+              <input nz-input id="subject" formControlName="subject" placeholder="Short summary of the issue" />
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item>
+            <nz-form-label nzFor="description">Description</nz-form-label>
+            <nz-form-control>
+              <textarea
+                nz-input
+                id="description"
+                formControlName="description"
+                rows="4"
+                placeholder="Add any reproduction steps, error messages, or relevant context."
+              ></textarea>
+            </nz-form-control>
+          </nz-form-item>
+        </form>
+      }
+
+      @case (2) {
+        <form nz-form nzLayout="vertical" [formGroup]="priorityForm">
+          <h3 class="step-title">{{ stepDefs[2].subtitle }}</h3>
+          <p class="step-hint">Pick a priority. Assigning to an agent automatically moves status to In progress.</p>
+
+          <nz-form-item>
+            <nz-form-label nzRequired>Priority</nz-form-label>
+            <nz-form-control>
+              <nz-radio-group formControlName="priority" class="priority-grid">
+                @for (p of priorityOptions; track p.value) {
+                  <label nz-radio-button [nzValue]="p.value" class="priority-card">
+                    <span class="priority-card__label">{{ p.label }}</span>
+                    <span class="priority-card__hint">{{ p.hint }}</span>
+                  </label>
+                }
+              </nz-radio-group>
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item>
+            <nz-form-label nzFor="assignee">Assignee</nz-form-label>
+            <nz-form-control>
+              <nz-select
+                id="assignee"
+                formControlName="assigneeId"
+                nzPlaceHolder="Leave unassigned"
+                nzAllowClear
+                nzShowSearch
+              >
+                @for (opt of agentOptions(); track opt.value) {
+                  <nz-option [nzValue]="opt.value" [nzLabel]="opt.label" />
+                }
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </form>
+      }
+
+      @case (3) {
+        @let value = collect();
+        <h3 class="step-title">{{ stepDefs[3].subtitle }}</h3>
+
+        <nz-alert
+          nzType="info"
+          nzMessage="This is a portfolio mock"
+          nzDescription="Creating the ticket adds it to the in-memory store but does not send any email or webhook."
+          nzShowIcon
+          class="mock-alert"
+        />
+
+        <nz-descriptions nzBordered nzSize="small" [nzColumn]="1" class="review">
+          <nz-descriptions-item nzTitle="Customer">{{ value.customer }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Category">{{ categoryLabel(value.category) }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Subject">{{ value.subject }}</nz-descriptions-item>
+          @if (value.description) {
+            <nz-descriptions-item nzTitle="Description">{{ value.description }}</nz-descriptions-item>
+          }
+          <nz-descriptions-item nzTitle="Priority">
+            <nz-tag [nzColor]="value.priority === 'urgent' ? 'red' : value.priority === 'high' ? 'volcano' : value.priority === 'normal' ? 'blue' : 'default'">
+              {{ value.priority }}
+            </nz-tag>
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Assignee">{{ agentName(value.assigneeId) }}</nz-descriptions-item>
+        </nz-descriptions>
+      }
+    }
+  </div>
+
+  <div class="wizard__foot">
+    <button nz-button type="button" (click)="cancel()">Cancel</button>
+    <div class="wizard__spacer"></div>
+    @if (step() > 0) {
+      <button nz-button type="button" (click)="prev()">
+        <nz-icon nzType="left" /> Back
+      </button>
+    }
+    @if (step() < 3) {
+      <button nz-button nzType="primary" type="button" (click)="next()">
+        Next <nz-icon nzType="right" />
+      </button>
+    } @else {
+      <button nz-button nzType="primary" type="button" [nzLoading]="submitting()" (click)="submit()">
+        <nz-icon nzType="check-circle" /> Create ticket
+      </button>
+    }
+  </div>
+</div>

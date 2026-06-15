@@ -35,6 +35,7 @@ import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 import { DataService } from '../../data/data.service';
+import { NewTicketWizard } from './new-ticket-wizard';
 import {
   Ticket,
   TicketPriority,
@@ -81,6 +82,7 @@ const STATUS_TAG: Record<TicketStatus, string> = {
     NzTooltipModule,
     NzBadgeModule,
     NzDropdownMenuComponent,
+    NewTicketWizard,
   ],
   templateUrl: './tickets.html',
   styleUrl: './tickets.less',
@@ -358,6 +360,11 @@ export class Tickets {
 
   protected closeDrawer(): void {
     this.drawerOpen.set(false);
+  }
+
+  protected onTicketCreated(created: { id: string; subject: string }): void {
+    this.drawerOpen.set(false);
+    this.message.success(`Created ${created.id}`);
   }
 
   // --- Helpers used in the template ---

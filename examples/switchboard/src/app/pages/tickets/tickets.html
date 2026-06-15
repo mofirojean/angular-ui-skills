@@ -297,25 +297,20 @@
   </nz-dropdown-menu>
 </div>
 
-<!-- New ticket drawer (Phase 4 will populate the Steps wizard inside) -->
+<!-- New ticket drawer with Phase 4 wizard -->
 <nz-drawer
   [nzVisible]="drawerOpen()"
   nzTitle="New ticket"
   nzPlacement="right"
-  [nzWidth]="520"
+  [nzWidth]="560"
   (nzOnClose)="closeDrawer()"
 >
   <ng-container *nzDrawerContent>
-    <div class="drawer-placeholder">
-      <div class="drawer-placeholder__icon">
-        <nz-icon nzType="profile" />
-      </div>
-      <p class="drawer-placeholder__title">Coming in Phase 4</p>
-      <p class="drawer-placeholder__hint">
-        The new-ticket wizard runs inside this Drawer as an <code>nz-steps</code> flow with
-        customer → category → priority → review stages.
-      </p>
-      <button nz-button nzType="primary" (click)="closeDrawer()">Got it</button>
-    </div>
+    @if (drawerOpen()) {
+      <app-new-ticket-wizard
+        (cancelled)="closeDrawer()"
+        (done)="onTicketCreated($event)"
+      />
+    }
   </ng-container>
 </nz-drawer>
