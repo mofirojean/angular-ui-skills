@@ -56,7 +56,7 @@ export class App {
       description:
         'Headless brain primitives + helm components, with theming via CSS variables and the hlm-tailwind-preset.',
       status: 'ready',
-      tracks: '@spartan-ng/brain v0.0.1-alpha.696',
+      tracks: '@spartan-ng/brain v0.0.1-alpha.704',
       logo: 'logos/spartan-ng.svg',
       logoBg: 'bg-rose-50 dark:bg-rose-950/40',
     },
@@ -68,7 +68,7 @@ export class App {
       description:
         'Full-featured PrimeNG v21 with Aura preset customization, definePreset patterns, and tailwindcss-primeui.',
       status: 'ready',
-      tracks: 'PrimeNG v21',
+      tracks: 'PrimeNG 21.1.9',
       logo: 'logos/primeng.svg',
       logoBg: 'bg-zinc-100 dark:bg-zinc-900',
     },
@@ -78,9 +78,9 @@ export class App {
       library: 'NG-ZORRO',
       site: 'https://ng.ant.design',
       description:
-        'Ant Design system for Angular, with Less theming, internationalization, and the full nz-* component set.',
-      status: 'planned',
-      tracks: 'TBD',
+        'Ant Design system for Angular, with LESS theming, internationalisation, and the full nz-* component set including services, drag-drop, and Watermark.',
+      status: 'ready',
+      tracks: 'ng-zorro-antd 21.3.1',
       logo: 'logos/ng-zorro.svg',
       logoBg: 'bg-sky-50 dark:bg-sky-950/30',
     },
@@ -152,7 +152,7 @@ export class App {
       path: 'examples/switchboard',
       accent: 'from-blue-400/25 via-cyan-300/15 to-transparent',
       badges: ['Zinc palette', 'Cmd+K palette', '8 pages'],
-      image: 'projects/switchboard-dark-mode.png',
+      image: 'projects/switchboard.png',
       demo: SITE_CONFIG.demos.switchboard,
     },
   ];
