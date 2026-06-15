@@ -40,7 +40,7 @@ type InstallTab = 'cli' | 'claude' | 'gemini' | 'cursor' | 'manual';
 export class App {
   private readonly document = inject(DOCUMENT);
 
-  protected readonly mode = signal<'light' | 'dark'>('dark');
+  protected readonly mode = signal<'light' | 'dark'>('light');
   protected readonly modeIcon = computed(() => (this.mode() === 'light' ? '☾' : '☀'));
   protected readonly installTab = signal<InstallTab>('cli');
   protected readonly copiedKey = signal<string | null>(null);
