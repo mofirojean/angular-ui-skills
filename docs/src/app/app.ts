@@ -141,6 +141,20 @@ export class App {
       image: 'projects/apex-chat-dark-mode.png',
       demo: SITE_CONFIG.demos.apex,
     },
+    {
+      slug: 'switchboard',
+      name: 'Switchboard',
+      tagline: 'Support-ops helpdesk console',
+      description:
+        'A SaaS support / ticket-ops console with a flagship tickets table, Kanban drag-drop, ticket detail with splitter + comment thread, KB with Tree + Anchor TOC, settings with 5 anchored sections, and an agent management page with Modal + Transfer + QR pairing. Validates ng-zorro-developer.',
+      stack: ['Angular v21', 'NG-ZORRO v21', 'LESS theming', '@angular/cdk', 'Zoneless'],
+      skill: 'ng-zorro-developer',
+      path: 'examples/switchboard',
+      accent: 'from-blue-400/25 via-cyan-300/15 to-transparent',
+      badges: ['Zinc palette', 'Cmd+K palette', '8 pages'],
+      image: 'projects/switchboard-dark-mode.png',
+      demo: SITE_CONFIG.demos.switchboard,
+    },
   ];
 
   protected readonly heroSnippet = [

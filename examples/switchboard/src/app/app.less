@@ -397,8 +397,15 @@
 
 @media (max-width: 768px) {
   .app-header__title { display: none; }
-  .app-header__center { padding: 0 12px; }
+  .app-header__center { padding: 0 8px; }
+  .app-search-trigger { max-width: none; }
   .app-search-trigger__kbd { display: none; }
+  .app-search-trigger__placeholder { font-size: 12.5px; }
+}
+
+@media (max-width: 480px) {
+  .app-header { padding: 0 8px; }
+  .app-header__right .ant-btn { padding: 0 6px !important; }
 }
 
 // ============================================================================
