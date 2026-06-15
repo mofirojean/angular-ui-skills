@@ -316,14 +316,14 @@
         </p>
       </div>
 
-      <div class="grid gap-6 lg:grid-cols-2">
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         @for (ex of examples; track ex.slug) {
-          <article class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] group relative overflow-hidden rounded-2xl border bg-white dark:bg-[var(--color-ink-3)] transition-all hover:shadow-2xl hover:shadow-[var(--color-ng-red-600)]/5 hover:-translate-y-0.5">
+          <article class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] group relative flex flex-col overflow-hidden rounded-xl border bg-white dark:bg-[var(--color-ink-3)] transition-all hover:shadow-lg hover:shadow-[var(--color-ng-red-600)]/5 hover:-translate-y-0.5 hover:border-zinc-300 dark:hover:border-zinc-700">
             <a
               [href]="ex.demo ?? '#'"
               target="_blank"
               rel="noopener"
-              class="block aspect-[16/10] relative overflow-hidden bg-gradient-to-br"
+              class="block aspect-[4/3] relative overflow-hidden bg-gradient-to-br"
               [class]="ex.accent"
               [attr.aria-label]="'Open ' + ex.name + ' live demo'"
             >
@@ -332,50 +332,42 @@
                 [alt]="ex.name + ' screenshot'"
                 loading="lazy"
                 decoding="async"
-                class="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.02]"
+                class="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
               />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
-              <div class="absolute right-3 top-3 flex items-center gap-1.5">
-                <span class="bg-black/60 text-white border-white/10 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium backdrop-blur">
-                  <span class="relative flex h-1.5 w-1.5">
-                    <span class="bg-emerald-400 animate-pulse-ring absolute inline-flex h-full w-full rounded-full"></span>
-                    <span class="bg-emerald-400 relative inline-flex h-1.5 w-1.5 rounded-full"></span>
-                  </span>
-                  Live demo
+              <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+              <span class="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/65 text-white border border-white/10 px-2 py-0.5 text-[9px] font-medium backdrop-blur">
+                <span class="relative flex h-1.5 w-1.5">
+                  <span class="bg-emerald-400 animate-pulse-ring absolute inline-flex h-full w-full rounded-full"></span>
+                  <span class="bg-emerald-400 relative inline-flex h-1.5 w-1.5 rounded-full"></span>
                 </span>
-              </div>
-              <div class="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/60 border border-white/10 px-2.5 py-1 backdrop-blur">
-                <p class="text-[10px] font-mono uppercase tracking-wider text-white/90">{{ ex.tagline }}</p>
-              </div>
+                Live
+              </span>
             </a>
 
-            <div class="p-5 sm:p-6">
-              <div class="flex items-start justify-between gap-3">
-                <div>
-                  <h3 class="text-lg font-semibold tracking-tight sm:text-xl">{{ ex.name }}</h3>
-                  <p class="mt-1 text-[13px] text-zinc-600 dark:text-zinc-400">{{ ex.description }}</p>
-                </div>
+            <div class="flex flex-1 flex-col p-4">
+              <div class="flex items-baseline justify-between gap-2">
+                <h3 class="text-[15px] font-semibold tracking-tight">{{ ex.name }}</h3>
+                <span class="text-[10px] font-mono uppercase tracking-wider text-zinc-500 truncate">{{ ex.tagline }}</span>
               </div>
 
-              <div class="mt-4 flex flex-wrap gap-1.5">
+              <p class="mt-1 text-[12.5px] text-zinc-600 dark:text-zinc-400 leading-snug line-clamp-2">
+                {{ ex.description }}
+              </p>
+
+              <div class="mt-3 flex flex-wrap gap-1">
                 @for (b of ex.badges; track b) {
-                  <span class="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded px-2 py-0.5 text-[10px] font-medium">{{ b }}</span>
+                  <span class="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded px-1.5 py-0.5 text-[10px] font-medium">{{ b }}</span>
                 }
               </div>
 
-              <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] mt-5 border-t pt-4">
-                <p class="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Stack</p>
-                <p class="mt-1 font-mono text-[11px] text-zinc-700 dark:text-zinc-300">{{ ex.stack.join(' · ') }}</p>
-              </div>
-
-              <div class="mt-4 flex items-center justify-between gap-3">
-                <span class="text-[11px] text-zinc-500">Validates <code class="font-mono text-zinc-700 dark:text-zinc-300">{{ ex.skill }}</code></span>
-                <div class="flex items-center gap-3">
+              <div class="mt-auto pt-3 flex items-center justify-between gap-2 text-[11px]">
+                <code class="font-mono text-zinc-500 truncate" [title]="ex.skill">{{ ex.skill }}</code>
+                <div class="flex items-center gap-2.5 flex-shrink-0">
                   <a
                     [href]="'https://github.com/mofirojean/angular-ui-skills/tree/master/' + ex.path"
                     target="_blank"
                     rel="noopener"
-                    class="text-zinc-600 dark:text-zinc-400 hover:text-[var(--color-ng-red-600)] dark:hover:text-[var(--color-ng-red-400)] inline-flex items-center gap-1 text-[12px] font-medium"
+                    class="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
                   >
                     Source
                   </a>
@@ -383,10 +375,10 @@
                     [href]="ex.demo ?? '#'"
                     target="_blank"
                     rel="noopener"
-                    class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] hover:underline inline-flex items-center gap-1 text-[12px] font-medium"
+                    class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] inline-flex items-center gap-0.5 font-medium hover:underline"
                   >
-                    Open demo
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                    Demo
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
                   </a>
                 </div>
               </div>
