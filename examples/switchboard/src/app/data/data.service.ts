@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, signal, WritableSignal } from '@angular/core';
 
 import {
   ACTIVITY,
@@ -14,6 +14,10 @@ import {
   KbCategory,
   MESSAGES,
   Message,
+  NOTIFICATIONS,
+  PERMISSIONS,
+  Permission,
+  SystemNotification,
   Ticket,
   TICKETS,
   VOLUME,
@@ -37,6 +41,12 @@ export class DataService {
   readonly activity = signal<readonly ActivityEvent[]>(ACTIVITY);
   readonly kbArticles = signal<readonly KbArticle[]>(KB_ARTICLES);
   readonly kbCategories = signal<readonly KbCategory[]>(KB_CATEGORIES);
+  readonly notifications = signal<readonly SystemNotification[]>(NOTIFICATIONS);
+  readonly permissions = signal<readonly Permission[]>(PERMISSIONS);
+
+  readonly unreadNotifications = computed(() =>
+    this.notifications().filter((n) => !n.read && !n.archived).length,
+  );
 
   readonly onlineAgents = computed(() => this.agents().filter((a) => a.online));
 
@@ -116,6 +126,66 @@ export class DataService {
     this.tickets.update((list) =>
       list.map((t) => (idSet.has(t.id) ? { ...t, ...patch, updatedAt: new Date() } : t)),
     );
+  }
+
+  // --- Notifications mutators ---
+
+  markNotificationRead(id: string): void {
+    this.notifications.update((list) =>
+      list.map((n) => (n.id === id ? { ...n, read: true } : n)),
+    );
+  }
+
+  markAllNotificationsRead(): void {
+    this.notifications.update((list) =>
+      list.map((n) => (n.read ? n : { ...n, read: true })),
+    );
+  }
+
+  archiveNotification(id: string): void {
+    this.notifications.update((list) =>
+      list.map((n) => (n.id === id ? { ...n, read: true, archived: true } : n)),
+    );
+  }
+
+  // --- Agent permissions mutator ---
+
+  updateAgentPermissions(id: string, keys: readonly string[]): void {
+    this.agents.update((list) =>
+      list.map((a) => (a.id === id ? { ...a, permissions: keys } : a)),
+    );
+  }
+
+  addAgent(input: { name: string; email: string; role: string }): Agent {
+    const initials = input.name
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((s) => s[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
+    const nextNumber = this.agents().reduce((max, a) => {
+      const n = parseInt(a.id.replace(/^a-/, ''), 10);
+      return Number.isNaN(n) ? max : Math.max(max, n);
+    }, 0) + 1;
+    const id = `a-${String(nextNumber).padStart(3, '0')}`;
+    const agent: Agent = {
+      id,
+      name: input.name,
+      initials,
+      role: input.role,
+      online: false,
+      loadPct: 0,
+      resolvedThisWeek: 0,
+      avgResponseMinutes: 0,
+      email: input.email,
+      timezone: 'UTC',
+      skills: [],
+      permissions: ['tickets:read', 'tickets:reply', 'tickets:close'],
+      joinedAt: new Date(),
+    };
+    this.agents.update((list) => [...list, agent]);
+    return agent;
   }
 
   addTicket(input: {

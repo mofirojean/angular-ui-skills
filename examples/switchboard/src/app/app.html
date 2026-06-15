@@ -82,30 +82,19 @@
       </div>
 
       <div class="app-header__center">
-        <nz-input-group
-          [nzPrefix]="searchPrefix"
-          [nzSuffix]="searchSuffix"
-          class="app-search"
+        <button
+          type="button"
+          class="app-search-trigger"
+          (click)="openPalette()"
+          aria-label="Open command palette"
         >
-          <input
-            #searchInput
-            type="text"
-            nz-input
-            placeholder="Search tickets, agents, articles..."
-            [ngModel]="searchQuery()"
-            (ngModelChange)="searchQuery.set($event)"
-            aria-label="Search"
-          />
-        </nz-input-group>
-        <ng-template #searchPrefix>
-          <nz-icon nzType="search" class="app-search__icon" />
-        </ng-template>
-        <ng-template #searchSuffix>
-          <span class="app-search__kbd" aria-hidden="true">
+          <nz-icon nzType="search" class="app-search-trigger__icon" />
+          <span class="app-search-trigger__placeholder">Search tickets, agents, articles...</span>
+          <span class="app-search-trigger__kbd" aria-hidden="true">
             <kbd>{{ isMac ? '⌘' : 'Ctrl' }}</kbd>
             <kbd>K</kbd>
           </span>
-        </ng-template>
+        </button>
       </div>
 
       <div class="app-header__right">
@@ -120,8 +109,15 @@
           <nz-icon nzType="bulb" />
         </button>
 
-        <button nz-button nzType="text" aria-label="Notifications">
-          <nz-badge [nzCount]="3" nzSize="small">
+        <button
+          nz-button
+          nzType="text"
+          aria-label="Notifications"
+          (click)="openInbox()"
+          nz-tooltip
+          nzTooltipTitle="Notifications inbox"
+        >
+          <nz-badge [nzCount]="data.unreadNotifications()" nzSize="small">
             <nz-icon nzType="bell" />
           </nz-badge>
         </button>
@@ -151,3 +147,23 @@
     </nz-footer>
   </nz-layout>
 </nz-layout>
+
+<!-- Notifications inbox drawer -->
+<nz-drawer
+  [nzVisible]="inboxOpen()"
+  nzTitle="Notifications"
+  nzPlacement="right"
+  [nzWidth]="440"
+  (nzOnClose)="closeInbox()"
+>
+  <ng-container *nzDrawerContent>
+    @if (inboxOpen()) {
+      <app-notifications-inbox />
+    }
+  </ng-container>
+</nz-drawer>
+
+<!-- Command palette template, opened via NzModalService -->
+<ng-template #paletteTpl>
+  <app-command-palette (close)="closePalette()" />
+</ng-template>

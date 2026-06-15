@@ -11,6 +11,28 @@ export interface Agent {
   readonly loadPct: number;
   readonly resolvedThisWeek: number;
   readonly avgResponseMinutes: number;
+  readonly email: string;
+  readonly timezone: string;
+  readonly skills: readonly string[];
+  readonly permissions: readonly string[];
+  readonly joinedAt: Date;
+}
+
+export interface Permission {
+  readonly key: string;
+  readonly title: string;
+  readonly description: string;
+}
+
+export interface SystemNotification {
+  readonly id: string;
+  readonly kind: 'ticket-assigned' | 'sla-warning' | 'mention' | 'system' | 'integration';
+  readonly title: string;
+  readonly body: string;
+  read: boolean;
+  archived: boolean;
+  readonly createdAt: Date;
+  readonly relatedTicketId?: string;
 }
 
 export interface Ticket {
@@ -98,15 +120,83 @@ const minutesAgo = (m: number) => new Date(NOW.getTime() - m * 60_000);
 const hoursAgo = (h: number) => minutesAgo(h * 60);
 const hoursAhead = (h: number) => new Date(NOW.getTime() + h * 60 * 60_000);
 
+export const PERMISSIONS: readonly Permission[] = [
+  { key: 'tickets:read', title: 'Read tickets', description: 'View all tickets and their conversation history' },
+  { key: 'tickets:reply', title: 'Reply to tickets', description: 'Send public and internal replies' },
+  { key: 'tickets:close', title: 'Close tickets', description: 'Mark tickets as resolved' },
+  { key: 'tickets:assign', title: 'Assign tickets', description: 'Reassign to other agents and teams' },
+  { key: 'tickets:delete', title: 'Delete tickets', description: 'Permanently remove tickets (audit logged)' },
+  { key: 'billing:read', title: 'View billing data', description: 'See plan, invoices, and seat usage' },
+  { key: 'billing:refund', title: 'Issue refunds', description: 'Process partial and full refunds' },
+  { key: 'agents:invite', title: 'Invite agents', description: 'Send invitations to new team members' },
+  { key: 'agents:manage', title: 'Manage agent permissions', description: 'Grant and revoke per-role permissions' },
+  { key: 'workspace:admin', title: 'Workspace administration', description: 'Full settings + integration access' },
+];
+
+const BASE_PERMS = ['tickets:read', 'tickets:reply', 'tickets:close'];
+const SENIOR_PERMS = [...BASE_PERMS, 'tickets:assign'];
+const TIER2_PERMS = [...SENIOR_PERMS, 'billing:read', 'billing:refund'];
+const LEAD_PERMS = [...TIER2_PERMS, 'agents:invite', 'agents:manage', 'workspace:admin', 'tickets:delete'];
+
+const DAYS_AGO = (n: number) => new Date(NOW.getTime() - n * 24 * 60 * 60_000);
+
 export const AGENTS: readonly Agent[] = [
-  { id: 'a-001', name: 'Mofiro Jean', initials: 'MJ', role: 'Senior Agent', online: true, loadPct: 78, resolvedThisWeek: 42, avgResponseMinutes: 6 },
-  { id: 'a-002', name: 'Maya Chen', initials: 'MC', role: 'Senior Agent', online: true, loadPct: 64, resolvedThisWeek: 38, avgResponseMinutes: 9 },
-  { id: 'a-003', name: 'Joren Bell', initials: 'JB', role: 'Agent', online: true, loadPct: 41, resolvedThisWeek: 27, avgResponseMinutes: 11 },
-  { id: 'a-004', name: 'Aisha Karim', initials: 'AK', role: 'Agent', online: true, loadPct: 55, resolvedThisWeek: 31, avgResponseMinutes: 8 },
-  { id: 'a-005', name: 'Diego Salas', initials: 'DS', role: 'Agent', online: false, loadPct: 0, resolvedThisWeek: 22, avgResponseMinutes: 12 },
-  { id: 'a-006', name: 'Priya Rao', initials: 'PR', role: 'Tier 2', online: true, loadPct: 88, resolvedThisWeek: 19, avgResponseMinutes: 18 },
-  { id: 'a-007', name: 'Tomas Holm', initials: 'TH', role: 'Tier 2', online: false, loadPct: 0, resolvedThisWeek: 24, avgResponseMinutes: 21 },
-  { id: 'a-008', name: 'Lena Voss', initials: 'LV', role: 'Lead', online: true, loadPct: 32, resolvedThisWeek: 15, avgResponseMinutes: 4 },
+  {
+    id: 'a-001', name: 'Mofiro Jean', initials: 'MJ', role: 'Senior Agent',
+    online: true, loadPct: 78, resolvedThisWeek: 42, avgResponseMinutes: 6,
+    email: 'mofiro.jean@switchboard.example', timezone: 'Europe/London',
+    skills: ['Auth', 'Billing', 'SSO'], permissions: SENIOR_PERMS,
+    joinedAt: DAYS_AGO(420),
+  },
+  {
+    id: 'a-002', name: 'Maya Chen', initials: 'MC', role: 'Senior Agent',
+    online: true, loadPct: 64, resolvedThisWeek: 38, avgResponseMinutes: 9,
+    email: 'maya.chen@switchboard.example', timezone: 'America/Los_Angeles',
+    skills: ['API', 'Integrations', 'Webhooks'], permissions: SENIOR_PERMS,
+    joinedAt: DAYS_AGO(380),
+  },
+  {
+    id: 'a-003', name: 'Joren Bell', initials: 'JB', role: 'Agent',
+    online: true, loadPct: 41, resolvedThisWeek: 27, avgResponseMinutes: 11,
+    email: 'joren.bell@switchboard.example', timezone: 'Europe/Berlin',
+    skills: ['Onboarding', 'Workspace'], permissions: BASE_PERMS,
+    joinedAt: DAYS_AGO(180),
+  },
+  {
+    id: 'a-004', name: 'Aisha Karim', initials: 'AK', role: 'Agent',
+    online: true, loadPct: 55, resolvedThisWeek: 31, avgResponseMinutes: 8,
+    email: 'aisha.karim@switchboard.example', timezone: 'Asia/Dubai',
+    skills: ['UI', 'Mobile', 'Accessibility'], permissions: BASE_PERMS,
+    joinedAt: DAYS_AGO(220),
+  },
+  {
+    id: 'a-005', name: 'Diego Salas', initials: 'DS', role: 'Agent',
+    online: false, loadPct: 0, resolvedThisWeek: 22, avgResponseMinutes: 12,
+    email: 'diego.salas@switchboard.example', timezone: 'America/Buenos_Aires',
+    skills: ['Reports', 'Exports'], permissions: BASE_PERMS,
+    joinedAt: DAYS_AGO(140),
+  },
+  {
+    id: 'a-006', name: 'Priya Rao', initials: 'PR', role: 'Tier 2',
+    online: true, loadPct: 88, resolvedThisWeek: 19, avgResponseMinutes: 18,
+    email: 'priya.rao@switchboard.example', timezone: 'Asia/Kolkata',
+    skills: ['Infrastructure', 'SSL', 'Auth'], permissions: TIER2_PERMS,
+    joinedAt: DAYS_AGO(530),
+  },
+  {
+    id: 'a-007', name: 'Tomas Holm', initials: 'TH', role: 'Tier 2',
+    online: false, loadPct: 0, resolvedThisWeek: 24, avgResponseMinutes: 21,
+    email: 'tomas.holm@switchboard.example', timezone: 'Europe/Stockholm',
+    skills: ['API', 'Data integrity'], permissions: TIER2_PERMS,
+    joinedAt: DAYS_AGO(610),
+  },
+  {
+    id: 'a-008', name: 'Lena Voss', initials: 'LV', role: 'Lead',
+    online: true, loadPct: 32, resolvedThisWeek: 15, avgResponseMinutes: 4,
+    email: 'lena.voss@switchboard.example', timezone: 'Europe/Berlin',
+    skills: ['Process', 'Coaching', 'Incident response'], permissions: LEAD_PERMS,
+    joinedAt: DAYS_AGO(910),
+  },
 ];
 
 export const TICKETS: readonly Ticket[] = [
@@ -399,6 +489,71 @@ const lorem = (lines: number) =>
     `Paragraph ${i + 1}. This is mock content for demonstration. It describes the procedure step by step in plain language so a new agent can follow it. ` +
     `Always confirm the customer's identity before making changes that affect billing, access, or data retention.`,
   ).join('\n\n');
+
+// --- System notifications (in the header bell drawer) ---
+
+export const NOTIFICATIONS: readonly SystemNotification[] = [
+  {
+    id: 'n-1',
+    kind: 'ticket-assigned',
+    title: 'New ticket assigned',
+    body: 'T-2070, SSO login redirects in a loop on Edge, just landed in your queue.',
+    read: false, archived: false,
+    createdAt: minutesAgo(4),
+    relatedTicketId: 'T-2070',
+  },
+  {
+    id: 'n-2',
+    kind: 'sla-warning',
+    title: 'SLA window 80% elapsed',
+    body: 'T-2064 SLA closes in 24 minutes. Send an update or escalate.',
+    read: false, archived: false,
+    createdAt: minutesAgo(18),
+    relatedTicketId: 'T-2064',
+  },
+  {
+    id: 'n-3',
+    kind: 'mention',
+    title: 'Maya mentioned you',
+    body: '"@mofiro can you take a look at the auth flow on T-2061? I am at the airport."',
+    read: false, archived: false,
+    createdAt: minutesAgo(42),
+    relatedTicketId: 'T-2061',
+  },
+  {
+    id: 'n-4',
+    kind: 'integration',
+    title: 'Slack integration reconnected',
+    body: 'The Slack token was refreshed automatically. No action needed.',
+    read: true, archived: false,
+    createdAt: hoursAgo(3),
+  },
+  {
+    id: 'n-5',
+    kind: 'ticket-assigned',
+    title: 'Bulk-assigned 3 tickets',
+    body: 'T-2057, T-2050, and T-2049 were bulk-assigned to you by Lena.',
+    read: true, archived: false,
+    createdAt: hoursAgo(5),
+  },
+  {
+    id: 'n-6',
+    kind: 'system',
+    title: 'Weekly digest ready',
+    body: 'Your performance digest for the week ending Sunday is in your inbox.',
+    read: true, archived: false,
+    createdAt: hoursAgo(20),
+  },
+  {
+    id: 'n-7',
+    kind: 'sla-warning',
+    title: 'SLA window breached',
+    body: 'T-2049 missed its SLA window 3 hours ago. Mark it overdue or escalate.',
+    read: true, archived: true,
+    createdAt: hoursAgo(28),
+    relatedTicketId: 'T-2049',
+  },
+];
 
 export const KB_ARTICLES: readonly KbArticle[] = [
   {

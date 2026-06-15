@@ -1,0 +1,188 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h2 class="page-title">Agents</h2>
+      <p class="page-sub">
+        {{ data.agents().length }} agents · {{ data.onlineAgents().length }} online right now
+      </p>
+    </div>
+    <button nz-button nzType="primary" (click)="openInvite()">
+      <nz-icon nzType="plus" /> Invite agent
+    </button>
+  </header>
+
+  <nz-card [nzBordered]="false" class="table-card">
+    <nz-table
+      #at
+      [nzData]="data.agents()"
+      [nzShowPagination]="false"
+      nzSize="small"
+      nzTableLayout="fixed"
+    >
+      <thead>
+        <tr>
+          <th nzWidth="44px"></th>
+          <th>Name</th>
+          <th nzWidth="120px">Role</th>
+          <th nzWidth="110px">Status</th>
+          <th nzWidth="180px">Current load</th>
+          <th nzWidth="120px">Resolved (week)</th>
+          <th nzWidth="110px">Avg response</th>
+          <th nzWidth="48px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of at.data; track row.id) {
+          <tr class="agent-row" (click)="openDetail(row)">
+            <td>
+              <nz-badge nzDot [nzStatus]="row.online ? 'success' : 'default'">
+                <nz-avatar [nzText]="row.initials" nzSize="default" [nzGap]="4" />
+              </nz-badge>
+            </td>
+            <td>
+              <p class="agent-name">{{ row.name }}</p>
+              <p class="agent-email">{{ row.email }}</p>
+            </td>
+            <td><nz-tag>{{ row.role }}</nz-tag></td>
+            <td>
+              @if (row.online) {
+                <span class="status status--online">Online</span>
+              } @else {
+                <span class="status">Offline</span>
+              }
+            </td>
+            <td>
+              <div class="load-cell">
+                <nz-progress
+                  [nzPercent]="row.loadPct"
+                  nzSize="small"
+                  [nzShowInfo]="false"
+                  [nzStrokeColor]="loadPctStrokeColor(row.loadPct)"
+                />
+                <span class="load-value">{{ row.loadPct }}%</span>
+              </div>
+            </td>
+            <td class="num">{{ row.resolvedThisWeek }}</td>
+            <td class="num">{{ row.avgResponseMinutes }}m</td>
+            <td>
+              <nz-icon nzType="right" class="row-chev" />
+            </td>
+          </tr>
+        }
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>
+
+<!-- Agent detail Modal template -->
+<ng-template #detailTpl>
+  @if (active(); as a) {
+    <div class="detail">
+      <header class="detail__head">
+        <nz-badge nzDot [nzStatus]="a.online ? 'success' : 'default'">
+          <nz-avatar [nzText]="a.initials" nzSize="large" [nzGap]="4" />
+        </nz-badge>
+        <div class="detail__head-meta">
+          <h2 class="detail__name">{{ a.name }}</h2>
+          <p class="detail__role">
+            <nz-tag>{{ a.role }}</nz-tag>
+            <span>{{ a.email }}</span>
+          </p>
+        </div>
+      </header>
+
+      <div class="detail__stats">
+        <nz-statistic nzTitle="Load" [nzValue]="a.loadPct + '%'" [nzValueStyle]="{ color: loadPctStrokeColor(a.loadPct) }" />
+        <nz-statistic nzTitle="Resolved this week" [nzValue]="a.resolvedThisWeek" />
+        <nz-statistic nzTitle="Avg response" [nzValue]="a.avgResponseMinutes + 'm'" />
+      </div>
+
+      <nz-divider />
+
+      <div class="detail__grid">
+        <section>
+          <p class="detail__label">Profile</p>
+          <nz-descriptions nzBordered nzSize="small" [nzColumn]="1">
+            <nz-descriptions-item nzTitle="Email">{{ a.email }}</nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Timezone">{{ a.timezone }}</nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Joined">{{ relative(a.joinedAt) }}</nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Skills">
+              <div class="detail__skills">
+                @for (skill of a.skills; track skill) {
+                  <nz-tag nzColor="blue">{{ skill }}</nz-tag>
+                }
+                @if (a.skills.length === 0) { <span class="muted">No skills listed</span> }
+              </div>
+            </nz-descriptions-item>
+          </nz-descriptions>
+        </section>
+
+        <section>
+          <p class="detail__label">Recent activity</p>
+          <nz-timeline>
+            @for (line of activityFor(a); track line; let last = $last) {
+              <nz-timeline-item [nzColor]="last ? 'green' : 'blue'">{{ line }}</nz-timeline-item>
+            }
+          </nz-timeline>
+        </section>
+      </div>
+
+      <nz-divider />
+
+      <section>
+        <p class="detail__label">Permissions</p>
+        <p class="detail__hint">Move permissions from "Available" to "Granted" to give this agent access.</p>
+        <nz-transfer
+          [nzDataSource]="transferList()"
+          [nzTitles]="['Available', 'Granted']"
+          [nzShowSearch]="true"
+          nzSearchPlaceholder="Search"
+          (nzChange)="onTransferChange($event)"
+          class="detail__transfer"
+        />
+      </section>
+
+      <nz-divider />
+
+      <section class="detail__pair">
+        <div class="detail__pair-text">
+          <p class="detail__label">Pair the mobile app</p>
+          <p class="detail__hint">Scan this code from the Switchboard mobile app to sign {{ a.name }} in on a new device.</p>
+        </div>
+        <div class="detail__pair-qr">
+          <nz-qrcode [nzValue]="mobilePairUrl()" [nzSize]="140" nzLevel="H" />
+        </div>
+      </section>
+    </div>
+  }
+</ng-template>
+
+<!-- Invite Modal template -->
+<ng-template #inviteTpl>
+  <form nz-form nzLayout="vertical" [formGroup]="inviteForm">
+    <nz-form-item>
+      <nz-form-label nzRequired nzFor="agentName">Full name</nz-form-label>
+      <nz-form-control nzErrorTip="Please enter a name">
+        <input nz-input id="agentName" formControlName="name" placeholder="Ada Lovelace" />
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-label nzRequired nzFor="agentEmail">Work email</nz-form-label>
+      <nz-form-control nzErrorTip="Please enter a valid email">
+        <input nz-input id="agentEmail" formControlName="email" placeholder="ada@company.com" type="email" />
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-label nzRequired nzFor="agentRole">Role</nz-form-label>
+      <nz-form-control>
+        <nz-select id="agentRole" formControlName="role">
+          @for (r of roleOptions; track r) {
+            <nz-option [nzValue]="r" [nzLabel]="r" />
+          }
+        </nz-select>
+      </nz-form-control>
+    </nz-form-item>
+  </form>
+</ng-template>

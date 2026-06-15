@@ -1,0 +1,87 @@
+<div class="inbox">
+  <header class="inbox__head">
+    <h3 class="inbox__title">Inbox</h3>
+    @if (data.unreadNotifications() > 0) {
+      <button nz-button nzType="text" nzSize="small" (click)="data.markAllNotificationsRead()">
+        Mark all read
+      </button>
+    }
+  </header>
+
+  @if (active().length === 0) {
+    <div class="inbox__empty">
+      <nz-empty nzNotFoundContent="You're all caught up" />
+    </div>
+  } @else {
+    <ul class="inbox__list">
+      @for (n of active(); track n.id) {
+        @let meta = kindMeta[n.kind];
+        <li
+          class="row"
+          [class.row--unread]="!n.read"
+          (click)="openTicket(n)"
+          [attr.role]="n.relatedTicketId ? 'button' : null"
+        >
+          <div class="row__icon" [attr.data-tone]="meta.tone">
+            <nz-icon [nzType]="meta.icon" />
+          </div>
+          <div class="row__body">
+            <div class="row__head">
+              <p class="row__title">{{ n.title }}</p>
+              <span class="row__time">{{ relative(n.createdAt) }}</span>
+            </div>
+            <p class="row__text">{{ n.body }}</p>
+            <div class="row__foot">
+              <nz-tag [nzColor]="meta.tone">{{ meta.label }}</nz-tag>
+              @if (n.relatedTicketId) {
+                <span class="row__ref">{{ n.relatedTicketId }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="row__actions" (click)="$event.stopPropagation()">
+            @if (!n.read) {
+              <button
+                nz-button nzType="text" nzSize="small"
+                nz-tooltip nzTooltipTitle="Mark read"
+                (click)="markRead(n.id, $event)"
+                aria-label="Mark read"
+              >
+                <nz-icon nzType="check" />
+              </button>
+            }
+            <button
+              nz-button nzType="text" nzSize="small"
+              nz-tooltip nzTooltipTitle="Archive"
+              (click)="archive(n.id, $event)"
+              aria-label="Archive"
+            >
+              <nz-icon nzType="delete" />
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (archived().length > 0) {
+    <details class="inbox__archived">
+      <summary>Archived ({{ archived().length }})</summary>
+      <ul class="inbox__list inbox__list--archived">
+        @for (n of archived(); track n.id) {
+          @let meta = kindMeta[n.kind];
+          <li class="row row--archived">
+            <div class="row__icon" [attr.data-tone]="meta.tone">
+              <nz-icon [nzType]="meta.icon" />
+            </div>
+            <div class="row__body">
+              <p class="row__title">{{ n.title }}</p>
+              <p class="row__text">{{ n.body }}</p>
+              <span class="row__time">{{ relative(n.createdAt) }}</span>
+            </div>
+          </li>
+        }
+      </ul>
+    </details>
+  }
+</div>

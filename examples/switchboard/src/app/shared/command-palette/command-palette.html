@@ -1,0 +1,52 @@
+<div class="palette" (keydown)="onKeydown($event)">
+  <div class="palette__search">
+    <nz-icon nzType="search" class="palette__search-icon" />
+    <input
+      #input
+      type="text"
+      class="palette__input"
+      placeholder="Jump to a page, ticket, or action..."
+      [ngModel]="query()"
+      (ngModelChange)="query.set($event); activeIndex.set(0)"
+      aria-label="Command palette"
+    />
+    <span class="palette__hint">Esc</span>
+  </div>
+
+  <div class="palette__results">
+    @if (results().length === 0) {
+      <div class="palette__empty">
+        <nz-icon nzType="search" />
+        <p>No matches. Try a ticket ID, customer, or page name.</p>
+      </div>
+    } @else {
+      @for (entry of grouped(); track entry[0]) {
+        <div class="palette__group">
+          <p class="palette__group-title">{{ entry[0] }}</p>
+          @for (hit of entry[1]; track hit.title; let _ = $index) {
+            <button
+              type="button"
+              class="hit"
+              [class.hit--active]="indexOf(hit) === activeIndex()"
+              (click)="run(hit, indexOf(hit))"
+              (mouseenter)="activeIndex.set(indexOf(hit))"
+            >
+              <nz-icon [nzType]="hit.icon" class="hit__icon" />
+              <span class="hit__title">{{ hit.title }}</span>
+              @if (hit.hint) {
+                <span class="hit__hint">{{ hit.hint }}</span>
+              }
+              <nz-icon nzType="right" class="hit__chev" />
+            </button>
+          }
+        </div>
+      }
+    }
+  </div>
+
+  <footer class="palette__foot">
+    <span class="kbd-row"><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
+    <span class="kbd-row"><kbd>↵</kbd> Select</span>
+    <span class="kbd-row"><kbd>Esc</kbd> Close</span>
+  </footer>
+</div>

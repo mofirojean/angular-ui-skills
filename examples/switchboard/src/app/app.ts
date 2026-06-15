@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   HostListener,
+  TemplateRef,
   computed,
   inject,
   signal,
@@ -22,10 +23,14 @@ import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzDrawerModule } from 'ng-zorro-antd/drawer';
+import { NzModalService } from 'ng-zorro-antd/modal';
 
 import { NAV } from './core/nav';
 import { ThemeService } from './core/theme.service';
 import { DataService } from './data/data.service';
+import { NotificationsInbox } from './shared/notifications-inbox/notifications-inbox';
+import { CommandPalette } from './shared/command-palette/command-palette';
 
 @Component({
   selector: 'app-root',
@@ -43,6 +48,9 @@ import { DataService } from './data/data.service';
     NzTooltipModule,
     NzDropDownModule,
     NzInputModule,
+    NzDrawerModule,
+    NotificationsInbox,
+    CommandPalette,
   ],
   templateUrl: './app.html',
   styleUrl: './app.less',
@@ -52,10 +60,14 @@ export class App {
   protected readonly theme = inject(ThemeService);
   protected readonly data = inject(DataService);
   private readonly router = inject(Router);
+  private readonly modal = inject(NzModalService);
 
   protected readonly collapsed = signal(false);
-  protected readonly searchQuery = signal('');
+  protected readonly inboxOpen = signal(false);
   protected readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
+  protected readonly paletteTpl = viewChild<TemplateRef<unknown>>('paletteTpl');
+
+  private paletteRef: { destroy: () => void } | null = null;
 
   protected readonly nav = NAV;
   protected readonly currentAgent = {
@@ -100,14 +112,41 @@ export class App {
     const modifier = this.isMac ? event.metaKey : event.ctrlKey;
     if (modifier && event.key.toLowerCase() === 'k') {
       event.preventDefault();
-      this.searchInput()?.nativeElement.focus();
-    }
-    if (event.key === 'Escape' && document.activeElement === this.searchInput()?.nativeElement) {
-      this.searchInput()?.nativeElement.blur();
+      this.openPalette();
     }
   }
 
   protected toggleCollapsed(): void {
     this.collapsed.update((v) => !v);
+  }
+
+  protected openInbox(): void {
+    this.inboxOpen.set(true);
+  }
+
+  protected closeInbox(): void {
+    this.inboxOpen.set(false);
+  }
+
+  protected openPalette(): void {
+    const tpl = this.paletteTpl();
+    if (!tpl || this.paletteRef) return;
+    const ref = this.modal.create({
+      nzContent: tpl,
+      nzClosable: false,
+      nzFooter: null,
+      nzWidth: 600,
+      nzWrapClassName: 'command-palette-modal',
+      nzMaskClosable: true,
+      nzCentered: false,
+      nzStyle: { top: '120px' },
+    });
+    this.paletteRef = ref;
+    ref.afterClose.subscribe(() => (this.paletteRef = null));
+  }
+
+  protected closePalette(): void {
+    this.paletteRef?.destroy();
+    this.paletteRef = null;
   }
 }

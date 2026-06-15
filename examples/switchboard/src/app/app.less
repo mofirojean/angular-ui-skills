@@ -318,58 +318,57 @@
   gap: 4px;
 }
 
-// --- Centered header search ---
+// --- Centered header search-trigger button (opens command palette) ---
 
-.app-search {
+.app-search-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   width: 100%;
   max-width: 440px;
-
-  ::ng-deep .ant-input-affix-wrapper {
-    background: #f4f4f5 !important;
-    border-color: transparent !important;
-    border-radius: 8px !important;
-    height: 36px;
-    padding: 0 12px;
-    transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
-  }
-
-  ::ng-deep .ant-input-affix-wrapper:hover {
-    background: #ebebee !important;
-    border-color: transparent !important;
-  }
-
-  ::ng-deep .ant-input-affix-wrapper-focused,
-  ::ng-deep .ant-input-affix-wrapper:focus-within {
-    background: #ffffff !important;
-    border-color: #2563eb !important;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
-  }
-
-  ::ng-deep input.ant-input {
-    background: transparent !important;
-    font-size: 13px;
-    color: #27272a;
-  }
-
-  ::ng-deep input.ant-input::placeholder {
-    color: #a1a1aa;
-  }
+  height: 36px;
+  padding: 0 12px;
+  background: #f4f4f5;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+  font-size: 13px;
 }
 
-.app-search__icon {
+.app-search-trigger:hover {
+  background: #ebebee;
+}
+
+.app-search-trigger:focus-visible {
+  background: #ffffff;
+  border-color: #2563eb;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.app-search-trigger__icon {
   color: #a1a1aa;
   font-size: 14px;
-  margin-right: 4px;
 }
 
-.app-search__kbd {
+.app-search-trigger__placeholder {
+  flex: 1;
+  color: #a1a1aa;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-search-trigger__kbd {
   display: inline-flex;
   align-items: center;
   gap: 3px;
   pointer-events: none;
 }
 
-.app-search__kbd kbd {
+.app-search-trigger__kbd kbd {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -387,12 +386,10 @@
   line-height: 1;
 }
 
-// On narrow viewports the page title competes with the search bar; hide it
-// below the md breakpoint so the search stays usable.
 @media (max-width: 768px) {
   .app-header__title { display: none; }
   .app-header__center { padding: 0 12px; }
-  .app-search__kbd { display: none; }
+  .app-search-trigger__kbd { display: none; }
 }
 
 // ============================================================================
@@ -459,34 +456,24 @@
     border-top-color: rgba(255, 255, 255, 0.06);
   }
 
-  .app-search {
-    ::ng-deep .ant-input-affix-wrapper {
-      background: rgba(255, 255, 255, 0.04) !important;
-    }
-
-    ::ng-deep .ant-input-affix-wrapper:hover {
-      background: rgba(255, 255, 255, 0.06) !important;
-    }
-
-    ::ng-deep .ant-input-affix-wrapper-focused,
-    ::ng-deep .ant-input-affix-wrapper:focus-within {
-      background: rgba(255, 255, 255, 0.08) !important;
-      border-color: #60a5fa !important;
-      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.16) !important;
-    }
-
-    ::ng-deep input.ant-input {
-      color: rgba(255, 255, 255, 0.88);
-    }
-
-    ::ng-deep input.ant-input::placeholder {
-      color: rgba(255, 255, 255, 0.35);
-    }
+  .app-search-trigger {
+    background: rgba(255, 255, 255, 0.04);
   }
 
-  .app-search__icon { color: rgba(255, 255, 255, 0.4); }
+  .app-search-trigger:hover {
+    background: rgba(255, 255, 255, 0.07);
+  }
 
-  .app-search__kbd kbd {
+  .app-search-trigger:focus-visible {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.16);
+  }
+
+  .app-search-trigger__icon { color: rgba(255, 255, 255, 0.4); }
+  .app-search-trigger__placeholder { color: rgba(255, 255, 255, 0.4); }
+
+  .app-search-trigger__kbd kbd {
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.08);
     color: rgba(255, 255, 255, 0.55);
