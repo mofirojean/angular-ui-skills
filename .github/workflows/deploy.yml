@@ -132,6 +132,7 @@ jobs:
         run: npm i -g vercel@latest
 
       - name: Resolve Vercel project ID
+        id: resolve
         env:
           VERCEL_PROJECT_ID_DOCS: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
           VERCEL_PROJECT_ID_MISSION_CONTROL: ${{ secrets.VERCEL_PROJECT_ID_MISSION_CONTROL }}
@@ -139,31 +140,52 @@ jobs:
           VERCEL_PROJECT_ID_APEX: ${{ secrets.VERCEL_PROJECT_ID_APEX }}
           VERCEL_PROJECT_ID_SWITCHBOARD: ${{ secrets.VERCEL_PROJECT_ID_SWITCHBOARD }}
         run: |
+          set -euo pipefail
           case "${{ matrix.app }}" in
-            docs)             echo "VERCEL_PROJECT_ID=$VERCEL_PROJECT_ID_DOCS" >> "$GITHUB_ENV" ;;
-            mission-control)  echo "VERCEL_PROJECT_ID=$VERCEL_PROJECT_ID_MISSION_CONTROL" >> "$GITHUB_ENV" ;;
-            quanta-desk)      echo "VERCEL_PROJECT_ID=$VERCEL_PROJECT_ID_QUANTA_DESK" >> "$GITHUB_ENV" ;;
-            apex)             echo "VERCEL_PROJECT_ID=$VERCEL_PROJECT_ID_APEX" >> "$GITHUB_ENV" ;;
-            switchboard)      echo "VERCEL_PROJECT_ID=$VERCEL_PROJECT_ID_SWITCHBOARD" >> "$GITHUB_ENV" ;;
+            docs)             project_id="$VERCEL_PROJECT_ID_DOCS" ;;
+            mission-control)  project_id="$VERCEL_PROJECT_ID_MISSION_CONTROL" ;;
+            quanta-desk)      project_id="$VERCEL_PROJECT_ID_QUANTA_DESK" ;;
+            apex)             project_id="$VERCEL_PROJECT_ID_APEX" ;;
+            switchboard)      project_id="$VERCEL_PROJECT_ID_SWITCHBOARD" ;;
+            *)                project_id="" ;;
           esac
 
+          if [[ -z "$project_id" ]]; then
+            echo "::warning title=${{ matrix.app }} skipped::No Vercel project ID secret is configured for this app (expected VERCEL_PROJECT_ID_$(echo '${{ matrix.app }}' | tr 'a-z-' 'A-Z_')). Create the Vercel project and add the secret, then re-run the workflow."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "### ${{ matrix.app }} skipped"
+              echo ""
+              echo ":warning: No \`VERCEL_PROJECT_ID_$(echo '${{ matrix.app }}' | tr 'a-z-' 'A-Z_')\` secret configured. Create the Vercel project, copy its ID from the project's settings, and add it to the repo secrets to enable deploys."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          echo "VERCEL_PROJECT_ID=$project_id" >> "$GITHUB_ENV"
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+
       - name: Pull Vercel environment
+        if: steps.resolve.outputs.skip != 'true'
         run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
       - name: Install dependencies
+        if: steps.resolve.outputs.skip != 'true'
         run: npm install --no-audit --no-fund
 
       - name: Build with Vercel
+        if: steps.resolve.outputs.skip != 'true'
         run: vercel build --prod --token=$VERCEL_TOKEN
 
       - name: Deploy to Vercel
         id: deploy
+        if: steps.resolve.outputs.skip != 'true'
         run: |
           url=$(vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN)
           echo "url=$url" >> "$GITHUB_OUTPUT"
           echo "::notice title=${{ matrix.app }} deployed::$url"
 
       - name: Summary
+        if: steps.resolve.outputs.skip != 'true'
         run: |
           {
             echo "### ${{ matrix.app }} deployed"
