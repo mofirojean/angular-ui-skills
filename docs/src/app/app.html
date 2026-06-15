@@ -141,6 +141,36 @@
     </div>
   </section>
 
+  <!-- Available for these agents, mirrors the wall on skills.vercel.app -->
+  <section class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] border-t bg-white dark:bg-[var(--color-ink)]">
+    <div class="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
+      <div class="mb-8 flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+        <div class="max-w-2xl">
+          <p class="text-[var(--color-ng-red-600)] dark:text-[var(--color-ng-red-400)] mb-3 font-mono text-[11px] font-semibold uppercase tracking-wider">Compatibility</p>
+          <h2 class="text-[22px] font-semibold tracking-tight sm:text-[26px]">Works with your agent</h2>
+          <p class="mt-2 text-[13.5px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+            One source of truth, many surfaces. The <code class="bg-zinc-100 dark:bg-zinc-800 rounded px-1.5 py-0.5 font-mono text-[12.5px]">npx skills</code> CLI registers the skill with every supported runtime, or grab a single SKILL.md file via the per-agent recipes.
+          </p>
+        </div>
+        <div class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] flex items-center gap-3 rounded-lg border bg-zinc-50/70 dark:bg-[var(--color-ink-2)]/70 px-3 py-2 backdrop-blur shrink-0">
+          <span class="font-mono text-[20px] font-semibold tracking-tight">{{ agents.length }}</span>
+          <span class="text-[11px] font-mono uppercase tracking-wider text-zinc-500">Runtimes</span>
+        </div>
+      </div>
+
+      <ul class="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        @for (a of agents; track a.name) {
+          <li class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] hover:border-[var(--color-line-strong)] dark:hover:border-[var(--color-line-dark-strong)] flex items-center gap-2.5 rounded-md border bg-white dark:bg-[var(--color-ink-2)] px-3 py-2.5 transition-colors">
+            <span class="agent-mark agent-mark--{{ a.tone }} flex h-7 w-7 shrink-0 items-center justify-center rounded font-mono text-[10px] font-semibold">
+              {{ a.mark }}
+            </span>
+            <span class="text-[12.5px] font-medium tracking-tight truncate">{{ a.name }}</span>
+          </li>
+        }
+      </ul>
+    </div>
+  </section>
+
   <section class="border-[var(--color-line)] dark:border-[var(--color-line-dark)] border-y bg-zinc-50/50 dark:bg-[var(--color-ink-2)]/50">
     <div class="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
       <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">

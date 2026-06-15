@@ -217,6 +217,33 @@ export class App {
     },
   };
 
+  // The runtimes the `npx skills` CLI targets. Surfaced as a logo wall right
+  // after the hero so visitors can confirm at a glance that their tool is
+  // supported. Order roughly follows the order skills.vercel.app uses, the
+  // most-popular runtimes are at the start.
+  protected readonly agents: readonly { name: string; mark: string; tone: string }[] = [
+    { name: 'Claude Code',    mark: 'CC', tone: 'amber' },
+    { name: 'Cursor',         mark: 'CU', tone: 'zinc' },
+    { name: 'Codex',          mark: 'CX', tone: 'emerald' },
+    { name: 'GitHub Copilot', mark: 'GC', tone: 'zinc' },
+    { name: 'Gemini',         mark: 'GM', tone: 'sky' },
+    { name: 'Windsurf',       mark: 'WS', tone: 'cyan' },
+    { name: 'Cline',          mark: 'CL', tone: 'rose' },
+    { name: 'AMP',            mark: 'AM', tone: 'indigo' },
+    { name: 'Antigravity',    mark: 'AG', tone: 'violet' },
+    { name: 'ClawdBot',       mark: 'CB', tone: 'orange' },
+    { name: 'Droid',          mark: 'DR', tone: 'emerald' },
+    { name: 'Goose',          mark: 'GO', tone: 'yellow' },
+    { name: 'Kilo',           mark: 'KI', tone: 'pink' },
+    { name: 'Kiro CLI',       mark: 'KR', tone: 'teal' },
+    { name: 'Nous Research',  mark: 'NR', tone: 'red' },
+    { name: 'OpenCode',       mark: 'OC', tone: 'blue' },
+    { name: 'Roo',            mark: 'RO', tone: 'fuchsia' },
+    { name: 'Trae',           mark: 'TR', tone: 'lime' },
+    { name: 'VS Code',        mark: 'VS', tone: 'blue' },
+    { name: 'Zed',            mark: 'ZD', tone: 'slate' },
+  ];
+
   protected readonly features = [
     {
       icon: 'M3 5h18M3 12h18M3 19h12',

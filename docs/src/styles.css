@@ -126,6 +126,55 @@ body {
   animation: float 5s ease-in-out infinite;
 }
 
+/* Agent compatibility wall, mono initials in tinted squares */
+.agent-mark {
+  --tone-bg: rgba(0, 0, 0, 0.04);
+  --tone-fg: rgba(15, 23, 42, 0.7);
+  background: var(--tone-bg);
+  color: var(--tone-fg);
+}
+
+.dark .agent-mark {
+  --tone-bg: rgba(255, 255, 255, 0.06);
+  --tone-fg: rgba(255, 255, 255, 0.65);
+}
+
+.agent-mark--amber    { --tone-bg: #fef3c7; --tone-fg: #92400e; }
+.agent-mark--zinc     { --tone-bg: #e4e4e7; --tone-fg: #18181b; }
+.agent-mark--emerald  { --tone-bg: #d1fae5; --tone-fg: #065f46; }
+.agent-mark--sky      { --tone-bg: #e0f2fe; --tone-fg: #075985; }
+.agent-mark--cyan     { --tone-bg: #cffafe; --tone-fg: #155e63; }
+.agent-mark--rose     { --tone-bg: #ffe4e6; --tone-fg: #9f1239; }
+.agent-mark--indigo   { --tone-bg: #e0e7ff; --tone-fg: #3730a3; }
+.agent-mark--violet   { --tone-bg: #ede9fe; --tone-fg: #5b21b6; }
+.agent-mark--orange   { --tone-bg: #ffedd5; --tone-fg: #9a3412; }
+.agent-mark--yellow   { --tone-bg: #fef9c3; --tone-fg: #854d0e; }
+.agent-mark--pink     { --tone-bg: #fce7f3; --tone-fg: #9d174d; }
+.agent-mark--teal     { --tone-bg: #ccfbf1; --tone-fg: #0f766e; }
+.agent-mark--red      { --tone-bg: #fee2e2; --tone-fg: #991b1b; }
+.agent-mark--blue     { --tone-bg: #dbeafe; --tone-fg: #1e40af; }
+.agent-mark--fuchsia  { --tone-bg: #fae8ff; --tone-fg: #86198f; }
+.agent-mark--lime     { --tone-bg: #ecfccb; --tone-fg: #3f6212; }
+.agent-mark--slate    { --tone-bg: #e2e8f0; --tone-fg: #1e293b; }
+
+.dark .agent-mark--amber    { --tone-bg: rgba(245, 158, 11, 0.16);  --tone-fg: #fcd34d; }
+.dark .agent-mark--zinc     { --tone-bg: rgba(255, 255, 255, 0.08); --tone-fg: #e4e4e7; }
+.dark .agent-mark--emerald  { --tone-bg: rgba(16, 185, 129, 0.18);  --tone-fg: #6ee7b7; }
+.dark .agent-mark--sky      { --tone-bg: rgba(14, 165, 233, 0.18);  --tone-fg: #7dd3fc; }
+.dark .agent-mark--cyan     { --tone-bg: rgba(6, 182, 212, 0.18);   --tone-fg: #67e8f9; }
+.dark .agent-mark--rose     { --tone-bg: rgba(244, 63, 94, 0.18);   --tone-fg: #fda4af; }
+.dark .agent-mark--indigo   { --tone-bg: rgba(99, 102, 241, 0.20);  --tone-fg: #a5b4fc; }
+.dark .agent-mark--violet   { --tone-bg: rgba(139, 92, 246, 0.20);  --tone-fg: #c4b5fd; }
+.dark .agent-mark--orange   { --tone-bg: rgba(249, 115, 22, 0.18);  --tone-fg: #fdba74; }
+.dark .agent-mark--yellow   { --tone-bg: rgba(234, 179, 8, 0.18);   --tone-fg: #fde047; }
+.dark .agent-mark--pink     { --tone-bg: rgba(236, 72, 153, 0.18);  --tone-fg: #f9a8d4; }
+.dark .agent-mark--teal     { --tone-bg: rgba(20, 184, 166, 0.18);  --tone-fg: #5eead4; }
+.dark .agent-mark--red      { --tone-bg: rgba(239, 68, 68, 0.18);   --tone-fg: #fca5a5; }
+.dark .agent-mark--blue     { --tone-bg: rgba(59, 130, 246, 0.20);  --tone-fg: #93c5fd; }
+.dark .agent-mark--fuchsia  { --tone-bg: rgba(217, 70, 239, 0.18);  --tone-fg: #f0abfc; }
+.dark .agent-mark--lime     { --tone-bg: rgba(132, 204, 22, 0.20);  --tone-fg: #bef264; }
+.dark .agent-mark--slate    { --tone-bg: rgba(148, 163, 184, 0.20); --tone-fg: #cbd5e1; }
+
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
