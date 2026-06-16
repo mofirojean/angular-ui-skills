@@ -19,7 +19,7 @@ Drop the `-g` for a project-scoped install.
 | [`spartan-ng-developer`](./skills/spartan-ng-developer) | Spartan/ng | `@spartan-ng/brain` 0.0.1-alpha.714 |
 | [`primeng-developer`](./skills/primeng-developer) | PrimeNG | 21.1.9 |
 | [`ng-zorro-developer`](./skills/ng-zorro-developer) | NG-ZORRO | `ng-zorro-antd` 21.3.1 |
-| `angular-material-developer` | Angular Material | planned |
+| [`angular-material-developer`](./skills/angular-material-developer) | Angular Material | `@angular/material` 21.2.14 |
 
 Each skill is validated by a deployed reference app under [`examples/`](./examples).
 

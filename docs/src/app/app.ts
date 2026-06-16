@@ -90,9 +90,9 @@ export class App {
       library: 'Angular Material',
       site: 'https://material.angular.dev',
       description:
-        'Material 3 components, ng-add schematics, design tokens, MDC migration patterns, and CDK primitives.',
-      status: 'planned',
-      tracks: 'TBD',
+        'Material 3 components with the mat.theme() Sass mixin, prebuilt palettes, density tuning, plus CDK primitives (Overlay, A11y, Drag-Drop, VirtualScroll).',
+      status: 'ready',
+      tracks: '@angular/material 21.2.14',
       logo: 'logos/angular-material.webp',
       logoBg: 'bg-pink-50 dark:bg-pink-950/30',
     },
