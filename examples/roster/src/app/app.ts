@@ -75,9 +75,12 @@ export class App {
 
   protected readonly pageTitle = computed(() => {
     const url = this.currentUrl();
-    const match = this.nav.find(
-      (n) => n.path === url || (n.path !== '/' && url.startsWith(n.path)),
-    );
-    return match?.label ?? 'Roster';
+    for (const section of this.nav) {
+      const match = section.items.find(
+        (i) => i.path === url || (i.path !== '/' && url.startsWith(i.path)),
+      );
+      if (match) return match.label;
+    }
+    return 'Roster';
   });
 }

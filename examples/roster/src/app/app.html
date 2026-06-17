@@ -14,34 +14,75 @@
       </span>
     </a>
 
-    <mat-divider />
+    <div class="quick-add">
+      <button mat-flat-button class="quick-add__btn" [matMenuTriggerFor]="addMenu">
+        <mat-icon class="material-symbols-outlined">add</mat-icon>
+        <span>Quick add</span>
+        <mat-icon class="material-symbols-outlined quick-add__chev">expand_more</mat-icon>
+      </button>
+      <mat-menu #addMenu="matMenu" class="quick-add-menu">
+        <button mat-menu-item>
+          <mat-icon class="material-symbols-outlined">person_add</mat-icon>
+          <span>Invite employee</span>
+        </button>
+        <button mat-menu-item>
+          <mat-icon class="material-symbols-outlined">event_busy</mat-icon>
+          <span>Request time off</span>
+        </button>
+        <button mat-menu-item>
+          <mat-icon class="material-symbols-outlined">edit_note</mat-icon>
+          <span>Start review cycle</span>
+        </button>
+        <mat-divider />
+        <button mat-menu-item>
+          <mat-icon class="material-symbols-outlined">upload_file</mat-icon>
+          <span>Import from CSV</span>
+        </button>
+      </mat-menu>
+    </div>
 
-    <mat-nav-list class="nav-list">
-      @for (item of nav; track item.path) {
-        <a
-          mat-list-item
-          [routerLink]="item.path"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: item.path === '/' }"
-          (click)="isHandset() && sidenav.close()"
-        >
-          <mat-icon matListItemIcon class="material-symbols-outlined">{{ item.icon }}</mat-icon>
-          <span matListItemTitle>{{ item.label }}</span>
-        </a>
+    <nav class="nav-list">
+      @for (section of nav; track section.label) {
+        <p class="nav-section">{{ section.label }}</p>
+        <mat-nav-list class="nav-group">
+          @for (item of section.items; track item.path) {
+            <a
+              mat-list-item
+              [routerLink]="item.path"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+              (click)="isHandset() && sidenav.close()"
+            >
+              <mat-icon matListItemIcon class="material-symbols-outlined">{{ item.icon }}</mat-icon>
+              <span matListItemTitle>{{ item.label }}</span>
+              @if (item.badge !== undefined) {
+                <span matListItemMeta class="nav-badge">{{ item.badge }}</span>
+              }
+            </a>
+          }
+        </mat-nav-list>
       }
-    </mat-nav-list>
+    </nav>
+
+    <div class="workspace-chip">
+      <span class="workspace-chip__mark">A</span>
+      <div class="workspace-chip__meta">
+        <span class="workspace-chip__name">Acme Corp</span>
+        <span class="workspace-chip__plan">Business · 204 seats</span>
+      </div>
+      <mat-icon class="material-symbols-outlined workspace-chip__chev">unfold_more</mat-icon>
+    </div>
 
     <div class="sidenav__foot">
-      <mat-divider />
-      <button mat-button class="user-trigger" [matMenuTriggerFor]="userMenu">
+      <button type="button" class="user-trigger" [matMenuTriggerFor]="userMenu" aria-label="User menu">
         <span class="user-avatar">{{ user.initials }}</span>
         <span class="user-meta">
           <span class="user-name">{{ user.name }}</span>
           <span class="user-role">{{ user.role }}</span>
         </span>
-        <mat-icon matSuffix class="material-symbols-outlined">expand_more</mat-icon>
+        <mat-icon class="material-symbols-outlined user-chevron">expand_more</mat-icon>
       </button>
-      <mat-menu #userMenu="matMenu" xPosition="before">
+      <mat-menu #userMenu="matMenu" xPosition="before" class="user-menu">
         <button mat-menu-item>
           <mat-icon class="material-symbols-outlined">person</mat-icon>
           <span>Profile</span>

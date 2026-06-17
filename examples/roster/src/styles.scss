@@ -47,3 +47,10 @@ html.theme-light { color-scheme: light; }
     'GRAD' 0,
     'opsz' 24;
 }
+
+// MatMenu lives in a global overlay portal, so panelClass overrides live in
+// styles.scss (not in app.scss where they'd be component-scoped). Widening
+// the sidenav user menu to feel proportional to the trigger row above it.
+.user-menu.mat-mdc-menu-panel {
+  min-width: 232px !important;
+}
