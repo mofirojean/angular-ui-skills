@@ -1,0 +1,49 @@
+// Angular Material 3 theming. `mat.theme()` emits the CSS variables every
+// `mat-*` component reads at runtime; we lean on `--mat-sys-*` tokens for our
+// custom surfaces so the whole app stays inside Material's design system.
+@use '@angular/material' as mat;
+
+html {
+  height: 100%;
+
+  // Defer to the user's system preference; the ThemeService also toggles a
+  // `.theme-dark` class on <html> when the user manually overrides via the
+  // header sun/moon button.
+  color-scheme: light dark;
+
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      // density: -1 reads a touch tighter than Material's default (0) which is
+      // closer to what users expect from a forms-heavy HR app.
+      density: -1,
+    )
+  );
+}
+
+body {
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+  height: 100%;
+}
+
+// Manual dark-mode override (ThemeService flips this class on <html>).
+html.theme-dark { color-scheme: dark; }
+html.theme-light { color-scheme: light; }
+
+// Material Symbols icon font default settings. The `<link>` in index.html loads
+// the font; this CSS rule applies the variable-font axes (size + fill weight)
+// to every `<mat-icon>` that uses the `material-symbols-outlined` class.
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}

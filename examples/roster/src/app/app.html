@@ -1,0 +1,110 @@
+<mat-sidenav-container class="app-shell" autosize>
+  <mat-sidenav
+    #sidenav
+    class="sidenav"
+    [mode]="sidenavMode()"
+    [opened]="sidenavOpened()"
+    [disableClose]="!isHandset()"
+  >
+    <a routerLink="/" class="brand">
+      <span class="brand-mark">R</span>
+      <span class="brand-text">
+        <span class="brand-name">Roster</span>
+        <span class="brand-sub">HR Console</span>
+      </span>
+    </a>
+
+    <mat-divider />
+
+    <mat-nav-list class="nav-list">
+      @for (item of nav; track item.path) {
+        <a
+          mat-list-item
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+          (click)="isHandset() && sidenav.close()"
+        >
+          <mat-icon matListItemIcon class="material-symbols-outlined">{{ item.icon }}</mat-icon>
+          <span matListItemTitle>{{ item.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
+
+    <div class="sidenav__foot">
+      <mat-divider />
+      <button mat-button class="user-trigger" [matMenuTriggerFor]="userMenu">
+        <span class="user-avatar">{{ user.initials }}</span>
+        <span class="user-meta">
+          <span class="user-name">{{ user.name }}</span>
+          <span class="user-role">{{ user.role }}</span>
+        </span>
+        <mat-icon matSuffix class="material-symbols-outlined">expand_more</mat-icon>
+      </button>
+      <mat-menu #userMenu="matMenu" xPosition="before">
+        <button mat-menu-item>
+          <mat-icon class="material-symbols-outlined">person</mat-icon>
+          <span>Profile</span>
+        </button>
+        <button mat-menu-item>
+          <mat-icon class="material-symbols-outlined">settings</mat-icon>
+          <span>Preferences</span>
+        </button>
+        <mat-divider />
+        <button mat-menu-item>
+          <mat-icon class="material-symbols-outlined">logout</mat-icon>
+          <span>Sign out</span>
+        </button>
+      </mat-menu>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="content">
+    <mat-toolbar class="header">
+      <button
+        mat-icon-button
+        (click)="sidenav.toggle()"
+        aria-label="Toggle navigation"
+        class="header__menu"
+      >
+        <mat-icon class="material-symbols-outlined">menu</mat-icon>
+      </button>
+
+      <h1 class="header__title">{{ pageTitle() }}</h1>
+
+      <span class="header__spacer"></span>
+
+      <button
+        mat-icon-button
+        (click)="theme.toggle()"
+        [attr.aria-label]="theme.mode() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+        matTooltip="Toggle theme"
+      >
+        <mat-icon class="material-symbols-outlined">
+          {{ theme.mode() === 'dark' ? 'light_mode' : 'dark_mode' }}
+        </mat-icon>
+      </button>
+
+      <button mat-icon-button matTooltip="Notifications" aria-label="Notifications">
+        <mat-icon matBadge="3" matBadgeColor="warn" matBadgeSize="small" class="material-symbols-outlined">
+          notifications
+        </mat-icon>
+      </button>
+
+      <a
+        mat-icon-button
+        href="https://github.com/mofirojean/angular-ui-skills"
+        target="_blank"
+        rel="noopener"
+        matTooltip="View on GitHub"
+        aria-label="View on GitHub"
+      >
+        <mat-icon class="material-symbols-outlined">code</mat-icon>
+      </a>
+    </mat-toolbar>
+
+    <main class="page">
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>
