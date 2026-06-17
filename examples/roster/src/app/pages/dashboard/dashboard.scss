@@ -85,8 +85,8 @@
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: var(--mat-sys-secondary-container);
-  color: var(--mat-sys-on-secondary-container);
+  background: var(--mat-sys-surface-container-high);
+  color: var(--mat-sys-on-surface-variant);
   flex-shrink: 0;
 }
 
@@ -96,20 +96,23 @@
   height: 18px;
 }
 
+// Tonal icon backgrounds use color-mix into the surface so they read as tinted
+// in light mode and stay calm in dark, the raw `*-container` tokens skew very
+// saturated on M3 azure.
 .kpi[data-tone="primary"] .kpi__icon {
-  background: var(--mat-sys-primary-container);
-  color: var(--mat-sys-on-primary-container);
+  background: color-mix(in srgb, var(--mat-sys-primary) 16%, var(--mat-sys-surface-container-high));
+  color: var(--mat-sys-on-surface);
 }
 .kpi[data-tone="tertiary"] .kpi__icon {
-  background: var(--mat-sys-tertiary-container);
-  color: var(--mat-sys-on-tertiary-container);
+  background: color-mix(in srgb, var(--mat-sys-tertiary) 16%, var(--mat-sys-surface-container-high));
+  color: var(--mat-sys-on-surface);
 }
 .kpi[data-tone="warn"] .kpi__icon {
-  background: var(--mat-sys-error-container);
-  color: var(--mat-sys-on-error-container);
+  background: color-mix(in srgb, var(--mat-sys-error) 14%, var(--mat-sys-surface-container-high));
+  color: var(--mat-sys-on-surface);
 }
 .kpi[data-tone="success"] .kpi__icon {
-  background: color-mix(in srgb, mediumseagreen 22%, var(--mat-sys-surface-container));
+  background: color-mix(in srgb, mediumseagreen 18%, var(--mat-sys-surface-container-high));
   color: var(--mat-sys-on-surface);
 }
 
@@ -276,20 +279,20 @@
 }
 
 .chip--vacation {
-  background: var(--mat-sys-primary-container);
-  color: var(--mat-sys-on-primary-container);
+  background: color-mix(in srgb, var(--mat-sys-primary) 14%, var(--mat-sys-surface-container-high));
+  color: var(--mat-sys-on-surface);
 }
 .chip--sick {
-  background: var(--mat-sys-error-container);
-  color: var(--mat-sys-on-error-container);
+  background: color-mix(in srgb, var(--mat-sys-error) 14%, var(--mat-sys-surface-container-high));
+  color: var(--mat-sys-on-surface);
 }
 .chip--personal {
-  background: var(--mat-sys-tertiary-container);
-  color: var(--mat-sys-on-tertiary-container);
+  background: color-mix(in srgb, var(--mat-sys-tertiary) 14%, var(--mat-sys-surface-container-high));
+  color: var(--mat-sys-on-surface);
 }
 .chip--parental {
-  background: var(--mat-sys-secondary-container);
-  color: var(--mat-sys-on-secondary-container);
+  background: color-mix(in srgb, mediumseagreen 16%, var(--mat-sys-surface-container-high));
+  color: var(--mat-sys-on-surface);
 }
 
 /* --- Birthday list --- */
@@ -352,7 +355,7 @@
 }
 
 .birthday-row__label--today {
-  color: var(--mat-sys-primary);
+  color: color-mix(in srgb, mediumseagreen 60%, var(--mat-sys-on-surface));
 }
 
 .birthday-row__date {
@@ -484,13 +487,10 @@
   color: var(--mat-sys-on-surface-variant);
 }
 
-.stage--offer    { background: var(--mat-sys-primary-container); color: var(--mat-sys-on-primary-container); }
-.stage--setup    { background: var(--mat-sys-tertiary-container); color: var(--mat-sys-on-tertiary-container); }
-.stage--day-1    { background: var(--mat-sys-secondary-container); color: var(--mat-sys-on-secondary-container); }
-.stage--30-days  {
-  background: color-mix(in srgb, mediumseagreen 18%, var(--mat-sys-surface-container));
-  color: var(--mat-sys-on-surface);
-}
+.stage--offer    { background: color-mix(in srgb, var(--mat-sys-primary) 14%, var(--mat-sys-surface-container-high)); color: var(--mat-sys-on-surface); }
+.stage--setup    { background: color-mix(in srgb, var(--mat-sys-tertiary) 14%, var(--mat-sys-surface-container-high)); color: var(--mat-sys-on-surface); }
+.stage--day-1    { background: color-mix(in srgb, goldenrod 16%, var(--mat-sys-surface-container-high)); color: var(--mat-sys-on-surface); }
+.stage--30-days  { background: color-mix(in srgb, mediumseagreen 18%, var(--mat-sys-surface-container-high)); color: var(--mat-sys-on-surface); }
 
 .due {
   font-weight: 600;
@@ -509,6 +509,20 @@
   right: 28px;
   bottom: 28px;
   z-index: 30;
+  // Override M3's default primary fill, the saturated azure reads too loud at
+  // FAB size. Soft tinted surface, on-surface text, subtle ring.
+  --mat-fab-container-color: color-mix(
+    in srgb,
+    var(--mat-sys-primary) 16%,
+    var(--mat-sys-surface-container-high)
+  );
+  --mat-fab-foreground-color: var(--mat-sys-on-surface);
+  --mat-fab-icon-color: var(--mat-sys-on-surface);
+  --mat-fab-extended-container-color: color-mix(
+    in srgb,
+    var(--mat-sys-primary) 16%,
+    var(--mat-sys-surface-container-high)
+  );
 }
 
 /* --- Responsive --- */

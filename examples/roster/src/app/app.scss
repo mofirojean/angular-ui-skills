@@ -41,8 +41,10 @@
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: var(--mat-sys-primary);
-  color: var(--mat-sys-on-primary);
+  // Tinted-surface rather than solid primary, the raw `--mat-sys-primary` token
+  // reads as harsh in dark mode at this size.
+  background: color-mix(in srgb, var(--mat-sys-primary) 18%, var(--mat-sys-surface-container-high));
+  color: var(--mat-sys-on-surface);
   font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -175,8 +177,8 @@
   width: 28px;
   height: 28px;
   border-radius: 6px;
-  background: var(--mat-sys-primary-container);
-  color: var(--mat-sys-on-primary-container);
+  background: color-mix(in srgb, var(--mat-sys-primary) 14%, var(--mat-sys-surface-container-high));
+  color: var(--mat-sys-on-surface);
   font-size: 13px;
   font-weight: 700;
   flex-shrink: 0;
