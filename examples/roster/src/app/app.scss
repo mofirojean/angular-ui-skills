@@ -9,6 +9,7 @@
 
 .sidenav {
   width: 252px;
+  border-radius: 0 !important;
   background: var(--mat-sys-surface-container);
   border-right: 1px solid var(--mat-sys-outline-variant);
 }
