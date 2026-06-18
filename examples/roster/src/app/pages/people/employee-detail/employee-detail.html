@@ -1,0 +1,545 @@
+@if (profile(); as p) {
+  <section class="profile">
+    <header class="profile__head">
+      <nav class="profile__crumb">
+        <a routerLink="/people">People</a>
+        <mat-icon class="material-symbols-outlined">chevron_right</mat-icon>
+        <span>{{ p.employee.name }}</span>
+      </nav>
+
+      <div class="profile__identity">
+        <span class="avatar avatar--tertiary">{{ p.employee.name | initials }}</span>
+        <div class="profile__title-wrap">
+          <div class="profile__title-row">
+            <h2 class="profile__name">{{ p.employee.name }}</h2>
+            <span
+              class="status-pill status-pill--{{ p.employee.status }}"
+              [matTooltip]="statusLabel(p.employee.status)"
+            >
+              {{ statusLabel(p.employee.status) }}
+            </span>
+            @if (p.sensitive) {
+              <span class="sensitive-flag" matTooltip="Sensitive role, restrict access by default.">
+                <mat-icon class="material-symbols-outlined">shield_person</mat-icon>
+                Sensitive
+              </span>
+            }
+          </div>
+          <p class="profile__role">
+            {{ p.employee.role }}
+            <span class="dot">·</span>
+            {{ p.employee.department }}
+            <span class="dot">·</span>
+            {{ p.employee.location }}
+          </p>
+        </div>
+
+        <div class="profile__actions">
+          <button mat-stroked-button>
+            <mat-icon class="material-symbols-outlined">edit</mat-icon>
+            Edit
+          </button>
+          <button mat-stroked-button>
+            <mat-icon class="material-symbols-outlined">forum</mat-icon>
+            Message
+          </button>
+          <button
+            mat-icon-button
+            [matMenuTriggerFor]="moreMenu"
+            aria-label="More actions"
+            matTooltip="More"
+          >
+            <mat-icon class="material-symbols-outlined">more_vert</mat-icon>
+          </button>
+          <mat-menu #moreMenu="matMenu" xPosition="before">
+            <button mat-menu-item>
+              <mat-icon class="material-symbols-outlined">key</mat-icon>
+              <span>Reset password</span>
+            </button>
+            <button mat-menu-item>
+              <mat-icon class="material-symbols-outlined">download</mat-icon>
+              <span>Export profile</span>
+            </button>
+            <mat-divider />
+            <button mat-menu-item class="menu-danger">
+              <mat-icon class="material-symbols-outlined">inventory_2</mat-icon>
+              <span>Archive employee</span>
+            </button>
+          </mat-menu>
+        </div>
+      </div>
+    </header>
+
+    <mat-tab-group class="profile__tabs" mat-stretch-tabs="false" mat-align-tabs="start">
+      <mat-tab label="Overview">
+        <div class="tab-body">
+          <!-- Metric cards -->
+          <div class="metrics">
+            <mat-card appearance="outlined" class="metric">
+              <div class="metric__icon"><mat-icon class="material-symbols-outlined">schedule</mat-icon></div>
+              <div class="metric__value">{{ p.tenureDays }}</div>
+              <div class="metric__label">days at Acme</div>
+              <div class="metric__sub">Joined {{ p.employee.joinedAt | date: 'MMM d, y' }}</div>
+            </mat-card>
+
+            <mat-card appearance="outlined" class="metric">
+              <div class="metric__icon"><mat-icon class="material-symbols-outlined">trending_up</mat-icon></div>
+              <div class="metric__value">{{ p.equityVestedPct }}%</div>
+              <div class="metric__label">equity vested</div>
+              <div class="metric__sub">4-year vest, monthly cliff</div>
+            </mat-card>
+
+            <mat-card appearance="outlined" class="metric">
+              <div class="metric__icon"><mat-icon class="material-symbols-outlined">groups</mat-icon></div>
+              <div class="metric__value">{{ p.reports.length }}</div>
+              <div class="metric__label">direct reports</div>
+              <div class="metric__sub">
+                @if (p.reports.length > 0) {
+                  Spanning {{ p.employee.department }}
+                } @else {
+                  Individual contributor
+                }
+              </div>
+            </mat-card>
+
+            <mat-card appearance="outlined" class="metric">
+              <div class="metric__icon"><mat-icon class="material-symbols-outlined">reviews</mat-icon></div>
+              <div class="metric__value">
+                @if (p.employee.lastReviewedAt) {
+                  {{ p.employee.lastReviewedAt | date: 'MMM y' }}
+                } @else {
+                  ,
+                }
+              </div>
+              <div class="metric__label">last review</div>
+              <div class="metric__sub">
+                @if (p.employee.lastReviewedAt) {
+                  {{ p.employee.lastReviewedAt | timeAgo }}
+                } @else {
+                  Pending first cycle
+                }
+              </div>
+            </mat-card>
+          </div>
+
+          <!-- About + Reports -->
+          <div class="two-col">
+            <mat-card appearance="outlined" class="surface">
+              <div class="surface__head">
+                <div>
+                  <h3 class="surface__title">About</h3>
+                  <p class="surface__sub">Contact and assignment details.</p>
+                </div>
+                @if (!editing()) {
+                  <button mat-stroked-button (click)="toggleEdit()">
+                    <mat-icon class="material-symbols-outlined">edit</mat-icon>
+                    Edit
+                  </button>
+                }
+              </div>
+
+              @if (!editing()) {
+                <dl class="about-grid">
+                  <dt>Email</dt>
+                  <dd>{{ emailFor(p.employee.name) }}</dd>
+
+                  <dt>Phone</dt>
+                  <dd>+1 (555) 0100</dd>
+
+                  <dt>Start date</dt>
+                  <dd>{{ p.employee.joinedAt | date: 'MMM d, y' }}</dd>
+
+                  <dt>Birthday</dt>
+                  <dd>{{ p.employee.birthday.month }}/{{ p.employee.birthday.day }}</dd>
+
+                  <dt>Department</dt>
+                  <dd>{{ p.employee.department }}</dd>
+
+                  <dt>Team</dt>
+                  <dd>{{ p.employee.team }}</dd>
+
+                  <dt>Manager</dt>
+                  <dd>
+                    @if (p.manager) {
+                      <a [routerLink]="['/people', p.manager.id]" class="link">
+                        {{ p.manager.name }}
+                      </a>
+                    } @else {
+                      <span class="muted">,</span>
+                    }
+                  </dd>
+
+                  <dt>Location</dt>
+                  <dd>{{ p.employee.location }}</dd>
+                </dl>
+              } @else {
+                <form [formGroup]="aboutForm" class="about-form" (ngSubmit)="saveAbout()">
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Email</mat-label>
+                    <input matInput formControlName="email" type="email" />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Phone</mat-label>
+                    <input matInput formControlName="phone" />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Department</mat-label>
+                    <mat-select formControlName="department">
+                      @for (d of departments; track d) {
+                        <mat-option [value]="d">{{ d }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Team</mat-label>
+                    <input matInput formControlName="team" />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Location</mat-label>
+                    <mat-select formControlName="location">
+                      @for (loc of locations; track loc) {
+                        <mat-option [value]="loc">{{ loc }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Manager</mat-label>
+                    <input matInput formControlName="manager" />
+                  </mat-form-field>
+
+                  <div class="about-form__actions">
+                    <button mat-button type="button" (click)="cancelEdit()">Cancel</button>
+                    <button mat-flat-button type="submit" class="save-btn">
+                      <mat-icon class="material-symbols-outlined">check</mat-icon>
+                      Save changes
+                    </button>
+                  </div>
+                </form>
+              }
+            </mat-card>
+
+            <mat-card appearance="outlined" class="surface">
+              <div class="surface__head">
+                <div>
+                  <h3 class="surface__title">Reporting line</h3>
+                  <p class="surface__sub">Manager and direct reports.</p>
+                </div>
+              </div>
+              <div class="tree-wrap">
+                <mat-tree [dataSource]="tree()" [childrenAccessor]="childrenOf">
+                  <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding [matTreeNodePaddingIndent]="24">
+                    <button mat-icon-button disabled aria-hidden="true" class="tree-toggle">
+                      <mat-icon class="material-symbols-outlined">subdirectory_arrow_right</mat-icon>
+                    </button>
+                    <a
+                      [routerLink]="['/people', node.id]"
+                      class="tree-row"
+                      [class.tree-row--me]="node.isMe"
+                    >
+                      <span class="avatar avatar--tertiary avatar--sm">{{ node.name | initials }}</span>
+                      <span class="tree-row__meta">
+                        <span class="tree-row__name">{{ node.name }}</span>
+                        <span class="tree-row__role">{{ node.role }}</span>
+                      </span>
+                    </a>
+                  </mat-tree-node>
+
+                  <mat-tree-node
+                    *matTreeNodeDef="let node; when: hasChildren"
+                    matTreeNodePadding
+                    [matTreeNodePaddingIndent]="24"
+                  >
+                    <button mat-icon-button matTreeNodeToggle class="tree-toggle">
+                      <mat-icon class="material-symbols-outlined">arrow_drop_down</mat-icon>
+                    </button>
+                    <a
+                      [routerLink]="['/people', node.id]"
+                      class="tree-row"
+                      [class.tree-row--me]="node.isMe"
+                    >
+                      <span class="avatar avatar--tertiary avatar--sm">{{ node.name | initials }}</span>
+                      <span class="tree-row__meta">
+                        <span class="tree-row__name">{{ node.name }}</span>
+                        <span class="tree-row__role">{{ node.role }}</span>
+                      </span>
+                    </a>
+                  </mat-tree-node>
+                </mat-tree>
+              </div>
+            </mat-card>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Compensation">
+        <div class="tab-body">
+          <mat-card appearance="outlined" class="surface">
+            <div class="surface__head">
+              <div>
+                <h3 class="surface__title">Current compensation</h3>
+                <p class="surface__sub">Effective {{ p.salaryHistory.at(-1)?.effectiveOn | date: 'MMM y' }}</p>
+              </div>
+              <button mat-flat-button class="save-btn" (click)="openAdjustDialog()">
+                <mat-icon class="material-symbols-outlined">tune</mat-icon>
+                Adjust
+              </button>
+            </div>
+            <div class="comp-headline">
+              <span class="comp-headline__value">${{ p.currentSalary.toLocaleString('en-US') }}</span>
+              <span class="comp-headline__unit">base salary, USD</span>
+            </div>
+
+            <table mat-table [dataSource]="p.salaryHistory" class="comp-table">
+              <ng-container matColumnDef="effective">
+                <th mat-header-cell *matHeaderCellDef>Effective</th>
+                <td mat-cell *matCellDef="let row">{{ row.effectiveOn | date: 'MMM d, y' }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="amount">
+                <th mat-header-cell *matHeaderCellDef>Amount</th>
+                <td mat-cell *matCellDef="let row">${{ row.amount.toLocaleString('en-US') }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="change">
+                <th mat-header-cell *matHeaderCellDef>Change</th>
+                <td mat-cell *matCellDef="let row; let i = index">
+                  @if (i > 0) {
+                    @let pct = changePct(row.amount, p.salaryHistory[i - 1].amount);
+                    <span class="change-pill" [class.change-pill--up]="(pct ?? 0) > 0">
+                      +{{ pct }}%
+                    </span>
+                  } @else {
+                    <span class="muted">,</span>
+                  }
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="reason">
+                <th mat-header-cell *matHeaderCellDef>Reason</th>
+                <td mat-cell *matCellDef="let row">{{ row.reason }}</td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="compCols"></tr>
+              <tr mat-row *matRowDef="let row; columns: compCols"></tr>
+            </table>
+          </mat-card>
+
+          <mat-card appearance="outlined" class="surface">
+            <div class="surface__head">
+              <div>
+                <h3 class="surface__title">Equity & benefits</h3>
+                <p class="surface__sub">Vesting cliff: 1 year, then monthly.</p>
+              </div>
+            </div>
+            <div class="equity-grid">
+              <div class="equity-item">
+                <div class="equity-item__label">Equity vested</div>
+                <div class="equity-item__value">{{ p.equityVestedPct }}%</div>
+                <mat-progress-bar mode="determinate" [value]="p.equityVestedPct" />
+              </div>
+              <div class="equity-item">
+                <div class="equity-item__label">Health & dental</div>
+                <div class="equity-item__value">Premium plan</div>
+                <div class="equity-item__sub">$0 monthly contribution</div>
+              </div>
+              <div class="equity-item">
+                <div class="equity-item__label">401(k) match</div>
+                <div class="equity-item__value">6%</div>
+                <div class="equity-item__sub">Immediate vesting</div>
+              </div>
+              <div class="equity-item">
+                <div class="equity-item__label">Annual bonus target</div>
+                <div class="equity-item__value">10%</div>
+                <div class="equity-item__sub">Paid in Q1</div>
+              </div>
+            </div>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Reviews">
+        <div class="tab-body">
+          <mat-card appearance="outlined" class="surface">
+            <div class="surface__head">
+              <div>
+                <h3 class="surface__title">Review history</h3>
+                <p class="surface__sub">{{ p.reviews.length }} past cycles</p>
+              </div>
+              <button mat-flat-button class="save-btn">
+                <mat-icon class="material-symbols-outlined">play_arrow</mat-icon>
+                Start review
+              </button>
+            </div>
+
+            @if (p.reviews.length === 0) {
+              <div class="empty-block">
+                <mat-icon class="material-symbols-outlined">history_toggle_off</mat-icon>
+                <p>No review cycles yet. {{ p.employee.name | initials }} joined recently.</p>
+              </div>
+            } @else {
+              <mat-accordion class="review-accordion">
+                @for (r of p.reviews; track r.cycle) {
+                  <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        <div class="review-title">
+                          <span class="review-cycle">{{ r.cycle }}</span>
+                          <span class="score">
+                            <mat-icon class="material-symbols-outlined">star</mat-icon>
+                            {{ r.score }}
+                          </span>
+                        </div>
+                      </mat-panel-title>
+                      <mat-panel-description>{{ r.date | date: 'MMM d, y' }}, {{ r.reviewer }}</mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <p class="review-summary">{{ r.summary }}</p>
+                    <div class="review-actions">
+                      <button mat-button>
+                        <mat-icon class="material-symbols-outlined">visibility</mat-icon>
+                        View details
+                      </button>
+                    </div>
+                  </mat-expansion-panel>
+                }
+              </mat-accordion>
+            }
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Documents">
+        <div class="tab-body">
+          <mat-card appearance="outlined" class="surface">
+            <div class="surface__head">
+              <div>
+                <h3 class="surface__title">Documents</h3>
+                <p class="surface__sub">{{ p.documents.length }} files</p>
+              </div>
+            </div>
+
+            <div class="upload-row">
+              <label class="upload-zone" [class.upload-zone--busy]="uploadProgress() !== null">
+                <input
+                  type="file"
+                  class="upload-zone__input"
+                  (change)="onUploadPicked($event)"
+                  [disabled]="uploadProgress() !== null"
+                />
+                <mat-icon class="material-symbols-outlined upload-zone__icon">cloud_upload</mat-icon>
+                <span class="upload-zone__label">
+                  @if (uploadProgress() === null) {
+                    Drag a file here or click to upload
+                  } @else {
+                    Uploading {{ uploadName() }},
+                  }
+                </span>
+                @if (uploadProgress() !== null) {
+                  <mat-progress-bar mode="determinate" [value]="uploadProgress()!" class="upload-zone__bar" />
+                }
+              </label>
+            </div>
+
+            <ul class="doc-list">
+              @for (d of p.documents; track d.id) {
+                <li class="doc-item">
+                  <span class="doc-item__icon">
+                    <mat-icon class="material-symbols-outlined">description</mat-icon>
+                  </span>
+                  <div class="doc-item__meta">
+                    <span class="doc-item__name">{{ d.name }}</span>
+                    <span class="doc-item__sub">
+                      Uploaded by {{ d.uploadedBy }} {{ d.uploadedAt | timeAgo }}
+                    </span>
+                  </div>
+                  <span class="doc-category doc-category--{{ d.category | lowercase }}">{{ d.category }}</span>
+                  <span class="doc-item__size">{{ d.bytes | bytes: 1 }}</span>
+                  <button mat-icon-button matTooltip="Download" aria-label="Download">
+                    <mat-icon class="material-symbols-outlined">download</mat-icon>
+                  </button>
+                </li>
+              }
+            </ul>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Activity">
+        <div class="tab-body">
+          <mat-card appearance="outlined" class="surface">
+            <div class="surface__head">
+              <div>
+                <h3 class="surface__title">Activity</h3>
+                <p class="surface__sub">{{ p.activity.length }} events</p>
+              </div>
+            </div>
+            <ol class="timeline">
+              @for (ev of p.activity; track ev.id) {
+                <li class="timeline__row">
+                  <span class="timeline__dot">
+                    <mat-icon class="material-symbols-outlined">{{ activityIcon(ev.kind) }}</mat-icon>
+                  </span>
+                  <div class="timeline__meta">
+                    <span class="timeline__label">{{ ev.label }}</span>
+                    <span class="timeline__when">
+                      {{ ev.at | date: 'MMM d, y' }}
+                      <span class="dot">·</span>
+                      {{ ev.at | timeAgo }}
+                    </span>
+                  </div>
+                </li>
+              }
+            </ol>
+          </mat-card>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </section>
+
+  <!-- Inline Adjust Compensation dialog template -->
+  <ng-template #adjustTpl>
+    <h2 mat-dialog-title>Adjust compensation</h2>
+    <mat-dialog-content>
+      <form [formGroup]="adjustForm" class="adjust-form">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>New amount (USD)</mat-label>
+          <input matInput type="number" formControlName="amount" />
+          <span matTextPrefix>$</span>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Reason</mat-label>
+          <mat-select formControlName="reason">
+            <mat-option value="Annual increase">Annual increase</mat-option>
+            <mat-option value="Promotion">Promotion</mat-option>
+            <mat-option value="Adjustment">Adjustment</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Note</mat-label>
+          <textarea matInput rows="3" formControlName="note" placeholder="Optional context for the cycle owner,"></textarea>
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button mat-dialog-close>Cancel</button>
+      <button mat-flat-button class="save-btn" [mat-dialog-close]="true">
+        <mat-icon class="material-symbols-outlined">check</mat-icon>
+        Submit for review
+      </button>
+    </mat-dialog-actions>
+  </ng-template>
+} @else {
+  <section class="profile-missing">
+    <mat-icon class="material-symbols-outlined">person_off</mat-icon>
+    <h2>No employee with id "{{ id() }}"</h2>
+    <a mat-stroked-button routerLink="/people">
+      <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+      Back to directory
+    </a>
+  </section>
+}

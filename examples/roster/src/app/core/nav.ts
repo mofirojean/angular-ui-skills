@@ -1,16 +1,4 @@
-export interface NavItem {
-  readonly path: string;
-  readonly label: string;
-  readonly icon: string;
-  /** Optional static count shown on the right side of the row. Replace with a
-   *  signal-driven value once the data service is wired in Phase 1+. */
-  readonly badge?: number | string;
-}
-
-export interface NavSection {
-  readonly label: string;
-  readonly items: readonly NavItem[];
-}
+import type { NavSection } from './model';
 
 export const NAV: readonly NavSection[] = [
   {

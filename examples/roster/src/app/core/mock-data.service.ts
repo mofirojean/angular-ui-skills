@@ -1,58 +1,41 @@
 import { Injectable, signal } from '@angular/core';
 
-export type EmployeeStatus = 'active' | 'on-leave' | 'onboarding';
+import type {
+  ActivityEvent,
+  BirthdayEntry,
+  DashboardKpis,
+  DocCategory,
+  Employee,
+  EmployeeProfile,
+  EmployeeStatus,
+  LeaveToday,
+  OnboardingTask,
+  ProfileDoc,
+  ReviewCycleSummary,
+  SalaryEntry,
+  SalaryReason,
+} from './model';
 
-// Initials and time-ago strings are derived in templates via ngx-transforms
-// pipes (`| initials`, `| timeAgo`), so we don't carry pre-computed values on
-// these shapes anymore.
-
-export interface Employee {
-  readonly id: string;
-  readonly name: string;
-  readonly role: string;
-  readonly department: string;
-  readonly team: string;
-  readonly location: string;
-  readonly manager: string | null;
-  readonly status: EmployeeStatus;
-  readonly joinedAt: Date;
-  readonly lastReviewedAt: Date | null;
-  readonly birthday: { month: number; day: number };
-}
-
-export interface LeaveToday {
-  readonly employee: Pick<Employee, 'id' | 'name' | 'role'>;
-  readonly type: 'vacation' | 'sick' | 'personal' | 'parental';
-  readonly returnsOn: Date;
-}
-
-export interface BirthdayEntry {
-  readonly employee: Pick<Employee, 'id' | 'name' | 'role'>;
-  readonly date: Date;
-  readonly daysAway: number;
-}
-
-export interface OnboardingTask {
-  readonly id: string;
-  readonly hire: string;
-  readonly task: string;
-  readonly stage: 'Offer' | 'Setup' | 'Day 1' | '30 days';
-  readonly dueIn: number;
-  readonly owner: string;
-}
-
-export interface DashboardKpis {
-  readonly activeEmployees: number;
-  readonly openPositions: number;
-  readonly pendingTimeOff: number;
-  readonly reviewsDue: number;
-  readonly deltas: {
-    readonly activeEmployees: number;
-    readonly openPositions: number;
-    readonly pendingTimeOff: number;
-    readonly reviewsDue: number;
-  };
-}
+// Re-export so existing `import { Employee, ... } from './core/mock-data.service'`
+// call sites keep working. New code should import shapes from `./model`.
+export type {
+  ActivityEvent,
+  ActivityKind,
+  BirthdayEntry,
+  DashboardKpis,
+  DocCategory,
+  Employee,
+  EmployeeProfile,
+  EmployeeStatus,
+  LeaveToday,
+  NavItem,
+  NavSection,
+  OnboardingTask,
+  ProfileDoc,
+  ReviewCycleSummary,
+  SalaryEntry,
+  SalaryReason,
+} from './model';
 
 // --- Source data --------------------------------------------------------------
 
@@ -305,7 +288,203 @@ export class MockDataService {
 
   readonly openOnboardingTasks = signal<readonly OnboardingTask[]>(ONBOARDING_TASKS);
 
+  // --- Profile lookup --------------------------------------------------------
+
+  /**
+   * Resolves the full profile bundle for an employee, deterministic per id so
+   * the same surface renders every time. Returns null if no such id exists.
+   */
+  getProfile(id: string): EmployeeProfile | null {
+    const all = this.employees();
+    const employee = all.find((e) => e.id === id);
+    if (!employee) return null;
+
+    const seed = Number(id.replace(/\D/g, '')) || 0;
+    const reports = employee.manager === null
+      ? []
+      : all.filter((e) => e.manager === employee.name).slice(0, 6);
+    const managerEmp = employee.manager
+      ? all.find((e) => e.name === employee.manager) ?? null
+      : null;
+
+    const tenureDays = Math.round(
+      (TODAY.getTime() - employee.joinedAt.getTime()) / 86_400_000,
+    );
+
+    return {
+      employee,
+      manager: managerEmp,
+      reports,
+      currentSalary: buildSalaryHistory(employee, seed).at(-1)!.amount,
+      salaryHistory: buildSalaryHistory(employee, seed),
+      reviews: buildReviews(employee, seed),
+      documents: buildDocuments(employee, seed),
+      activity: buildActivity(employee, seed),
+      sensitive:
+        MANAGERS.includes(employee.name as (typeof MANAGERS)[number]) ||
+        /Lead|Manager|Staff|Controller/.test(employee.role),
+      tenureDays,
+      equityVestedPct: Math.min(100, Math.round((tenureDays / (4 * 365)) * 100)),
+    };
+  }
+
   constructor() {
     setTimeout(() => this.loading.set(false), 400);
   }
+}
+
+// --- Profile derivation helpers ----------------------------------------------
+
+function roleBase(role: string): number {
+  if (/Staff|Lead|Manager|Controller|Director/.test(role)) return 175_000;
+  if (/Senior/.test(role)) return 135_000;
+  if (/Junior|Analyst|Specialist|Accountant/.test(role)) return 78_000;
+  return 105_000;
+}
+
+function buildSalaryHistory(emp: Employee, seed: number): readonly SalaryEntry[] {
+  const out: SalaryEntry[] = [];
+  const base = roleBase(emp.role);
+  const tenureYears = Math.max(
+    1,
+    Math.floor((TODAY.getTime() - emp.joinedAt.getTime()) / (365 * 86_400_000)),
+  );
+  const steps = Math.min(5, tenureYears + 1);
+
+  let amount = Math.round(base * (0.82 + hash(seed, 21) * 0.08));
+  let date = new Date(emp.joinedAt);
+
+  out.push({
+    effectiveOn: new Date(date),
+    amount,
+    reason: 'Hire',
+  });
+
+  for (let i = 1; i < steps; i++) {
+    date = new Date(date);
+    date.setMonth(date.getMonth() + 12);
+    const bumpKind = hash(seed, 30 + i);
+    const reason: SalaryReason =
+      bumpKind > 0.85 ? 'Promotion' : bumpKind > 0.25 ? 'Annual increase' : 'Adjustment';
+    const pct = reason === 'Promotion' ? 0.12 + hash(seed, 40 + i) * 0.08 : 0.04 + hash(seed, 50 + i) * 0.05;
+    amount = Math.round(amount * (1 + pct));
+    out.push({ effectiveOn: new Date(date), amount, reason });
+  }
+
+  // Cap so we don't put future-dated entries.
+  return out.filter((e) => e.effectiveOn <= TODAY);
+}
+
+function buildReviews(emp: Employee, seed: number): readonly ReviewCycleSummary[] {
+  if (emp.lastReviewedAt === null) return [];
+  const cycles: ReviewCycleSummary[] = [];
+  const startYear = emp.joinedAt.getFullYear();
+  const endYear = TODAY.getFullYear();
+  let idx = 0;
+  for (let y = endYear; y >= Math.max(startYear, endYear - 3); y--) {
+    for (const half of ['H1', 'H2']) {
+      const cycleStart = new Date(y, half === 'H1' ? 5 : 11, 15);
+      if (cycleStart > TODAY) continue;
+      if (cycleStart < emp.joinedAt) continue;
+      const score = 3 + Math.round(hash(seed, 60 + idx) * 2 * 10) / 10;
+      cycles.push({
+        cycle: `${half} ${y}`,
+        date: cycleStart,
+        score,
+        summary:
+          score >= 4.5
+            ? 'Exceeded expectations across the cycle, ready for next-level scope.'
+            : score >= 3.5
+              ? 'Met or exceeded expectations, strong contributor on the team.'
+              : 'Met expectations, growth areas flagged for the next cycle.',
+        reviewer: emp.manager ?? 'Mofiro Jean',
+      });
+      idx++;
+      if (cycles.length >= 4) break;
+    }
+    if (cycles.length >= 4) break;
+  }
+  return cycles;
+}
+
+const DOC_TEMPLATES: ReadonlyArray<{ name: string; category: DocCategory; kb: number }> = [
+  { name: 'Employment offer.pdf',       category: 'Contract', kb: 412 },
+  { name: 'NDA + IP assignment.pdf',    category: 'Contract', kb: 286 },
+  { name: 'W-9 form 2025.pdf',          category: 'Tax',      kb: 188 },
+  { name: 'Direct deposit setup.pdf',   category: 'Tax',      kb: 140 },
+  { name: 'Stock option agreement.pdf', category: 'Equity',   kb: 524 },
+  { name: 'ID verification.jpg',        category: 'ID',       kb: 1860 },
+  { name: 'Equipment receipt.pdf',      category: 'Misc',     kb: 96 },
+  { name: 'Background check report.pdf', category: 'Contract', kb: 612 },
+];
+
+function buildDocuments(emp: Employee, seed: number): readonly ProfileDoc[] {
+  const count = 3 + Math.floor(hash(seed, 70) * 4);
+  const picks = DOC_TEMPLATES.slice(0, count);
+  return picks.map((d, i) => ({
+    id: `${emp.id}-doc-${i}`,
+    name: d.name,
+    category: d.category,
+    bytes: d.kb * 1024,
+    uploadedAt: (() => {
+      const offset = Math.floor(hash(seed, 80 + i) * 540);
+      const max = Math.max(0, Math.round((TODAY.getTime() - emp.joinedAt.getTime()) / 86_400_000));
+      return daysFromNow(-Math.min(offset, max));
+    })(),
+    uploadedBy: i % 3 === 0 ? emp.name : (emp.manager ?? 'Mofiro Jean'),
+  }));
+}
+
+function buildActivity(emp: Employee, seed: number): readonly ActivityEvent[] {
+  const events: ActivityEvent[] = [];
+  let idx = 0;
+
+  events.push({
+    id: `${emp.id}-act-${idx++}`,
+    kind: 'joined',
+    label: `Joined Acme Corp as ${emp.role}`,
+    at: emp.joinedAt,
+  });
+
+  const days = Math.round((TODAY.getTime() - emp.joinedAt.getTime()) / 86_400_000);
+  if (days > 60) {
+    events.push({
+      id: `${emp.id}-act-${idx++}`,
+      kind: 'team-change',
+      label: `Moved to ${emp.team} team`,
+      at: daysFromNow(-Math.floor(days * 0.7)),
+    });
+  }
+  if (days > 200) {
+    events.push({
+      id: `${emp.id}-act-${idx++}`,
+      kind: 'comp-adjustment',
+      label: 'Compensation adjusted (annual cycle)',
+      at: daysFromNow(-Math.floor(days * 0.55)),
+    });
+  }
+  if (emp.lastReviewedAt) {
+    events.push({
+      id: `${emp.id}-act-${idx++}`,
+      kind: 'review',
+      label: 'Performance review completed',
+      at: emp.lastReviewedAt,
+    });
+  }
+  if (hash(seed, 91) > 0.4) {
+    events.push({
+      id: `${emp.id}-act-${idx++}`,
+      kind: 'leave',
+      label: 'Vacation request approved',
+      at: daysFromNow(-Math.floor(60 + hash(seed, 92) * 200)),
+    });
+  }
+  events.push({
+    id: `${emp.id}-act-${idx++}`,
+    kind: 'doc-upload',
+    label: 'Stock option agreement uploaded',
+    at: daysFromNow(-Math.floor(30 + hash(seed, 93) * 100)),
+  });
+
+  return events.sort((a, b) => b.at.getTime() - a.at.getTime());
 }
