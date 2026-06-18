@@ -1,0 +1,331 @@
+<section class="people">
+  <header class="people__head">
+    <div>
+      <h2 class="people__title">People</h2>
+      <p class="people__sub">
+        {{ dataSource.data.length }} of {{ allEmployeesCount() }} employees
+        @if (activeFilterCount() > 0) {
+          shown
+        }
+      </p>
+    </div>
+    <div class="people__actions">
+      <mat-slide-toggle
+        [checked]="compact()"
+        (change)="toggleCompact($event.checked)"
+        class="people__compact"
+      >
+        Compact
+      </mat-slide-toggle>
+      <button mat-flat-button class="people__invite">
+        <mat-icon class="material-symbols-outlined">person_add</mat-icon>
+        Invite employee
+      </button>
+    </div>
+  </header>
+
+  <form [formGroup]="filtersForm" class="filters">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filters__search">
+      <mat-label>Search by name or role</mat-label>
+      <mat-icon matIconPrefix class="material-symbols-outlined">search</mat-icon>
+      <input
+        matInput
+        type="search"
+        formControlName="search"
+        [matAutocomplete]="searchAuto"
+        placeholder="Type a name,"
+        autocomplete="off"
+      />
+      <mat-autocomplete #searchAuto="matAutocomplete" autoActiveFirstOption>
+        @for (s of searchSuggestions(); track s.id) {
+          <mat-option [value]="s.name" (onSelectionChange)="pickSuggestion(s.name)">
+            <div class="suggestion">
+              <span class="avatar avatar--tertiary avatar--xs">{{ s.initials }}</span>
+              <span class="suggestion__meta">
+                <span class="suggestion__name">{{ s.name }}</span>
+                <span class="suggestion__role">{{ s.role }}, {{ s.department }}</span>
+              </span>
+            </div>
+          </mat-option>
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filters__select">
+      <mat-label>Department</mat-label>
+      <mat-select formControlName="department">
+        <mat-option [value]="null">All departments</mat-option>
+        @for (d of departments; track d) {
+          <mat-option [value]="d">{{ d }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filters__select">
+      <mat-label>Team</mat-label>
+      <mat-select formControlName="team">
+        <mat-option [value]="null">All teams</mat-option>
+        @for (t of teamOptions(); track t) {
+          <mat-option [value]="t">{{ t }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-button-toggle-group formControlName="status" hideSingleSelectionIndicator class="filters__status">
+      <mat-button-toggle value="all">All</mat-button-toggle>
+      <mat-button-toggle value="active">Active</mat-button-toggle>
+      <mat-button-toggle value="on-leave">On leave</mat-button-toggle>
+      <mat-button-toggle value="onboarding">Onboarding</mat-button-toggle>
+    </mat-button-toggle-group>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filters__range">
+      <mat-label>Hired</mat-label>
+      <mat-date-range-input [rangePicker]="hiredPicker">
+        <input matStartDate formControlName="hiredFrom" placeholder="From" />
+        <input matEndDate formControlName="hiredTo" placeholder="To" />
+      </mat-date-range-input>
+      <mat-datepicker-toggle matIconSuffix [for]="hiredPicker" />
+      <mat-date-range-picker #hiredPicker />
+    </mat-form-field>
+
+    @if (activeFilterCount() > 0) {
+      <button mat-stroked-button type="button" class="filters__reset" (click)="reset()">
+        <mat-icon class="material-symbols-outlined">close</mat-icon>
+        Reset
+      </button>
+    }
+  </form>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" class="people__loader" />
+  }
+
+  @if (selectedCount() > 0) {
+    <div class="bulk-bar" role="region" aria-label="Bulk actions">
+      <div class="bulk-bar__count">
+        <mat-icon class="material-symbols-outlined">check_circle</mat-icon>
+        <strong>{{ selectedCount() }}</strong>
+        selected
+      </div>
+      <div class="bulk-bar__actions">
+        <button mat-button (click)="bulkAction('Message')">
+          <mat-icon class="material-symbols-outlined">forum</mat-icon>
+          Message
+        </button>
+        <button mat-button (click)="bulkAction('Export')">
+          <mat-icon class="material-symbols-outlined">download</mat-icon>
+          Export CSV
+        </button>
+        <button mat-button (click)="bulkAction('Archive')">
+          <mat-icon class="material-symbols-outlined">inventory_2</mat-icon>
+          Archive
+        </button>
+        <button mat-icon-button matTooltip="Clear selection" (click)="clearSelection()">
+          <mat-icon class="material-symbols-outlined">close</mat-icon>
+        </button>
+      </div>
+    </div>
+  }
+
+  <mat-card appearance="outlined" class="surface">
+    @if (compact()) {
+      <cdk-virtual-scroll-viewport itemSize="56" class="compact-vp">
+        <div
+          *cdkVirtualFor="let row of dataSource.data; trackBy: trackById"
+          class="compact-row"
+          [class.row-selected]="selection.isSelected(row)"
+          (click)="onRowClick(row, $event)"
+        >
+          <mat-checkbox
+            (click)="$event.stopPropagation()"
+            (change)="selection.toggle(row)"
+            [checked]="selection.isSelected(row)"
+            class="compact-row__check"
+            [attr.aria-label]="'Select ' + row.name"
+          />
+          <span class="avatar avatar--tertiary">{{ row.initials }}</span>
+          <div class="compact-row__meta">
+            <span class="compact-row__name">{{ row.name }}</span>
+            <span class="compact-row__role">{{ row.role }}, {{ row.department }}</span>
+          </div>
+          <span class="compact-row__team">{{ row.team }}</span>
+          <span class="compact-row__manager">
+            @if (row.manager) {
+              {{ row.manager }}
+            } @else {
+              <span class="cell-empty">,</span>
+            }
+          </span>
+          <span class="compact-row__joined">{{ row.joinedAt | date: 'MMM d, y' }}</span>
+          <span class="status-pill status-pill--{{ row.status }}">
+            {{ statusLabel(row.status) }}
+          </span>
+        </div>
+        @if (dataSource.data.length === 0) {
+          <div class="empty-row">
+            <mat-icon class="material-symbols-outlined">filter_alt_off</mat-icon>
+            <span>No employees match these filters.</span>
+            <button mat-stroked-button type="button" (click)="reset()">Reset filters</button>
+          </div>
+        }
+      </cdk-virtual-scroll-viewport>
+    } @else {
+    <div class="table-wrap">
+      <table
+        mat-table
+        matSort
+        matSortActive="joined"
+        matSortDirection="desc"
+        [dataSource]="dataSource"
+        class="people-table"
+      >
+        <!-- Bulk select -->
+        <ng-container matColumnDef="select" sticky>
+          <th mat-header-cell *matHeaderCellDef class="cell-select">
+            <mat-checkbox
+              (change)="toggleAll()"
+              [checked]="isAllSelected()"
+              [indeterminate]="isPartiallySelected()"
+              aria-label="Select all employees on this page"
+            />
+          </th>
+          <td mat-cell *matCellDef="let row" class="cell-select" (click)="$event.stopPropagation()">
+            <mat-checkbox
+              (change)="selection.toggle(row)"
+              [checked]="selection.isSelected(row)"
+              [attr.aria-label]="'Select ' + row.name"
+            />
+          </td>
+        </ng-container>
+
+        <!-- Name (sticky / frozen) -->
+        <ng-container matColumnDef="name" sticky>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+          <td mat-cell *matCellDef="let row">
+            <a
+              class="cell-name"
+              [routerLink]="['/people', row.id]"
+              (click)="$event.stopPropagation()"
+            >
+              <span class="avatar avatar--tertiary">{{ row.initials }}</span>
+              <span class="cell-name__meta">
+                <span class="cell-name__title">{{ row.name }}</span>
+                <span class="cell-name__role">{{ row.role }}</span>
+              </span>
+            </a>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="department">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Department</th>
+          <td mat-cell *matCellDef="let row">{{ row.department }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="team">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Team</th>
+          <td mat-cell *matCellDef="let row">{{ row.team }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="manager">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Manager</th>
+          <td mat-cell *matCellDef="let row">
+            @if (row.manager) {
+              {{ row.manager }}
+            } @else {
+              <span class="cell-empty">,</span>
+            }
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="location">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Location</th>
+          <td mat-cell *matCellDef="let row">{{ row.location }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="joined">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Joined</th>
+          <td mat-cell *matCellDef="let row">
+            {{ row.joinedAt | date: 'MMM d, y' }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="lastReviewed">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Last review</th>
+          <td mat-cell *matCellDef="let row">
+            @if (row.lastReviewedAt) {
+              {{ row.lastReviewedAt | date: 'MMM d, y' }}
+            } @else {
+              <span class="cell-empty">Pending</span>
+            }
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="status-pill status-pill--{{ row.status }}">
+              {{ statusLabel(row.status) }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Trailing 3-dot menu -->
+        <ng-container matColumnDef="actions" stickyEnd>
+          <th mat-header-cell *matHeaderCellDef class="cell-actions" aria-label="Row actions"></th>
+          <td mat-cell *matCellDef="let row" class="cell-actions" (click)="$event.stopPropagation()">
+            <button
+              mat-icon-button
+              [matMenuTriggerFor]="rowMenu"
+              aria-label="Row actions"
+              matTooltip="More"
+            >
+              <mat-icon class="material-symbols-outlined">more_vert</mat-icon>
+            </button>
+            <mat-menu #rowMenu="matMenu">
+              <a mat-menu-item [routerLink]="['/people', row.id]">
+                <mat-icon class="material-symbols-outlined">person</mat-icon>
+                <span>View profile</span>
+              </a>
+              <button mat-menu-item (click)="rowAction('Message', row)">
+                <mat-icon class="material-symbols-outlined">forum</mat-icon>
+                <span>Send message</span>
+              </button>
+              <button mat-menu-item (click)="rowAction('Edit', row)">
+                <mat-icon class="material-symbols-outlined">edit</mat-icon>
+                <span>Edit</span>
+              </button>
+              <button mat-menu-item (click)="rowAction('Archive', row)">
+                <mat-icon class="material-symbols-outlined">inventory_2</mat-icon>
+                <span>Archive</span>
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedColumns"
+          [class.row-selected]="selection.isSelected(row)"
+          (click)="onRowClick(row, $event)"
+        ></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell empty-row" [attr.colspan]="displayedColumns.length">
+            <mat-icon class="material-symbols-outlined">filter_alt_off</mat-icon>
+            <span>No employees match these filters.</span>
+            <button mat-stroked-button type="button" (click)="reset()">Reset filters</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <mat-paginator
+      [pageSizeOptions]="[15, 25, 50, 100]"
+      [pageSize]="25"
+      showFirstLastButtons
+      aria-label="Select page"
+    />
+    }
+  </mat-card>
+</section>
