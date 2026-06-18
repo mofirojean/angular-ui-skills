@@ -20,6 +20,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 
+import { InitialsPipe } from 'ngx-transforms';
+
 import { NAV } from './core/nav';
 import { ThemeService } from './core/theme.service';
 
@@ -38,6 +40,7 @@ import { ThemeService } from './core/theme.service';
     MatMenuModule,
     MatTooltipModule,
     MatDividerModule,
+    InitialsPipe,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
@@ -51,7 +54,6 @@ export class App {
   protected readonly nav = NAV;
   protected readonly user = {
     name: 'Mofiro Jean',
-    initials: 'MJ',
     role: 'HR Admin',
   };
 

@@ -54,6 +54,11 @@
             ],
             "styles": [
               "src/styles.scss"
+            ],
+            "allowedCommonJsDependencies": [
+              "qrcode",
+              "jsbarcode",
+              "js-md5"
             ]
           },
           "configurations": {

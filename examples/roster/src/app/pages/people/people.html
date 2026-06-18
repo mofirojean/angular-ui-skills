@@ -40,7 +40,7 @@
         @for (s of searchSuggestions(); track s.id) {
           <mat-option [value]="s.name" (onSelectionChange)="pickSuggestion(s.name)">
             <div class="suggestion">
-              <span class="avatar avatar--tertiary avatar--xs">{{ s.initials }}</span>
+              <span class="avatar avatar--tertiary avatar--xs">{{ s.name | initials }}</span>
               <span class="suggestion__meta">
                 <span class="suggestion__name">{{ s.name }}</span>
                 <span class="suggestion__role">{{ s.role }}, {{ s.department }}</span>
@@ -143,7 +143,7 @@
             class="compact-row__check"
             [attr.aria-label]="'Select ' + row.name"
           />
-          <span class="avatar avatar--tertiary">{{ row.initials }}</span>
+          <span class="avatar avatar--tertiary">{{ row.name | initials }}</span>
           <div class="compact-row__meta">
             <span class="compact-row__name">{{ row.name }}</span>
             <span class="compact-row__role">{{ row.role }}, {{ row.department }}</span>
@@ -207,7 +207,7 @@
               [routerLink]="['/people', row.id]"
               (click)="$event.stopPropagation()"
             >
-              <span class="avatar avatar--tertiary">{{ row.initials }}</span>
+              <span class="avatar avatar--tertiary">{{ row.name | initials }}</span>
               <span class="cell-name__meta">
                 <span class="cell-name__title">{{ row.name }}</span>
                 <span class="cell-name__role">{{ row.role }}</span>

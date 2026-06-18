@@ -2,10 +2,13 @@ import { Injectable, signal } from '@angular/core';
 
 export type EmployeeStatus = 'active' | 'on-leave' | 'onboarding';
 
+// Initials and time-ago strings are derived in templates via ngx-transforms
+// pipes (`| initials`, `| timeAgo`), so we don't carry pre-computed values on
+// these shapes anymore.
+
 export interface Employee {
   readonly id: string;
   readonly name: string;
-  readonly initials: string;
   readonly role: string;
   readonly department: string;
   readonly team: string;
@@ -18,13 +21,13 @@ export interface Employee {
 }
 
 export interface LeaveToday {
-  readonly employee: Pick<Employee, 'id' | 'name' | 'initials' | 'role'>;
+  readonly employee: Pick<Employee, 'id' | 'name' | 'role'>;
   readonly type: 'vacation' | 'sick' | 'personal' | 'parental';
   readonly returnsOn: Date;
 }
 
 export interface BirthdayEntry {
-  readonly employee: Pick<Employee, 'id' | 'name' | 'initials' | 'role'>;
+  readonly employee: Pick<Employee, 'id' | 'name' | 'role'>;
   readonly date: Date;
   readonly daysAway: number;
 }
@@ -32,7 +35,6 @@ export interface BirthdayEntry {
 export interface OnboardingTask {
   readonly id: string;
   readonly hire: string;
-  readonly initials: string;
   readonly task: string;
   readonly stage: 'Offer' | 'Setup' | 'Day 1' | '30 days';
   readonly dueIn: number;
@@ -137,15 +139,6 @@ const MANAGERS = [
   'Hana Yamamoto',
 ] as const;
 
-function initials(name: string): string {
-  return name
-    .split(' ')
-    .map((p) => p[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
-}
-
 function daysFromNow(days: number, today = TODAY): Date {
   const d = new Date(today);
   d.setDate(d.getDate() + days);
@@ -189,7 +182,6 @@ function buildEmployees(): Employee[] {
     out.push({
       id: `emp-${String(i + 1).padStart(3, '0')}`,
       name,
-      initials: initials(name),
       role,
       department: dept.name,
       team,
@@ -237,12 +229,12 @@ const BIRTHDAYS: ReadonlyArray<{ name: string; role: string; daysAway: number }>
 ];
 
 const ONBOARDING_TASKS: ReadonlyArray<OnboardingTask> = [
-  { id: 'ob-1', hire: 'Amelia Stone', initials: 'AS', task: 'Ship laptop & peripherals', stage: 'Setup',   dueIn: 1,  owner: 'IT' },
-  { id: 'ob-2', hire: 'Amelia Stone', initials: 'AS', task: 'Buddy intro coffee',        stage: 'Day 1',   dueIn: 3,  owner: 'Sasha Lin' },
-  { id: 'ob-3', hire: 'Jordan Park',  initials: 'JP', task: 'Figma + Linear access',     stage: 'Setup',   dueIn: 0,  owner: 'IT' },
-  { id: 'ob-4', hire: 'Jordan Park',  initials: 'JP', task: 'Brand systems walkthrough', stage: '30 days', dueIn: 12, owner: 'Aiko Tanaka' },
-  { id: 'ob-5', hire: 'Noah Rivera',  initials: 'NR', task: 'CRM onboarding session',    stage: 'Day 1',   dueIn: 2,  owner: 'Quinn Hayes' },
-  { id: 'ob-6', hire: 'Sasha Lin',    initials: 'SL', task: '1:1 cadence with reports',  stage: '30 days', dueIn: 6,  owner: 'Mofiro Jean' },
+  { id: 'ob-1', hire: 'Amelia Stone', task: 'Ship laptop & peripherals', stage: 'Setup',   dueIn: 1,  owner: 'IT' },
+  { id: 'ob-2', hire: 'Amelia Stone', task: 'Buddy intro coffee',        stage: 'Day 1',   dueIn: 3,  owner: 'Sasha Lin' },
+  { id: 'ob-3', hire: 'Jordan Park',  task: 'Figma + Linear access',     stage: 'Setup',   dueIn: 0,  owner: 'IT' },
+  { id: 'ob-4', hire: 'Jordan Park',  task: 'Brand systems walkthrough', stage: '30 days', dueIn: 12, owner: 'Aiko Tanaka' },
+  { id: 'ob-5', hire: 'Noah Rivera',  task: 'CRM onboarding session',    stage: 'Day 1',   dueIn: 2,  owner: 'Quinn Hayes' },
+  { id: 'ob-6', hire: 'Sasha Lin',    task: '1:1 cadence with reports',  stage: '30 days', dueIn: 6,  owner: 'Mofiro Jean' },
 ];
 
 // --- Service ------------------------------------------------------------------
@@ -276,7 +268,6 @@ export class MockDataService {
       employee: {
         id: `lv-${i}`,
         name: l.name,
-        initials: initials(l.name),
         role: l.role,
       },
       type: l.type,
@@ -288,7 +279,6 @@ export class MockDataService {
     RECENT_HIRES.map((h, i) => ({
       id: `rj-${i}`,
       name: h.name,
-      initials: initials(h.name),
       role: h.role,
       department: h.dept,
       team: h.team,
@@ -306,7 +296,6 @@ export class MockDataService {
       employee: {
         id: `bd-${i}`,
         name: b.name,
-        initials: initials(b.name),
         role: b.role,
       },
       date: daysFromNow(b.daysAway),

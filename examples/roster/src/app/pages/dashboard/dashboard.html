@@ -51,13 +51,13 @@
         <mat-list class="leave-list">
           @for (entry of onLeaveToday(); track entry.employee.id) {
             <mat-list-item class="leave-list__row">
-              <span class="avatar" matListItemAvatar>{{ entry.employee.initials }}</span>
+              <span class="avatar" matListItemAvatar>{{ entry.employee.name | initials }}</span>
               <span matListItemTitle class="leave-list__name">{{ entry.employee.name }}</span>
               <span matListItemLine class="leave-list__role">{{ entry.employee.role }}</span>
               <div matListItemMeta class="leave-list__meta">
                 <span class="chip chip--{{ entry.type }}">{{ leaveTypeLabel(entry.type) }}</span>
                 <span class="leave-list__back">
-                  Back in {{ returnsInDays(entry.returnsOn) }}d
+                  Back {{ entry.returnsOn | timeAgo }}
                 </span>
               </div>
             </mat-list-item>
@@ -79,7 +79,7 @@
         <ul class="birthday-list">
           @for (b of upcomingBirthdays(); track b.employee.id) {
             <li class="birthday-row">
-              <span class="avatar avatar--tertiary">{{ b.employee.initials }}</span>
+              <span class="avatar avatar--tertiary">{{ b.employee.name | initials }}</span>
               <div class="birthday-row__meta">
                 <span class="birthday-row__name">{{ b.employee.name }}</span>
                 <span class="birthday-row__role">{{ b.employee.role }}</span>
@@ -110,7 +110,7 @@
         @for (hire of recentlyJoined(); track hire.id) {
           <article class="hire">
             <div class="hire__top">
-              <span class="avatar avatar--primary">{{ hire.initials }}</span>
+              <span class="avatar avatar--primary">{{ hire.name | initials }}</span>
               <span class="hire__dept">{{ hire.department }}</span>
             </div>
             <div class="hire__name">{{ hire.name }}</div>
@@ -119,7 +119,7 @@
               <mat-icon class="material-symbols-outlined hire__icon">place</mat-icon>
               <span class="hire__location">{{ hire.location }}</span>
               <span class="hire__sep">·</span>
-              <span class="hire__days">{{ joinedDaysAgo(hire.joinedAt) }}d ago</span>
+              <span class="hire__days">{{ hire.joinedAt | timeAgo }}</span>
             </div>
           </article>
         }
@@ -141,7 +141,7 @@
           <th mat-header-cell *matHeaderCellDef>Hire</th>
           <td mat-cell *matCellDef="let row">
             <div class="onb-hire">
-              <span class="avatar avatar--sm">{{ row.initials }}</span>
+              <span class="avatar avatar--sm">{{ row.hire | initials }}</span>
               <span>{{ row.hire }}</span>
             </div>
           </td>

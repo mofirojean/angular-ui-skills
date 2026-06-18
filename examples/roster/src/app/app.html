@@ -75,7 +75,7 @@
 
     <div class="sidenav__foot">
       <button type="button" class="user-trigger" [matMenuTriggerFor]="userMenu" aria-label="User menu">
-        <span class="user-avatar">{{ user.initials }}</span>
+        <span class="user-avatar">{{ user.name | initials }}</span>
         <span class="user-meta">
           <span class="user-name">{{ user.name }}</span>
           <span class="user-role">{{ user.role }}</span>

@@ -42,6 +42,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 
+import { InitialsPipe } from 'ngx-transforms';
+
 import { Employee, MockDataService } from '../../core/mock-data.service';
 
 type StatusFilter = Employee['status'] | 'all';
@@ -80,6 +82,7 @@ interface DirectoryFilters {
     MatMenuModule,
     MatSlideToggleModule,
     ScrollingModule,
+    InitialsPipe,
   ],
   templateUrl: './people.html',
   styleUrl: './people.scss',

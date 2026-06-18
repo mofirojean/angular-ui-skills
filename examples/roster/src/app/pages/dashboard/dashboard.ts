@@ -12,6 +12,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 
+import { InitialsPipe, TimeAgoPipe } from 'ngx-transforms';
+
 import { MockDataService } from '../../core/mock-data.service';
 
 interface KpiTile {
@@ -36,6 +38,8 @@ interface KpiTile {
     MatTooltipModule,
     MatProgressSpinnerModule,
     MatDividerModule,
+    InitialsPipe,
+    TimeAgoPipe,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
@@ -72,16 +76,6 @@ export class Dashboard {
       case 'parental': return 'Parental';
       default:         return type;
     }
-  }
-
-  protected returnsInDays(returnsOn: Date): number {
-    const ms = returnsOn.getTime() - this.today.getTime();
-    return Math.max(0, Math.round(ms / 86_400_000));
-  }
-
-  protected joinedDaysAgo(joinedAt: Date): number {
-    const ms = this.today.getTime() - joinedAt.getTime();
-    return Math.max(0, Math.round(ms / 86_400_000));
   }
 
   protected birthdayLabel(days: number): string {
