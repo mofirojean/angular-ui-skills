@@ -268,7 +268,7 @@ export class People {
   protected onRowClick(row: Employee, event: MouseEvent): void {
     const target = event.target as HTMLElement;
     if (target.closest('button, mat-checkbox, .cell-actions, a')) return;
-    this.router.navigate(['/people', row.id]);
+    this.router.navigate(['/people', row.id]).then();
   }
 
   protected rowAction(action: string, row: Employee): void {
