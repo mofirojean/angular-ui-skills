@@ -3,12 +3,16 @@ import { Injectable, signal } from '@angular/core';
 import type {
   ActivityEvent,
   BirthdayEntry,
+  ChecklistItem,
   DashboardKpis,
   DocCategory,
   Employee,
   EmployeeProfile,
   EmployeeStatus,
   LeaveToday,
+  OnboardingChecklist,
+  OnboardingHire,
+  OnboardingStage,
   OnboardingTask,
   ProfileDoc,
   ReviewCycleSummary,
@@ -16,12 +20,11 @@ import type {
   SalaryReason,
 } from './model';
 
-// Re-export so existing `import { Employee, ... } from './core/mock-data.service'`
-// call sites keep working. New code should import shapes from `./model`.
 export type {
   ActivityEvent,
   ActivityKind,
   BirthdayEntry,
+  ChecklistItem,
   DashboardKpis,
   DocCategory,
   Employee,
@@ -30,6 +33,9 @@ export type {
   LeaveToday,
   NavItem,
   NavSection,
+  OnboardingChecklist,
+  OnboardingHire,
+  OnboardingStage,
   OnboardingTask,
   ProfileDoc,
   ReviewCycleSummary,
@@ -37,7 +43,6 @@ export type {
   SalaryReason,
 } from './model';
 
-// --- Source data --------------------------------------------------------------
 
 const FIRST = [
   'Aiko','Ines','Riley','Quinn','Marcus','Lena','Hana','Owen','Zara','Felix',
@@ -128,11 +133,8 @@ function daysFromNow(days: number, today = TODAY): Date {
   return d;
 }
 
-// Anchor everything to a fixed "today" so the data is deterministic.
 const TODAY = new Date(2026, 5, 18);
 
-// Pseudo-random but deterministic, used to spread join dates / review dates so
-// the table feels real without depending on `Math.random()`.
 function hash(n: number, salt: number): number {
   const x = Math.sin(n * 12.9898 + salt * 78.233) * 43758.5453;
   return x - Math.floor(x);
@@ -152,12 +154,10 @@ function buildEmployees(): Employee[] {
     const status: EmployeeStatus =
       i % 23 === 0 ? 'onboarding' : i % 17 === 0 ? 'on-leave' : 'active';
 
-    // Joined between ~7 years ago and 7 days ago. Onboarding hires are recent.
     const joinedDaysAgo = status === 'onboarding'
       ? Math.floor(hash(i, 1) * 25) + 1
       : Math.floor(hash(i, 2) * 2400) + 30;
 
-    // Last review: nullable, recent hires haven't been reviewed yet.
     const reviewedDaysAgo = joinedDaysAgo < 120
       ? null
       : Math.floor(hash(i, 3) * 540) + 14;
@@ -182,8 +182,6 @@ function buildEmployees(): Employee[] {
   }
   return out;
 }
-
-// --- Dashboard surfaces (still hand-curated for narrative tightness) ----------
 
 const RECENT_HIRES: ReadonlyArray<{ name: string; role: string; daysAgo: number; dept: string; team: string }> = [
   { name: 'Amelia Stone',  role: 'Senior Backend Engineer', daysAgo: 3,  dept: 'Engineering', team: 'Platform' },
@@ -220,7 +218,6 @@ const ONBOARDING_TASKS: ReadonlyArray<OnboardingTask> = [
   { id: 'ob-6', hire: 'Sasha Lin',    task: '1:1 cadence with reports',  stage: '30 days', dueIn: 6,  owner: 'Mofiro Jean' },
 ];
 
-// --- Service ------------------------------------------------------------------
 
 @Injectable({ providedIn: 'root' })
 export class MockDataService {
@@ -287,6 +284,48 @@ export class MockDataService {
   );
 
   readonly openOnboardingTasks = signal<readonly OnboardingTask[]>(ONBOARDING_TASKS);
+
+  readonly hires = signal<readonly OnboardingHire[]>(buildHires());
+
+  /** Move a hire to a different stage (CDK drop event handler in the kanban). */
+  moveHireToStage(hireId: string, stage: OnboardingStage): void {
+    this.hires.update((list) =>
+      list.map((h) => (h.id === hireId ? { ...h, stage } : h)),
+    );
+  }
+
+  /** Insert a freshly-built hire (called from the new-hire wizard). */
+  addHire(hire: OnboardingHire): void {
+    this.hires.update((list) => [hire, ...list]);
+  }
+
+  getHire(id: string): OnboardingHire | null {
+    return this.hires().find((h) => h.id === id) ?? null;
+  }
+
+  getChecklist(id: string): OnboardingChecklist | null {
+    const hire = this.getHire(id);
+    if (!hire) return null;
+    const overrides = this.checklistOverrides();
+    const items = buildChecklist(hire, overrides);
+    const completed = items.filter((i) => i.done).length;
+    return {
+      hire,
+      items,
+      completedCount: completed,
+      totalCount: items.length,
+      progressPct: items.length === 0 ? 0 : Math.round((completed / items.length) * 100),
+    };
+  }
+
+  toggleChecklistItem(hireId: string, itemId: string, done: boolean, note?: string): void {
+    this.checklistOverrides.update((m) => ({
+      ...m,
+      [`${hireId}/${itemId}`]: { done, note },
+    }));
+  }
+
+  readonly checklistOverrides = signal<Record<string, { done: boolean; note?: string }>>({});
 
   // --- Profile lookup --------------------------------------------------------
 
@@ -433,6 +472,106 @@ function buildDocuments(emp: Employee, seed: number): readonly ProfileDoc[] {
     })(),
     uploadedBy: i % 3 === 0 ? emp.name : (emp.manager ?? 'Mofiro Jean'),
   }));
+}
+
+// --- Onboarding builders -----------------------------------------------------
+
+const SEED_HIRES: ReadonlyArray<{
+  name: string;
+  role: string;
+  dept: string;
+  team: string;
+  manager: string;
+  location: string;
+  startInDays: number;
+  stage: OnboardingStage;
+}> = [
+  { name: 'Bram Cohen',     role: 'Senior Frontend Engineer', dept: 'Engineering', team: 'Web',          manager: 'Sasha Lin',     location: 'Remote, US',     startInDays: 14, stage: 'Offer' },
+  { name: 'Lila Walsh',     role: 'Account Executive',         dept: 'Sales',       team: 'AMER',         manager: 'Quinn Hayes',   location: 'New York',       startInDays: 21, stage: 'Offer' },
+  { name: 'Otis Singh',     role: 'Product Manager',           dept: 'Product',     team: 'Growth',       manager: 'Riley Chen',    location: 'San Francisco',  startInDays: 30, stage: 'Offer' },
+  { name: 'Anya Reyes',     role: 'Mobile Engineer',           dept: 'Engineering', team: 'Mobile',       manager: 'Sasha Lin',     location: 'Berlin',         startInDays: 10, stage: 'Setup' },
+  { name: 'Kai Berg',       role: 'Brand Designer',            dept: 'Design',      team: 'Brand',        manager: 'Aiko Tanaka',   location: 'London',         startInDays: 6,  stage: 'Setup' },
+  { name: 'Mira Okafor',    role: 'Sales Engineer',            dept: 'Sales',       team: 'EMEA',         manager: 'Quinn Hayes',   location: 'Remote, EU',     startInDays: 4,  stage: 'Setup' },
+  { name: 'Tess Mahmoud',   role: 'Recruiter',                 dept: 'People',      team: 'Recruiting',   manager: 'Mofiro Jean',   location: 'Singapore',      startInDays: 1,  stage: 'Day 1' },
+  { name: 'Yara Adler',     role: 'Financial Analyst',         dept: 'Finance',     team: 'FP&A',         manager: 'Owen Carter',   location: 'Toronto',        startInDays: 0,  stage: 'Day 1' },
+  { name: 'Xavi Holloway',  role: 'Software Engineer',         dept: 'Engineering', team: 'Platform',     manager: 'Sasha Lin',     location: 'Remote, US',     startInDays: 0,  stage: 'Day 1' },
+  { name: 'Wren Carter',    role: 'Lead Designer',             dept: 'Design',      team: 'Product Design', manager: 'Aiko Tanaka', location: 'San Francisco',  startInDays: -20, stage: '30 days' },
+  { name: 'Greta Pereira',  role: 'Content Lead',              dept: 'Marketing',   team: 'Content',      manager: 'Diego Brooks',  location: 'Remote, US',     startInDays: -24, stage: '30 days' },
+  { name: 'Cleo Cohen',     role: 'Senior Engineer',           dept: 'Engineering', team: 'Infra',        manager: 'Sasha Lin',     location: 'London',         startInDays: -28, stage: '30 days' },
+];
+
+function buildHires(): OnboardingHire[] {
+  return SEED_HIRES.map((h, i) => ({
+    id: `hire-${String(i + 1).padStart(3, '0')}`,
+    name: h.name,
+    role: h.role,
+    department: h.dept,
+    team: h.team,
+    manager: h.manager,
+    location: h.location,
+    startDate: daysFromNow(h.startInDays),
+    stage: h.stage,
+  }));
+}
+
+/** Items every new hire needs to complete, grouped by stage. */
+const CHECKLIST_TEMPLATE: ReadonlyArray<{
+  label: string;
+  stage: OnboardingStage;
+  owner: 'IT' | 'People' | 'Manager' | 'Hire';
+  dueOffsetDays: number;
+}> = [
+  // Offer stage, before start date
+  { label: 'Send signed offer letter',           stage: 'Offer',   owner: 'People',  dueOffsetDays: -14 },
+  { label: 'Background check complete',          stage: 'Offer',   owner: 'People',  dueOffsetDays: -10 },
+  { label: 'Equipment ordered',                  stage: 'Offer',   owner: 'IT',      dueOffsetDays: -7  },
+  // Setup, week before start
+  { label: 'Workstation prepared',               stage: 'Setup',   owner: 'IT',      dueOffsetDays: -3  },
+  { label: 'Accounts provisioned (SSO, GitHub, Slack)', stage: 'Setup', owner: 'IT', dueOffsetDays: -2 },
+  { label: 'Welcome packet sent',                stage: 'Setup',   owner: 'People',  dueOffsetDays: -1  },
+  // Day 1, the first day
+  { label: 'Office tour / remote-buddy intro',   stage: 'Day 1',   owner: 'Manager', dueOffsetDays: 0   },
+  { label: 'Team introductions',                 stage: 'Day 1',   owner: 'Manager', dueOffsetDays: 0   },
+  { label: 'Codebase / tools walkthrough',       stage: 'Day 1',   owner: 'Manager', dueOffsetDays: 1   },
+  // 30 days
+  { label: 'First 1:1 with manager',             stage: '30 days', owner: 'Manager', dueOffsetDays: 7   },
+  { label: 'Complete compliance training',       stage: '30 days', owner: 'Hire',    dueOffsetDays: 14  },
+  { label: 'Ship first PR / closed deal / shipped review', stage: '30 days', owner: 'Hire', dueOffsetDays: 30 },
+];
+
+function buildChecklist(
+  hire: OnboardingHire,
+  overrides: Record<string, { done: boolean; note?: string }>,
+): readonly ChecklistItem[] {
+  return CHECKLIST_TEMPLATE.map((t, i) => {
+    const id = `c-${i + 1}`;
+    const ownerName =
+      t.owner === 'IT' ? 'IT desk'
+      : t.owner === 'People' ? 'Mofiro Jean'
+      : t.owner === 'Manager' ? hire.manager
+      : hire.name;
+    const dueOn = new Date(hire.startDate);
+    dueOn.setDate(dueOn.getDate() + t.dueOffsetDays);
+    const ov = overrides[`${hire.id}/${id}`];
+    // Pre-mark earlier-stage tasks as done by default so the progress bar
+    // shows realistic forward momentum, the user can untick them.
+    const stageOrder: Record<OnboardingStage, number> = {
+      Offer: 0,
+      Setup: 1,
+      'Day 1': 2,
+      '30 days': 3,
+    };
+    const defaultDone = stageOrder[t.stage] < stageOrder[hire.stage];
+    return {
+      id,
+      label: t.label,
+      stage: t.stage,
+      owner: ownerName,
+      dueOn,
+      done: ov?.done ?? defaultDone,
+      note: ov?.note,
+    };
+  });
 }
 
 function buildActivity(emp: Employee, seed: number): readonly ActivityEvent[] {

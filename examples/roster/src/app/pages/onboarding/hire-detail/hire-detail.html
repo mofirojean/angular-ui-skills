@@ -1,0 +1,96 @@
+@if (checklist(); as c) {
+  <section class="hire">
+    <header class="hire__head">
+      <nav class="hire__crumb">
+        <a routerLink="/onboarding">Onboarding</a>
+        <mat-icon class="material-symbols-outlined">chevron_right</mat-icon>
+        <span>{{ c.hire.name }}</span>
+      </nav>
+
+      <div class="hire__identity">
+        <span class="avatar avatar--tertiary">{{ c.hire.name | initials }}</span>
+        <div class="hire__title-wrap">
+          <h2 class="hire__name">{{ c.hire.name }}</h2>
+          <p class="hire__role">
+            {{ c.hire.role }}
+            <span class="dot">·</span>
+            {{ c.hire.department }} · {{ c.hire.team }}
+            <span class="dot">·</span>
+            starts {{ c.hire.startDate | timeAgo }}
+          </p>
+        </div>
+
+        <span class="stage-pill stage-pill--{{ stageTone(c.hire.stage) }}">
+          <mat-icon class="material-symbols-outlined">{{ stageIcon(c.hire.stage) }}</mat-icon>
+          {{ c.hire.stage }}
+        </span>
+      </div>
+
+      <div class="hire__progress">
+        <div class="hire__progress-row">
+          <span class="hire__progress-label">Onboarding progress</span>
+          <span class="hire__progress-count">{{ c.completedCount }} / {{ c.totalCount }} tasks</span>
+        </div>
+        <mat-progress-bar mode="determinate" [value]="c.progressPct" />
+      </div>
+    </header>
+
+    <div class="checklist">
+      @for (group of groups(); track group.stage) {
+        <section class="group">
+          <header class="group__head" [attr.data-tone]="stageTone(group.stage)">
+            <span class="group__icon">
+              <mat-icon class="material-symbols-outlined">{{ stageIcon(group.stage) }}</mat-icon>
+            </span>
+            <h3 class="group__title">{{ group.stage }}</h3>
+            <span class="group__count">{{ group.items.length }} tasks</span>
+          </header>
+
+          <ul class="group__list">
+            @for (item of group.items; track item.id) {
+              <li class="task" [class.task--done]="item.done">
+                <mat-checkbox
+                  [checked]="item.done"
+                  (change)="toggle(item, $event.checked)"
+                  [attr.aria-label]="item.label"
+                />
+                <div class="task__meta">
+                  <span class="task__label">{{ item.label }}</span>
+                  <span class="task__sub">
+                    Due {{ item.dueOn | date: 'MMM d' }}
+                    <span class="dot">·</span>
+                    {{ item.owner }}
+                  </span>
+                  @if (item.note) {
+                    <p class="task__note">
+                      <mat-icon class="material-symbols-outlined">format_quote</mat-icon>
+                      {{ item.note }}
+                    </p>
+                  }
+                </div>
+                <button
+                  mat-icon-button
+                  [class.task__note-btn--active]="!!item.note"
+                  matTooltip="Add or edit note"
+                  (click)="openNote(item)"
+                  aria-label="Open note"
+                >
+                  <mat-icon class="material-symbols-outlined">sticky_note_2</mat-icon>
+                </button>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
+  </section>
+} @else {
+  <section class="missing">
+    <mat-icon class="material-symbols-outlined">person_off</mat-icon>
+    <h2>No hire with id "{{ id() }}"</h2>
+    <a mat-stroked-button routerLink="/onboarding">
+      <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+      Back to pipeline
+    </a>
+  </section>
+}

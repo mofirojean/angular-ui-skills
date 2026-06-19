@@ -53,13 +53,47 @@ export interface BirthdayEntry {
   readonly daysAway: number;
 }
 
+export type OnboardingStage = 'Offer' | 'Setup' | 'Day 1' | '30 days';
+
 export interface OnboardingTask {
   readonly id: string;
   readonly hire: string;
   readonly task: string;
-  readonly stage: 'Offer' | 'Setup' | 'Day 1' | '30 days';
+  readonly stage: OnboardingStage;
   readonly dueIn: number;
   readonly owner: string;
+}
+
+// --- Onboarding pipeline -----------------------------------------------------
+
+export interface OnboardingHire {
+  readonly id: string;
+  readonly name: string;
+  readonly role: string;
+  readonly department: string;
+  readonly team: string;
+  readonly manager: string;
+  readonly location: string;
+  readonly startDate: Date;
+  readonly stage: OnboardingStage;
+}
+
+export interface ChecklistItem {
+  readonly id: string;
+  readonly label: string;
+  readonly stage: OnboardingStage;
+  readonly owner: string;
+  readonly dueOn: Date;
+  readonly done: boolean;
+  readonly note?: string;
+}
+
+export interface OnboardingChecklist {
+  readonly hire: OnboardingHire;
+  readonly items: readonly ChecklistItem[];
+  readonly completedCount: number;
+  readonly totalCount: number;
+  readonly progressPct: number;
 }
 
 export interface DashboardKpis {

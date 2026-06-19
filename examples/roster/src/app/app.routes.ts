@@ -28,6 +28,18 @@ export const routes: Routes = [
     title: 'Onboarding, Roster',
   },
   {
+    path: 'onboarding/new',
+    loadComponent: () =>
+      import('./pages/onboarding/new-hire/new-hire').then((m) => m.NewHire),
+    title: 'New hire, Roster',
+  },
+  {
+    path: 'onboarding/:id',
+    loadComponent: () =>
+      import('./pages/onboarding/hire-detail/hire-detail').then((m) => m.HireDetail),
+    title: 'Onboarding checklist, Roster',
+  },
+  {
     path: 'time-off',
     loadComponent: () =>
       import('./pages/time-off/time-off').then((m) => m.TimeOff),

@@ -1,0 +1,87 @@
+<section class="onb">
+  <header class="onb__head">
+    <div>
+      <h2 class="onb__title">Onboarding pipeline</h2>
+      <p class="onb__sub">
+        {{ hires().length }} new hires across the pipeline. Drag cards between
+        columns to update stage.
+      </p>
+    </div>
+    <a mat-flat-button routerLink="/onboarding/new" class="onb__new">
+      <mat-icon class="material-symbols-outlined">person_add</mat-icon>
+      Start new hire
+    </a>
+  </header>
+
+  <div class="board" cdkDropListGroup>
+    @for (col of columns; track col.stage) {
+      <div class="column" [attr.data-tone]="col.tone">
+        <div class="column__head">
+          <div class="column__title-row">
+            <span class="column__icon">
+              <mat-icon class="material-symbols-outlined">{{ stageMeta(col.stage).icon }}</mat-icon>
+            </span>
+            <div>
+              <h3 class="column__title">{{ col.label }}</h3>
+              <p class="column__sub">{{ stageMeta(col.stage).tip }}</p>
+            </div>
+            <span class="column__count">{{ hiresInStage(col.stage)().length }}</span>
+          </div>
+        </div>
+
+        <div
+          class="column__drop"
+          cdkDropList
+          [cdkDropListData]="col.stage"
+          (cdkDropListDropped)="onDrop($event)"
+        >
+          @for (hire of hiresInStage(col.stage)(); track hire.id) {
+            <article
+              class="hire-card"
+              cdkDrag
+              [cdkDragData]="hire"
+              [routerLink]="['/onboarding', hire.id]"
+            >
+              <div class="hire-card__preview" *cdkDragPreview>
+                <span class="avatar avatar--tertiary">{{ hire.name | initials }}</span>
+                <div>
+                  <strong>{{ hire.name }}</strong>
+                  <div class="hire-card__role">{{ hire.role }}</div>
+                </div>
+              </div>
+
+              <div class="hire-card__top">
+                <span class="avatar avatar--tertiary">{{ hire.name | initials }}</span>
+                <div class="hire-card__meta">
+                  <span class="hire-card__name">{{ hire.name }}</span>
+                  <span class="hire-card__role">{{ hire.role }}</span>
+                </div>
+                <button
+                  mat-icon-button
+                  class="hire-card__grip"
+                  matTooltip="Drag to move"
+                  tabindex="-1"
+                  (click)="$event.stopPropagation(); $event.preventDefault()"
+                >
+                  <mat-icon class="material-symbols-outlined">drag_indicator</mat-icon>
+                </button>
+              </div>
+
+              <div class="hire-card__foot">
+                <span class="hire-card__dept">{{ hire.department }} · {{ hire.team }}</span>
+                <span class="hire-card__date">
+                  <mat-icon class="material-symbols-outlined">event</mat-icon>
+                  {{ hire.startDate | date: 'MMM d' }}
+                  <span class="dot">·</span>
+                  starts {{ hire.startDate | timeAgo }}
+                </span>
+              </div>
+            </article>
+          } @empty {
+            <div class="column__empty">Drop a hire here</div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</section>

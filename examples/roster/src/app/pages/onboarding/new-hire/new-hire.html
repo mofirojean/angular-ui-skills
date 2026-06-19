@@ -1,0 +1,235 @@
+<section class="wizard">
+  <header class="wizard__head">
+    <a routerLink="/onboarding" class="wizard__back" matTooltip="Back to pipeline">
+      <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+    </a>
+    <div>
+      <h2 class="wizard__title">Start a new hire</h2>
+      <p class="wizard__sub">Four steps. Submit kicks off the onboarding pipeline.</p>
+    </div>
+  </header>
+
+  <mat-stepper linear class="wizard__stepper">
+    <!-- Step 1: Candidate -->
+    <mat-step [stepControl]="candidate" label="Candidate">
+      <form [formGroup]="candidate" class="step-form">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Full name</mat-label>
+          <input matInput formControlName="name" placeholder="e.g. Jamie Rivera" />
+          @if (candidate.controls.name.hasError('required') && candidate.controls.name.touched) {
+            <mat-error>Name is required.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="name@example.com" />
+          @if (candidate.controls.email.hasError('email') && candidate.controls.email.touched) {
+            <mat-error>Invalid email format.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="span-2">
+          <mat-label>Role</mat-label>
+          <input matInput formControlName="role" [matAutocomplete]="roleAuto" placeholder="Search a role," />
+          <mat-autocomplete #roleAuto="matAutocomplete" autoActiveFirstOption>
+            @for (r of roleSuggestions(); track r) {
+              <mat-option [value]="r">{{ r }}</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Start date</mat-label>
+          <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
+          <mat-datepicker-toggle matIconSuffix [for]="startPicker" />
+          <mat-datepicker #startPicker />
+        </mat-form-field>
+      </form>
+      <div class="step-actions">
+        <button mat-flat-button matStepperNext class="next-btn">
+          Next
+          <mat-icon class="material-symbols-outlined" iconPositionEnd>arrow_forward</mat-icon>
+        </button>
+      </div>
+    </mat-step>
+
+    <!-- Step 2: Team -->
+    <mat-step [stepControl]="team" label="Team">
+      <form [formGroup]="team" class="step-form">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Department</mat-label>
+          <mat-select formControlName="department">
+            @for (d of departments; track d) {
+              <mat-option [value]="d">{{ d }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Manager</mat-label>
+          <input matInput formControlName="manager" [matAutocomplete]="mgrAuto" placeholder="Reports to," />
+          <mat-autocomplete #mgrAuto="matAutocomplete" autoActiveFirstOption>
+            @for (m of managerSuggestions(); track m) {
+              <mat-option [value]="m">{{ m }}</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Location</mat-label>
+          <mat-select formControlName="location">
+            @for (loc of locations; track loc) {
+              <mat-option [value]="loc">{{ loc }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <div class="radio-group">
+          <span class="radio-group__label">Employment type</span>
+          <mat-radio-group formControlName="employmentType">
+            <mat-radio-button value="full-time">Full-time</mat-radio-button>
+            <mat-radio-button value="contract">Contract</mat-radio-button>
+            <mat-radio-button value="intern">Intern</mat-radio-button>
+          </mat-radio-group>
+        </div>
+      </form>
+      <div class="step-actions">
+        <button mat-button matStepperPrevious>
+          <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+          Back
+        </button>
+        <button mat-flat-button matStepperNext class="next-btn">
+          Next
+          <mat-icon class="material-symbols-outlined" iconPositionEnd>arrow_forward</mat-icon>
+        </button>
+      </div>
+    </mat-step>
+
+    <!-- Step 3: Equipment -->
+    <mat-step [stepControl]="equipment" label="Equipment">
+      <form [formGroup]="equipment" class="step-form">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Laptop model</mat-label>
+          <mat-select formControlName="laptop">
+            @for (l of laptops; track l) {
+              <mat-option [value]="l">{{ l }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="span-2">
+          <mat-label>Accessories kit</mat-label>
+          <mat-chip-grid #chipGrid aria-label="Accessory kit">
+            @for (item of equipment.controls.accessories.value; track item) {
+              <mat-chip-row (removed)="removeAccessory(item)">
+                {{ item }}
+                <button matChipRemove aria-label="Remove">
+                  <mat-icon class="material-symbols-outlined">close</mat-icon>
+                </button>
+              </mat-chip-row>
+            }
+          </mat-chip-grid>
+          <input
+            placeholder="Add accessory and press Enter,"
+            [matChipInputFor]="chipGrid"
+            [matChipInputSeparatorKeyCodes]="chipSeparators"
+            (matChipInputTokenEnd)="addAccessory($event)"
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="span-2">
+          <mat-label>Shipping address</mat-label>
+          <textarea matInput rows="3" formControlName="shippingAddress" placeholder="Street, city, postal code,"></textarea>
+        </mat-form-field>
+      </form>
+      <div class="step-actions">
+        <button mat-button matStepperPrevious>
+          <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+          Back
+        </button>
+        <button mat-flat-button matStepperNext class="next-btn">
+          Review
+          <mat-icon class="material-symbols-outlined" iconPositionEnd>arrow_forward</mat-icon>
+        </button>
+      </div>
+    </mat-step>
+
+    <!-- Step 4: Review -->
+    <mat-step [stepControl]="confirm" label="Review">
+      <div class="review">
+        <h3 class="review__title">Review and confirm</h3>
+        <div class="review__grid">
+          <mat-card appearance="outlined" class="review__card">
+            <h4 class="review__cardtitle">Candidate</h4>
+            <dl>
+              <dt>Name</dt><dd>{{ candidate.value.name || ',' }}</dd>
+              <dt>Email</dt><dd>{{ candidate.value.email || ',' }}</dd>
+              <dt>Role</dt><dd>{{ candidate.value.role || ',' }}</dd>
+              <dt>Start date</dt>
+              <dd>
+                @if (candidate.value.startDate) {
+                  {{ candidate.value.startDate | date: 'EEEE, MMM d, y' }}
+                } @else {
+                  ,
+                }
+              </dd>
+            </dl>
+          </mat-card>
+
+          <mat-card appearance="outlined" class="review__card">
+            <h4 class="review__cardtitle">Team</h4>
+            <dl>
+              <dt>Department</dt><dd>{{ team.value.department || ',' }}</dd>
+              <dt>Manager</dt><dd>{{ team.value.manager || ',' }}</dd>
+              <dt>Location</dt><dd>{{ team.value.location || ',' }}</dd>
+              <dt>Employment</dt><dd>{{ employmentLabel(team.value.employmentType ?? 'full-time') }}</dd>
+            </dl>
+          </mat-card>
+
+          <mat-card appearance="outlined" class="review__card span-2">
+            <h4 class="review__cardtitle">Equipment</h4>
+            <dl>
+              <dt>Laptop</dt><dd>{{ equipment.value.laptop || ',' }}</dd>
+              <dt>Accessories</dt>
+              <dd>
+                @if (equipment.value.accessories && equipment.value.accessories.length > 0) {
+                  <span class="kit">
+                    @for (item of equipment.value.accessories; track item) {
+                      <span class="kit__chip">{{ item }}</span>
+                    }
+                  </span>
+                } @else {
+                  None
+                }
+              </dd>
+              <dt>Shipping</dt><dd>{{ equipment.value.shippingAddress || ',' }}</dd>
+            </dl>
+          </mat-card>
+        </div>
+
+        <form [formGroup]="confirm" class="review__confirm">
+          <mat-checkbox formControlName="acknowledged">
+            I've reviewed everything, kick off onboarding.
+          </mat-checkbox>
+        </form>
+      </div>
+
+      <div class="step-actions">
+        <button mat-button matStepperPrevious>
+          <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+          Back
+        </button>
+        <button
+          mat-flat-button
+          class="next-btn"
+          [disabled]="confirm.invalid || submitting()"
+          (click)="submit()"
+        >
+          <mat-icon class="material-symbols-outlined">check</mat-icon>
+          Start onboarding
+        </button>
+      </div>
+    </mat-step>
+  </mat-stepper>
+</section>

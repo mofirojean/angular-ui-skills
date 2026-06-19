@@ -1,0 +1,193 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.wizard {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  box-sizing: border-box;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.wizard__head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.wizard__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--mat-sys-surface-container-high);
+  color: var(--mat-sys-on-surface);
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: background 120ms ease;
+}
+
+.wizard__back:hover {
+  background: var(--mat-sys-surface-container-highest);
+}
+
+.wizard__title {
+  margin: 0;
+  font: var(--mat-sys-title-large);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.wizard__sub {
+  margin: 4px 0 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}
+
+.wizard__stepper {
+  background: transparent;
+  --mat-stepper-container-color: transparent;
+}
+
+/* --- Form layout per step --- */
+
+.step-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+  padding-top: 8px;
+}
+
+.step-form mat-form-field {
+  width: 100%;
+}
+
+.span-2 {
+  grid-column: 1 / -1;
+}
+
+.radio-group {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.radio-group__label {
+  font: var(--mat-sys-label-large);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.radio-group mat-radio-group {
+  display: inline-flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.step-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 18px;
+}
+
+.next-btn {
+  --mat-flat-button-container-color: color-mix(
+    in srgb,
+    var(--mat-sys-primary) 16%,
+    var(--mat-sys-surface-container-high)
+  );
+  --mat-flat-button-foreground-color: var(--mat-sys-on-surface);
+  --mat-flat-button-icon-color: var(--mat-sys-on-surface);
+}
+
+/* --- Review step --- */
+
+.review {
+  padding-top: 8px;
+}
+
+.review__title {
+  margin: 0 0 12px;
+  font: var(--mat-sys-title-small);
+  font-weight: 600;
+  color: var(--mat-sys-on-surface);
+}
+
+.review__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.review__card {
+  padding: 14px 16px !important;
+}
+
+.review__cardtitle {
+  margin: 0 0 8px;
+  font: var(--mat-sys-label-large);
+  color: var(--mat-sys-on-surface-variant);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.review__card dl {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 6px 14px;
+  margin: 0;
+}
+
+.review__card dt {
+  font: var(--mat-sys-label-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.review__card dd {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface);
+}
+
+.kit {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.kit__chip {
+  display: inline-flex;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--mat-sys-tertiary) 14%, var(--mat-sys-surface-container-high));
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-label-small);
+  font-weight: 600;
+}
+
+.review__confirm {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px dashed var(--mat-sys-outline-variant);
+  border-radius: 10px;
+  background: var(--mat-sys-surface);
+}
+
+@media (max-width: 900px) {
+  .step-form,
+  .review__grid {
+    grid-template-columns: 1fr;
+  }
+  .span-2 {
+    grid-column: 1;
+  }
+}
