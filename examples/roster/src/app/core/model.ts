@@ -109,6 +109,43 @@ export interface DashboardKpis {
   };
 }
 
+// --- Time off ----------------------------------------------------------------
+
+export type LeaveType = 'vacation' | 'sick' | 'personal' | 'parental';
+export type TimeOffStatus = 'pending' | 'approved' | 'rejected';
+
+export interface TimeOffRequest {
+  readonly id: string;
+  readonly employeeId: string;
+  readonly employeeName: string;
+  readonly employeeRole: string;
+  readonly department: string;
+  readonly type: LeaveType;
+  readonly startDate: Date;
+  readonly endDate: Date;
+  readonly days: number;
+  readonly reason: string;
+  readonly status: TimeOffStatus;
+  readonly requestedAt: Date;
+  readonly reviewedAt: Date | null;
+  readonly reviewer: string | null;
+}
+
+export interface LeaveBalanceLine {
+  readonly type: LeaveType;
+  readonly used: number;
+  readonly total: number;
+  readonly accrualPerMonth: number;
+}
+
+export interface LeaveBalance {
+  readonly employeeId: string;
+  readonly employeeName: string;
+  readonly employeeRole: string;
+  readonly department: string;
+  readonly lines: readonly LeaveBalanceLine[];
+}
+
 // --- Profile surfaces --------------------------------------------------------
 
 export type SalaryReason = 'Hire' | 'Annual increase' | 'Promotion' | 'Adjustment';

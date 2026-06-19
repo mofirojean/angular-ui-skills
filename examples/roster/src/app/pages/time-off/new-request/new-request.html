@@ -1,0 +1,79 @@
+<section class="new-req">
+  <header class="new-req__head">
+    <a routerLink="/time-off" class="new-req__back" matTooltip="Back to time off">
+      <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+    </a>
+    <div>
+      <h2 class="new-req__title">New time-off request</h2>
+      <p class="new-req__sub">Submit a leave request on behalf of an employee.</p>
+    </div>
+  </header>
+
+  <mat-card appearance="outlined" class="new-req__card">
+    <form [formGroup]="form" class="form" (ngSubmit)="submit()">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Employee</mat-label>
+        <input
+          matInput
+          [formControl]="employeeQuery"
+          [matAutocomplete]="empAuto"
+          placeholder="Search by name or role,"
+          autocomplete="off"
+        />
+        <mat-autocomplete
+          #empAuto="matAutocomplete"
+          autoActiveFirstOption
+          [displayWith]="employeeLabel"
+          (optionSelected)="pickEmployee($event.option.value)"
+        >
+          @for (s of employeeSuggestions(); track s.id) {
+            <mat-option [value]="s">
+              <div class="emp-opt">
+                <span class="avatar">{{ s.name | initials }}</span>
+                <span class="emp-opt__meta">
+                  <span class="emp-opt__name">{{ s.name }}</span>
+                  <span class="emp-opt__role">{{ s.role }}, {{ s.department }}</span>
+                </span>
+              </div>
+            </mat-option>
+          }
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <div class="row">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Type</mat-label>
+          <mat-select formControlName="type">
+            <mat-option value="vacation">Vacation</mat-option>
+            <mat-option value="sick">Sick</mat-option>
+            <mat-option value="personal">Personal</mat-option>
+            <mat-option value="parental">Parental</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Date range</mat-label>
+          <mat-date-range-input [rangePicker]="rangePicker">
+            <input matStartDate formControlName="start" placeholder="From" />
+            <input matEndDate formControlName="end" placeholder="To" />
+          </mat-date-range-input>
+          <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
+          <mat-date-range-picker #rangePicker></mat-date-range-picker>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Reason</mat-label>
+        <textarea matInput rows="3" formControlName="reason" placeholder="Briefly, what's the leave for?"></textarea>
+      </mat-form-field>
+
+      <div class="actions">
+        <a mat-button routerLink="/time-off">Cancel</a>
+        <button mat-flat-button class="save-btn" type="submit" [disabled]="form.invalid">
+          <mat-icon class="material-symbols-outlined">check</mat-icon>
+          Submit request
+        </button>
+      </div>
+    </form>
+  </mat-card>
+</section>

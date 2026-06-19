@@ -9,7 +9,10 @@ import type {
   Employee,
   EmployeeProfile,
   EmployeeStatus,
+  LeaveBalance,
+  LeaveBalanceLine,
   LeaveToday,
+  LeaveType,
   OnboardingChecklist,
   OnboardingHire,
   OnboardingStage,
@@ -18,6 +21,8 @@ import type {
   ReviewCycleSummary,
   SalaryEntry,
   SalaryReason,
+  TimeOffRequest,
+  TimeOffStatus,
 } from './model';
 
 export type {
@@ -30,7 +35,10 @@ export type {
   Employee,
   EmployeeProfile,
   EmployeeStatus,
+  LeaveBalance,
+  LeaveBalanceLine,
   LeaveToday,
+  LeaveType,
   NavItem,
   NavSection,
   OnboardingChecklist,
@@ -41,6 +49,8 @@ export type {
   ReviewCycleSummary,
   SalaryEntry,
   SalaryReason,
+  TimeOffRequest,
+  TimeOffStatus,
 } from './model';
 
 
@@ -287,6 +297,43 @@ export class MockDataService {
 
   readonly hires = signal<readonly OnboardingHire[]>(buildHires());
 
+  // --- Time off --------------------------------------------------------------
+
+  readonly timeOffRequests = signal<readonly TimeOffRequest[]>(buildTimeOffRequests(this.employees()));
+  readonly leaveBalances = signal<readonly LeaveBalance[]>(buildLeaveBalances(this.employees()));
+
+  setRequestStatus(id: string, status: TimeOffStatus): TimeOffStatus | null {
+    let previous: TimeOffStatus | null = null;
+    this.timeOffRequests.update((list) =>
+      list.map((r) => {
+        if (r.id !== id) return r;
+        previous = r.status;
+        return {
+          ...r,
+          status,
+          reviewedAt: status === 'pending' ? null : daysFromNow(0),
+          reviewer: status === 'pending' ? null : 'Mofiro Jean',
+        };
+      }),
+    );
+    return previous;
+  }
+
+  addTimeOffRequest(req: Omit<TimeOffRequest, 'id' | 'requestedAt' | 'status' | 'reviewedAt' | 'reviewer' | 'days'>): void {
+    const days =
+      Math.round((req.endDate.getTime() - req.startDate.getTime()) / 86_400_000) + 1;
+    const full: TimeOffRequest = {
+      ...req,
+      id: `to-${Date.parse(req.startDate.toISOString())}-${req.employeeId}`,
+      days,
+      status: 'pending',
+      requestedAt: daysFromNow(0),
+      reviewedAt: null,
+      reviewer: null,
+    };
+    this.timeOffRequests.update((list) => [full, ...list]);
+  }
+
   /** Move a hire to a different stage (CDK drop event handler in the kanban). */
   moveHireToStage(hireId: string, stage: OnboardingStage): void {
     this.hires.update((list) =>
@@ -472,6 +519,113 @@ function buildDocuments(emp: Employee, seed: number): readonly ProfileDoc[] {
     })(),
     uploadedBy: i % 3 === 0 ? emp.name : (emp.manager ?? 'Mofiro Jean'),
   }));
+}
+
+// --- Time off builders -------------------------------------------------------
+
+const LEAVE_TYPES: readonly LeaveType[] = ['vacation', 'sick', 'personal', 'parental'];
+
+const REASON_BANK: Record<LeaveType, readonly string[]> = {
+  vacation: [
+    'Family trip to Lisbon',
+    'Wedding in upstate New York',
+    'Off-grid backpacking week',
+    'Annual visit home',
+    'Conference + extension',
+  ],
+  sick: [
+    'Flu, doctor visit',
+    'Migraine, recovery',
+    'Recovering from minor surgery',
+    'Stomach bug',
+  ],
+  personal: [
+    'Moving day',
+    'Family emergency',
+    'Court appearance',
+    'Religious holiday',
+  ],
+  parental: [
+    'Maternity leave',
+    'Paternity leave',
+    'Adoption leave',
+  ],
+};
+
+function buildTimeOffRequests(employees: readonly Employee[]): readonly TimeOffRequest[] {
+  if (employees.length === 0) return [];
+  const out: TimeOffRequest[] = [];
+  // Pull a deterministic slice of employees so the same fleet always shows up
+  // in the table across re-renders.
+  for (let i = 0; i < 30; i++) {
+    const emp = employees[(i * 17) % employees.length];
+    const type = LEAVE_TYPES[Math.floor(hash(i, 100) * LEAVE_TYPES.length)];
+    const startOffset = Math.floor(hash(i, 101) * 90) - 30; // -30..+60 days from today
+    const duration = type === 'parental'
+      ? 30 + Math.floor(hash(i, 102) * 60)
+      : 1 + Math.floor(hash(i, 103) * 9);
+    const start = daysFromNow(startOffset);
+    const end = daysFromNow(startOffset + duration - 1);
+    const status: TimeOffStatus =
+      i % 5 === 0 ? 'pending'
+      : i % 7 === 0 ? 'rejected'
+      : 'approved';
+    const reasonPool = REASON_BANK[type];
+    const reason = reasonPool[Math.floor(hash(i, 104) * reasonPool.length)];
+    out.push({
+      id: `to-${String(i + 1).padStart(3, '0')}`,
+      employeeId: emp.id,
+      employeeName: emp.name,
+      employeeRole: emp.role,
+      department: emp.department,
+      type,
+      startDate: start,
+      endDate: end,
+      days: duration,
+      reason,
+      status,
+      requestedAt: daysFromNow(startOffset - 7 - Math.floor(hash(i, 105) * 14)),
+      reviewedAt: status === 'pending' ? null : daysFromNow(startOffset - Math.floor(hash(i, 106) * 5)),
+      reviewer: status === 'pending' ? null : emp.manager ?? 'Mofiro Jean',
+    });
+  }
+  // Newest first.
+  return out.sort((a, b) => b.requestedAt.getTime() - a.requestedAt.getTime());
+}
+
+function buildLeaveBalances(employees: readonly Employee[]): readonly LeaveBalance[] {
+  if (employees.length === 0) return [];
+  // Show balances for the top 12 employees, plenty for the cards grid.
+  const slice = employees.slice(0, 12);
+  return slice.map((emp, i) => {
+    const lines: LeaveBalanceLine[] = [
+      {
+        type: 'vacation',
+        used: Math.floor(hash(i, 200) * 14),
+        total: 25,
+        accrualPerMonth: 2.08,
+      },
+      {
+        type: 'sick',
+        used: Math.floor(hash(i, 201) * 5),
+        total: 10,
+        accrualPerMonth: 0.83,
+      },
+      {
+        type: 'personal',
+        used: Math.floor(hash(i, 202) * 3),
+        total: 5,
+        accrualPerMonth: 0.42,
+      },
+    ];
+    return {
+      employeeId: emp.id,
+      employeeName: emp.name,
+      employeeRole: emp.role,
+      department: emp.department,
+      lines,
+    };
+  });
 }
 
 // --- Onboarding builders -----------------------------------------------------

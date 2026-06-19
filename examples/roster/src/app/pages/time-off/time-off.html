@@ -1,0 +1,243 @@
+<section class="too">
+  <header class="too__head">
+    <div>
+      <h2 class="too__title">Time off</h2>
+      <p class="too__sub">
+        {{ requests().length }} total requests
+        @if (pendingCount() > 0) {
+          <span class="too__sub-strong">· {{ pendingCount() }} pending review</span>
+        }
+      </p>
+    </div>
+  </header>
+
+  <mat-tab-group class="too__tabs" mat-align-tabs="start" mat-stretch-tabs="false">
+    <!-- ============================ CALENDAR =========================== -->
+    <mat-tab label="Calendar">
+      <div class="tab-body">
+        <div class="cal__head">
+          <button mat-icon-button (click)="stepMonth(-1)" matTooltip="Previous month" aria-label="Previous month">
+            <mat-icon class="material-symbols-outlined">chevron_left</mat-icon>
+          </button>
+          <h3 class="cal__title">{{ monthLabel() }}</h3>
+          <button mat-icon-button (click)="stepMonth(1)" matTooltip="Next month" aria-label="Next month">
+            <mat-icon class="material-symbols-outlined">chevron_right</mat-icon>
+          </button>
+          <span class="cal__legend">
+            <span class="legend-dot legend-dot--vacation"></span> Vacation
+            <span class="legend-dot legend-dot--sick"></span> Sick
+            <span class="legend-dot legend-dot--personal"></span> Personal
+            <span class="legend-dot legend-dot--parental"></span> Parental
+          </span>
+        </div>
+
+        <div class="cal">
+          <div class="cal__weekdays">
+            <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+          </div>
+          <div class="cal__grid">
+            @for (cell of monthCells(); track cell.key) {
+              <button
+                type="button"
+                class="cal__cell"
+                [class.cal__cell--out]="!cell.inMonth"
+                [class.cal__cell--today]="isToday(cell.date)"
+                [class.cal__cell--clickable]="leaveForDay(cell.key).length > 0"
+                (click)="openDay(cell.key, cell.date)"
+              >
+                <span class="cal__date">{{ cell.date.getDate() }}</span>
+                @let entries = leaveForDay(cell.key);
+                @if (entries.length > 0) {
+                  <div class="cal__chips">
+                    @for (e of entries.slice(0, 3); track e.id) {
+                      <span class="cal__chip cal__chip--{{ e.type }}" [matTooltip]="e.employeeName + ', ' + typeLabel(e.type)">
+                        {{ e.employeeName | initials }}
+                      </span>
+                    }
+                    @if (entries.length > 3) {
+                      <span class="cal__more">+{{ entries.length - 3 }}</span>
+                    }
+                  </div>
+                }
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- ============================ REQUESTS =========================== -->
+    <mat-tab label="Requests">
+      <div class="tab-body">
+        <div class="req__toolbar">
+          <mat-button-toggle-group
+            [value]="statusFilter()"
+            (change)="setStatusFilter($event.value)"
+            hideSingleSelectionIndicator
+            class="req__filter"
+          >
+            <mat-button-toggle value="all">All</mat-button-toggle>
+            <mat-button-toggle value="pending">Pending</mat-button-toggle>
+            <mat-button-toggle value="approved">Approved</mat-button-toggle>
+            <mat-button-toggle value="rejected">Rejected</mat-button-toggle>
+          </mat-button-toggle-group>
+          <p class="req__count">
+            Showing {{ filteredRequests().length }} of {{ requests().length }}
+          </p>
+        </div>
+
+        <mat-card appearance="outlined" class="surface">
+          <div class="table-wrap">
+            <table mat-table [dataSource]="filteredRequests()" class="req-table">
+              <ng-container matColumnDef="employee">
+                <th mat-header-cell *matHeaderCellDef>Employee</th>
+                <td mat-cell *matCellDef="let row">
+                  <div class="cell-employee">
+                    <span class="avatar avatar--tertiary">{{ row.employeeName | initials }}</span>
+                    <div>
+                      <div class="cell-employee__name">{{ row.employeeName }}</div>
+                      <div class="cell-employee__role">{{ row.employeeRole }}</div>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef>Type</th>
+                <td mat-cell *matCellDef="let row">
+                  <span class="leave-pill leave-pill--{{ row.type }}">{{ typeLabel(row.type) }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="dates">
+                <th mat-header-cell *matHeaderCellDef>Dates</th>
+                <td mat-cell *matCellDef="let row">
+                  {{ row.startDate | date: 'MMM d' }} – {{ row.endDate | date: 'MMM d, y' }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="days">
+                <th mat-header-cell *matHeaderCellDef>Days</th>
+                <td mat-cell *matCellDef="let row" class="num">{{ row.days }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="reason">
+                <th mat-header-cell *matHeaderCellDef>Reason</th>
+                <td mat-cell *matCellDef="let row" class="reason">{{ row.reason }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="requested">
+                <th mat-header-cell *matHeaderCellDef>Requested</th>
+                <td mat-cell *matCellDef="let row">{{ row.requestedAt | date: 'MMM d' }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let row">
+                  <span class="status-pill status-pill--{{ row.status }}">
+                    {{ statusLabel(row.status) }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let row" class="actions-cell">
+                  <button
+                    mat-icon-button
+                    [matMenuTriggerFor]="rowMenu"
+                    aria-label="Request actions"
+                    matTooltip="More"
+                  >
+                    <mat-icon class="material-symbols-outlined">more_vert</mat-icon>
+                  </button>
+                  <mat-menu #rowMenu="matMenu">
+                    <button
+                      mat-menu-item
+                      [disabled]="row.status === 'approved'"
+                      (click)="approveRequest(row)"
+                    >
+                      <mat-icon class="material-symbols-outlined menu-positive">check_circle</mat-icon>
+                      <span>Approve</span>
+                    </button>
+                    <button
+                      mat-menu-item
+                      [disabled]="row.status === 'rejected'"
+                      (click)="rejectRequest(row)"
+                    >
+                      <mat-icon class="material-symbols-outlined menu-negative">cancel</mat-icon>
+                      <span>Reject</span>
+                    </button>
+                  </mat-menu>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="requestCols; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: requestCols"></tr>
+
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell empty-row" [attr.colspan]="requestCols.length">
+                  <mat-icon class="material-symbols-outlined">filter_alt_off</mat-icon>
+                  <span>No requests match this filter.</span>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- ============================ BALANCES =========================== -->
+    <mat-tab label="Balances">
+      <div class="tab-body">
+        <div class="bal__grid">
+          @for (b of balances(); track b.employeeId) {
+            <mat-card appearance="outlined" class="bal__card">
+              <header class="bal__head">
+                <span class="avatar avatar--tertiary">{{ b.employeeName | initials }}</span>
+                <div class="bal__meta">
+                  <span class="bal__name">{{ b.employeeName }}</span>
+                  <span class="bal__role">{{ b.employeeRole }} · {{ b.department }}</span>
+                </div>
+              </header>
+              <div class="bal__lines">
+                @for (line of b.lines; track line.type) {
+                  @let remaining = line.total - line.used;
+                  <div
+                    class="bal__line"
+                    [matTooltip]="'Accrues ' + line.accrualPerMonth + ' days/mo'"
+                  >
+                    <div class="bal__line-row">
+                      <span class="bal__line-label">{{ typeLabel(line.type) }}</span>
+                      <span class="bal__line-numbers">
+                        <strong>{{ remaining }}</strong>
+                        <span class="bal__line-total">/ {{ line.total }}</span>
+                      </span>
+                    </div>
+                    <mat-progress-bar
+                      mode="determinate"
+                      [value]="(line.used / line.total) * 100"
+                      class="bal__bar bal__bar--{{ line.type }}"
+                    />
+                  </div>
+                }
+              </div>
+            </mat-card>
+          }
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+  <a
+    mat-fab
+    extended
+    routerLink="/time-off/new"
+    class="fab-new"
+    matTooltip="New time-off request"
+    aria-label="New time-off request"
+  >
+    <mat-icon class="material-symbols-outlined">event</mat-icon>
+    New request
+  </a>
+</section>

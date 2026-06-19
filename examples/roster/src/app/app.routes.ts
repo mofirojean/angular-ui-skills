@@ -46,6 +46,12 @@ export const routes: Routes = [
     title: 'Time off, Roster',
   },
   {
+    path: 'time-off/new',
+    loadComponent: () =>
+      import('./pages/time-off/new-request/new-request').then((m) => m.NewRequest),
+    title: 'New time-off request, Roster',
+  },
+  {
     path: 'reviews',
     loadComponent: () =>
       import('./pages/reviews/reviews').then((m) => m.Reviews),
