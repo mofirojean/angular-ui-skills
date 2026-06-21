@@ -18,7 +18,12 @@ import type {
   OnboardingStage,
   OnboardingTask,
   ProfileDoc,
+  ReviewCycle,
+  ReviewCycleStatus,
   ReviewCycleSummary,
+  ReviewParticipant,
+  ReviewStageKey,
+  ReviewStageStatus,
   SalaryEntry,
   SalaryReason,
   TimeOffRequest,
@@ -46,7 +51,12 @@ export type {
   OnboardingStage,
   OnboardingTask,
   ProfileDoc,
+  ReviewCycle,
+  ReviewCycleStatus,
   ReviewCycleSummary,
+  ReviewParticipant,
+  ReviewStageKey,
+  ReviewStageStatus,
   SalaryEntry,
   SalaryReason,
   TimeOffRequest,
@@ -302,6 +312,45 @@ export class MockDataService {
   readonly timeOffRequests = signal<readonly TimeOffRequest[]>(buildTimeOffRequests(this.employees()));
   readonly leaveBalances = signal<readonly LeaveBalance[]>(buildLeaveBalances(this.employees()));
 
+  readonly reviewCycles = signal<readonly ReviewCycle[]>(buildReviewCycles());
+  readonly reviewParticipants = signal<readonly ReviewParticipant[]>(
+    buildReviewParticipants(this.reviewCycles(), this.employees()),
+  );
+
+  getReviewCycle(id: string): ReviewCycle | null {
+    return this.reviewCycles().find((c) => c.id === id) ?? null;
+  }
+
+  getParticipantsForCycle(cycleId: string): readonly ReviewParticipant[] {
+    return this.reviewParticipants().filter((p) => p.cycleId === cycleId);
+  }
+
+  getParticipant(cycleId: string, employeeId: string): ReviewParticipant | null {
+    return this.reviewParticipants().find(
+      (p) => p.cycleId === cycleId && p.employeeId === employeeId,
+    ) ?? null;
+  }
+
+  updateParticipantStage(
+    cycleId: string,
+    employeeId: string,
+    stage: ReviewStageKey,
+    status: ReviewStageStatus,
+    extras?: { score?: number; summary?: string },
+  ): void {
+    this.reviewParticipants.update((list) =>
+      list.map((p) => {
+        if (p.cycleId !== cycleId || p.employeeId !== employeeId) return p;
+        return {
+          ...p,
+          stages: { ...p.stages, [stage]: status },
+          score: extras?.score ?? p.score,
+          summary: extras?.summary ?? p.summary,
+        };
+      }),
+    );
+  }
+
   setRequestStatus(id: string, status: TimeOffStatus): TimeOffStatus | null {
     let previous: TimeOffStatus | null = null;
     this.timeOffRequests.update((list) =>
@@ -519,6 +568,104 @@ function buildDocuments(emp: Employee, seed: number): readonly ProfileDoc[] {
     })(),
     uploadedBy: i % 3 === 0 ? emp.name : (emp.manager ?? 'Mofiro Jean'),
   }));
+}
+
+// --- Review cycle builders ---------------------------------------------------
+
+const REVIEW_CYCLE_SEEDS: ReadonlyArray<{
+  id: string;
+  name: string;
+  startOffsetDays: number;
+  durationDays: number;
+  status: ReviewCycleStatus;
+  eligibility: string;
+}> = [
+  { id: 'rc-h1-2026', name: 'H1 2026', startOffsetDays: -45,  durationDays: 90,  status: 'active',   eligibility: 'All full-time employees, tenure 90+ days' },
+  { id: 'rc-h2-2025', name: 'H2 2025', startOffsetDays: -225, durationDays: 90,  status: 'complete', eligibility: 'All full-time employees' },
+  { id: 'rc-h1-2025', name: 'H1 2025', startOffsetDays: -405, durationDays: 90,  status: 'complete', eligibility: 'All full-time employees' },
+  { id: 'rc-h2-2024', name: 'H2 2024', startOffsetDays: -585, durationDays: 90,  status: 'complete', eligibility: 'Engineering + Product only' },
+];
+
+function buildReviewCycles(): readonly ReviewCycle[] {
+  return REVIEW_CYCLE_SEEDS.map((s) => {
+    const startDate = daysFromNow(s.startOffsetDays);
+    const endDate = daysFromNow(s.startOffsetDays + s.durationDays);
+    return {
+      id: s.id,
+      name: s.name,
+      startDate,
+      endDate,
+      status: s.status,
+      eligibility: s.eligibility,
+    };
+  });
+}
+
+function buildReviewParticipants(
+  cycles: readonly ReviewCycle[],
+  employees: readonly Employee[],
+): readonly ReviewParticipant[] {
+  if (employees.length === 0) return [];
+  const out: ReviewParticipant[] = [];
+
+  for (const cycle of cycles) {
+    const sliceSize = cycle.id === 'rc-h2-2024' ? 12 : 18;
+    for (let i = 0; i < sliceSize; i++) {
+      const emp = employees[(i * 11 + cycle.id.length) % employees.length];
+      const stages = generateStageProgression(cycle.status, cycle.id, i);
+      const allDone = Object.values(stages).every((s) => s === 'complete');
+      const score = allDone ? 3 + Math.round(hash(i, cycle.id.length) * 2 * 10) / 10 : null;
+      out.push({
+        cycleId: cycle.id,
+        employeeId: emp.id,
+        employeeName: emp.name,
+        employeeRole: emp.role,
+        department: emp.department,
+        manager: emp.manager ?? 'Mofiro Jean',
+        stages,
+        score,
+        summary:
+          score === null
+            ? ''
+            : score >= 4.5
+              ? 'Exceeded expectations across the cycle.'
+              : score >= 3.5
+                ? 'Met or exceeded expectations.'
+                : 'Met expectations with growth areas flagged.',
+      });
+    }
+  }
+
+  return out;
+}
+
+function generateStageProgression(
+  cycleStatus: ReviewCycleStatus,
+  cycleId: string,
+  i: number,
+): Record<ReviewStageKey, ReviewStageStatus> {
+  if (cycleStatus === 'complete') {
+    return {
+      self: 'complete',
+      manager: 'complete',
+      calibration: 'complete',
+      final: 'complete',
+    };
+  }
+  const progress = hash(i, cycleId.length + 17);
+  const stageOrder: ReviewStageKey[] = ['self', 'manager', 'calibration', 'final'];
+  const completed = Math.floor(progress * 4);
+  const stages: Record<ReviewStageKey, ReviewStageStatus> = {
+    self: 'not-started',
+    manager: 'not-started',
+    calibration: 'not-started',
+    final: 'not-started',
+  };
+  for (let s = 0; s < stageOrder.length; s++) {
+    if (s < completed) stages[stageOrder[s]] = 'complete';
+    else if (s === completed) stages[stageOrder[s]] = progress > 0.15 ? 'in-progress' : 'not-started';
+  }
+  return stages;
 }
 
 // --- Time off builders -------------------------------------------------------

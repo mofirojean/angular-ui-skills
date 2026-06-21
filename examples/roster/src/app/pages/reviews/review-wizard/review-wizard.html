@@ -1,0 +1,173 @@
+@if (cycle(); as c) {
+  @if (participant(); as p) {
+    <section class="wiz">
+      <header class="wiz__head">
+        <a routerLink="/reviews" class="wiz__back" matTooltip="Back to reviews">
+          <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+        </a>
+        <div class="wiz__identity">
+          <span class="avatar">{{ p.employeeName | initials }}</span>
+          <div>
+            <h2 class="wiz__title">{{ p.employeeName }}</h2>
+            <p class="wiz__sub">
+              {{ p.employeeRole }} · {{ p.department }}
+              <span class="dot">·</span>
+              {{ c.name }} cycle
+              <span class="dot">·</span>
+              ends {{ c.endDate | date: 'MMM d, y' }}
+            </p>
+          </div>
+        </div>
+      </header>
+
+      <mat-card appearance="outlined" class="wiz__card">
+        <mat-stepper linear class="wiz__stepper">
+          <mat-step [stepControl]="selfForm" label="Self-assessment">
+            <form [formGroup]="selfForm" class="step-form">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Accomplishments</mat-label>
+                <textarea matInput rows="3" formControlName="accomplishments" placeholder="Top wins this cycle,"></textarea>
+              </mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Growth areas</mat-label>
+                <textarea matInput rows="3" formControlName="growthAreas" placeholder="Where you want to grow next,"></textarea>
+              </mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="score-field">
+                <mat-label>Self-assessed score</mat-label>
+                <mat-select formControlName="selfScore">
+                  @for (s of scoreOptions; track s) {
+                    <mat-option [value]="s">{{ s }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </form>
+            <div class="step-actions">
+              <button mat-flat-button matStepperNext class="next-btn">
+                Next
+                <mat-icon class="material-symbols-outlined" iconPositionEnd>arrow_forward</mat-icon>
+              </button>
+            </div>
+          </mat-step>
+
+          <mat-step [stepControl]="managerForm" label="Manager review">
+            <form [formGroup]="managerForm" class="step-form">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Strengths</mat-label>
+                <textarea matInput rows="3" formControlName="strengths" placeholder="What stood out,"></textarea>
+              </mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Opportunities</mat-label>
+                <textarea matInput rows="3" formControlName="opportunities" placeholder="Coaching areas for next cycle,"></textarea>
+              </mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="score-field">
+                <mat-label>Manager score</mat-label>
+                <mat-select formControlName="managerScore">
+                  @for (s of scoreOptions; track s) {
+                    <mat-option [value]="s">{{ s }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </form>
+            <div class="step-actions">
+              <button mat-button matStepperPrevious>
+                <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+                Back
+              </button>
+              <button mat-flat-button matStepperNext class="next-btn">
+                Next
+                <mat-icon class="material-symbols-outlined" iconPositionEnd>arrow_forward</mat-icon>
+              </button>
+            </div>
+          </mat-step>
+
+          <mat-step [stepControl]="calibrationForm" label="Calibration">
+            <form [formGroup]="calibrationForm" class="step-form">
+              <div class="calibration-row">
+                <span class="calibration-label">Score after calibration</span>
+                <mat-radio-group formControlName="adjustment" class="calibration-radio">
+                  <mat-radio-button value="down">Adjust down</mat-radio-button>
+                  <mat-radio-button value="unchanged">Unchanged</mat-radio-button>
+                  <mat-radio-button value="up">Adjust up</mat-radio-button>
+                </mat-radio-group>
+              </div>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="score-field">
+                <mat-label>Final score</mat-label>
+                <mat-select formControlName="finalScore">
+                  @for (s of scoreOptions; track s) {
+                    <mat-option [value]="s">{{ s }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Calibration notes</mat-label>
+                <textarea matInput rows="3" formControlName="calibrationNotes" placeholder="Rationale for any adjustment,"></textarea>
+              </mat-form-field>
+            </form>
+            <div class="step-actions">
+              <button mat-button matStepperPrevious>
+                <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+                Back
+              </button>
+              <button mat-flat-button matStepperNext class="next-btn">
+                Next
+                <mat-icon class="material-symbols-outlined" iconPositionEnd>arrow_forward</mat-icon>
+              </button>
+            </div>
+          </mat-step>
+
+          <mat-step [stepControl]="finalForm" label="Final">
+            <form [formGroup]="finalForm" class="step-form">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Delivery date</mat-label>
+                <input matInput type="text" formControlName="deliveryDate" placeholder="2026-07-15" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Delivery channel</mat-label>
+                <mat-select formControlName="deliveryChannel">
+                  <mat-option value="in-person">In person</mat-option>
+                  <mat-option value="video">Video call</mat-option>
+                  <mat-option value="written">Written only</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Closing notes</mat-label>
+                <textarea matInput rows="3" formControlName="closingNotes" placeholder="Anything to capture from the conversation,"></textarea>
+              </mat-form-field>
+              <label class="confirm">
+                <input type="checkbox" formControlName="acknowledged" />
+                <span>I have reviewed everything and the package is ready to deliver.</span>
+              </label>
+            </form>
+            <div class="step-actions">
+              <button mat-button matStepperPrevious>
+                <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+                Back
+              </button>
+              <button
+                mat-flat-button
+                class="next-btn"
+                [disabled]="finalForm.invalid"
+                (click)="submit()"
+              >
+                <mat-icon class="material-symbols-outlined">check</mat-icon>
+                Finalize review
+              </button>
+            </div>
+          </mat-step>
+        </mat-stepper>
+      </mat-card>
+    </section>
+  } @else {
+    <section class="missing">
+      <mat-icon class="material-symbols-outlined">person_off</mat-icon>
+      <h2>This employee isn't a participant in cycle "{{ cycle()?.name }}"</h2>
+      <a mat-stroked-button routerLink="/reviews">Back to reviews</a>
+    </section>
+  }
+} @else {
+  <section class="missing">
+    <mat-icon class="material-symbols-outlined">event_busy</mat-icon>
+    <h2>No cycle with id "{{ cycleId() }}"</h2>
+    <a mat-stroked-button routerLink="/reviews">Back to reviews</a>
+  </section>
+}

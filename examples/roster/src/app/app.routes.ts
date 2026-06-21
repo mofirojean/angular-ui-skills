@@ -58,6 +58,12 @@ export const routes: Routes = [
     title: 'Reviews, Roster',
   },
   {
+    path: 'reviews/:cycleId/:employeeId',
+    loadComponent: () =>
+      import('./pages/reviews/review-wizard/review-wizard').then((m) => m.ReviewWizard),
+    title: 'Review, Roster',
+  },
+  {
     path: 'settings',
     loadComponent: () =>
       import('./pages/settings/settings').then((m) => m.Settings),

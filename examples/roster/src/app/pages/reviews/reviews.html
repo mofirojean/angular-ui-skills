@@ -1,0 +1,97 @@
+<section class="rev">
+  <header class="rev__head">
+    <div>
+      <h2 class="rev__title">Performance reviews</h2>
+      <p class="rev__sub">{{ summaries().length }} cycles, expand a cycle to see participants.</p>
+    </div>
+    <button mat-flat-button class="rev__new">
+      <mat-icon class="material-symbols-outlined">play_arrow</mat-icon>
+      Start new cycle
+    </button>
+  </header>
+
+  <mat-accordion class="rev__list" multi>
+    @for (s of summaries(); track s.cycle.id) {
+      <mat-expansion-panel [expanded]="s.cycle.status === 'active'" class="rev__panel">
+        <mat-expansion-panel-header collapsedHeight="64px" expandedHeight="64px">
+          <mat-panel-title>
+            <div class="rev__panel-title">
+              <span class="rev__cycle-name">{{ s.cycle.name }}</span>
+              <span class="rev__chip rev__chip--{{ s.cycle.status }}">
+                {{ cycleStatusLabel(s.cycle.status) }}
+              </span>
+            </div>
+          </mat-panel-title>
+          <mat-panel-description class="rev__panel-desc">
+            <span class="rev__dates">
+              {{ s.cycle.startDate | date: 'MMM d' }} – {{ s.cycle.endDate | date: 'MMM d, y' }}
+            </span>
+            <span class="rev__progress">
+              <strong>{{ s.completedCount }}</strong>
+              <span class="rev__progress-total">/ {{ s.participants.length }}</span>
+              <span class="rev__progress-bar">
+                <mat-progress-bar mode="determinate" [value]="s.progressPct" />
+              </span>
+            </span>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <div class="rev__eligibility">
+          <mat-icon class="material-symbols-outlined">group</mat-icon>
+          {{ s.cycle.eligibility }}
+        </div>
+
+        <div class="rev__table-wrap">
+          <table mat-table [dataSource]="s.participants" class="rev-table">
+            <ng-container matColumnDef="employee">
+              <th mat-header-cell *matHeaderCellDef>Employee</th>
+              <td mat-cell *matCellDef="let row">
+                <a class="cell-emp" [routerLink]="['/reviews', s.cycle.id, row.employeeId]">
+                  <span class="avatar">{{ row.employeeName | initials }}</span>
+                  <span class="cell-emp__meta">
+                    <span class="cell-emp__name">{{ row.employeeName }}</span>
+                    <span class="cell-emp__role">{{ row.employeeRole }}, {{ row.department }}</span>
+                  </span>
+                </a>
+              </td>
+            </ng-container>
+
+            @for (stage of stages; track stage.key) {
+              <ng-container [matColumnDef]="stage.key">
+                <th mat-header-cell *matHeaderCellDef>{{ stage.label }}</th>
+                <td mat-cell *matCellDef="let row">
+                  <span
+                    class="stage-cell stage-cell--{{ row.stages[stage.key] }}"
+                    [matTooltip]="stageLabel(row.stages[stage.key])"
+                  >
+                    <mat-icon class="material-symbols-outlined">
+                      {{ stageIcon(row.stages[stage.key]) }}
+                    </mat-icon>
+                  </span>
+                </td>
+              </ng-container>
+            }
+
+            <ng-container matColumnDef="score">
+              <th mat-header-cell *matHeaderCellDef>Score</th>
+              <td mat-cell *matCellDef="let row" class="score-cell">
+                @if (row.score !== null) {
+                  <span class="score-chip">
+                    <mat-icon class="material-symbols-outlined">star</mat-icon>
+                    {{ row.score }}
+                  </span>
+                } @else {
+                  <span class="muted">,</span>
+                }
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="cols"></tr>
+            <tr mat-row *matRowDef="let row; columns: cols"
+              [routerLink]="['/reviews', s.cycle.id, row.employeeId]"></tr>
+          </table>
+        </div>
+      </mat-expansion-panel>
+    }
+  </mat-accordion>
+</section>

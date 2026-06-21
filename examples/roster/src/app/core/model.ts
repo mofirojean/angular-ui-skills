@@ -109,6 +109,33 @@ export interface DashboardKpis {
   };
 }
 
+// --- Review cycles -----------------------------------------------------------
+
+export type ReviewCycleStatus = 'planning' | 'active' | 'complete';
+export type ReviewStageStatus = 'not-started' | 'in-progress' | 'complete';
+export type ReviewStageKey = 'self' | 'manager' | 'calibration' | 'final';
+
+export interface ReviewCycle {
+  readonly id: string;
+  readonly name: string;
+  readonly startDate: Date;
+  readonly endDate: Date;
+  readonly status: ReviewCycleStatus;
+  readonly eligibility: string;
+}
+
+export interface ReviewParticipant {
+  readonly cycleId: string;
+  readonly employeeId: string;
+  readonly employeeName: string;
+  readonly employeeRole: string;
+  readonly department: string;
+  readonly manager: string;
+  readonly stages: Record<ReviewStageKey, ReviewStageStatus>;
+  readonly score: number | null;
+  readonly summary: string;
+}
+
 // --- Time off ----------------------------------------------------------------
 
 export type LeaveType = 'vacation' | 'sick' | 'personal' | 'parental';

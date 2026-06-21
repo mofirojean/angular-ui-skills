@@ -1,0 +1,305 @@
+<mat-sidenav-container class="set" autosize>
+  <mat-sidenav mode="side" opened class="set__nav">
+    <div class="set__nav-head">
+      <h2 class="set__nav-title">Settings</h2>
+      <p class="set__nav-sub">Workspace + per-user controls</p>
+    </div>
+
+    <nav class="set__nav-list" aria-label="Settings sections">
+      @for (s of sections; track s.key) {
+        <button
+          type="button"
+          class="set__nav-item"
+          [class.active]="active() === s.key"
+          (click)="select(s.key)"
+        >
+          <span class="set__nav-icon">
+            <mat-icon class="material-symbols-outlined">{{ s.icon }}</mat-icon>
+          </span>
+          <span class="set__nav-text">
+            <span class="set__nav-label">{{ s.label }}</span>
+            <span class="set__nav-sub-row">{{ s.sub }}</span>
+          </span>
+        </button>
+      }
+    </nav>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="set__content">
+    @switch (active()) {
+      @case ('general') {
+        <section class="sect">
+          <header class="sect__head">
+            <div>
+              <h3 class="sect__title">General</h3>
+              <p class="sect__sub">Workspace identity, time + density preferences.</p>
+            </div>
+          </header>
+
+          <mat-card appearance="outlined" class="sect__card">
+            <form [formGroup]="generalForm" class="form">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Workspace name</mat-label>
+                <input matInput formControlName="workspaceName" />
+              </mat-form-field>
+
+              <div class="row">
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                  <mat-label>Time zone</mat-label>
+                  <mat-select formControlName="timezone">
+                    @for (tz of timezones; track tz) {
+                      <mat-option [value]="tz">{{ tz }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                  <mat-label>Week starts on</mat-label>
+                  <mat-select formControlName="weekStart">
+                    @for (w of weekStarts; track w.value) {
+                      <mat-option [value]="w.value">{{ w.label }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div class="density">
+                <div class="density__row">
+                  <span class="density__label">Default density</span>
+                  <span class="density__value">{{ densityLabel() }}</span>
+                </div>
+                <mat-slider min="-4" max="0" step="1" discrete showTickMarks class="density__slider">
+                  <input matSliderThumb formControlName="densityScale" />
+                </mat-slider>
+                <p class="density__hint">
+                  Negative values pack tighter, 0 is Material's default. Roster ships at -1.
+                </p>
+              </div>
+            </form>
+          </mat-card>
+
+          <div class="sect__actions">
+            <button mat-flat-button class="save-btn" (click)="saveAll()">
+              <mat-icon class="material-symbols-outlined">check</mat-icon>
+              Save changes
+            </button>
+          </div>
+        </section>
+      }
+
+      @case ('branding') {
+        <section class="sect">
+          <header class="sect__head">
+            <div>
+              <h3 class="sect__title">Branding</h3>
+              <p class="sect__sub">Logo + palette preview. Roster ships with Azure.</p>
+            </div>
+          </header>
+
+          <mat-card appearance="outlined" class="sect__card">
+            <div class="logo-row">
+              <div class="logo-preview">
+                <span class="logo-preview__mark">{{ logoForm.value.logoText }}</span>
+                <span class="logo-preview__text">{{ logoForm.value.logoLabel }}</span>
+              </div>
+              <form [formGroup]="logoForm" class="logo-form">
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                  <mat-label>Mark</mat-label>
+                  <input matInput formControlName="logoText" maxlength="2" />
+                </mat-form-field>
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                  <mat-label>Workspace label</mat-label>
+                  <input matInput formControlName="logoLabel" />
+                </mat-form-field>
+              </form>
+            </div>
+
+            <mat-divider />
+
+            <div class="palette">
+              <h4 class="palette__title">Primary palette</h4>
+              <div class="palette__grid">
+                @for (p of paletteOptions; track p.value) {
+                  <button
+                    type="button"
+                    class="palette__swatch"
+                    [class.palette__swatch--active]="selectedPalette() === p.value"
+                    (click)="pickPalette(p.value)"
+                    [matTooltip]="p.label"
+                  >
+                    <span class="palette__dot" [style.background]="p.swatch"></span>
+                    <span class="palette__label">{{ p.label }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+          </mat-card>
+
+          <div class="sect__actions">
+            <button mat-flat-button class="save-btn" (click)="saveAll()">
+              <mat-icon class="material-symbols-outlined">check</mat-icon>
+              Save changes
+            </button>
+          </div>
+        </section>
+      }
+
+      @case ('teams') {
+        <section class="sect">
+          <header class="sect__head">
+            <div>
+              <h3 class="sect__title">Teams</h3>
+              <p class="sect__sub">{{ teams().length }} teams across the company.</p>
+            </div>
+          </header>
+
+          <mat-card appearance="outlined" class="sect__card">
+            <ul class="teams">
+              @for (t of teams(); track t.team) {
+                <li class="teams__row">
+                  <div class="teams__meta">
+                    <span class="teams__name">{{ t.team }}</span>
+                    <span class="teams__dept">{{ t.department }}</span>
+                  </div>
+                  <span class="teams__count">{{ t.members }} members</span>
+                  <span class="teams__lead">Lead, {{ t.lead }}</span>
+                  <button mat-icon-button matTooltip="Edit team" aria-label="Edit team">
+                    <mat-icon class="material-symbols-outlined">edit</mat-icon>
+                  </button>
+                </li>
+              }
+            </ul>
+          </mat-card>
+        </section>
+      }
+
+      @case ('roles') {
+        <section class="sect">
+          <header class="sect__head">
+            <div>
+              <h3 class="sect__title">Roles & permissions</h3>
+              <p class="sect__sub">Per-permission toggles + role assignments.</p>
+            </div>
+          </header>
+
+          <mat-card appearance="outlined" class="sect__card">
+            <ul class="perms">
+              @for (p of permissions(); track p.key) {
+                <li class="perms__row">
+                  <div class="perms__meta">
+                    <span class="perms__label">{{ p.label }}</span>
+                    <span class="perms__desc">{{ p.description }}</span>
+                  </div>
+                  <mat-slide-toggle
+                    [checked]="p.enabled"
+                    (change)="togglePermission(p.key, $event.checked)"
+                    [attr.aria-label]="p.label"
+                  />
+                </li>
+              }
+            </ul>
+          </mat-card>
+
+          <mat-card appearance="outlined" class="sect__card">
+            <div class="roles-head">
+              <h4 class="roles-title">Per-role overrides</h4>
+              <p class="roles-sub">Roles that get elevated access by default.</p>
+            </div>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Roles</mat-label>
+              <mat-chip-grid #rolesGrid>
+                @for (role of rolesAssigned(); track role) {
+                  <mat-chip-row (removed)="removeRole(role)">
+                    {{ role }}
+                    <button matChipRemove aria-label="Remove">
+                      <mat-icon class="material-symbols-outlined">close</mat-icon>
+                    </button>
+                  </mat-chip-row>
+                }
+              </mat-chip-grid>
+              <input
+                placeholder="Type a role and press Enter,"
+                [matChipInputFor]="rolesGrid"
+                [matChipInputSeparatorKeyCodes]="chipSeparators"
+                (matChipInputTokenEnd)="addRole($event.value); $event.chipInput.clear()"
+              />
+            </mat-form-field>
+          </mat-card>
+        </section>
+      }
+
+      @case ('holidays') {
+        <section class="sect">
+          <header class="sect__head">
+            <div>
+              <h3 class="sect__title">Holidays</h3>
+              <p class="sect__sub">{{ holidays().length }} company holidays this year.</p>
+            </div>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="import-field">
+              <mat-label>Import country defaults</mat-label>
+              <mat-select (selectionChange)="importCountry($event.value)">
+                @for (c of countryPresets; track c.value) {
+                  <mat-option [value]="c.value">{{ c.label }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </header>
+
+          <mat-card appearance="outlined" class="sect__card">
+            <ul class="holidays">
+              @for (h of holidays(); track h.id) {
+                <li class="holiday">
+                  <div class="holiday__date">
+                    <span class="holiday__month">{{ h.date.toLocaleDateString('en-US', { month: 'short' }) }}</span>
+                    <span class="holiday__day">{{ h.date.getDate() }}</span>
+                  </div>
+                  <div class="holiday__meta">
+                    <span class="holiday__name">{{ h.name }}</span>
+                    <span class="holiday__weekday">{{ h.date.toLocaleDateString('en-US', { weekday: 'long' }) }}</span>
+                  </div>
+                  <button
+                    mat-icon-button
+                    matTooltip="Remove holiday"
+                    aria-label="Remove holiday"
+                    (click)="removeHoliday(h.id)"
+                  >
+                    <mat-icon class="material-symbols-outlined">close</mat-icon>
+                  </button>
+                </li>
+              }
+            </ul>
+          </mat-card>
+        </section>
+      }
+
+      @case ('notifications') {
+        <section class="sect">
+          <header class="sect__head">
+            <div>
+              <h3 class="sect__title">Notifications</h3>
+              <p class="sect__sub">In-app + email preferences.</p>
+            </div>
+          </header>
+
+          <mat-card appearance="outlined" class="sect__card">
+            <ul class="perms">
+              @for (n of notifications(); track n.key) {
+                <li class="perms__row">
+                  <div class="perms__meta">
+                    <span class="perms__label">{{ n.label }}</span>
+                    <span class="perms__desc">{{ n.description }}</span>
+                  </div>
+                  <mat-slide-toggle
+                    [checked]="n.enabled"
+                    (change)="toggleNotification(n.key, $event.checked)"
+                    [attr.aria-label]="n.label"
+                  />
+                </li>
+              }
+            </ul>
+          </mat-card>
+        </section>
+      }
+    }
+  </mat-sidenav-content>
+</mat-sidenav-container>
