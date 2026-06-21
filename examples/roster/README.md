@@ -2,6 +2,10 @@
 
 A reference Angular app built with [Angular Material](https://material.angular.dev) to validate the [`angular-material-developer` skill](../../skills/angular-material-developer). The app is a fictional HR / people-management console for a 200-person company, picked because Material's two strongest moats over Spartan, PrimeNG, and NG-ZORRO (the polished `mat-form-field` and the `MatDatepicker`) get exercised hardest in HR-shaped workflows.
 
+**Live demo:** https://roster-khaki-pi.vercel.app
+
+![Roster dashboard, light mode](../../docs/public/projects/roster-light-mode.png)
+
 > **Status**, complete. All 7 phases shipped per [`PLAN.md`](./PLAN.md).
 
 ## Stack

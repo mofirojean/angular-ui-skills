@@ -155,6 +155,20 @@ export class App {
       image: 'projects/switchboard.png',
       demo: SITE_CONFIG.demos.switchboard,
     },
+    {
+      slug: 'roster',
+      name: 'Roster',
+      tagline: 'HR + people management',
+      description:
+        'A people-ops console for a 200-person company, dashboard KPIs, flagship MatTable directory, tabbed employee profile with MatTree reporting line + Compensation MatDialog, CDK drag-drop onboarding kanban with a MatStepper wizard, time-off with calendar + requests + balances, reviews accordion with stepper wizard, settings with secondary MatSidenav. Validates angular-material-developer.',
+      stack: ['Angular v21', 'Angular Material v21', 'Material 3', '@angular/cdk', 'ngx-transforms', 'Zoneless'],
+      skill: 'angular-material-developer',
+      path: 'examples/roster',
+      accent: 'from-pink-400/25 via-rose-300/15 to-transparent',
+      badges: ['Azure palette', 'M3 tokens', '9 routes'],
+      image: 'projects/roster-light-mode.png',
+      demo: SITE_CONFIG.demos.roster,
+    },
   ];
 
   protected readonly heroSnippet = [

@@ -5,5 +5,6 @@ export const SITE_CONFIG = {
     quantaDesk: 'https://quanta-desk.vercel.app',
     apex: 'https://apex-ecru-nu.vercel.app',
     switchboard: 'https://switchboard-olive.vercel.app',
+    roster: 'https://roster-khaki-pi.vercel.app',
   },
 } as const;
