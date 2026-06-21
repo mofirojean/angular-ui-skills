@@ -15,6 +15,7 @@ on:
           - quanta-desk
           - apex
           - switchboard
+          - roster
         default: all
 
 concurrency:
@@ -54,6 +55,9 @@ jobs:
             switchboard:
               - 'examples/switchboard/**'
               - '.github/workflows/deploy.yml'
+            roster:
+              - 'examples/roster/**'
+              - '.github/workflows/deploy.yml'
 
       - name: Build deploy matrix
         id: plan
@@ -63,6 +67,7 @@ jobs:
           QD: ${{ steps.filter.outputs.quanta-desk }}
           APEX: ${{ steps.filter.outputs.apex }}
           SB: ${{ steps.filter.outputs.switchboard }}
+          ROSTER: ${{ steps.filter.outputs.roster }}
           EVENT: ${{ github.event_name }}
           TARGET: ${{ inputs.target }}
         run: |
@@ -92,6 +97,9 @@ jobs:
           fi
           if should_run switchboard "$SB"; then
             items+=('{"app":"switchboard","path":"examples/switchboard","project_id_name":"VERCEL_PROJECT_ID_SWITCHBOARD"}')
+          fi
+          if should_run roster "$ROSTER"; then
+            items+=('{"app":"roster","path":"examples/roster","project_id_name":"VERCEL_PROJECT_ID_ROSTER"}')
           fi
 
           if [[ ${#items[@]} -eq 0 ]]; then
@@ -139,6 +147,7 @@ jobs:
           VERCEL_PROJECT_ID_QUANTA_DESK: ${{ secrets.VERCEL_PROJECT_ID_QUANTA_DESK }}
           VERCEL_PROJECT_ID_APEX: ${{ secrets.VERCEL_PROJECT_ID_APEX }}
           VERCEL_PROJECT_ID_SWITCHBOARD: ${{ secrets.VERCEL_PROJECT_ID_SWITCHBOARD }}
+          VERCEL_PROJECT_ID_ROSTER: ${{ secrets.VERCEL_PROJECT_ID_ROSTER }}
         run: |
           set -euo pipefail
           case "${{ matrix.app }}" in
@@ -147,6 +156,7 @@ jobs:
             quanta-desk)      project_id="$VERCEL_PROJECT_ID_QUANTA_DESK" ;;
             apex)             project_id="$VERCEL_PROJECT_ID_APEX" ;;
             switchboard)      project_id="$VERCEL_PROJECT_ID_SWITCHBOARD" ;;
+            roster)           project_id="$VERCEL_PROJECT_ID_ROSTER" ;;
             *)                project_id="" ;;
           esac
 
