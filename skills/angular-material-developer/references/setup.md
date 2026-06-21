@@ -80,7 +80,9 @@ The legacy `MatButtonModule` still re-exports the same classes, do not introduce
 ## Common pitfalls
 
 1. **No animations.** Symptom: ripples don't show, menu opens with no transition, dialog backdrop pops in. Fix: ensure `provideAnimationsAsync()` is in `app.config.ts`.
-2. **Missing `@angular/cdk`.** Material cascades into CDK for overlay, portal, a11y. If `@angular/cdk` isn't in dependencies, dialogs and dropdowns throw on construction.
-3. **`styles.css` instead of `styles.scss`.** The theming engine requires Sass. Rename and update `angular.json`.
-4. **Color-scheme not set.** Without `color-scheme: light dark`, native form controls render in light mode even when your app is dark. Add it on `html` in `styles.scss`.
-5. **Using `mat.define-light-theme()` in v19+.** That API is M2-only. Switch to `mat.theme()`, see [theming.md](./theming.md).
+2. **Missing `@angular/animations` peer dep.** `ng add @angular/material --animations=enabled` does **not** always install `@angular/animations` as a top-level dep, even though `provideAnimationsAsync()` dynamically imports `@angular/animations/browser` at runtime. The build fails with `Could not resolve "@angular/animations/browser"`. Fix: `npm install @angular/animations@^21.2.0` (match your Angular minor). This same gotcha hits NG-ZORRO's animation provider too.
+3. **Missing `@angular/cdk`.** Material cascades into CDK for overlay, portal, a11y. If `@angular/cdk` isn't in dependencies, dialogs and dropdowns throw on construction.
+4. **`styles.css` instead of `styles.scss`.** The theming engine requires Sass. Rename and update `angular.json`.
+5. **Color-scheme not set.** Without `color-scheme: light dark`, native form controls render in light mode even when your app is dark. Add it on `html` in `styles.scss`.
+6. **Using `mat.define-light-theme()` in v19+.** That API is M2-only. Switch to `mat.theme()`, see [theming.md](./theming.md).
+7. **Browser-default `<button>` border bleeds through "borderless" designs.** If you build custom controls (calendar cells, kanban cards, nav rows) on `<button>` elements, the user-agent stylesheet draws a `buttonborder` line that's especially visible in light mode. Explicitly set `border: none` on the host. This isn't Material-specific, but Material's heavy use of `<button>` for icon and list-item triggers makes it show up frequently.

@@ -55,7 +55,7 @@ Accessibility helpers.
 
 ## DragDrop
 
-- Import: `import { CdkDrag, CdkDropList, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';`
+- Import: `import { CdkDrag, CdkDropList, CdkDropListGroup, CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';`
 - Sortable list:
   ```html
   <div cdkDropList (cdkDropListDropped)="onDrop($event)">
@@ -64,8 +64,42 @@ Accessibility helpers.
     }
   </div>
   ```
-- Multi-list (kanban): wire two `cdkDropList`s with `cdkDropListConnectedTo`, then use `transferArrayItem` in the drop handler.
-- Drag handle (only part of the element initiates drag): apply `cdkDragHandle` to a child.
+- **Kanban (multi-column) pattern.** Wrap all columns in `cdkDropListGroup` instead of wiring each pair with `cdkDropListConnectedTo`, the group auto-connects every descendant `cdkDropList`. Pass a stage-key as `cdkDropListData` so the drop handler knows the target column without needing array indices:
+  ```html
+  <div cdkDropListGroup>
+    @for (col of columns; track col.stage) {
+      <div
+        cdkDropList
+        [cdkDropListData]="col.stage"
+        (cdkDropListDropped)="onDrop($event)"
+      >
+        @for (card of itemsByStage(col.stage)(); track card.id) {
+          <article cdkDrag [cdkDragData]="card">...</article>
+        }
+      </div>
+    }
+  </div>
+  ```
+  ```ts
+  protected onDrop(event: CdkDragDrop<Stage>): void {
+    const target = event.container.data;       // the stage we dropped into
+    const card = event.item.data as Card;      // the dragged card
+    if (card.stage === target) return;
+    this.data.moveCardToStage(card.id, target);
+  }
+  ```
+  When the data source is a signal of cards (`hires = signal<Card[]>`), the drop handler is a tiny update mutator on the signal, no `transferArrayItem` needed because filtering by stage happens at render time.
+- **Custom drag preview.** Project a `*cdkDragPreview` template inside the draggable to control what's rendered under the cursor during drag:
+  ```html
+  <article cdkDrag [cdkDragData]="card">
+    <div *cdkDragPreview class="drag-preview">
+      <span class="avatar">{{ card.name | initials }}</span>
+      <strong>{{ card.name }}</strong>
+    </div>
+    ...
+  </article>
+  ```
+- **Drag handle** (only part of the element initiates drag): apply `cdkDragHandle` to a child element.
 
 ## VirtualScroll
 

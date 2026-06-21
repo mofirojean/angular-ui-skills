@@ -57,7 +57,7 @@ ngOnInit() {
 - Import: `import { MatSort, MatSortHeader } from '@angular/material/sort';`
 - Markup:
   ```html
-  <table mat-table [dataSource]="dataSource" matSort>
+  <table mat-table [dataSource]="dataSource" matSort matSortActive="joined" matSortDirection="desc">
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
       <td mat-cell *matCellDef="let row">{{ row.name }}</td>
@@ -65,14 +65,38 @@ ngOnInit() {
     ...
   </table>
   ```
-- Wire up the sort to the data source:
+- Wire up the sort to the data source. The modern v17+ pattern uses `viewChild` signal queries + an `effect`:
   ```ts
-  ngAfterViewInit() {
-    this.dataSource.sort = this.sort();
-  }
+  private readonly sort = viewChild(MatSort);
+  private readonly paginator = viewChild(MatPaginator);
 
-  // Where `sort()` is a viewChild on MatSort.
+  constructor() {
+    effect(() => {
+      const sort = this.sort();
+      const paginator = this.paginator();
+      if (sort)      this.dataSource.sort = sort;
+      if (paginator) this.dataSource.paginator = paginator;
+    });
+  }
   ```
+  This replaces the `ngAfterViewInit` lifecycle hook, and re-runs reactively if the viewChild ever changes.
+
+### Custom `sortingDataAccessor`
+
+`MatTableDataSource`'s default sort uses `String(row[prop])` , dates sort lexicographically (wrong), nullable fields all hash to the same empty bucket, nested values are inaccessible. Override the accessor for any column that isn't a plain string or number:
+
+```ts
+this.dataSource.sortingDataAccessor = (row, prop) => {
+  switch (prop) {
+    case 'joined':       return row.joinedAt.getTime();
+    case 'lastReviewed': return row.lastReviewedAt ? row.lastReviewedAt.getTime() : 0;
+    case 'manager':      return (row.manager ?? '').toLowerCase();
+    default:             return (row as Record<string, string>)[prop] ?? '';
+  }
+};
+```
+
+Numeric returns sort numerically (correct for dates), the empty-string fallback puts nullable rows at the start or end depending on sort direction.
 
 ### Pagination
 
@@ -82,12 +106,46 @@ ngOnInit() {
   <table mat-table [dataSource]="dataSource" matSort>...</table>
   <mat-paginator [pageSizeOptions]="[10, 25, 50]" pageSize="10" showFirstLastButtons />
   ```
-- Wire:
+- Wire via the same `viewChild` + `effect` pattern shown above for sort.
+- **Reset to first page on filter change.** Replacing `dataSource.data` does not reset the paginator's current page index. After applying a filter that shrinks the data, the paginator can be sitting on page 5 of a now-2-page list, showing nothing. Call `paginator.firstPage()` in the effect that recomputes `dataSource.data`:
   ```ts
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator();
-  }
+  effect(() => {
+    this.dataSource.data = this.applyFilters(this.source(), this.filters());
+    this.paginator()?.firstPage();
+  });
   ```
+
+### Sticky columns
+
+Add `sticky` (left) or `stickyEnd` (right) to a `<ng-container matColumnDef>`. Sticky header rows take `sticky: true` on the `*matHeaderRowDef`:
+
+```html
+<ng-container matColumnDef="select" sticky>...</ng-container>
+<ng-container matColumnDef="name" sticky>...</ng-container>
+<ng-container matColumnDef="actions" stickyEnd>...</ng-container>
+
+<tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+```
+
+**Sticky-cell background-color gotcha.** Sticky cells slide over their neighbours during horizontal scroll, but Material's default cell background is `transparent` so other cells' content bleeds through. Explicitly paint the sticky cells with the row's background, including hover and selected states:
+
+```scss
+.mat-mdc-cell.mat-column-name,
+.mat-mdc-cell.mat-column-select,
+.mat-mdc-cell.mat-column-actions {
+  background: var(--mat-sys-surface);
+}
+
+.mat-mdc-row:hover .mat-mdc-cell.mat-column-name {
+  background: var(--mat-sys-surface-container-high);
+}
+
+.mat-mdc-row.row-selected .mat-mdc-cell.mat-column-name {
+  background: color-mix(in srgb, var(--mat-sys-primary) 10%, var(--mat-sys-surface));
+}
+```
+
+Header sticky cells need their own paint (typically `--mat-sys-surface-container-lowest` to match the header row).
 
 ### Filter
 

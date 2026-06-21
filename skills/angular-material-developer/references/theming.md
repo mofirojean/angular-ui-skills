@@ -72,27 +72,35 @@ Then in TypeScript flip `document.documentElement.classList.toggle('theme-dark')
 
 ## Custom palettes
 
-For brand color matching, build a custom palette via the schematic:
+For brand color matching, build a custom palette via the schematic. The command name in Material v21 is `theme-color`, **not** `m3-theme` (older docs and tutorials still cite the deprecated name):
 
 ```
-ng generate @angular/material:m3-theme
+ng generate @angular/material:theme-color \
+  --primary-color="#0d9488" \
+  --tertiary-color="#f97316" \
+  --directory="src/styles"
 ```
 
-It prompts for a hex color and writes a `_theme-colors.scss` with a fully-tuned tonal scale. Then use it:
+It writes a `<directory>_theme-colors.scss` with a fully-tuned tonal scale exposing `$primary-palette` and `$tertiary-palette` Sass maps. Then use it:
 
 ```scss
 @use '@angular/material' as mat;
-@use './theme-colors' as colors;
+@use 'styles/theme-colors' as brand;
 
 html {
   color-scheme: light dark;
   @include mat.theme((
-    color: colors.$primary-palette,
+    color: (
+      primary: brand.$primary-palette,
+      tertiary: brand.$tertiary-palette,
+    ),
     typography: Roboto,
     density: 0,
   ));
 }
 ```
+
+**Note on `--directory`:** the schematic concatenates the directory value onto the filename (so `--directory=src/styles` produces `src/styles_theme-colors.scss` at workspace root, not `src/styles/_theme-colors.scss` in a folder). Move the file into a proper folder + rename to a partial (`_theme-colors.scss`) after generation if you want clean structure.
 
 ## Per-component overrides
 

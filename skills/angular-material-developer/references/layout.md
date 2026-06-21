@@ -147,7 +147,19 @@ Hierarchical view.
 - Two flavors:
   - **Flat tree** , flattens the data via `MatTreeFlattener`, performs better on large trees.
   - **Nested tree** , each node renders its children directly inside.
-- Markup is verbose, refer to the Material docs for a full example. Most apps use a flat tree.
+- The v17+ API uses `childrenAccessor` or `levelAccessor` (no `treeControl`):
+  ```html
+  <mat-tree [dataSource]="nodes" [childrenAccessor]="childrenOf">
+    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>...</mat-tree-node>
+    <mat-tree-node *matTreeNodeDef="let node; when: hasChildren" matTreeNodePadding matTreeNodeToggle>...</mat-tree-node>
+  </mat-tree>
+  ```
+- `childrenAccessor` is typed `(node: T) => T[] | Observable<T[]>` , **not** `readonly T[]`. If your domain model uses `readonly children: readonly T[]`, you must spread on the way out:
+  ```ts
+  childrenOf = (n: TreeNode): TreeNode[] => [...n.children];
+  ```
+  Otherwise TypeScript errors with `Type 'readonly TreeNode[]' is not assignable to type 'TreeNode[] | Observable<TreeNode[]>'`.
+- Markup is otherwise verbose, refer to the Material docs for a full example.
 
 ## Common pitfalls
 
@@ -156,3 +168,5 @@ Hierarchical view.
 3. **`mat-tab-group` re-creates tab content on switch** , state inside resets every time. To preserve, render content lazily with `<ng-template matTabContent>`.
 4. **`mat-accordion` without `multi`** , only one panel can be open at a time. Add `multi` if you want independent toggling.
 5. **`mat-list-option` outside `mat-selection-list`** , won't render. Always wrap.
+6. **Two-line `mat-list-item` resists `align-self: center` overrides on the leading icon.** Material's MDC list-item applies internal padding inside `.mat-mdc-list-item-unscoped-content` that competes with your alignment rules, the icon drifts toward the top edge even when `min-height` is generous. For tight vertical alignment, drop the `mat-list-item` structure entirely and use a plain `<button>` with `display: flex; align-items: center;` and your own icon + text-block children. The `examples/roster` settings sub-sidebar uses this pattern.
+7. **`childrenAccessor` rejects `readonly T[]`** , see the MatTree section above. Spread the readonly array into a mutable one in the accessor.
