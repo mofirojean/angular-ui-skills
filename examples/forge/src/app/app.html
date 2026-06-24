@@ -1,0 +1,20 @@
+<main class="min-h-screen bg-background text-foreground flex items-center justify-center p-8">
+  <div hlmCard class="max-w-md w-full">
+    <div hlmCardHeader>
+      <h1 hlmCardTitle>{{ title() }}</h1>
+      <p hlmCardDescription>Phase 0 scaffold gate.</p>
+    </div>
+    <div hlmCardContent>
+      <p class="text-sm text-muted-foreground mb-4">
+        If you can read this and the button below is styled, the foundation is solid.
+      </p>
+      <div class="flex gap-2">
+        <button hlmBtn>Primary action</button>
+        <button hlmBtn variant="outline" (click)="toggleTheme()">
+          {{ modeIcon() }} Toggle theme
+        </button>
+      </div>
+    </div>
+  </div>
+  <router-outlet />
+</main>
