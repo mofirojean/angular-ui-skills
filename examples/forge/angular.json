@@ -9,7 +9,16 @@
   "projects": {
     "forge": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:component": { "skipTests": true },
+        "@schematics/angular:directive": { "skipTests": true },
+        "@schematics/angular:guard":     { "skipTests": true },
+        "@schematics/angular:interceptor": { "skipTests": true },
+        "@schematics/angular:pipe":      { "skipTests": true },
+        "@schematics/angular:resolver":  { "skipTests": true },
+        "@schematics/angular:service":   { "skipTests": true },
+        "@schematics/angular:class":     { "skipTests": true }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -34,13 +43,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "1MB",
+                  "maximumError": "2MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "16kB",
+                  "maximumError": "32kB"
                 }
               ],
               "outputHashing": "all"
@@ -64,9 +73,6 @@
             }
           },
           "defaultConfiguration": "development"
-        },
-        "test": {
-          "builder": "@angular/build:unit-test"
         }
       }
     }

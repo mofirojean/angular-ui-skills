@@ -1,0 +1,133 @@
+<section class="flex flex-col h-full">
+  <header class="px-6 pt-6 pb-3 border-b border-border">
+    <nav class="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
+      <a routerLink="/" class="hover:text-foreground">Inbox</a>
+      <ng-icon name="lucideChevronRight" size="12"></ng-icon>
+      <span class="font-mono">forge/runtime</span>
+      <ng-icon name="lucideChevronRight" size="12"></ng-icon>
+      <span>PR #{{ id() || '142' }}</span>
+    </nav>
+
+    <div class="flex items-start justify-between gap-4 flex-wrap">
+      <div class="min-w-0 flex-1">
+        <div class="flex items-center gap-2 flex-wrap">
+          <h2 class="text-xl font-semibold tracking-tight">Fix race condition in agent run scheduler</h2>
+          <span class="text-xs px-2 py-0.5 rounded-full border border-sky-500/30 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300">Open</span>
+        </div>
+        <p class="mt-1.5 text-sm text-muted-foreground">
+          <span class="font-mono">feat/runner-v2</span>
+          <ng-icon name="lucideArrowRight" size="12" class="inline align-middle mx-1"></ng-icon>
+          <span class="font-mono">main</span>
+          <span class="mx-2">·</span>
+          opened by <span class="font-medium text-foreground">Sasha Lin</span>
+          <span class="mx-2">·</span>
+          <span class="text-emerald-600 dark:text-emerald-400 font-mono">+89</span>
+          <span class="text-red-600 dark:text-red-400 font-mono ml-1">-23</span>
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <div class="flex -space-x-2 mr-2">
+          <hlm-avatar class="size-7 ring-2 ring-background">
+            <span hlmAvatarFallback class="text-[11px] font-semibold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">MJ</span>
+          </hlm-avatar>
+          <hlm-avatar class="size-7 ring-2 ring-background">
+            <span hlmAvatarFallback class="text-[11px] font-semibold bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300">RC</span>
+          </hlm-avatar>
+        </div>
+        <button hlmBtn variant="outline" size="sm" class="gap-2">
+          <ng-icon name="lucideMessageSquare" size="14"></ng-icon>
+          Comment
+        </button>
+        <button hlmBtn size="sm" class="gap-2">
+          <ng-icon name="lucideCheck" size="14"></ng-icon>
+          Approve
+        </button>
+        <button hlmBtn variant="ghost" size="icon" aria-label="More">
+          <ng-icon name="lucideMoreHorizontal" size="16"></ng-icon>
+        </button>
+      </div>
+    </div>
+
+    <nav class="flex items-center gap-1 mt-5 -mb-3">
+      @for (tab of tabs; track tab.key) {
+        <button
+          (click)="setTab(tab.key)"
+          class="flex items-center gap-2 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors"
+          [class.border-foreground]="activeTab() === tab.key"
+          [class.text-foreground]="activeTab() === tab.key"
+          [class.border-transparent]="activeTab() !== tab.key"
+          [class.text-muted-foreground]="activeTab() !== tab.key"
+        >
+          <ng-icon [name]="tab.icon" size="12"></ng-icon>
+          {{ tab.label }}
+          @if (tab.count !== undefined) {
+            <span class="inline-flex h-4 items-center rounded-full bg-muted px-1.5 text-[10px] font-medium text-muted-foreground">{{ tab.count }}</span>
+          }
+        </button>
+      }
+    </nav>
+  </header>
+
+  <div class="flex-1 min-h-0 overflow-auto px-6 py-6 max-w-4xl">
+    <ol class="relative ml-3 border-l border-border space-y-6 pl-6">
+      @for (item of timeline; track $index) {
+        <li class="relative">
+          <span class="absolute -left-[2.05rem] top-1 h-3 w-3 rounded-full ring-4 ring-background"
+                [class.bg-emerald-500]="item.kind === 'review'"
+                [class.bg-zinc-300]="item.kind === 'event'"
+                [class.dark:bg-zinc-700]="item.kind === 'event'"
+                [class.bg-foreground]="item.kind === 'description' || item.kind === 'comment'"></span>
+
+          @if (item.kind === 'event') {
+            <div class="flex items-center gap-2 text-xs text-muted-foreground">
+              <ng-icon [name]="item.icon ?? ''" size="14"></ng-icon>
+              <span>{{ item.label }}</span>
+              <span class="text-muted-foreground/60">·</span>
+              <span>{{ item.ago }}</span>
+            </div>
+          } @else if (item.author; as author) {
+            <article class="rounded-lg border border-border bg-card overflow-hidden">
+              <header class="flex items-center gap-2 px-3 py-2 bg-muted/40 border-b border-border">
+                <hlm-avatar class="size-6">
+                  <span hlmAvatarFallback class="text-[10px] font-semibold" [ngClass]="author.tone">{{ author.initials }}</span>
+                </hlm-avatar>
+                <span class="text-xs font-medium">{{ author.name }}</span>
+                @if (item.kind === 'description') {
+                  <span class="text-xs text-muted-foreground">{{ item.ago }}</span>
+                } @else if (item.kind === 'review') {
+                  <span class="text-xs text-muted-foreground">approved {{ item.ago }}</span>
+                  <span class="ml-1 text-xs px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">Approved</span>
+                } @else {
+                  <span class="text-xs text-muted-foreground">commented {{ item.ago }}</span>
+                }
+              </header>
+              <div class="px-4 py-3 text-sm leading-relaxed">{{ item.body }}</div>
+            </article>
+          }
+        </li>
+      }
+    </ol>
+
+    <form class="mt-8 rounded-lg border border-border bg-card overflow-hidden">
+      <div class="flex items-center gap-2 px-3 py-2 bg-muted/40 border-b border-border text-xs text-muted-foreground">
+        Leave a comment
+      </div>
+      <textarea
+        rows="3"
+        placeholder="Comment, suggest changes, or approve the PR,"
+        class="block w-full px-4 py-3 text-sm bg-transparent focus:outline-none resize-none"
+      ></textarea>
+      <div class="flex items-center justify-between gap-2 px-3 py-2 border-t border-border">
+        <span class="text-xs text-muted-foreground">Markdown supported</span>
+        <div class="flex items-center gap-2">
+          <button hlmBtn variant="outline" size="sm">Comment</button>
+          <button hlmBtn size="sm" class="gap-2">
+            <ng-icon name="lucideCheck" size="14"></ng-icon>
+            Approve
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>

@@ -1,0 +1,82 @@
+<section class="p-6 max-w-screen-2xl mx-auto">
+  <header class="flex items-end justify-between gap-4 flex-wrap">
+    <div>
+      <h2 class="text-xl font-semibold tracking-tight">Inbox</h2>
+      <p class="text-sm text-muted-foreground mt-1">7 pull requests need your review.</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <button hlmBtn variant="outline" size="sm" class="gap-2">
+        <ng-icon name="lucideSearch" size="14"></ng-icon>
+        <span>Search inbox</span>
+      </button>
+      <button hlmBtn size="sm" class="gap-2">
+        <ng-icon name="lucideGitPullRequestArrow" size="14"></ng-icon>
+        New PR
+      </button>
+    </div>
+  </header>
+
+  <nav class="flex items-center gap-1 mt-5 border-b border-border">
+    @for (f of filters; track f.key) {
+      <button
+        class="px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors"
+        [class.border-foreground]="f.active"
+        [class.text-foreground]="f.active"
+        [class.border-transparent]="!f.active"
+        [class.text-muted-foreground]="!f.active"
+      >
+        {{ f.label }}
+        <span class="ml-1.5 inline-flex h-4 items-center rounded-full bg-muted px-1.5 text-[10px] font-medium text-muted-foreground">{{ f.count }}</span>
+      </button>
+    }
+    <div class="flex-1"></div>
+    <button hlmBtn variant="ghost" size="sm" class="gap-2 text-xs">
+      Updated
+      <ng-icon name="lucideChevronsUpDown" size="12"></ng-icon>
+    </button>
+  </nav>
+
+  <ul class="mt-2 divide-y divide-border">
+    @for (row of rows; track row.id) {
+      <li class="group">
+        <a
+          [routerLink]="['/pr', row.id]"
+          class="grid items-center gap-3 px-2 py-3 hover:bg-muted/50 rounded-md transition-colors"
+          style="grid-template-columns: 1fr auto auto"
+        >
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="text-xs px-1.5 py-0.5 rounded border" [ngClass]="statusTone(row.status)">{{ statusLabel(row.status) }}</span>
+              <h3 class="text-sm font-medium truncate group-hover:text-primary">{{ row.title }}</h3>
+            </div>
+            <div class="mt-1 flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+              <span class="font-mono">{{ row.repo }} #{{ row.id }}</span>
+              <span class="text-muted-foreground/60">·</span>
+              <span class="font-mono">{{ row.branch }}</span>
+              <span class="text-muted-foreground/60">·</span>
+              <span>by {{ row.author.name }}</span>
+              <span class="text-muted-foreground/60">·</span>
+              <span>{{ row.updatedAgo }}</span>
+              @for (label of row.labels; track label.name) {
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-medium" [ngClass]="label.tone">{{ label.name }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 text-xs text-muted-foreground font-mono">
+            <span class="text-emerald-600 dark:text-emerald-400">+{{ row.added }}</span>
+            <span class="text-red-600 dark:text-red-400">-{{ row.removed }}</span>
+          </div>
+
+          <div class="flex -space-x-2">
+            @for (r of row.reviewers; track $index) {
+              <hlm-avatar class="size-6 ring-2 ring-background">
+                <span hlmAvatarFallback [ngClass]="r.tone" class="text-[10px] font-semibold">{{ r.initials }}</span>
+              </hlm-avatar>
+            }
+          </div>
+        </a>
+      </li>
+    }
+  </ul>
+</section>

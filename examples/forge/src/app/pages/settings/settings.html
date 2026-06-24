@@ -1,0 +1,70 @@
+<section class="grid grid-cols-[260px_minmax(0,1fr)] h-full">
+  <aside class="border-r border-border bg-muted/30 p-4">
+    <h2 class="text-base font-semibold tracking-tight px-2 mb-1">Settings</h2>
+    <p class="text-xs text-muted-foreground px-2 mb-4">Workspace + per-user.</p>
+    <nav class="flex flex-col gap-0.5">
+      @for (s of sections; track s.key) {
+        <button
+          (click)="select(s.key)"
+          class="flex items-center gap-3 px-2 py-2 rounded-md text-left transition-colors"
+          [class.bg-background]="active() === s.key"
+          [class.shadow-sm]="active() === s.key"
+          [class.hover:bg-background/60]="active() !== s.key"
+        >
+          <span class="inline-flex h-7 w-7 items-center justify-center rounded-md bg-muted text-muted-foreground shrink-0">
+            <ng-icon [name]="s.icon" size="14"></ng-icon>
+          </span>
+          <span class="flex flex-col min-w-0">
+            <span class="text-sm font-medium">{{ s.label }}</span>
+            <span class="text-[11px] text-muted-foreground truncate">{{ s.sub }}</span>
+          </span>
+        </button>
+      }
+    </nav>
+  </aside>
+
+  <div class="overflow-y-auto p-8 max-w-2xl">
+    <header class="mb-6">
+      <h3 class="text-xl font-semibold tracking-tight">Profile</h3>
+      <p class="text-sm text-muted-foreground mt-1">How you appear across Forge.</p>
+    </header>
+
+    <div class="space-y-5">
+      <div class="grid grid-cols-[140px_minmax(0,1fr)] gap-4 items-start">
+        <label class="text-sm font-medium pt-2">Display name</label>
+        <input value="Mofiro Jean" class="h-9 rounded-md border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+      </div>
+      <div class="grid grid-cols-[140px_minmax(0,1fr)] gap-4 items-start">
+        <label class="text-sm font-medium pt-2">Handle</label>
+        <div class="flex items-center h-9 rounded-md border border-border bg-background px-3 text-sm">
+          <span class="text-muted-foreground">forge.dev/</span>
+          <input value="mofirojean" class="flex-1 bg-transparent focus:outline-none ml-1" />
+        </div>
+      </div>
+      <div class="grid grid-cols-[140px_minmax(0,1fr)] gap-4 items-start">
+        <label class="text-sm font-medium pt-2">Bio</label>
+        <textarea
+          rows="3"
+          class="rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-y"
+        >HR Admin at Acme Corp. Maintains the angular-ui-skills project, dogfooding Spartan/ng in Forge.</textarea>
+      </div>
+      <div class="grid grid-cols-[140px_minmax(0,1fr)] gap-4 items-start">
+        <label class="text-sm font-medium pt-2">Timezone</label>
+        <select class="h-9 rounded-md border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring">
+          <option>America/Los_Angeles</option>
+          <option>America/New_York</option>
+          <option>Europe/London</option>
+          <option>Africa/Lagos</option>
+        </select>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-4 border-t border-border">
+        <button hlmBtn variant="outline" size="sm">Discard</button>
+        <button hlmBtn size="sm" class="gap-2">
+          <ng-icon name="lucideCheck" size="14"></ng-icon>
+          Save changes
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

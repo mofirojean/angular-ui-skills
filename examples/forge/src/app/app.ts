@@ -1,30 +1,79 @@
-import { ChangeDetectionStrategy, Component, DOCUMENT, computed, effect, inject, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map } from 'rxjs';
+
+import { NgIcon } from '@ng-icons/core';
 
 import { HlmButtonImports } from '@spartan-ng/helm/button';
-import { HlmCardImports } from '@spartan-ng/helm/card';
+import { HlmSidebarImports } from '@spartan-ng/helm/sidebar';
+import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
+import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
+import { HlmToaster } from '@spartan-ng/helm/sonner';
+
+import { ThemeService } from './core/theme.service';
+import { MockDataService } from './core/mock-data.service';
+import { NAV } from './core/nav';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, HlmButtonImports, HlmCardImports],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    NgIcon,
+    HlmButtonImports,
+    HlmSidebarImports,
+    HlmDropdownMenuImports,
+    HlmAvatarImports,
+    HlmToaster,
+  ],
   templateUrl: './app.html',
   styleUrl: './app.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
-  private readonly document = inject(DOCUMENT);
+  protected readonly theme = inject(ThemeService);
+  protected readonly data = inject(MockDataService);
+  private readonly router = inject(Router);
 
-  protected readonly title = signal('Forge');
-  protected readonly mode = signal<'light' | 'dark'>('light');
-  protected readonly modeIcon = computed(() => (this.mode() === 'dark' ? '☀' : '☾'));
+  protected readonly nav = NAV;
+  protected readonly reviewer = this.data.currentReviewer;
 
-  constructor() {
-    effect(() => {
-      this.document.documentElement.classList.toggle('dark', this.mode() === 'dark');
-    });
-  }
+  protected readonly pinnedRepos = [
+    { name: 'forge/runtime', openPrs: 3, status: 'pass' as const },
+    { name: 'forge/api',     openPrs: 7, status: 'build' as const },
+    { name: 'forge/web',     openPrs: 2, status: 'pass' as const },
+    { name: 'forge/docs',    openPrs: 1, status: 'fail' as const },
+  ];
 
-  protected toggleTheme(): void {
-    this.mode.update((m) => (m === 'light' ? 'dark' : 'light'));
-  }
+  protected readonly userInitials = computed(() =>
+    this.reviewer().name
+      .split(' ')
+      .map((p) => p[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase(),
+  );
+
+  private readonly currentUrl = toSignal(
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      map((e) => e.urlAfterRedirects),
+    ),
+    { initialValue: this.router.url },
+  );
+
+  protected readonly pageTitle = computed(() => {
+    const url = this.currentUrl();
+    for (const section of this.nav) {
+      const match = section.items.find(
+        (i) => i.path === url || (i.path !== '/' && url.startsWith(i.path)),
+      );
+      if (match) return match.label;
+    }
+    if (url.startsWith('/pr/')) return 'Pull request';
+    if (url.startsWith('/author/')) return 'Author';
+    return 'Forge';
+  });
 }
