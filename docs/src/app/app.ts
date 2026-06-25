@@ -169,6 +169,20 @@ export class App {
       image: 'projects/roster-light-mode.png',
       demo: SITE_CONFIG.demos.roster,
     },
+    {
+      slug: 'forge',
+      name: 'Forge',
+      tagline: 'Code review console',
+      description:
+        'A polished PR review surface for a fictional Angular monorepo team. Sidebar nav with pinned repos and CI-status dots, inbox queue, PR detail with tab strip (Conversation / Files / Commits / Checks) + reviewer avatars + activity timeline, author profile with stat cards, settings with sub-nav, ⌘K command palette navigating every route. Validates spartan-ng-developer on Spartan v1.0.',
+      stack: ['Angular v21', 'Spartan/ng v1.0.1', 'Tailwind v4', 'ngx-sonner', '@ng-icons/lucide', 'Zoneless'],
+      skill: 'spartan-ng-developer',
+      path: 'examples/forge',
+      accent: 'from-amber-500/25 via-orange-400/15 to-transparent',
+      badges: ['Spartan v1.0', '⌘K palette', 'Sidebar nav'],
+      image: 'projects/forge-light-mode.png',
+      demo: SITE_CONFIG.demos.forge,
+    },
   ];
 
   protected readonly heroSnippet = [

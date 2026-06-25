@@ -6,5 +6,6 @@ export const SITE_CONFIG = {
     apex: 'https://apex-ecru-nu.vercel.app',
     switchboard: 'https://switchboard-olive.vercel.app',
     roster: 'https://roster-khaki-pi.vercel.app',
+    forge: 'https://forge.vercel.app',
   },
 } as const;
