@@ -16,7 +16,7 @@ Drop the `-g` for a project-scoped install.
 
 | Skill | Library | Tracks |
 |---|---|---|
-| [`spartan-ng-developer`](./skills/spartan-ng-developer) | Spartan/ng | `@spartan-ng/brain` 0.0.1-alpha.714 |
+| [`spartan-ng-developer`](./skills/spartan-ng-developer) | Spartan/ng | `@spartan-ng/brain` 1.0.1 |
 | [`primeng-developer`](./skills/primeng-developer) | PrimeNG | 21.1.9 |
 | [`ng-zorro-developer`](./skills/ng-zorro-developer) | NG-ZORRO | `ng-zorro-antd` 21.3.1 |
 | [`angular-material-developer`](./skills/angular-material-developer) | Angular Material | `@angular/material` 21.2.14 |
@@ -38,7 +38,8 @@ mkdir -p ~/.claude/skills && \
   tar -xz --strip-components=2 -C ~/.claude/skills \
     angular-ui-skills-master/skills/spartan-ng-developer \
     angular-ui-skills-master/skills/primeng-developer \
-    angular-ui-skills-master/skills/ng-zorro-developer
+    angular-ui-skills-master/skills/ng-zorro-developer \
+    angular-ui-skills-master/skills/angular-material-developer
 ```
 
 For Cursor, drop a `SKILL.md` into `.cursor/rules/`. For other agents, copy any `skills/<name>/SKILL.md` into the agent's skill or rules folder.
