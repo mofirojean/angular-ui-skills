@@ -13,7 +13,9 @@ import { HlmToaster } from '@spartan-ng/helm/sonner';
 
 import { ThemeService } from './core/theme.service';
 import { MockDataService } from './core/mock-data.service';
+import { CommandPaletteService } from './core/command-palette.service';
 import { NAV } from './core/nav';
+import { CommandPalette } from './shell/command-palette';
 
 @Component({
   selector: 'app-root',
@@ -27,15 +29,28 @@ import { NAV } from './core/nav';
     HlmDropdownMenuImports,
     HlmAvatarImports,
     HlmToaster,
+    CommandPalette,
+    HlmSidebarImports,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(window:keydown)': 'onGlobalKey($event)',
+  },
 })
 export class App {
   protected readonly theme = inject(ThemeService);
   protected readonly data = inject(MockDataService);
+  protected readonly palette = inject(CommandPaletteService);
   private readonly router = inject(Router);
+
+  protected onGlobalKey(event: KeyboardEvent): void {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      this.palette.toggle();
+    }
+  }
 
   protected readonly nav = NAV;
   protected readonly reviewer = this.data.currentReviewer;
