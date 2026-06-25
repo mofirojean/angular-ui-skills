@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  HostListener,
   TemplateRef,
   computed,
   inject,
@@ -55,6 +54,9 @@ import { CommandPalette } from './shared/command-palette/command-palette';
   templateUrl: './app.html',
   styleUrl: './app.less',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(document:keydown)': 'onKeydown($event)',
+  },
 })
 export class App {
   protected readonly theme = inject(ThemeService);
@@ -107,7 +109,6 @@ export class App {
     return 'Switchboard';
   });
 
-  @HostListener('document:keydown', ['$event'])
   protected onKeydown(event: KeyboardEvent): void {
     const modifier = this.isMac ? event.metaKey : event.ctrlKey;
     if (modifier && event.key.toLowerCase() === 'k') {
