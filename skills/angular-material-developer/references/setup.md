@@ -86,3 +86,15 @@ The legacy `MatButtonModule` still re-exports the same classes, do not introduce
 5. **Color-scheme not set.** Without `color-scheme: light dark`, native form controls render in light mode even when your app is dark. Add it on `html` in `styles.scss`.
 6. **Using `mat.define-light-theme()` in v19+.** That API is M2-only. Switch to `mat.theme()`, see [theming.md](./theming.md).
 7. **Browser-default `<button>` border bleeds through "borderless" designs.** If you build custom controls (calendar cells, kanban cards, nav rows) on `<button>` elements, the user-agent stylesheet draws a `buttonborder` line that's especially visible in light mode. Explicitly set `border: none` on the host. This isn't Material-specific, but Material's heavy use of `<button>` for icon and list-item triggers makes it show up frequently.
+
+8. **Using `@HostListener` / `@HostBinding` in new code.** Symptom: works, but the host expressions get no compile-time type check, and the decorators don't compose cleanly with signal-based APIs. Fix: declare host bindings via the `host: {}` metadata in `@Component` / `@Directive`, then enable `typeCheckHostBindings: true` under `angularCompilerOptions` in `tsconfig.json`. Pattern:
+   ```ts
+   @Component({
+     // ...
+     host: {
+       '(window:keydown)': 'onKey($event)',
+       '[class.dark]': "mode() === 'dark'",
+     },
+   })
+   ```
+   Event targets (`window:`, `document:`, `body:`) live inside the parentheses of the key. This is an Angular fundamentals topic, not Material-specific, but it shows up in every component you'll write.

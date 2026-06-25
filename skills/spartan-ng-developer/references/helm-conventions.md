@@ -119,6 +119,42 @@ Bindings from parent templates use bracket notation for dynamic values and bare 
 
 When customizing or extending Helm components, stay consistent - use `input()`, not the legacy `@Input()` decorator.
 
+### Host bindings: `host: {}` metadata, not `@HostListener` / `@HostBinding`
+
+Spartan's own Helm sources use the **`host: {}` metadata** property in the `@Component` / `@Directive` decorator for every event listener and DOM attribute binding. The legacy `@HostListener` and `@HostBinding` decorators are no longer recommended for new code. Stay consistent when writing custom components that consume Helm:
+
+```ts
+// ✗ legacy decorator form
+@Component({ ... })
+export class App {
+  @HostListener('window:keydown', ['$event'])
+  onKey(event: KeyboardEvent) { ... }
+
+  @HostBinding('class.dark') get isDark() { return this.theme.mode() === 'dark'; }
+}
+
+// ✓ modern host: {} metadata
+@Component({
+  ...,
+  host: {
+    '(window:keydown)': 'onKey($event)',
+    '[class.dark]': "theme.mode() === 'dark'",
+  },
+})
+export class App {
+  onKey(event: KeyboardEvent) { ... }
+}
+```
+
+Why this matters:
+
+1. **Type safety.** Enable `typeCheckHostBindings: true` under `angularCompilerOptions` in `tsconfig.json`, the host expressions are then type-checked against the host element's DOM types at compile time. The decorator form gives you no equivalent check.
+2. **Centralized declaration.** Host config lives next to selector + template + imports, not scattered as method/property decorators. Easier to scan, easier to grep.
+3. **Signals-friendly.** Host expressions can read signals directly (`'[class.dark]': "theme.mode() === 'dark'"`), no need for getter properties.
+4. **Spartan's own source uses it.** Helm wrappers like `HlmButton` apply their classes via the `classes()` utility plus `host: { 'data-slot': '...' }` metadata. Mixing decorators in user code breaks the consistency.
+
+For event-listener targets (`window:keydown`, `document:click`, `body:scroll`), the syntax is identical, the target prefix lives inside the parentheses of the metadata key.
+
 ## 4. `hostDirectives` composition with Brain
 
 Helm doesn't reimplement behavior - it wraps Brain primitives. Angular's `hostDirectives` mechanism applies one or more directives to the host element of the wrapping component, so the Brain primitive's logic runs on the same element as Helm's styling.

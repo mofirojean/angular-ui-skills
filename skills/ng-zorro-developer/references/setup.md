@@ -108,3 +108,15 @@ provideNzIcons([UserOutline, SettingOutline]);
 3. **Major-version mismatch.** Installing `ng-zorro-antd@21` into an Angular 20 project fails npm peer checks. The major numbers MUST match. Upgrade Angular first.
 4. **Mixing module and standalone imports for the same component.** Both work, but importing `NzButtonModule` AND `NzButtonComponent` in the same component bloats the bundle. Pick one per component.
 5. **Using `<nz-icon>` without registering the icon.** Symptom: blank space where the icon should be, console warning "icon not found". Fix: add the icon to `provideNzIcons([...])`.
+
+6. **Using `@HostListener` / `@HostBinding` in new code.** Symptom: works, but the host expressions get no compile-time type check, and the decorators don't compose cleanly with signal-based APIs. Fix: declare host bindings via the `host: {}` metadata in `@Component` / `@Directive`, then enable `typeCheckHostBindings: true` under `angularCompilerOptions` in `tsconfig.json`. Pattern:
+   ```ts
+   @Component({
+     // ...
+     host: {
+       '(document:keydown)': 'onKey($event)',
+       '[class.dark]': "mode() === 'dark'",
+     },
+   })
+   ```
+   Event targets (`window:`, `document:`, `body:`) live inside the parentheses of the key. This is an Angular fundamentals topic, not NG-ZORRO-specific, but it shows up in every component you'll write.

@@ -131,4 +131,16 @@ If the button renders with primary-color background and rounded corners → setu
 
 6. **CSS conflicts with Tailwind v4.** Symptom: PrimeNG components inherit Tailwind's preflight too aggressively, or Tailwind utilities don't override PrimeNG defaults. Fix: enable `cssLayer` with the order shown above.
 
+7. **Using `@HostListener` / `@HostBinding` in new code.** Symptom: works, but the host expressions get no compile-time type check, and the decorators don't compose cleanly with signal-based APIs. Fix: declare host bindings via the `host: {}` metadata in `@Component` / `@Directive`, then enable `typeCheckHostBindings: true` under `angularCompilerOptions` in `tsconfig.json`. Pattern:
+   ```ts
+   @Component({
+     // ...
+     host: {
+       '(window:keydown)': 'onKey($event)',
+       '[class.dark]': "mode() === 'dark'",
+     },
+   })
+   ```
+   Event targets (`window:`, `document:`, `body:`) live inside the parentheses of the key. This is an Angular fundamentals topic, not PrimeNG-specific, but it shows up in every component you'll write.
+
 7. **`unstyled` mode without Tailwind setup.** Symptom: components render with no styles at all. Either turn off `unstyled` (use the preset) or pair it with `tailwindcss-primeui`. See [styled-vs-unstyled.md](./styled-vs-unstyled.md).
