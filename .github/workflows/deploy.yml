@@ -16,6 +16,7 @@ on:
           - apex
           - switchboard
           - roster
+          - forge
         default: all
 
 concurrency:
@@ -58,6 +59,9 @@ jobs:
             roster:
               - 'examples/roster/**'
               - '.github/workflows/deploy.yml'
+            forge:
+              - 'examples/forge/**'
+              - '.github/workflows/deploy.yml'
 
       - name: Build deploy matrix
         id: plan
@@ -68,6 +72,7 @@ jobs:
           APEX: ${{ steps.filter.outputs.apex }}
           SB: ${{ steps.filter.outputs.switchboard }}
           ROSTER: ${{ steps.filter.outputs.roster }}
+          FORGE: ${{ steps.filter.outputs.forge }}
           EVENT: ${{ github.event_name }}
           TARGET: ${{ inputs.target }}
         run: |
@@ -100,6 +105,9 @@ jobs:
           fi
           if should_run roster "$ROSTER"; then
             items+=('{"app":"roster","path":"examples/roster","project_id_name":"VERCEL_PROJECT_ID_ROSTER"}')
+          fi
+          if should_run forge "$FORGE"; then
+            items+=('{"app":"forge","path":"examples/forge","project_id_name":"VERCEL_PROJECT_ID_FORGE"}')
           fi
 
           if [[ ${#items[@]} -eq 0 ]]; then
@@ -148,6 +156,7 @@ jobs:
           VERCEL_PROJECT_ID_APEX: ${{ secrets.VERCEL_PROJECT_ID_APEX }}
           VERCEL_PROJECT_ID_SWITCHBOARD: ${{ secrets.VERCEL_PROJECT_ID_SWITCHBOARD }}
           VERCEL_PROJECT_ID_ROSTER: ${{ secrets.VERCEL_PROJECT_ID_ROSTER }}
+          VERCEL_PROJECT_ID_FORGE: ${{ secrets.VERCEL_PROJECT_ID_FORGE }}
         run: |
           set -euo pipefail
           case "${{ matrix.app }}" in
@@ -157,6 +166,7 @@ jobs:
             apex)             project_id="$VERCEL_PROJECT_ID_APEX" ;;
             switchboard)      project_id="$VERCEL_PROJECT_ID_SWITCHBOARD" ;;
             roster)           project_id="$VERCEL_PROJECT_ID_ROSTER" ;;
+            forge)            project_id="$VERCEL_PROJECT_ID_FORGE" ;;
             *)                project_id="" ;;
           esac
 
