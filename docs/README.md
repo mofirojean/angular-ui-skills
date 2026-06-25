@@ -35,10 +35,10 @@ Demo URLs and the repo URL live in **`src/app/site.config.ts`**. Swap them when 
 
 ## Assets
 
-- **`public/logos/`** — library logos shown in the skills cards (Spartan/ng, PrimeNG, NG-ZORRO, Angular Material)
-- **`public/projects/`** — example app screenshots (light and dark mode)
-- **`public/favicon.svg`** — the shield logo as a standalone SVG (same gradient as the header)
-- **`public/robots.txt`** and **`public/sitemap.xml`** — SEO essentials
+- **`public/logos/`**, library logos shown in the skills cards (Spartan/ng, PrimeNG, NG-ZORRO, Angular Material)
+- **`public/projects/`**, example app screenshots (light and dark mode)
+- **`public/favicon.svg`**, the shield logo as a standalone SVG (same gradient as the header)
+- **`public/robots.txt`** and **`public/sitemap.xml`**, SEO essentials
 
 When the custom domain is set up, update the canonical URL in `src/index.html`, the `og:url` and `og:image` tags, the `<link rel="canonical">`, and the URLs in `robots.txt` and `sitemap.xml`.
 

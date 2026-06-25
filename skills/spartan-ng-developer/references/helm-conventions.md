@@ -251,7 +251,7 @@ selector: 'button[hlmSidebarMenuButton], a[hlmSidebarMenuButton]'  // <button> O
 selector: 'main[hlmSidebarInset]'   // must be <main>
 ```
 
-The `<ul>` + `<li>` requirement for menu lists is the most surprising one — Spartan wants real list semantics, not `<div>`-faked lists. Using the wrong element produces `NG8001` at build time.
+The `<ul>` + `<li>` requirement for menu lists is the most surprising one, Spartan wants real list semantics, not `<div>`-faked lists. Using the wrong element produces `NG8001` at build time.
 
 ### C. Directive-only (no element form)
 
@@ -269,7 +269,7 @@ If you instinctively reach for `<hlm-sidebar-rail />`, you get:
 NG8001: 'hlm-sidebar-rail' is not a known element
 ```
 
-The fix is to apply the directive to the right native element. The Helm source files in your repo are the source of truth — grep for `selector:` in the relevant `src/libs/ui/<component>/src/lib/` folder when in doubt.
+The fix is to apply the directive to the right native element. The Helm source files in your repo are the source of truth, grep for `selector:` in the relevant `src/libs/ui/<component>/src/lib/` folder when in doubt.
 
 ### Discovering the right form
 
@@ -292,7 +292,7 @@ The output tells you whether to write `<hlm-sidebar-rail />` (element form), `<b
 | Mixing Helm + raw Brain primitives without understanding `hostDirectives` | Duplicate-directive errors or doubled behavior | Use Brain directly only when Helm doesn't expose what you need ([brain.md](brain.md)) |
 | Replacing `@import "tailwindcss/theme.css" layer(theme); ...` with `@import "tailwindcss";` | Spartan preset layers incorrectly; components render unstyled | Keep the explicit four-line layer imports - see [setup.md](setup.md) |
 | Forgetting `*hlmXPortal` on a Pattern-C overlay's content | Overlay renders inline (broken layout / z-index) | Add the structural directive: `<hlm-dialog-content *hlmDialogPortal>`. Pattern-D overlays (Dropdown Menu, Context Menu, Menubar) don't use `*hlmXPortal` - they take a template ref via `[hlm{X}Trigger]="tplRef"` instead. |
-| `NG8001: 'hlm-X' is not a known element` on something you imported | Helm component is directive-only — no matching custom element exists | Read the actual `selector:` in the generated Helm source. `<hlm-sidebar-rail />` doesn't exist; the form is `<button hlmSidebarRail></button>`. See §7. |
+| `NG8001: 'hlm-X' is not a known element` on something you imported | Helm component is directive-only, no matching custom element exists | Read the actual `selector:` in the generated Helm source. `<hlm-sidebar-rail />` doesn't exist; the form is `<button hlmSidebarRail></button>`. See §7. |
 | Writing `<div hlmSidebarMenu>` instead of `<ul hlmSidebarMenu>` | `NG8001` because the selector is `ul[hlmSidebarMenu]` strict-semantic | Use the required element: `<ul hlmSidebarMenu>`, `<li hlmSidebarMenuItem>`, `<main hlmSidebarInset>`. See §7. |
 
 ## See also

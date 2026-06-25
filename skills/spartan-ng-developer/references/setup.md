@@ -133,7 +133,7 @@ Then add the CSS variable theme block - see [theming.md](theming.md).
 
 ## Non-interactive install (for AI agents and CI)
 
-`init` and `ui-theme` cannot be run non-interactively — their `schema.json` files have empty `properties: {}` and the prompts live inside the generator code via `enquirer.prompt()` calls. **No flag will suppress them.** Verified by reading `node_modules/@spartan-ng/cli/src/generators/{init,theme}/generator.js`.
+`init` and `ui-theme` cannot be run non-interactively, their `schema.json` files have empty `properties: {}` and the prompts live inside the generator code via `enquirer.prompt()` calls. **No flag will suppress them.** Verified by reading `node_modules/@spartan-ng/cli/src/generators/{init,theme}/generator.js`.
 
 For automated environments, replicate what `init` + `ui-theme` would do, then continue with the regular `ng g @spartan-ng/cli:ui <name>` flow (which *does* accept flags). Exact steps:
 
@@ -186,12 +186,12 @@ If you'll touch the date-picker stack, add `npm install luxon @types/luxon` to s
 :root {
   color-scheme: light;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  /* full :root variable block — see theming.md */
+  /* full :root variable block, see theming.md */
 }
 
 :root.dark {
   color-scheme: dark;
-  /* full :root.dark variable block — see theming.md */
+  /* full :root.dark variable block, see theming.md */
 }
 
 @layer base {
@@ -200,7 +200,7 @@ If you'll touch the date-picker stack, add `npm install luxon @types/luxon` to s
 }
 ```
 
-If `ng add tailwindcss` wrote a bare `@import 'tailwindcss';`, **remove** that line — the four explicit layer imports above replace it.
+If `ng add tailwindcss` wrote a bare `@import 'tailwindcss';`, **remove** that line, the four explicit layer imports above replace it.
 
 The Neutral block is in [theming.md](theming.md). For other base themes (Stone, Zinc, Gray, Slate), pull values from `node_modules/@spartan-ng/cli/src/generators/theme/libs/colors.js` `exports.themes`.
 
@@ -249,11 +249,11 @@ Known transitive chains (verified against `1.0.1`):
 | `field` | `separator` |
 | `sidebar` | `skeleton`, `tooltip` (rail uses tooltip; loading state uses skeleton) |
 | `dropdown-menu` | inherits CDK menu, no Helm transitives |
-| `sonner` | `ngx-sonner` runtime peer (NOT installed by the schematic) — `npm install ngx-sonner` separately |
+| `sonner` | `ngx-sonner` runtime peer (NOT installed by the schematic), `npm install ngx-sonner` separately |
 
 The `sonner` case is the easy-to-miss one: the schematic writes the Helm wrapper but doesn't install the underlying `ngx-sonner` npm package. The build fails with `Cannot find module 'ngx-sonner'` until you install it.
 
-**Recommended first-batch flow.** For new projects, run the interactive picker once (`ng g @spartan-ng/cli:ui` with no name) and select all the components you expect to need. The picker prompts you about transitives in one pass, faster than generating one at a time. For incremental additions, the positional-name form works fine — just watch the `CREATE` lines for unexpected transitive components and adjust your imports accordingly.
+**Recommended first-batch flow.** For new projects, run the interactive picker once (`ng g @spartan-ng/cli:ui` with no name) and select all the components you expect to need. The picker prompts you about transitives in one pass, faster than generating one at a time. For incremental additions, the positional-name form works fine, just watch the `CREATE` lines for unexpected transitive components and adjust your imports accordingly.
 
 ## Step 8 - components.json
 
@@ -297,7 +297,7 @@ After `init`, `ui-theme`, and at least one generated component:
 | "Where is the Helm component source?" | Confusion about Helm's copy-into-repo model | Find the path in `tsconfig.json` `paths` - the `@spartan-ng/helm/<name>` alias points at it. Configured by `components.json` `componentsPath`. Helm components are **not** in `node_modules`. |
 | Imports use a path that doesn't exist | Generated tsconfig path alias is missing | Check `tsconfig.json` `paths` - the `init` schematic should have added `@spartan-ng/helm/*` aliases pointing to the generated UI library folder. |
 | `NG3004: Unable to import component X. The module '@spartan-ng/helm/<name>' could not be found.` after generating a new Helm component while `ng serve` is running | esbuild/Vite cached the `tsconfig.json` `paths` at dev-server start; new aliases added by `ng g @spartan-ng/cli:ui <name>` are not picked up on hot reload | **Stop and restart `ng serve`.** A fresh server reads the updated `tsconfig.json`. Verify the alias exists first: `grep "@spartan-ng/helm/<name>" tsconfig.json`. |
-| `NG0309: Directive _BrnButton matches multiple times on the same element` | Stacking two directives that both host-directive `HlmButton` (e.g. `<button hlmSidebarTrigger hlmBtn>`) — both bring `BrnButton`, which Angular forbids twice on one host | Use the more specific trigger directive on its own. `hlmSidebarTrigger` is a self-contained component (own template, own styling) — drop `hlmBtn`. The same applies to any future Helm directive that internally composes `HlmButton`. |
+| `NG0309: Directive _BrnButton matches multiple times on the same element` | Stacking two directives that both host-directive `HlmButton` (e.g. `<button hlmSidebarTrigger hlmBtn>`), both bring `BrnButton`, which Angular forbids twice on one host | Use the more specific trigger directive on its own. `hlmSidebarTrigger` is a self-contained component (own template, own styling), drop `hlmBtn`. The same applies to any future Helm directive that internally composes `HlmButton`. |
 
 ## See also
 

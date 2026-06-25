@@ -177,7 +177,7 @@ The 9 Helm components for structuring page layout - containers, separators, coll
 - **Service methods**: `setOpen(open)`, `setOpenMobile(open)`, `setVariant(variant)`, `toggleSidebar()`. Read-only signals: `open`, `openMobile`, `isMobile`, `variant`, `state` (`'expanded' | 'collapsed'`).
 - **Sub-directives**: `hlmSidebarWrapper`, `hlmSidebarHeader`, `hlmSidebarContent`, `hlmSidebarFooter`, `hlmSidebarGroup`, `hlmSidebarGroupLabel`, `hlmSidebarGroupContent`, `hlmSidebarMenu`, `hlmSidebarMenuItem`, `hlmSidebarMenuButton`, `hlmSidebarMenuAction`, `hlmSidebarMenuBadge`, `hlmSidebarMenuSub`, `hlmSidebarMenuSubItem`, `hlmSidebarMenuSubButton`, `hlmSidebarSeparator`, `hlmSidebarTrigger`.
 - **Gotcha**: The outer `<div hlmSidebarWrapper>` is required - it wraps both the sidebar and the main content area. Forgetting it makes the trigger silently fail.
-- **Gotcha (NG0309)**: `hlmSidebarTrigger` is a **self-contained component** (selector `button[hlmSidebarTrigger]`). It already host-directives `HlmButton`, applies `provideBrnButtonConfig({ variant: 'ghost', size: 'icon' })`, and renders the `lucidePanelLeft` icon from its own template. **Do not also add `hlmBtn`** — that re-applies `BrnButton` and triggers `NG0309: Directive _BrnButton matches multiple times on the same element`. Just write `<button hlmSidebarTrigger aria-label="Toggle sidebar"></button>` with no children.
+- **Gotcha (NG0309)**: `hlmSidebarTrigger` is a **self-contained component** (selector `button[hlmSidebarTrigger]`). It already host-directives `HlmButton`, applies `provideBrnButtonConfig({ variant: 'ghost', size: 'icon' })`, and renders the `lucidePanelLeft` icon from its own template. **Do not also add `hlmBtn`**, that re-applies `BrnButton` and triggers `NG0309: Directive _BrnButton matches multiple times on the same element`. Just write `<button hlmSidebarTrigger aria-label="Toggle sidebar"></button>` with no children.
 
 #### Collapsed icon mode
 
@@ -208,11 +208,11 @@ Three rules that come up repeatedly:
 
 1. **Hide text labels** with `group-data-[collapsible=icon]:hidden` on the text wrapper, never on the icon next to it.
 2. **Center the leading icon** with `group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center` on the surrounding link/button. The default padding shoves a 32px icon to the left edge of the 48px-wide collapsed strip.
-3. **`hlmSidebarMenuButton` auto-applies `size-8! p-2!`** in collapsed mode. The `!` is `!important`, which clamps the button to a 32×32 box with 16px inner — too small for a normal-sized `<hlm-avatar>` or any content larger than a 16px icon. To use a bigger child (e.g. an `size-7` avatar that should fill the button), override with `group-data-[collapsible=icon]:p-0! group-data-[collapsible=icon]:justify-center`. The trailing `!` is required; without it the override loses to the directive's `p-2!`.
+3. **`hlmSidebarMenuButton` auto-applies `size-8! p-2!`** in collapsed mode. The `!` is `!important`, which clamps the button to a 32×32 box with 16px inner, too small for a normal-sized `<hlm-avatar>` or any content larger than a 16px icon. To use a bigger child (e.g. an `size-7` avatar that should fill the button), override with `group-data-[collapsible=icon]:p-0! group-data-[collapsible=icon]:justify-center`. The trailing `!` is required; without it the override loses to the directive's `p-2!`.
 
 #### Sidebar width tokens
 
-The collapsed icon strip is `3rem` (48px) by default — controlled by `--sidebar-width-icon` on the wrapper. Expanded is `--sidebar-width` (default `16rem`). Override via inputs on `<div hlmSidebarWrapper [sidebarWidthIcon]="'4rem'">` if you need more room for richer collapsed content.
+The collapsed icon strip is `3rem` (48px) by default, controlled by `--sidebar-width-icon` on the wrapper. Expanded is `--sidebar-width` (default `16rem`). Override via inputs on `<div hlmSidebarWrapper [sidebarWidthIcon]="'4rem'">` if you need more room for richer collapsed content.
 
 ### Tabs
 

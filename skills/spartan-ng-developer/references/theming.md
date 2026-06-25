@@ -111,7 +111,7 @@ After the two variable blocks, the `ui-theme` schematic also appends a base laye
 
 > **Use `oklch()`, not hex or HSL.** Spartan's defaults are in `oklch` (perceptually uniform color space) for better dark-mode contrast and easier tweaking. Stay in `oklch` when defining custom values - mixing color spaces produces inconsistent perceived lightness.
 
-> **Dark-mode selector is `:root.dark`** — the class goes on `<html>` (which IS `:root`). A `body.dark` or scoped `.dark` selector won't match Spartan's stylesheet.
+> **Dark-mode selector is `:root.dark`**, the class goes on `<html>` (which IS `:root`). A `body.dark` or scoped `.dark` selector won't match Spartan's stylesheet.
 
 ## 3. Toggling dark mode
 
