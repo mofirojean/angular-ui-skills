@@ -56,7 +56,7 @@ export class App {
       description:
         'Headless brain primitives + helm components, with theming via CSS variables and the hlm-tailwind-preset.',
       status: 'ready',
-      tracks: '@spartan-ng/brain v0.0.1-alpha.714',
+      tracks: '@spartan-ng/brain v1.0.1',
       logo: 'logos/spartan-ng.svg',
       logoBg: 'bg-rose-50 dark:bg-rose-950/40',
     },
@@ -310,7 +310,7 @@ export class App {
     },
     {
       label: 'Generated code',
-      detail: 'Uses HlmCommand, brn-command-input, the v0.0.1-alpha.696 API surface, and the helm preset already in your tailwind config.',
+      detail: 'Uses HlmCommand, brn-command-input, the v1.0.1 stable API surface, and the helm preset already in your tailwind config.',
     },
   ];
 
