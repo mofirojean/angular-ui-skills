@@ -14,9 +14,12 @@ export interface Author {
   readonly tone?: string;
 }
 
+export type ReviewState = 'approved' | 'requested-changes' | 'pending';
+
 export interface MiniAvatar {
   readonly initials: string;
   readonly tone: string;
+  readonly review?: ReviewState;
 }
 
 export interface Label {

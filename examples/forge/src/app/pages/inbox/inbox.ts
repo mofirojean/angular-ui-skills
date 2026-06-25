@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { NgIcon } from '@ng-icons/core';
@@ -9,6 +9,8 @@ import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
 
 import type { PrRow } from '../../core/model';
 
+type FilterKey = 'needs' | 'wait' | 'approved' | 'all';
+
 @Component({
   selector: 'app-inbox',
   imports: [NgClass, RouterLink, NgIcon, HlmButtonImports, HlmBadgeImports, HlmAvatarImports],
@@ -17,12 +19,63 @@ import type { PrRow } from '../../core/model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Inbox {
-  protected readonly filters = [
-    { key: 'needs',    label: 'Needs review',     count: 13, active: true },
-    { key: 'wait',     label: 'Waiting on author', count: 5, active: false },
-    { key: 'approved', label: 'Approved',          count: 4, active: false },
-    { key: 'all',      label: 'All',               count: 22, active: false },
+  protected readonly activeFilter = signal<FilterKey>('needs');
+
+  protected readonly filters: { key: FilterKey; label: string; count: number }[] = [
+    { key: 'needs',    label: 'Needs review',      count: 13 },
+    { key: 'wait',     label: 'Waiting on author', count:  5 },
+    { key: 'approved', label: 'Approved',          count:  4 },
+    { key: 'all',      label: 'All',               count: 22 },
   ];
+
+  protected setFilter(key: FilterKey): void { this.activeFilter.set(key); }
+
+  protected readonly visibleRows = computed<readonly PrRow[]>(() => {
+    const f = this.activeFilter();
+    if (f === 'all') return this.rows;
+    if (f === 'approved') return this.rows.filter(r => r.status === 'approved');
+    if (f === 'wait') return this.rows.filter(r => r.status === 'changes-requested');
+    return this.rows.filter(r => r.status === 'open' || r.status === 'draft');
+  });
+
+  protected readonly subtitle = computed<string>(() => {
+    const f = this.activeFilter();
+    const n = this.visibleRows().length;
+    if (f === 'needs')    return `${n} pull request${n === 1 ? '' : 's'} need${n === 1 ? 's' : ''} your review`;
+    if (f === 'wait')     return `${n} waiting on the author`;
+    if (f === 'approved') return `${n} approved by you`;
+    return `${n} pull request${n === 1 ? '' : 's'} in the queue`;
+  });
+
+  protected statusAccent(s: PrRow['status']): string {
+    switch (s) {
+      case 'open':              return 'border-l-sky-500';
+      case 'draft':              return 'border-l-zinc-300 dark:border-l-zinc-700';
+      case 'approved':           return 'border-l-emerald-500';
+      case 'changes-requested':  return 'border-l-amber-500';
+    }
+  }
+
+  protected reviewerRing(s: 'approved' | 'requested-changes' | 'pending' | undefined): string {
+    if (s === 'approved')          return 'ring-emerald-500/80';
+    if (s === 'requested-changes') return 'ring-amber-500/80';
+    return 'ring-background';
+  }
+
+  protected authorTone(initials: string): string {
+    const palette = [
+      'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300',
+      'bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300',
+      'bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300',
+      'bg-fuchsia-100 dark:bg-fuchsia-950 text-fuchsia-700 dark:text-fuchsia-300',
+      'bg-violet-100 dark:bg-violet-950 text-violet-700 dark:text-violet-300',
+      'bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300',
+      'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300',
+    ];
+    let hash = 0;
+    for (let i = 0; i < initials.length; i++) hash = (hash * 31 + initials.charCodeAt(i)) | 0;
+    return palette[Math.abs(hash) % palette.length];
+  }
 
   protected readonly rows: readonly PrRow[] = [
     {
@@ -32,8 +85,8 @@ export class Inbox {
       branch: 'feat/runner-v2',
       author: { name: 'Sasha Lin', initials: 'SL' },
       reviewers: [
-        { initials: 'MJ', tone: 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300' },
-        { initials: 'RC', tone: 'bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300' },
+        { initials: 'MJ', tone: 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300', review: 'pending' },
+        { initials: 'RC', tone: 'bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300', review: 'approved' },
       ],
       labels: [
         { name: 'bug',  tone: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300' },
@@ -61,7 +114,7 @@ export class Inbox {
       repo: 'forge/web',
       branch: 'polish/settings',
       author: { name: 'Mofiro Jean', initials: 'MJ' },
-      reviewers: [{ initials: 'AT', tone: 'bg-fuchsia-100 dark:bg-fuchsia-950 text-fuchsia-700 dark:text-fuchsia-300' }],
+      reviewers: [{ initials: 'AT', tone: 'bg-fuchsia-100 dark:bg-fuchsia-950 text-fuchsia-700 dark:text-fuchsia-300', review: 'approved' }],
       labels: [{ name: 'polish', tone: 'bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300' }],
       status: 'approved',
       added: 14, removed: 9,
@@ -310,7 +363,7 @@ export class Inbox {
       branch: 'chore/drop-lodash',
       author: { name: 'Cyrus Lopez', initials: 'CL' },
       reviewers: [
-        { initials: 'MJ', tone: 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300' },
+        { initials: 'MJ', tone: 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300', review: 'requested-changes' },
       ],
       labels: [
         { name: 'chore', tone: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300' },

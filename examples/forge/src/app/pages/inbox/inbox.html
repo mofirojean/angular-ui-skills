@@ -2,13 +2,9 @@
   <header class="flex items-end justify-between gap-4 flex-wrap px-6 pt-6 pb-3">
     <div>
       <h2 class="text-xl font-semibold tracking-tight">Inbox</h2>
-      <p class="text-sm text-muted-foreground mt-1">{{ rows.length }} pull requests in the queue.</p>
+      <p class="text-sm text-muted-foreground mt-1">{{ subtitle() }}</p>
     </div>
     <div class="flex items-center gap-2">
-      <button hlmBtn variant="outline" size="sm" class="gap-2">
-        <ng-icon name="lucideSearch" size="14"></ng-icon>
-        <span>Search inbox</span>
-      </button>
       <button hlmBtn size="sm" class="gap-2">
         <ng-icon name="lucideGitPullRequestArrow" size="14"></ng-icon>
         New PR
@@ -19,78 +15,136 @@
   <nav class="flex items-center gap-1 px-6">
     @for (f of filters; track f.key) {
       <button
+        type="button"
+        (click)="setFilter(f.key)"
         class="px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors"
-        [class.border-foreground]="f.active"
-        [class.text-foreground]="f.active"
-        [class.border-transparent]="!f.active"
-        [class.text-muted-foreground]="!f.active"
+        [class.border-foreground]="activeFilter() === f.key"
+        [class.text-foreground]="activeFilter() === f.key"
+        [class.border-transparent]="activeFilter() !== f.key"
+        [class.text-muted-foreground]="activeFilter() !== f.key"
       >
         {{ f.label }}
-        <span class="ml-1.5 inline-flex h-4 items-center rounded-full bg-muted px-1.5 text-[10px] font-medium text-muted-foreground">{{ f.count }}</span>
+        <span class="ml-1.5 inline-flex h-4 items-center rounded-full bg-muted px-1.5 text-[10px] font-medium text-muted-foreground tabular-nums">{{ f.count }}</span>
       </button>
     }
-    <div class="flex-1"></div>
-    <button hlmBtn variant="ghost" size="sm" class="gap-2 text-xs">
-      Updated
-      <ng-icon name="lucideChevronsUpDown" size="12"></ng-icon>
-    </button>
   </nav>
 
   <div
     class="grid items-center gap-3 px-6 py-2 text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground border-t border-border bg-muted/40"
-    style="grid-template-columns: minmax(0, 1fr) 88px 96px"
+    style="grid-template-columns: 32px minmax(0, 1fr) 152px 88px 96px 88px 32px"
   >
-    <span>Pull request</span>
-    <span class="text-right">Diff</span>
+    <span>
+      <input type="checkbox" class="size-3.5 accent-foreground align-middle" aria-label="Select all" />
+    </span>
+    <button type="button" class="text-left hover:text-foreground transition-colors flex items-center gap-1">
+      Pull request
+      <ng-icon name="lucideChevronsUpDown" size="10" class="opacity-50"></ng-icon>
+    </button>
+    <span>Author</span>
+    <button type="button" class="text-right hover:text-foreground transition-colors inline-flex items-center justify-end gap-1">
+      Diff
+      <ng-icon name="lucideChevronsUpDown" size="10" class="opacity-50"></ng-icon>
+    </button>
     <span class="text-right">Reviewers</span>
+    <button type="button" class="text-right hover:text-foreground transition-colors inline-flex items-center justify-end gap-1">
+      Updated
+      <ng-icon name="lucideChevronsUpDown" size="10" class="opacity-50"></ng-icon>
+    </button>
+    <span></span>
   </div>
 </div>
 
-<ul class="flex-1 min-h-0 overflow-y-auto divide-y divide-border max-w-screen-2xl w-full mx-auto scroll-quiet">
-  @for (row of rows; track row.id) {
-    <li class="group">
-      <a
-        [routerLink]="['/pr', row.id]"
-        class="grid items-center gap-3 px-6 py-3 hover:bg-muted/50 transition-colors"
-        style="grid-template-columns: minmax(0, 1fr) 88px 96px"
-      >
-        <div class="min-w-0">
-          <div class="flex items-center gap-2">
-            <span class="text-xs px-1.5 py-0.5 rounded border" [ngClass]="statusTone(row.status)">{{ statusLabel(row.status) }}</span>
-            <h3 class="text-sm font-medium truncate group-hover:text-primary">{{ row.title }}</h3>
+@if (visibleRows().length === 0) {
+  <div class="flex-1 min-h-0 overflow-y-auto max-w-screen-2xl w-full mx-auto scroll-quiet">
+    <div class="flex flex-col items-center justify-center py-20 px-6 text-center max-w-sm mx-auto">
+      <span class="mb-4 size-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+        <ng-icon name="lucideInbox" size="22"></ng-icon>
+      </span>
+      <h3 class="text-base font-semibold tracking-tight">No pull requests here</h3>
+      <p class="mt-1 text-sm text-muted-foreground">
+        Switch tabs above, or open a draft PR to get something rolling.
+      </p>
+      <button hlmBtn size="sm" class="mt-4 gap-2">
+        <ng-icon name="lucideGitPullRequestArrow" size="14"></ng-icon>
+        New PR
+      </button>
+    </div>
+  </div>
+} @else {
+  <ul class="flex-1 min-h-0 overflow-y-auto divide-y divide-border max-w-screen-2xl w-full mx-auto scroll-quiet">
+    @for (row of visibleRows(); track row.id) {
+      <li class="group relative border-l-2 transition-colors hover:bg-muted/40"
+          [ngClass]="statusAccent(row.status)"
+          [class.opacity-60]="row.status === 'approved'">
+        <a [routerLink]="['/pr', row.id]"
+           class="grid items-center gap-3 pl-5 pr-4 py-2.5"
+           style="grid-template-columns: 32px minmax(0, 1fr) 152px 88px 96px 88px 32px">
+
+          <span (click)="$event.stopPropagation(); $event.preventDefault()">
+            <input type="checkbox" class="size-3.5 accent-foreground align-middle" [attr.aria-label]="'Select ' + row.title" />
+          </span>
+
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <h3 class="text-sm font-medium truncate group-hover:text-primary">{{ row.title }}</h3>
+            </div>
+            <div class="mt-0.5 flex items-center gap-2 text-[11px] text-muted-foreground flex-wrap">
+              <span class="font-mono">{{ row.repo }}#{{ row.id }}</span>
+              <span class="text-muted-foreground/40">·</span>
+              <span class="font-mono">{{ row.branch }}</span>
+              @if (row.labels.length) {
+                <span class="text-muted-foreground/40">·</span>
+                @for (label of row.labels; track label.name) {
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-medium leading-none" [ngClass]="label.tone">{{ label.name }}</span>
+                }
+              }
+            </div>
           </div>
-          <div class="mt-1 flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
-            <span class="font-mono">{{ row.repo }} #{{ row.id }}</span>
-            <span class="text-muted-foreground/60">·</span>
-            <span class="font-mono">{{ row.branch }}</span>
-            <span class="text-muted-foreground/60">·</span>
-            <span>by {{ row.author.name }}</span>
-            <span class="text-muted-foreground/60">·</span>
-            <span>{{ row.updatedAgo }}</span>
-            @for (label of row.labels; track label.name) {
-              <span class="px-1.5 py-0.5 rounded text-[10px] font-medium" [ngClass]="label.tone">{{ label.name }}</span>
+
+          <div class="flex items-center gap-2 min-w-0">
+            <hlm-avatar class="size-6 shrink-0">
+              <span hlmAvatarFallback [ngClass]="authorTone(row.author.initials)" class="text-[10px] font-semibold">{{ row.author.initials }}</span>
+            </hlm-avatar>
+            <span class="text-xs truncate">{{ row.author.name }}</span>
+          </div>
+
+          <div class="flex items-center justify-end gap-2 text-[11px] font-mono tabular-nums">
+            <span class="text-emerald-600 dark:text-emerald-400">+{{ row.added }}</span>
+            <span class="text-red-600 dark:text-red-400">-{{ row.removed }}</span>
+          </div>
+
+          <div class="flex items-center justify-end -space-x-2">
+            @for (r of row.reviewers.slice(0, 3); track $index) {
+              <hlm-avatar class="size-6 ring-2"
+                          [ngClass]="reviewerRing(r.review)"
+                          [title]="r.initials + ' (' + (r.review ?? 'pending') + ')'">
+                <span hlmAvatarFallback [ngClass]="r.tone" class="text-[10px] font-semibold">{{ r.initials }}</span>
+              </hlm-avatar>
+            }
+            @if (row.reviewers.length > 3) {
+              <span class="size-6 inline-flex items-center justify-center rounded-full ring-2 ring-background bg-muted text-[10px] font-semibold text-muted-foreground">
+                +{{ row.reviewers.length - 3 }}
+              </span>
             }
           </div>
-        </div>
 
-        <div class="flex items-center justify-end gap-3 text-xs text-muted-foreground font-mono">
-          <span class="text-emerald-600 dark:text-emerald-400">+{{ row.added }}</span>
-          <span class="text-red-600 dark:text-red-400">-{{ row.removed }}</span>
-        </div>
+          <span class="text-right text-[11px] text-muted-foreground tabular-nums">{{ row.updatedAgo }}</span>
 
-        <div class="flex items-center justify-end -space-x-2">
-          @for (r of row.reviewers.slice(0, 3); track $index) {
-            <hlm-avatar class="size-6 ring-2 ring-background">
-              <span hlmAvatarFallback [ngClass]="r.tone" class="text-[10px] font-semibold">{{ r.initials }}</span>
-            </hlm-avatar>
-          }
-          @if (row.reviewers.length > 3) {
-            <span class="size-6 inline-flex items-center justify-center rounded-full ring-2 ring-background bg-muted text-[10px] font-semibold text-muted-foreground">
-              +{{ row.reviewers.length - 3 }}
-            </span>
-          }
+          <span></span>
+        </a>
+
+        <div class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity flex items-center gap-0.5 bg-gradient-to-l from-background via-background to-transparent pl-6 pr-1">
+          <button type="button" hlmBtn variant="ghost" size="icon" class="size-7" aria-label="Copy link" title="Copy link">
+            <ng-icon name="lucideLink2" size="13"></ng-icon>
+          </button>
+          <button type="button" hlmBtn variant="ghost" size="icon" class="size-7" aria-label="Snooze" title="Snooze">
+            <ng-icon name="lucideEyeOff" size="13"></ng-icon>
+          </button>
+          <button type="button" hlmBtn variant="ghost" size="icon" class="size-7" aria-label="More actions" title="More actions">
+            <ng-icon name="lucideMoreHorizontal" size="13"></ng-icon>
+          </button>
         </div>
-      </a>
-    </li>
-  }
-</ul>
+      </li>
+    }
+  </ul>
+}
