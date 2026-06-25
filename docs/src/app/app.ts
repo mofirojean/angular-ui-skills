@@ -180,7 +180,7 @@ export class App {
       path: 'examples/forge',
       accent: 'from-amber-500/25 via-orange-400/15 to-transparent',
       badges: ['Spartan v1.0', '⌘K palette', 'Sidebar nav'],
-      image: 'projects/forge-light-mode.png',
+      image: 'projects/forge-inbox-dark-mode.png',
       demo: SITE_CONFIG.demos.forge,
     },
   ];
