@@ -180,7 +180,72 @@ Internally, the Helm directive uses a class-merging utility named `hlm()` (`twMe
 
 For **systemic** restyling, edit the generated Helm source files directly - they're in your repo at the location configured by `components.json` (see [setup.md](setup.md)).
 
-## 7. Common pitfalls
+## 7. Selector strictness
+
+Helm directives often require a **specific HTML element** rather than accepting any tag. Spartan does this to enforce semantic HTML, but it means you can't always substitute `<div>` for the intended element.
+
+Three patterns to know:
+
+### A. Element-or-directive form
+
+The most permissive shape. The selector accepts both a custom element and an attribute directive on a `<div>`:
+
+```ts
+selector: '[hlmSidebarHeader],hlm-sidebar-header'
+```
+
+Either of these compiles:
+
+```html
+<hlm-sidebar-header>...</hlm-sidebar-header>
+<div hlmSidebarHeader>...</div>
+```
+
+Most layout-shell components use this shape: `hlm-card`, `hlm-sidebar-header`, `hlm-sidebar-footer`, `hlm-sidebar-content`, `hlm-sidebar-group`, etc.
+
+### B. Strict-semantic-element directive
+
+The selector locks the directive to a specific HTML element:
+
+```ts
+selector: 'ul[hlmSidebarMenu]'      // must be <ul>
+selector: 'li[hlmSidebarMenuItem]'  // must be <li>
+selector: 'div[hlmSidebarGroupContent]'  // must be <div>
+selector: 'button[hlmSidebarMenuButton], a[hlmSidebarMenuButton]'  // <button> OR <a>
+selector: 'main[hlmSidebarInset]'   // must be <main>
+```
+
+The `<ul>` + `<li>` requirement for menu lists is the most surprising one — Spartan wants real list semantics, not `<div>`-faked lists. Using the wrong element produces `NG8001` at build time.
+
+### C. Directive-only (no element form)
+
+Some Helm components ship only as a directive, with **no matching custom element**. Easy to miss because other components in the same family expose both forms.
+
+```ts
+selector: 'button[hlmSidebarRail]'   // no <hlm-sidebar-rail> element exists
+selector: 'button[hlmSidebarTrigger]' // ditto
+selector: '[hlmDropdownMenuTrigger]'  // ditto
+```
+
+If you instinctively reach for `<hlm-sidebar-rail />`, you get:
+
+```
+NG8001: 'hlm-sidebar-rail' is not a known element
+```
+
+The fix is to apply the directive to the right native element. The Helm source files in your repo are the source of truth — grep for `selector:` in the relevant `src/libs/ui/<component>/src/lib/` folder when in doubt.
+
+### Discovering the right form
+
+When `NG8001` fires on a Helm component you expect to exist, check the actual selector in the generated source:
+
+```sh
+grep selector: src/libs/ui/sidebar/src/lib/*.ts
+```
+
+The output tells you whether to write `<hlm-sidebar-rail />` (element form), `<button hlmSidebarRail></button>` (directive form), or `<div hlmSidebarHeader>` (either form works).
+
+## 8. Common pitfalls
 
 | Pitfall | What goes wrong | Fix |
 |---|---|---|
@@ -191,6 +256,8 @@ For **systemic** restyling, edit the generated Helm source files directly - they
 | Mixing Helm + raw Brain primitives without understanding `hostDirectives` | Duplicate-directive errors or doubled behavior | Use Brain directly only when Helm doesn't expose what you need ([brain.md](brain.md)) |
 | Replacing `@import "tailwindcss/theme.css" layer(theme); ...` with `@import "tailwindcss";` | Spartan preset layers incorrectly; components render unstyled | Keep the explicit four-line layer imports - see [setup.md](setup.md) |
 | Forgetting `*hlmXPortal` on a Pattern-C overlay's content | Overlay renders inline (broken layout / z-index) | Add the structural directive: `<hlm-dialog-content *hlmDialogPortal>`. Pattern-D overlays (Dropdown Menu, Context Menu, Menubar) don't use `*hlmXPortal` - they take a template ref via `[hlm{X}Trigger]="tplRef"` instead. |
+| `NG8001: 'hlm-X' is not a known element` on something you imported | Helm component is directive-only — no matching custom element exists | Read the actual `selector:` in the generated Helm source. `<hlm-sidebar-rail />` doesn't exist; the form is `<button hlmSidebarRail></button>`. See §7. |
+| Writing `<div hlmSidebarMenu>` instead of `<ul hlmSidebarMenu>` | `NG8001` because the selector is `ul[hlmSidebarMenu]` strict-semantic | Use the required element: `<ul hlmSidebarMenu>`, `<li hlmSidebarMenuItem>`, `<main hlmSidebarInset>`. See §7. |
 
 ## See also
 

@@ -41,7 +41,26 @@ The 10 Helm components for presentational display - badges, icons, status indica
   </hlm-avatar>
   ```
 - **Variants**: `size` accepts `'default' | 'sm' | 'lg'`.
-- **Gotcha**: The image is `<img hlmAvatarImage>` (directive on `<img>`), the fallback is `<span hlmAvatarFallback>` (directive on `<span>`) - **not** `<hlm-avatar-image>` / `<hlm-avatar-fallback>` element children. The fallback shows only if the image fails to load.
+- **Gotcha (selectors)**: The image is `<img hlmAvatarImage>` (directive on `<img>`), the fallback is `<span hlmAvatarFallback>` (directive on `<span>`) - **not** `<hlm-avatar-image>` / `<hlm-avatar-fallback>` element children. The fallback shows only if the image fails to load.
+- **Gotcha (fallback is mandatory for initials)**: A plain `<span>` inside `<hlm-avatar>` without the `hlmAvatarFallback` directive renders as an unstyled inline element — the initials end up flush-left against the avatar's edge, not centered. The `hlmAvatarFallback` directive is what applies `flex size-full items-center justify-center` plus the muted background. Always wrap initials with the directive:
+  ```html
+  <!-- wrong: initials drift to the left edge -->
+  <hlm-avatar>
+    <span>MJ</span>
+  </hlm-avatar>
+
+  <!-- right: directive centers + tints the fallback -->
+  <hlm-avatar>
+    <span hlmAvatarFallback>MJ</span>
+  </hlm-avatar>
+  ```
+- **Customizing the shape**: The default is `rounded-full`. For a rounded-square (app-icon style), override on both the host AND the fallback, plus the `::after` border ring the host paints:
+  ```html
+  <hlm-avatar class="rounded-md after:rounded-md">
+    <span hlmAvatarFallback class="rounded-md">MJ</span>
+  </hlm-avatar>
+  ```
+  Forgetting any one of the three (`rounded-md` on the host, `after:rounded-md` on the host, `rounded-md` on the fallback) leaves a partially-pill shape that reads as a bug.
 
 ### Badge
 

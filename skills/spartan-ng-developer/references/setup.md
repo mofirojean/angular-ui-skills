@@ -2,6 +2,8 @@
 
 Install Spartan/ng into an Angular project. Follow the steps in order: detect the project layout, detect the Tailwind version, run Spartan's `init` schematic, run `ui-theme` to seed the theme variables, then generate Helm components as needed.
 
+> 🎉 **Spartan went stable.** As of June 2026, `@spartan-ng/cli` and `@spartan-ng/brain` ship as `1.0.x` (latest patch: `1.0.1`). The long alpha line (`0.0.1-alpha.*`) is retired. New projects should pin `^1.0.0`. Older docs and tutorials citing `alpha.704` / `alpha.714` / `alpha.720` are referring to the pre-stable line. The Helm component API and selectors are unchanged across the alpha → 1.0 transition.
+
 > ⚠ **For AI agents / CI / automation:** the `init` and `ui-theme` schematics are **fully interactive** (they prompt via `enquirer` and ignore `--defaults` / `--interactive=false` because their `schema.json` files have empty `properties`). If you don't have a TTY, follow §"Non-interactive install" below instead of the interactive `init` flow.
 
 ## Step 1 - Detect project layout
@@ -19,9 +21,9 @@ The destination directory for generated Helm source is configured by `components
 
 Read `package.json` `dependencies` / `devDependencies` and inspect the `tailwindcss` major version:
 
-- **v4** → Spartan's only documented installation path. Uses CSS-side configuration (`@theme` directive, layer imports).
-- **v3** → **Compatibility is not guaranteed.** Spartan's docs explicitly say "some components may not work as expected" on v3 and "strongly recommend upgrading to Tailwind v4". The v3 config in Step 6 is preserved here from earlier Spartan releases for legacy projects only.
-- **Tailwind not installed yet** → install it first using Tailwind's official docs. **Always pick v4** for new Spartan projects.
+- **v4** → Spartan's recommended path. Uses CSS-side configuration (`@theme` directive, layer imports).
+- **v3** → Supported but explicitly marked "Not Recommended" by Spartan. Uses `tailwind.config.js`.
+- **Tailwind not installed yet** → install it first using Tailwind's official docs, then prefer v4.
 
 Match the rest of this guide to the detected version.
 
@@ -84,9 +86,9 @@ The schematic prompts for application (in multi-project workspaces), styles entr
 
 > ⚠ Re-running `ui-theme` replaces the existing theme block - back up any custom additions first.
 
-## Step 6 - Tailwind v3 setup (legacy, not officially supported)
+## Step 6 - Tailwind v3 setup (legacy - not documented on current installation docs)
 
-> ⚠ **Spartan's current docs explicitly recommend upgrading to v4.** From upstream: *"some components may not work as expected"* on v3, and the team *"strongly recommends"* the upgrade. Only follow this section if you're maintaining an existing v3 project that can't migrate yet. Verify everything against your installed CLI version before relying on it.
+> ⚠ The official `/documentation/installation` page covers only Tailwind v4. The v3 config shown below is preserved from earlier Spartan releases; verify against your installed CLI version before relying on it.
 
 For projects on Tailwind v3, write the config and styles manually.
 
@@ -140,14 +142,37 @@ For automated environments, replicate what `init` + `ui-theme` would do, then co
 ```sh
 npm install -D @spartan-ng/cli
 # Runtime deps init adds
-npm install @spartan-ng/brain @angular/cdk tailwind-merge
+npm install @spartan-ng/brain @angular/cdk@^21 tailwind-merge
 # Only needed if you later generate icon or spinner (init adds them lazily)
 npm install @ng-icons/core @ng-icons/lucide
 # Tailwind v4 dev dep init adds
 npm install -D tw-animate-css
 ```
 
-Match the version of `@spartan-ng/brain` to your installed `@spartan-ng/cli`. CDK should match your Angular major version.
+**Pin `@angular/cdk` to your Angular major.** Without an explicit pin, npm grabs the latest `@angular/cdk` (currently `22.x`), and on an Angular 21 project that breaks the install with:
+
+```
+ERESOLVE could not resolve dependency:
+peer @angular/common@"^22.0.0 || ^23.0.0" from @angular/cdk@22.0.2
+```
+
+Spartan/brain @1.0+ accepts `@angular/cdk >=21.0.0 <23.0.0`, so the fix is to pin to the major that matches your Angular: `@angular/cdk@^21` on Angular 21, `@angular/cdk@^22` on Angular 22. Match the version of `@spartan-ng/brain` to your installed `@spartan-ng/cli`.
+
+**Brain peer dependencies (`@spartan-ng/brain@1.0.1`):**
+
+| Peer | Range | Notes |
+|---|---|---|
+| `@angular/cdk` | `>=21.0.0 <23.0.0` | Pin to your Angular major (see above) |
+| `@angular/common` | `>=21.0.0 <23.0.0` | |
+| `@angular/core` | `>=21.0.0 <23.0.0` | |
+| `@angular/forms` | `>=21.0.0 <23.0.0` | |
+| `clsx` | `>=2.0.0` | Pulled in via `tailwind-merge` |
+| `luxon` | `>=3.0.0` | Only required if you use date-picker primitives (`hlm-date-picker`, `brn-calendar`) |
+| `rxjs` | `>=6.6.0` | Standard Angular peer |
+| `tailwindcss` | `>=4.0.0` | Spartan is Tailwind v4-first |
+| `tw-animate-css` | `>=1.0.0` | Required for the animation classes Helm uses |
+
+If you'll touch the date-picker stack, add `npm install luxon @types/luxon` to step A.
 
 **B. Write the styles entry point yourself.** The exact template the `ui-theme` generator writes for Tailwind v4 + the Neutral theme is:
 
@@ -211,6 +236,24 @@ npx nx g @spartan-ng/cli:ui button
 The component name is the kebab-case form of any component listed at [spartan.ng/components](https://spartan.ng/components) - e.g. `button`, `dialog`, `dropdown-menu`, `data-table`.
 
 The schematic copies the Helm component source into the project at the path set by `components.json` `componentsPath`. The actual destination shows up in `tsconfig.json` `paths` after generation.
+
+### Transitive Helm dependencies
+
+Generating one Helm component sometimes pulls in others as transitive deps. The generator handles this automatically (you'll see `CREATE` lines for components you didn't ask for), but the build will fail if you generate the dependent first and forget the dependency.
+
+Known transitive chains (verified against `1.0.1`):
+
+| Generate this | Pulls in transitively |
+|---|---|
+| `command` | `input-group` (the command palette wraps an input-group internally) |
+| `field` | `separator` |
+| `sidebar` | `skeleton`, `tooltip` (rail uses tooltip; loading state uses skeleton) |
+| `dropdown-menu` | inherits CDK menu, no Helm transitives |
+| `sonner` | `ngx-sonner` runtime peer (NOT installed by the schematic) — `npm install ngx-sonner` separately |
+
+The `sonner` case is the easy-to-miss one: the schematic writes the Helm wrapper but doesn't install the underlying `ngx-sonner` npm package. The build fails with `Cannot find module 'ngx-sonner'` until you install it.
+
+**Recommended first-batch flow.** For new projects, run the interactive picker once (`ng g @spartan-ng/cli:ui` with no name) and select all the components you expect to need. The picker prompts you about transitives in one pass, faster than generating one at a time. For incremental additions, the positional-name form works fine — just watch the `CREATE` lines for unexpected transitive components and adjust your imports accordingly.
 
 ## Step 8 - components.json
 

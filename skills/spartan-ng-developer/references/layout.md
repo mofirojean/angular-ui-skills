@@ -179,6 +179,41 @@ The 9 Helm components for structuring page layout - containers, separators, coll
 - **Gotcha**: The outer `<div hlmSidebarWrapper>` is required - it wraps both the sidebar and the main content area. Forgetting it makes the trigger silently fail.
 - **Gotcha (NG0309)**: `hlmSidebarTrigger` is a **self-contained component** (selector `button[hlmSidebarTrigger]`). It already host-directives `HlmButton`, applies `provideBrnButtonConfig({ variant: 'ghost', size: 'icon' })`, and renders the `lucidePanelLeft` icon from its own template. **Do not also add `hlmBtn`** — that re-applies `BrnButton` and triggers `NG0309: Directive _BrnButton matches multiple times on the same element`. Just write `<button hlmSidebarTrigger aria-label="Toggle sidebar"></button>` with no children.
 
+#### Collapsed icon mode
+
+When `<hlm-sidebar collapsible="icon">` is collapsed, the sidebar host element gets these attributes (which descendants can target):
+
+- `class="group"` (added by the Helm host bindings)
+- `data-state="collapsed"`
+- `data-collapsible="icon"` (empty string when expanded, `"icon"` when actually collapsed in icon mode)
+
+Use these to hide brand text, user labels, and any non-icon content when the sidebar narrows:
+
+```html
+<div hlmSidebarHeader>
+  <a routerLink="/" class="flex items-center gap-2 px-2 py-1.5
+                         group-data-[collapsible=icon]:px-0
+                         group-data-[collapsible=icon]:justify-center">
+    <span class="size-8 inline-flex items-center justify-center rounded-md bg-primary">
+      <ng-icon name="lucideGitBranch" size="18" />
+    </span>
+    <span class="group-data-[collapsible=icon]:hidden">
+      Brand name
+    </span>
+  </a>
+</div>
+```
+
+Three rules that come up repeatedly:
+
+1. **Hide text labels** with `group-data-[collapsible=icon]:hidden` on the text wrapper, never on the icon next to it.
+2. **Center the leading icon** with `group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center` on the surrounding link/button. The default padding shoves a 32px icon to the left edge of the 48px-wide collapsed strip.
+3. **`hlmSidebarMenuButton` auto-applies `size-8! p-2!`** in collapsed mode. The `!` is `!important`, which clamps the button to a 32×32 box with 16px inner — too small for a normal-sized `<hlm-avatar>` or any content larger than a 16px icon. To use a bigger child (e.g. an `size-7` avatar that should fill the button), override with `group-data-[collapsible=icon]:p-0! group-data-[collapsible=icon]:justify-center`. The trailing `!` is required; without it the override loses to the directive's `p-2!`.
+
+#### Sidebar width tokens
+
+The collapsed icon strip is `3rem` (48px) by default — controlled by `--sidebar-width-icon` on the wrapper. Expanded is `--sidebar-width` (default `16rem`). Override via inputs on `<div hlmSidebarWrapper [sidebarWidthIcon]="'4rem'">` if you need more room for richer collapsed content.
+
 ### Tabs
 
 - **Pattern**: B (compound - directives as identifiers, not child tags)
