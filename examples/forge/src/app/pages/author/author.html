@@ -1,13 +1,27 @@
 <section class="p-6 max-w-screen-lg mx-auto">
   <header class="flex items-start gap-5">
-    <hlm-avatar class="size-20 shrink-0">
+    <hlm-avatar class="size-20 shrink-0 ring-4 ring-background">
       <span hlmAvatarFallback class="text-2xl font-semibold bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300">SL</span>
     </hlm-avatar>
     <div class="flex-1 min-w-0">
-      <h2 class="text-2xl font-semibold tracking-tight">{{ displayName() }}</h2>
-      <p class="text-sm text-muted-foreground mt-1">Staff Engineer · Runtime team · {{ '@' + (handle() || 'sashalin') }}</p>
+      <div class="flex items-center gap-2 flex-wrap">
+        <h2 class="text-2xl font-semibold tracking-tight">{{ displayName() }}</h2>
+        <span class="inline-flex items-center gap-1 text-[10.5px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/30">
+          <span class="size-1.5 rounded-full bg-emerald-500"></span>
+          Active
+        </span>
+      </div>
+      <div class="mt-1 flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+        <span class="font-mono">{{ '@' + (handle() || 'sashalin') }}</span>
+        <span class="text-muted-foreground/40">·</span>
+        <span>Staff Engineer</span>
+        <span class="text-muted-foreground/40">·</span>
+        <span>Runtime team</span>
+        <span class="text-muted-foreground/40">·</span>
+        <span>Joined 2024</span>
+      </div>
       <p class="mt-3 text-sm leading-relaxed max-w-2xl">
-        Works on the agent runtime, scheduler, and execution pipeline. Joined Forge in 2024. Most active in <code class="text-xs font-mono px-1 py-0.5 rounded bg-muted">forge/runtime</code> and <code class="text-xs font-mono px-1 py-0.5 rounded bg-muted">forge/api</code>.
+        Works on the agent runtime, scheduler, and execution pipeline. Most active in <code class="text-xs font-mono px-1 py-0.5 rounded bg-muted">forge/runtime</code> and <code class="text-xs font-mono px-1 py-0.5 rounded bg-muted">forge/api</code>.
       </p>
     </div>
     <div class="flex items-center gap-2">
@@ -24,43 +38,71 @@
 
   <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8">
     @for (s of stats; track s.label) {
-      <div class="rounded-lg border border-border bg-card p-4">
-        <div class="flex items-center justify-between">
-          <span class="inline-flex h-7 w-7 items-center justify-center rounded-md bg-muted text-muted-foreground">
-            <ng-icon [name]="s.icon" size="14"></ng-icon>
-          </span>
+      <article class="rounded-lg border border-border bg-card p-4">
+        <div class="flex items-start justify-between">
+          <span class="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">{{ s.label }}</span>
+          @if (s.delta) {
+            <span class="inline-flex items-center gap-0.5 text-[10px] font-mono px-1.5 py-0.5 rounded-full ring-1" [ngClass]="trendTone(s.trend)">
+              <ng-icon [name]="trendIcon(s.trend)" size="9"></ng-icon>
+              {{ s.delta }}
+            </span>
+          }
         </div>
-        <div class="mt-3 text-2xl font-semibold tracking-tight tabular-nums">{{ s.value }}</div>
-        <div class="text-xs text-muted-foreground mt-0.5">{{ s.label }}</div>
-        <div class="text-[10px] text-muted-foreground mt-1.5">{{ s.trend }}</div>
-      </div>
+        <p class="mt-3 text-2xl font-semibold tracking-tight tabular-nums">{{ s.value }}</p>
+        <p class="mt-1 text-[11px] text-muted-foreground flex items-center gap-1.5">
+          <ng-icon [name]="s.icon" size="11"></ng-icon>
+          <span>{{ s.period }}</span>
+        </p>
+      </article>
     }
   </div>
 
   <div class="mt-10">
     <nav class="flex items-center gap-1 border-b border-border">
-      <button class="px-3 py-2 text-xs font-medium border-b-2 -mb-px border-foreground text-foreground">Recent activity</button>
-      <button class="px-3 py-2 text-xs font-medium border-b-2 -mb-px border-transparent text-muted-foreground">Open PRs</button>
-      <button class="px-3 py-2 text-xs font-medium border-b-2 -mb-px border-transparent text-muted-foreground">Reviews given</button>
-      <button class="px-3 py-2 text-xs font-medium border-b-2 -mb-px border-transparent text-muted-foreground">Merged</button>
+      @for (t of tabs; track t.key) {
+        <button
+          type="button"
+          (click)="setTab(t.key)"
+          class="px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors"
+          [class.border-foreground]="activeTab() === t.key"
+          [class.text-foreground]="activeTab() === t.key"
+          [class.border-transparent]="activeTab() !== t.key"
+          [class.text-muted-foreground]="activeTab() !== t.key"
+        >
+          {{ t.label }}
+          <span class="ml-1.5 inline-flex h-4 items-center rounded-full bg-muted px-1.5 text-[10px] font-medium text-muted-foreground tabular-nums">{{ t.count }}</span>
+        </button>
+      }
     </nav>
 
-    <ul class="mt-3 divide-y divide-border">
-      @for (item of activity; track item.pr) {
-        <li class="flex items-center gap-3 py-3">
-          <span class="inline-flex h-7 w-7 items-center justify-center rounded-md bg-muted text-muted-foreground shrink-0">
-            <ng-icon [name]="kindIcon(item.kind)" size="14"></ng-icon>
-          </span>
-          <div class="flex-1 min-w-0">
-            <div class="text-sm">
-              <span class="text-muted-foreground">{{ kindLabel(item.kind) }}</span>
-              <span class="font-mono ml-1.5 text-muted-foreground">{{ item.pr }}</span>
-              <span class="ml-2 font-medium">{{ item.title }}</span>
+    @if (activeTab() === 'activity') {
+      <ul class="mt-2 divide-y divide-border">
+        @for (item of activity; track item.pr) {
+          <li class="flex items-center gap-3 py-2.5">
+            <span class="inline-flex size-7 items-center justify-center rounded-md shrink-0" [ngClass]="kindTone(item.kind)">
+              <ng-icon [name]="kindIcon(item.kind)" size="13"></ng-icon>
+            </span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap text-sm">
+                <span class="text-muted-foreground">{{ kindLabel(item.kind) }}</span>
+                <span class="font-mono text-[11px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{{ item.repo }}{{ item.pr }}</span>
+                <span class="font-medium truncate">{{ item.title }}</span>
+              </div>
             </div>
-          </div>
-          <span class="text-xs text-muted-foreground shrink-0">{{ item.ago }}</span>
-        </li>
-      }
-    </ul>
+            <span class="text-[11px] text-muted-foreground shrink-0 tabular-nums">{{ item.ago }}</span>
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="flex flex-col items-center justify-center py-16 px-6 text-center max-w-sm mx-auto">
+        <span class="mb-3 size-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+          <ng-icon name="lucideInbox" size="18"></ng-icon>
+        </span>
+        <p class="text-sm font-medium">Nothing to show yet</p>
+        <p class="mt-1 text-xs text-muted-foreground">
+          This tab is part of the static demo. The other surfaces are live, this one is intentionally empty.
+        </p>
+      </div>
+    }
   </div>
 </section>

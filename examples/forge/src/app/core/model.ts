@@ -32,6 +32,8 @@ export interface NavItem {
   readonly label: string;
   readonly icon: string;
   readonly badge?: number | string;
+  readonly urgent?: boolean;
+  readonly shortcut?: string;
 }
 
 export interface NavSection {
@@ -138,6 +140,12 @@ export interface CommitRow {
   author: Author;
   ago: string;
   status: CommitStatus;
+  day?: string;
+  added?: number;
+  removed?: number;
+  files?: number;
+  verified?: boolean;
+  progress?: number;
 }
 
 export type CheckStatus = 'pass' | 'fail' | 'pending' | 'skipped';

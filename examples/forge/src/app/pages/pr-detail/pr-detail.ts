@@ -73,6 +73,41 @@ export class PrDetail {
     });
   });
 
+  protected readonly totalAdded = computed(() =>
+    this.files.reduce((a, f) => a + f.added, 0),
+  );
+  protected readonly totalRemoved = computed(() =>
+    this.files.reduce((a, f) => a + f.removed, 0),
+  );
+
+  protected readonly diffRatio = computed(() => {
+    const a = this.totalAdded();
+    const r = this.totalRemoved();
+    if (a + r === 0) return { add: 50, del: 50 };
+    return { add: (a / (a + r)) * 100, del: (r / (a + r)) * 100 };
+  });
+
+  protected readonly sortedChecks = computed<readonly CheckRow[]>(() => {
+    const rank: Record<CheckStatus, number> = { fail: 0, pending: 1, skipped: 2, pass: 3 };
+    return [...this.checks].sort((a, b) => rank[a.status] - rank[b.status]);
+  });
+
+  protected readonly checkSummary = computed(() => {
+    const total   = this.checks.length;
+    const passed  = this.checks.filter(c => c.status === 'pass').length;
+    const failed  = this.checks.filter(c => c.status === 'fail').length;
+    const pending = this.checks.filter(c => c.status === 'pending').length;
+    return { total, passed, failed, pending };
+  });
+
+  protected parseHunk(header: string): { range: string; ctx: string } {
+    const m = /@@\s+-(\d+),?(\d*)\s+\+(\d+),?(\d*)\s+@@(.*)/.exec(header);
+    if (!m) return { range: header, ctx: '' };
+    const newStart = +m[3];
+    const newCount = m[4] ? +m[4] : 1;
+    return { range: `Lines ${newStart}–${newStart + newCount - 1}`, ctx: m[5].trim() };
+  }
+
   protected readonly tabs: { key: PrDetailTab; label: string; count?: number; icon: string; }[] = [
     { key: 'conversation', label: 'Conversation', icon: 'lucideMessageSquare', count: 7 },
     { key: 'files',        label: 'Files changed', icon: 'lucideFiles',        count: 7 },
@@ -216,34 +251,57 @@ export class PrDetail {
 
   protected readonly commits: readonly CommitRow[] = [
     {
-      sha: 'a17f2c4',
-      message: 'Lock slot allocator behind a mutex',
+      sha: 'd6f10c2',
+      message: 'Address review, factor out lockTimeoutMs',
       author: { name: 'Sasha Lin', initials: 'SL', tone: 'bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300' },
-      ago: '6 hours ago',
-      status: 'pass',
-    },
-    {
-      sha: 'b9d3e81',
-      message: 'Add regression test hammering 1k concurrent runs',
-      author: { name: 'Sasha Lin', initials: 'SL', tone: 'bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300' },
-      ago: '5 hours ago',
-      status: 'pass',
+      ago: 'Today, 11:42',
+      day: 'Today',
+      status: 'pending',
+      added: 16, removed: 8, files: 1, verified: true, progress: 64,
     },
     {
       sha: 'c2e88a0',
       message: 'Expose lock timeout via runtime config',
       author: { name: 'Sasha Lin', initials: 'SL', tone: 'bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300' },
-      ago: '3 hours ago',
+      ago: 'Today, 09:14',
+      day: 'Today',
       status: 'pass',
+      added: 24, removed: 5, files: 3, verified: true,
     },
     {
-      sha: 'd6f10c2',
-      message: 'Address review, factor out lockTimeoutMs',
+      sha: 'b9d3e81',
+      message: 'Add regression test hammering 1k concurrent runs',
       author: { name: 'Sasha Lin', initials: 'SL', tone: 'bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300' },
-      ago: '2 hours ago',
-      status: 'pending',
+      ago: 'Yesterday, 16:08',
+      day: 'Yesterday',
+      status: 'pass',
+      added: 18, removed: 2, files: 1, verified: true,
+    },
+    {
+      sha: 'a17f2c4',
+      message: 'Lock slot allocator behind a mutex',
+      author: { name: 'Sasha Lin', initials: 'SL', tone: 'bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300' },
+      ago: 'Yesterday, 14:23',
+      day: 'Yesterday',
+      status: 'pass',
+      added: 31, removed: 8, files: 2, verified: false,
     },
   ];
+
+  protected readonly commitGroups = computed<{ day: string; items: readonly CommitRow[] }[]>(() => {
+    const map = new Map<string, CommitRow[]>();
+    for (const c of this.commits) {
+      const day = c.day ?? 'Earlier';
+      if (!map.has(day)) map.set(day, []);
+      map.get(day)!.push(c);
+    }
+    return Array.from(map, ([day, items]) => ({ day, items }));
+  });
+
+  protected readonly commitsByAuthor = computed(() => {
+    const names = Array.from(new Set(this.commits.map(c => c.author.name)));
+    return names.length === 1 ? names[0] : `${names.length} authors`;
+  });
 
   protected readonly checks: readonly CheckRow[] = [
     { name: 'lint',         suite: 'ci · biome',     duration: '12s',    status: 'pass',    detail: 'No issues' },

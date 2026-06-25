@@ -15,6 +15,20 @@
       </a>
     </div>
 
+    <div class="px-2 pb-2 group-data-[collapsible=icon]:px-1">
+      <button
+        type="button"
+        (click)="palette.show()"
+        title="New pull request (N)"
+        aria-label="New pull request"
+        class="w-full inline-flex items-center gap-2 h-8 px-3 rounded-md bg-foreground text-background hover:bg-foreground/90 shadow-sm transition-colors group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center"
+      >
+        <ng-icon name="lucidePlus" size="14" class="shrink-0"></ng-icon>
+        <span class="text-sm font-medium group-data-[collapsible=icon]:hidden">New PR</span>
+        <kbd class="ml-auto font-mono text-[10px] px-1 py-0.5 rounded bg-background/15 text-background/80 group-data-[collapsible=icon]:hidden">N</kbd>
+      </button>
+    </div>
+
     <div hlmSidebarContent>
       @for (section of nav; track section.label) {
         <div hlmSidebarGroup>
@@ -28,11 +42,23 @@
                     [routerLink]="item.path"
                     routerLinkActive="bg-sidebar-accent text-sidebar-accent-foreground"
                     [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+                    [title]="item.shortcut ? item.label + ' — ' + item.shortcut : item.label"
                   >
                     <ng-icon [name]="item.icon" size="16"></ng-icon>
-                    <span>{{ item.label }}</span>
+                    <span class="flex-1">{{ item.label }}</span>
                     @if (item.badge !== undefined) {
-                      <span hlmSidebarMenuBadge>{{ item.badge }}</span>
+                      <span
+                        class="inline-flex h-4 items-center rounded-full px-1.5 text-[10px] font-semibold tabular-nums group-data-[collapsible=icon]:hidden"
+                        [class.bg-emerald-500/15]="item.urgent"
+                        [class.text-emerald-700]="item.urgent"
+                        [class.dark:text-emerald-300]="item.urgent"
+                        [class.ring-1]="item.urgent"
+                        [class.ring-emerald-500/30]="item.urgent"
+                        [class.bg-muted]="!item.urgent"
+                        [class.text-muted-foreground]="!item.urgent"
+                      >{{ item.badge }}</span>
+                    } @else if (item.shortcut) {
+                      <kbd class="font-mono text-[10px] px-1 py-0.5 rounded border border-border bg-muted text-muted-foreground opacity-0 group-hover/menu-item:opacity-100 transition-opacity group-data-[collapsible=icon]:hidden">{{ item.shortcut }}</kbd>
                     }
                   </a>
                 </li>
@@ -43,31 +69,24 @@
       }
     </div>
 
-    <div hlmSidebarGroup class="group-data-[collapsible=icon]:hidden">
-      <div hlmSidebarGroupLabel>Pinned</div>
-      <div hlmSidebarGroupContent>
-        <ul class="flex flex-col gap-0.5 px-1">
-          @for (repo of pinnedRepos; track repo.name) {
-            <li
-              [title]="repo.name + ', ' + repo.openPrs + ' open'"
-              class="flex items-center gap-2 px-2 py-1.5 rounded-md text-xs hover:bg-sidebar-accent/60 cursor-default"
-            >
-              <span
-                class="size-1.5 rounded-full shrink-0"
-                [class.bg-emerald-500]="repo.status === 'pass'"
-                [class.bg-amber-500]="repo.status === 'build'"
-                [class.bg-red-500]="repo.status === 'fail'"
-                [class.animate-pulse]="repo.status === 'build'"
-              ></span>
-              <span class="font-mono truncate text-sidebar-foreground/80">{{ repo.name }}</span>
-              <span class="ml-auto text-[10px] text-muted-foreground tabular-nums">{{ repo.openPrs }}</span>
-            </li>
-          }
-        </ul>
-      </div>
-    </div>
-
     <div hlmSidebarFooter>
+      <div class="px-2 mb-1 group-data-[collapsible=icon]:hidden">
+        <div class="rounded-md bg-muted/40 px-3 py-2 ring-1 ring-border/50">
+          <div class="flex items-center justify-between text-[10.5px]">
+            <span class="font-semibold uppercase tracking-wider text-muted-foreground">Today</span>
+            <span class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+              <span class="font-mono">CI 4 / 5</span>
+            </span>
+          </div>
+          <p class="mt-1 text-xs leading-snug">
+            <span class="font-semibold text-foreground tabular-nums">12</span>
+            <span class="text-muted-foreground ml-1">need review,</span>
+            <span class="font-semibold text-foreground tabular-nums ml-1">3</span>
+            <span class="text-muted-foreground ml-1">approved</span>
+          </p>
+        </div>
+      </div>
+
       <ul hlmSidebarMenu>
         <li hlmSidebarMenuItem>
           <button
@@ -86,7 +105,12 @@
           </button>
           <ng-template #userMenu>
             <div hlmDropdownMenu>
-              <div hlmDropdownMenuLabel>{{ reviewer().role }}</div>
+              <div hlmDropdownMenuLabel>
+                <div class="flex flex-col gap-0.5">
+                  <span class="text-sm font-medium">{{ reviewer().name }}</span>
+                  <span class="text-[11px] text-muted-foreground font-normal">{{ reviewer().role }}</span>
+                </div>
+              </div>
               <div hlmDropdownMenuSeparator></div>
               <button hlmDropdownMenuItem>
                 <ng-icon name="lucideCircleUserRound" size="14"></ng-icon>
@@ -94,7 +118,22 @@
               </button>
               <button hlmDropdownMenuItem>
                 <ng-icon name="lucideSettings" size="14"></ng-icon>
-                <span>Settings</span>
+                <span class="flex-1 justify-start">Settings</span>
+                <kbd class="font-mono text-[10px] px-1 py-0.5 rounded border border-border bg-muted">g s</kbd>
+              </button>
+              <button hlmDropdownMenuItem>
+                <ng-icon name="lucideCommand" size="14"></ng-icon>
+                <span class="flex-1">Keyboard shortcuts</span>
+                <kbd class="font-mono text-[10px] px-1 py-0.5 rounded border border-border bg-muted">?</kbd>
+              </button>
+              <div hlmDropdownMenuSeparator></div>
+              <button hlmDropdownMenuItem>
+                <ng-icon name="lucideMessageSquare" size="14"></ng-icon>
+                <span>Send feedback</span>
+              </button>
+              <button hlmDropdownMenuItem>
+                <ng-icon name="lucideEye" size="14"></ng-icon>
+                <span>Help &amp; docs</span>
               </button>
               <div hlmDropdownMenuSeparator></div>
               <button hlmDropdownMenuItem>
@@ -134,8 +173,9 @@
         }
       </button>
 
-      <button hlmBtn variant="ghost" size="icon" aria-label="Notifications">
+      <button hlmBtn variant="ghost" size="icon" class="relative" aria-label="Notifications (3 unread)" title="Notifications (3 unread)">
         <ng-icon name="lucideBell" size="16"></ng-icon>
+        <span class="absolute top-1.5 right-1.5 size-2 rounded-full bg-red-500 ring-2 ring-background"></span>
       </button>
     </header>
 

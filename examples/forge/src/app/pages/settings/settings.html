@@ -1,14 +1,17 @@
 <section class="grid grid-cols-[260px_minmax(0,1fr)] h-full">
-  <aside class="border-r border-border bg-muted/30 p-4">
+  <aside class="border-r border-border bg-muted/30 p-4 overflow-y-auto scroll-quiet">
     <h2 class="text-base font-semibold tracking-tight px-2 mb-1">Settings</h2>
     <p class="text-xs text-muted-foreground px-2 mb-4">Workspace + per-user.</p>
     <nav class="flex flex-col gap-0.5">
       @for (s of sections; track s.key) {
         <button
+          type="button"
           (click)="select(s.key)"
           class="flex items-center gap-3 px-2 py-2 rounded-md text-left transition-colors"
           [class.bg-background]="active() === s.key"
           [class.shadow-sm]="active() === s.key"
+          [class.ring-1]="active() === s.key"
+          [class.ring-border]="active() === s.key"
           [class.hover:bg-background/60]="active() !== s.key"
         >
           <span class="inline-flex h-7 w-7 items-center justify-center rounded-md bg-muted text-muted-foreground shrink-0">
@@ -23,48 +26,189 @@
     </nav>
   </aside>
 
-  <div class="overflow-y-auto p-8 max-w-2xl">
-    <header class="mb-6">
-      <h3 class="text-xl font-semibold tracking-tight">Profile</h3>
-      <p class="text-sm text-muted-foreground mt-1">How you appear across Forge.</p>
-    </header>
+  <div class="overflow-y-auto scroll-quiet">
+    @switch (active()) {
 
-    <div class="space-y-5">
-      <div class="grid grid-cols-[140px_minmax(0,1fr)] gap-4 items-start">
-        <label class="text-sm font-medium pt-2">Display name</label>
-        <input value="Mofiro Jean" class="h-9 rounded-md border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
-      </div>
-      <div class="grid grid-cols-[140px_minmax(0,1fr)] gap-4 items-start">
-        <label class="text-sm font-medium pt-2">Handle</label>
-        <div class="flex items-center h-9 rounded-md border border-border bg-background px-3 text-sm">
-          <span class="text-muted-foreground">forge.dev/</span>
-          <input value="mofirojean" class="flex-1 bg-transparent focus:outline-none ml-1" />
+      @case ('profile') {
+        <div class="p-8 max-w-2xl">
+          <header class="mb-6">
+            <h3 class="text-xl font-semibold tracking-tight">Profile</h3>
+            <p class="text-sm text-muted-foreground mt-1">How you appear across Forge.</p>
+          </header>
+
+          <div class="space-y-5">
+            <div class="grid grid-cols-[140px_minmax(0,1fr)] gap-4 items-start">
+              <label class="text-sm font-medium pt-2" for="set-name">Display name</label>
+              <input id="set-name" value="Mofiro Jean" (input)="touch()"
+                     class="h-9 rounded-md border border-border bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+            </div>
+            <div class="grid grid-cols-[140px_minmax(0,1fr)] gap-4 items-start">
+              <label class="text-sm font-medium pt-2" for="set-handle">Handle</label>
+              <div class="flex items-center h-9 rounded-md border border-border bg-background px-3 text-sm focus-within:ring-2 focus-within:ring-ring">
+                <span class="text-muted-foreground">forge.dev/</span>
+                <input id="set-handle" value="mofirojean" (input)="touch()" class="flex-1 bg-transparent focus:outline-none ml-1" />
+              </div>
+            </div>
+            <div class="grid grid-cols-[140px_minmax(0,1fr)] gap-4 items-start">
+              <label class="text-sm font-medium pt-2" for="set-bio">Bio</label>
+              <textarea id="set-bio" rows="3" (input)="touch()"
+                        class="rounded-md border border-border bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-y"
+              >Staff engineer working on Forge. Maintainer of angular-ui-skills. Most active on the runtime and review tooling.</textarea>
+            </div>
+            <div class="grid grid-cols-[140px_minmax(0,1fr)] gap-4 items-start">
+              <label class="text-sm font-medium pt-2" for="set-tz">Timezone</label>
+              <select id="set-tz" (change)="touch()"
+                      class="h-9 rounded-md border border-border bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <option>America/Los_Angeles</option>
+                <option>America/New_York</option>
+                <option>Europe/London</option>
+                <option>Africa/Lagos</option>
+              </select>
+            </div>
+
+            <div class="flex items-center justify-between gap-2 pt-4 border-t border-border">
+              <span class="text-xs text-muted-foreground" [class.text-amber-600]="dirty()" [class.dark:text-amber-400]="dirty()">
+                {{ dirty() ? 'Unsaved changes' : 'All changes saved' }}
+              </span>
+              <div class="flex items-center gap-2">
+                <button type="button" hlmBtn variant="outline" size="sm" [disabled]="!dirty()" (click)="discard()">Discard</button>
+                <button type="button" hlmBtn size="sm" class="gap-2" [disabled]="!dirty()" (click)="save()">
+                  <ng-icon name="lucideCheck" size="14"></ng-icon>
+                  Save changes
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="grid grid-cols-[140px_minmax(0,1fr)] gap-4 items-start">
-        <label class="text-sm font-medium pt-2">Bio</label>
-        <textarea
-          rows="3"
-          class="rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-y"
-        >HR Admin at Acme Corp. Maintains the angular-ui-skills project, dogfooding Spartan/ng in Forge.</textarea>
-      </div>
-      <div class="grid grid-cols-[140px_minmax(0,1fr)] gap-4 items-start">
-        <label class="text-sm font-medium pt-2">Timezone</label>
-        <select class="h-9 rounded-md border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring">
-          <option>America/Los_Angeles</option>
-          <option>America/New_York</option>
-          <option>Europe/London</option>
-          <option>Africa/Lagos</option>
-        </select>
-      </div>
+      }
 
-      <div class="flex justify-end gap-2 pt-4 border-t border-border">
-        <button hlmBtn variant="outline" size="sm">Discard</button>
-        <button hlmBtn size="sm" class="gap-2">
-          <ng-icon name="lucideCheck" size="14"></ng-icon>
-          Save changes
-        </button>
-      </div>
-    </div>
+      @case ('notifications') {
+        <div class="p-8 max-w-2xl">
+          <header class="mb-6">
+            <h3 class="text-xl font-semibold tracking-tight">Notifications</h3>
+            <p class="text-sm text-muted-foreground mt-1">Pick what reaches you and where.</p>
+          </header>
+
+          <div class="rounded-lg border border-border overflow-hidden">
+            <div class="grid grid-cols-[minmax(0,1fr)_72px_72px] items-center gap-3 px-4 py-2 bg-muted/40 border-b border-border text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <span>Event</span>
+              <span class="text-center">Email</span>
+              <span class="text-center">In-app</span>
+            </div>
+            <ul class="divide-y divide-border">
+              @for (p of notificationPrefs; track p.key) {
+                <li class="grid grid-cols-[minmax(0,1fr)_72px_72px] items-center gap-3 px-4 py-2.5 hover:bg-muted/30">
+                  <span class="text-sm">{{ p.label }}</span>
+                  <span class="text-center">
+                    <input type="checkbox" [checked]="p.email" class="size-3.5 accent-foreground" [attr.aria-label]="p.label + ' email'" />
+                  </span>
+                  <span class="text-center">
+                    <input type="checkbox" [checked]="p.inApp" class="size-3.5 accent-foreground" [attr.aria-label]="p.label + ' in-app'" />
+                  </span>
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+      }
+
+      @case ('keyboard') {
+        <div class="p-8 max-w-2xl">
+          <header class="mb-6">
+            <h3 class="text-xl font-semibold tracking-tight">Keyboard shortcuts</h3>
+            <p class="text-sm text-muted-foreground mt-1">Press <kbd class="font-mono text-[10px] px-1 py-0.5 rounded border bg-muted">?</kbd> on any page to see this list inline.</p>
+          </header>
+
+          <div class="rounded-lg border border-border overflow-hidden">
+            <ul class="divide-y divide-border">
+              @for (s of shortcuts; track s.action) {
+                <li class="flex items-center justify-between gap-4 px-4 py-2.5 hover:bg-muted/30">
+                  <span class="text-sm">{{ s.action }}</span>
+                  <span class="flex items-center gap-1">
+                    @for (k of s.keys; track k) {
+                      <kbd class="font-mono text-[10px] px-1.5 py-0.5 rounded border border-border bg-muted text-muted-foreground tabular-nums">{{ k }}</kbd>
+                    }
+                  </span>
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+      }
+
+      @case ('display') {
+        <div class="p-8 max-w-2xl">
+          <header class="mb-6">
+            <h3 class="text-xl font-semibold tracking-tight">Display</h3>
+            <p class="text-sm text-muted-foreground mt-1">Theme, density, font choice.</p>
+          </header>
+
+          <div class="space-y-6">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Theme</p>
+              <div class="inline-flex items-center rounded-md border border-border bg-card p-0.5">
+                <button type="button" class="px-3 py-1.5 text-xs rounded transition-colors bg-muted text-foreground">System</button>
+                <button type="button" class="px-3 py-1.5 text-xs rounded transition-colors text-muted-foreground hover:text-foreground">Light</button>
+                <button type="button" class="px-3 py-1.5 text-xs rounded transition-colors text-muted-foreground hover:text-foreground">Dark</button>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Density</p>
+              <div class="inline-flex items-center rounded-md border border-border bg-card p-0.5">
+                <button type="button" class="px-3 py-1.5 text-xs rounded transition-colors text-muted-foreground hover:text-foreground">Compact</button>
+                <button type="button" class="px-3 py-1.5 text-xs rounded transition-colors bg-muted text-foreground">Default</button>
+                <button type="button" class="px-3 py-1.5 text-xs rounded transition-colors text-muted-foreground hover:text-foreground">Comfy</button>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Monospace font</p>
+              <select class="h-9 rounded-md border border-border bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <option>JetBrains Mono</option>
+                <option>IBM Plex Mono</option>
+                <option>Fira Code</option>
+                <option>Cascadia Code</option>
+                <option>System default</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      }
+
+      @case ('integrations') {
+        <div class="p-8 max-w-2xl">
+          <header class="mb-6">
+            <h3 class="text-xl font-semibold tracking-tight">Integrations</h3>
+            <p class="text-sm text-muted-foreground mt-1">Services connected to your Forge workspace.</p>
+          </header>
+
+          <ul class="divide-y divide-border rounded-lg border border-border overflow-hidden">
+            @for (i of integrations; track i.name) {
+              <li class="flex items-center gap-3 px-4 py-3 hover:bg-muted/30">
+                <span class="inline-flex size-8 items-center justify-center rounded-md bg-muted text-muted-foreground shrink-0 font-semibold text-xs">
+                  {{ i.name.charAt(0) }}
+                </span>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium">{{ i.name }}</p>
+                  <p class="text-xs text-muted-foreground truncate">{{ i.detail }}</p>
+                </div>
+                @if (i.status === 'connected') {
+                  <span class="inline-flex items-center gap-1 text-[10.5px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/30">
+                    <span class="size-1.5 rounded-full bg-emerald-500"></span>
+                    Connected
+                  </span>
+                  <button type="button" hlmBtn variant="ghost" size="sm">Disconnect</button>
+                } @else {
+                  <span class="inline-flex items-center gap-1 text-[10.5px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground ring-1 ring-border">
+                    Off
+                  </span>
+                  <button type="button" hlmBtn variant="outline" size="sm">Connect</button>
+                }
+              </li>
+            }
+          </ul>
+        </div>
+      }
+
+    }
   </div>
 </section>
