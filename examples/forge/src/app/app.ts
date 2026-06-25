@@ -16,6 +16,7 @@ import { MockDataService } from './core/mock-data.service';
 import { CommandPaletteService } from './core/command-palette.service';
 import { NAV } from './core/nav';
 import { CommandPalette } from './shell/command-palette';
+import type { PinnedRepo } from './core/model';
 
 @Component({
   selector: 'app-root',
@@ -55,11 +56,11 @@ export class App {
   protected readonly nav = NAV;
   protected readonly reviewer = this.data.currentReviewer;
 
-  protected readonly pinnedRepos = [
-    { name: 'forge/runtime', openPrs: 3, status: 'pass' as const },
-    { name: 'forge/api',     openPrs: 7, status: 'build' as const },
-    { name: 'forge/web',     openPrs: 2, status: 'pass' as const },
-    { name: 'forge/docs',    openPrs: 1, status: 'fail' as const },
+  protected readonly pinnedRepos: readonly PinnedRepo[] = [
+    { name: 'forge/runtime', openPrs: 3, status: 'pass' },
+    { name: 'forge/api',     openPrs: 7, status: 'build' },
+    { name: 'forge/web',     openPrs: 2, status: 'pass' },
+    { name: 'forge/docs',    openPrs: 1, status: 'fail' },
   ];
 
   protected readonly userInitials = computed(() =>

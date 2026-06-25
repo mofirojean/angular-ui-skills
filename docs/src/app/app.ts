@@ -185,20 +185,6 @@ export class App {
     },
   ];
 
-  protected readonly heroSnippet = [
-    { kind: 'com', text: '# Install globally, available in every project' },
-    { kind: 'cmd', text: 'npx skills@latest add mofirojean/angular-ui-skills -g' },
-    { kind: 'gap', text: '' },
-    { kind: 'com', text: '# CLI handles Claude Code, Cursor, Codex, and 10+ others' },
-    { kind: 'out', text: '✓ Installed spartan-ng-developer' },
-    { kind: 'out', text: '✓ Installed primeng-developer' },
-    { kind: 'out', text: '✓ Installed ng-zorro-developer' },
-    { kind: 'out', text: '✓ Installed angular-material-developer' },
-    { kind: 'gap', text: '' },
-    { kind: 'com', text: '# Then ask your assistant:' },
-    { kind: 'prompt', text: '› Build me a Spartan/ng dashboard with a Cmd+K palette' },
-  ];
-
   protected readonly tabKeys: readonly InstallTab[] = ['cli', 'claude', 'gemini', 'cursor', 'manual'];
 
   protected readonly installCommands: Record<InstallTab, { label: string; lines: { tk: string; text: string }[] }> = {
@@ -253,10 +239,6 @@ export class App {
     },
   };
 
-  // The runtimes the `npx skills` CLI targets. Surfaced as a logo wall right
-  // after the hero so visitors can confirm at a glance that their tool is
-  // supported. Order roughly follows the order skills.vercel.app uses, the
-  // most-popular runtimes are at the start.
   protected readonly agents: readonly { name: string; mark: string; tone: string }[] = [
     { name: 'Claude Code',    mark: 'CC', tone: 'amber' },
     { name: 'Cursor',         mark: 'CU', tone: 'zinc' },
@@ -316,26 +298,6 @@ export class App {
     { line: '    └── a11y.md', tag: 'focus, ARIA, keyboard' },
   ];
 
-  protected readonly skillRun: readonly { label: string; detail: string; mono?: boolean }[] = [
-    {
-      label: 'Your prompt',
-      detail: '"Build a Spartan/ng dashboard with a Cmd+K palette"',
-    },
-    {
-      label: 'angular-developer',
-      detail: 'Loads first. Provides signals, standalone APIs, control flow, routing, forms, SSR, a11y.',
-    },
-    {
-      label: 'spartan-ng-developer/SKILL.md',
-      detail: 'Routes to references/primitives.md (brn-command palette) + references/theming.md (Cmd+K shortcut wiring).',
-      mono: true,
-    },
-    {
-      label: 'Generated code',
-      detail: 'Uses HlmCommand, brn-command-input, the v1.0.1 stable API surface, and the helm preset already in your tailwind config.',
-    },
-  ];
-
   constructor() {
     effect(() => {
       this.document.documentElement.classList.toggle('dark', this.mode() === 'dark');
@@ -374,16 +336,5 @@ export class App {
       .filter((l) => l.tk !== 'com')
       .map((l) => l.text)
       .join('\n');
-  }
-
-  protected statusLabel(status: Skill['status']): string {
-    switch (status) {
-      case 'ready':
-        return 'Ready';
-      case 'in-progress':
-        return 'In progress';
-      case 'planned':
-        return 'Planned';
-    }
   }
 }

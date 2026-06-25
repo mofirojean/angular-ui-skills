@@ -7,19 +7,7 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
 
-interface PrRow {
-  id: string;
-  title: string;
-  repo: string;
-  branch: string;
-  author: { name: string; initials: string; };
-  reviewers: { initials: string; tone: string; }[];
-  labels: { name: string; tone: string; }[];
-  status: 'open' | 'draft' | 'approved' | 'changes-requested';
-  added: number;
-  removed: number;
-  updatedAgo: string;
-}
+import type { PrRow } from '../../core/model';
 
 @Component({
   selector: 'app-inbox',

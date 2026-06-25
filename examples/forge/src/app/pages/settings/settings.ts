@@ -3,12 +3,7 @@ import { NgIcon } from '@ng-icons/core';
 
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 
-interface Section {
-  key: string;
-  label: string;
-  icon: string;
-  sub: string;
-}
+import type { SettingsSection } from '../../core/model';
 
 @Component({
   selector: 'app-settings',
@@ -20,7 +15,7 @@ interface Section {
 export class Settings {
   protected readonly active = signal<string>('profile');
 
-  protected readonly sections: Section[] = [
+  protected readonly sections: SettingsSection[] = [
     { key: 'profile',       label: 'Profile',            icon: 'lucideCircleUserRound', sub: 'Name, bio, photo' },
     { key: 'notifications', label: 'Notifications',      icon: 'lucideBell',            sub: 'Email + in-app' },
     { key: 'keyboard',      label: 'Keyboard shortcuts', icon: 'lucideCommand',         sub: 'Customize bindings' },

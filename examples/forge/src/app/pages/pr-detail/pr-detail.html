@@ -1,5 +1,5 @@
 <section class="flex flex-col h-full">
-  <header class="px-6 pt-6 pb-3 border-b border-border">
+  <header class="flex-shrink-0 px-6 pt-6 pb-3 border-b border-border">
     <nav class="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
       <a routerLink="/" class="hover:text-foreground">Inbox</a>
       <ng-icon name="lucideChevronRight" size="12"></ng-icon>
@@ -69,65 +69,543 @@
     </nav>
   </header>
 
-  <div class="flex-1 min-h-0 overflow-auto px-6 py-6 max-w-4xl">
-    <ol class="relative ml-3 border-l border-border space-y-6 pl-6">
-      @for (item of timeline; track $index) {
-        <li class="relative">
-          <span class="absolute -left-[2.05rem] top-1 h-3 w-3 rounded-full ring-4 ring-background"
-                [class.bg-emerald-500]="item.kind === 'review'"
-                [class.bg-zinc-300]="item.kind === 'event'"
-                [class.dark:bg-zinc-700]="item.kind === 'event'"
-                [class.bg-foreground]="item.kind === 'description' || item.kind === 'comment'"></span>
+  @switch (activeTab()) {
 
-          @if (item.kind === 'event') {
-            <div class="flex items-center gap-2 text-xs text-muted-foreground">
-              <ng-icon [name]="item.icon ?? ''" size="14"></ng-icon>
-              <span>{{ item.label }}</span>
-              <span class="text-muted-foreground/60">·</span>
-              <span>{{ item.ago }}</span>
-            </div>
-          } @else if (item.author; as author) {
-            <article class="rounded-lg border border-border bg-card overflow-hidden">
-              <header class="flex items-center gap-2 px-3 py-2 bg-muted/40 border-b border-border">
-                <hlm-avatar class="size-6">
-                  <span hlmAvatarFallback class="text-[10px] font-semibold" [ngClass]="author.tone">{{ author.initials }}</span>
-                </hlm-avatar>
-                <span class="text-xs font-medium">{{ author.name }}</span>
-                @if (item.kind === 'description') {
-                  <span class="text-xs text-muted-foreground">{{ item.ago }}</span>
-                } @else if (item.kind === 'review') {
-                  <span class="text-xs text-muted-foreground">approved {{ item.ago }}</span>
-                  <span class="ml-1 text-xs px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">Approved</span>
-                } @else {
-                  <span class="text-xs text-muted-foreground">commented {{ item.ago }}</span>
+    @case ('conversation') {
+      <div class="flex-1 min-h-0 overflow-auto px-6 py-6 scroll-quiet">
+        <div class="max-w-6xl mx-auto grid gap-8 grid-cols-1 lg:grid-cols-[minmax(0,1fr)_240px]">
+          <div class="min-w-0">
+          <ol class="relative space-y-5">
+            <span aria-hidden="true" class="absolute left-[15px] top-2 bottom-2 w-px bg-border"></span>
+
+            @for (item of timeline; track $index) {
+              <li class="relative pl-12">
+                @if (item.kind === 'event' && item.author; as eventAuthor) {
+                  <span class="absolute left-0 top-0 size-8 rounded-full ring-4 ring-background bg-muted flex items-center justify-center text-muted-foreground">
+                    <ng-icon [name]="item.icon ?? 'lucideCircleCheck'" size="14"></ng-icon>
+                  </span>
+                  <div class="flex items-center gap-1.5 text-xs text-muted-foreground py-1.5 flex-wrap">
+                    <hlm-avatar class="size-4">
+                      <span hlmAvatarFallback class="text-[8px] font-semibold" [ngClass]="eventAuthor.tone ?? ''">{{ eventAuthor.initials }}</span>
+                    </hlm-avatar>
+                    <span class="font-medium text-foreground">{{ eventAuthor.name }}</span>
+                    <span>{{ item.label }}</span>
+                    <span class="text-muted-foreground/60">·</span>
+                    <span>{{ item.ago }}</span>
+                  </div>
+                } @else if (item.author; as author) {
+                  <hlm-avatar class="absolute left-0 top-0 size-8 ring-4 ring-background">
+                    <span hlmAvatarFallback class="text-[11px] font-semibold" [ngClass]="author.tone ?? ''">{{ author.initials }}</span>
+                  </hlm-avatar>
+
+                  <article class="rounded-lg border border-border bg-card overflow-hidden shadow-sm">
+                    <header class="flex items-center gap-2 px-3 py-2 bg-muted/40 border-b border-border">
+                      <span class="text-sm font-medium">{{ author.name }}</span>
+                      @if (item.kind === 'description') {
+                        <span class="text-xs text-muted-foreground">{{ item.ago }}</span>
+                        <span class="ml-1 text-[10px] px-1.5 py-0.5 rounded border border-border text-muted-foreground">Author</span>
+                      } @else if (item.kind === 'review') {
+                        <span class="text-xs text-muted-foreground">{{ item.verdict }} {{ item.ago }}</span>
+                        <span class="ml-1 inline-flex items-center gap-1 text-[10.5px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/30">
+                          <ng-icon name="lucideCheck" size="10"></ng-icon>
+                          Approved
+                        </span>
+                      } @else {
+                        <span class="text-xs text-muted-foreground">commented {{ item.ago }}</span>
+                      }
+                      <div class="ml-auto flex items-center gap-0.5">
+                        <button type="button" class="size-6 inline-flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" aria-label="Add reaction">
+                          <ng-icon name="lucideSmilePlus" size="13"></ng-icon>
+                        </button>
+                        <button type="button" class="size-6 inline-flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" aria-label="More">
+                          <ng-icon name="lucideMoreHorizontal" size="13"></ng-icon>
+                        </button>
+                      </div>
+                    </header>
+
+                    <div class="px-4 py-3 text-sm leading-relaxed">{{ item.body }}</div>
+
+                    @if (item.kind === 'review' && item.fileComments) {
+                      <div class="px-4 py-2 border-t border-border bg-muted/20 text-xs text-muted-foreground flex items-center gap-1.5">
+                        <ng-icon name="lucideMessageSquare" size="12"></ng-icon>
+                        <a class="font-medium text-foreground hover:underline" (click)="setTab('files')">
+                          {{ item.fileComments }} file comments
+                        </a>
+                      </div>
+                    }
+
+                    @if (item.reactions?.length) {
+                      <div class="px-3 py-2 border-t border-border bg-muted/10 flex items-center gap-1 flex-wrap">
+                        @for (r of item.reactions; track r.emoji) {
+                          <button type="button" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs transition-colors"
+                                  [class.border-primary]="r.mine"
+                                  [class.bg-primary-foreground]="r.mine"
+                                  [class.text-foreground]="r.mine"
+                                  [class.border-border]="!r.mine"
+                                  [class.bg-background]="!r.mine"
+                                  [class.text-muted-foreground]="!r.mine"
+                                  [class.hover:bg-muted]="true">
+                            <span class="text-[13px] leading-none">{{ r.emoji }}</span>
+                            <span class="text-[11px] font-medium tabular-nums">{{ r.count }}</span>
+                          </button>
+                        }
+                        <button type="button" class="inline-flex items-center justify-center size-6 rounded-full border border-dashed border-border text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" aria-label="Add reaction">
+                          <ng-icon name="lucideSmilePlus" size="12"></ng-icon>
+                        </button>
+                      </div>
+                    }
+                  </article>
                 }
-              </header>
-              <div class="px-4 py-3 text-sm leading-relaxed">{{ item.body }}</div>
-            </article>
-          }
-        </li>
-      }
-    </ol>
+              </li>
+            }
+          </ol>
 
-    <form class="mt-8 rounded-lg border border-border bg-card overflow-hidden">
-      <div class="flex items-center gap-2 px-3 py-2 bg-muted/40 border-b border-border text-xs text-muted-foreground">
-        Leave a comment
-      </div>
-      <textarea
-        rows="3"
-        placeholder="Comment, suggest changes, or approve the PR,"
-        class="block w-full px-4 py-3 text-sm bg-transparent focus:outline-none resize-none"
-      ></textarea>
-      <div class="flex items-center justify-between gap-2 px-3 py-2 border-t border-border">
-        <span class="text-xs text-muted-foreground">Markdown supported</span>
-        <div class="flex items-center gap-2">
-          <button hlmBtn variant="outline" size="sm">Comment</button>
-          <button hlmBtn size="sm" class="gap-2">
-            <ng-icon name="lucideCheck" size="14"></ng-icon>
-            Approve
-          </button>
+          <section class="mt-8 rounded-lg border border-border bg-card overflow-hidden">
+            <header class="flex items-center gap-3 px-4 py-3 border-b border-border">
+              <span class="size-8 rounded-full bg-emerald-500/15 ring-1 ring-emerald-500/30 flex items-center justify-center shrink-0">
+                <ng-icon name="lucideGitMerge" size="15" class="text-emerald-600 dark:text-emerald-400"></ng-icon>
+              </span>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium">This branch is ready to merge</p>
+                <p class="text-xs text-muted-foreground">Approved by 1 reviewer · 4 of 5 checks succeeded · No conflicts with main</p>
+              </div>
+              <span class="text-[10.5px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
+                Mergeable
+              </span>
+            </header>
+
+            <ul class="px-4 py-3 space-y-1.5 text-xs">
+              <li class="flex items-center gap-2">
+                <ng-icon name="lucideCircleCheck" size="13" class="text-emerald-600 dark:text-emerald-400 shrink-0"></ng-icon>
+                <span class="text-muted-foreground">All required status checks are passing</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <ng-icon name="lucideCircleCheck" size="13" class="text-emerald-600 dark:text-emerald-400 shrink-0"></ng-icon>
+                <span class="text-muted-foreground">No conflicts with the base branch</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <ng-icon name="lucideCircleCheck" size="13" class="text-emerald-600 dark:text-emerald-400 shrink-0"></ng-icon>
+                <span class="text-muted-foreground">Approved by Riley Chen</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <ng-icon name="lucideClock" size="13" class="text-amber-600 dark:text-amber-400 shrink-0"></ng-icon>
+                <span class="text-muted-foreground">e2e suite still running (shard 3 of 4)</span>
+              </li>
+            </ul>
+
+            <footer class="px-4 py-3 border-t border-border bg-muted/20 flex flex-wrap items-center gap-2">
+              <button hlmBtn size="sm" class="gap-2">
+                <ng-icon name="lucideGitMerge" size="13"></ng-icon>
+                Merge pull request
+              </button>
+              <button hlmBtn variant="outline" size="sm">Squash and merge</button>
+              <button hlmBtn variant="outline" size="sm">Rebase and merge</button>
+              <div class="ml-auto">
+                <button hlmBtn variant="ghost" size="sm" class="text-muted-foreground">Mark as draft</button>
+              </div>
+            </footer>
+          </section>
+
+          <form class="mt-6 rounded-lg border border-border bg-card overflow-hidden">
+            <nav class="flex items-center border-b border-border bg-muted/40 px-2 py-1">
+              <button type="button" class="px-2.5 py-1 text-xs font-medium border-b-2 border-foreground -mb-1.5 text-foreground">Write</button>
+              <button type="button" class="px-2.5 py-1 text-xs font-medium border-b-2 border-transparent -mb-1.5 text-muted-foreground hover:text-foreground transition-colors">Preview</button>
+              <div class="flex-1"></div>
+              <div class="flex items-center gap-0.5">
+                <button type="button" class="size-7 inline-flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" aria-label="Bold">
+                  <ng-icon name="lucideBold" size="13"></ng-icon>
+                </button>
+                <button type="button" class="size-7 inline-flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" aria-label="Italic">
+                  <ng-icon name="lucideItalic" size="13"></ng-icon>
+                </button>
+                <span class="w-px h-4 bg-border mx-0.5"></span>
+                <button type="button" class="size-7 inline-flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" aria-label="Code">
+                  <ng-icon name="lucideCode" size="13"></ng-icon>
+                </button>
+                <button type="button" class="size-7 inline-flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" aria-label="Quote">
+                  <ng-icon name="lucideQuote" size="13"></ng-icon>
+                </button>
+                <button type="button" class="size-7 inline-flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" aria-label="Link">
+                  <ng-icon name="lucideLink2" size="13"></ng-icon>
+                </button>
+                <button type="button" class="size-7 inline-flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" aria-label="Ordered list">
+                  <ng-icon name="lucideListOrdered" size="13"></ng-icon>
+                </button>
+                <span class="w-px h-4 bg-border mx-0.5"></span>
+                <button type="button" class="size-7 inline-flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" aria-label="Mention">
+                  <ng-icon name="lucideAtSign" size="13"></ng-icon>
+                </button>
+                <button type="button" class="size-7 inline-flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" aria-label="Attach">
+                  <ng-icon name="lucidePaperclip" size="13"></ng-icon>
+                </button>
+              </div>
+            </nav>
+            <textarea
+              rows="4"
+              placeholder="Leave a comment,"
+              class="block w-full px-4 py-3 text-sm bg-transparent focus:outline-none resize-none font-sans"
+            ></textarea>
+            <footer class="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5 border-t border-border bg-muted/20">
+              <span class="text-[11px] text-muted-foreground inline-flex items-center gap-1.5">
+                <ng-icon name="lucidePaperclip" size="11"></ng-icon>
+                Drag files here, paste from clipboard, or select to attach
+              </span>
+              <div class="flex items-center gap-2">
+                <button type="button" hlmBtn variant="ghost" size="sm" class="text-muted-foreground">Close pull request</button>
+                <button type="button" hlmBtn variant="outline" size="sm">Comment</button>
+                <button type="button" hlmBtn size="sm" class="gap-2">
+                  <ng-icon name="lucideCheck" size="13"></ng-icon>
+                  Approve
+                </button>
+              </div>
+            </footer>
+          </form>
+          </div>
+
+          <aside class="text-sm">
+            <section class="py-3 border-b border-border">
+              <header class="flex items-center justify-between mb-2">
+                <span class="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">Assignee</span>
+                <button type="button" class="size-5 inline-flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" aria-label="Edit assignee">
+                  <ng-icon name="lucideSettings" size="11"></ng-icon>
+                </button>
+              </header>
+              <div class="flex items-center gap-2">
+                <hlm-avatar class="size-6">
+                  <span hlmAvatarFallback class="text-[10px] font-semibold" [ngClass]="assignee.tone ?? ''">{{ assignee.initials }}</span>
+                </hlm-avatar>
+                <span class="text-xs font-medium">{{ assignee.name }}</span>
+              </div>
+            </section>
+
+            <section class="py-3 border-b border-border">
+              <header class="flex items-center justify-between mb-2">
+                <span class="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">Reviewers</span>
+                <button type="button" class="size-5 inline-flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" aria-label="Edit reviewers">
+                  <ng-icon name="lucideSettings" size="11"></ng-icon>
+                </button>
+              </header>
+              <ul class="space-y-1.5">
+                @for (r of prReviewers; track r.author.name) {
+                  <li class="flex items-center gap-2">
+                    <hlm-avatar class="size-6">
+                      <span hlmAvatarFallback class="text-[10px] font-semibold" [ngClass]="r.author.tone ?? ''">{{ r.author.initials }}</span>
+                    </hlm-avatar>
+                    <span class="text-xs">{{ r.author.name }}</span>
+                    @if (r.approved) {
+                      <span class="ml-auto inline-flex items-center gap-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+                        <ng-icon name="lucideCheck" size="10"></ng-icon>
+                        approved
+                      </span>
+                    } @else {
+                      <span class="ml-auto inline-flex items-center gap-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                        <ng-icon name="lucideClock" size="10"></ng-icon>
+                        pending
+                      </span>
+                    }
+                  </li>
+                }
+              </ul>
+            </section>
+
+            <section class="py-3 border-b border-border">
+              <header class="flex items-center justify-between mb-2">
+                <span class="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">Labels</span>
+                <button type="button" class="size-5 inline-flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" aria-label="Edit labels">
+                  <ng-icon name="lucideSettings" size="11"></ng-icon>
+                </button>
+              </header>
+              @if (prLabels.length) {
+                <div class="flex flex-wrap gap-1.5">
+                  @for (l of prLabels; track l.name) {
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-medium" [ngClass]="l.tone">{{ l.name }}</span>
+                  }
+                </div>
+              } @else {
+                <p class="text-xs text-muted-foreground">None</p>
+              }
+            </section>
+
+            <section class="py-3 border-b border-border">
+              <header class="flex items-center justify-between mb-2">
+                <span class="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">Milestone</span>
+                <button type="button" class="size-5 inline-flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" aria-label="Edit milestone">
+                  <ng-icon name="lucideSettings" size="11"></ng-icon>
+                </button>
+              </header>
+              <p class="text-xs text-muted-foreground">None</p>
+            </section>
+
+            <section class="py-3 border-b border-border">
+              <header class="flex items-center justify-between mb-2">
+                <span class="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">Time tracking</span>
+                <button type="button" class="size-5 inline-flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" aria-label="Edit time tracking">
+                  <ng-icon name="lucideClock" size="11"></ng-icon>
+                </button>
+              </header>
+              <p class="text-xs text-muted-foreground">No estimate or time spent</p>
+            </section>
+
+            <section class="py-3">
+              <header class="flex items-center justify-between mb-2">
+                <span class="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">{{ prParticipants.length }} Participants</span>
+              </header>
+              <div class="flex -space-x-1.5 mb-2">
+                @for (p of prParticipants; track p.name) {
+                  <hlm-avatar class="size-6 ring-2 ring-background">
+                    <span hlmAvatarFallback class="text-[10px] font-semibold" [ngClass]="p.tone ?? ''">{{ p.initials }}</span>
+                  </hlm-avatar>
+                }
+              </div>
+              <ul class="space-y-1">
+                @for (p of prParticipants; track p.name) {
+                  <li class="text-xs text-muted-foreground">{{ p.name }}</li>
+                }
+              </ul>
+            </section>
+          </aside>
         </div>
       </div>
-    </form>
-  </div>
+    }
+
+    @case ('files') {
+      <div class="flex-1 min-h-0 flex">
+        <aside class="w-72 flex-shrink-0 border-r border-border flex flex-col bg-muted/20">
+          <header class="flex-shrink-0 flex items-center justify-between px-3 py-2.5 border-b border-border">
+            <div class="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <ng-icon name="lucideListTree" size="12"></ng-icon>
+              <span>{{ files.length }} files</span>
+            </div>
+            <button class="text-[11px] text-muted-foreground hover:text-foreground transition-colors">
+              Collapse all
+            </button>
+          </header>
+
+          <div class="flex-shrink-0 px-3 py-2 border-b border-border">
+            <div class="relative">
+              <ng-icon name="lucideSearch" size="12" class="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"></ng-icon>
+              <input
+                type="text"
+                placeholder="Filter files"
+                class="w-full pl-7 pr-2 py-1 text-xs bg-background border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring"
+              />
+            </div>
+          </div>
+
+          <ul class="flex-1 overflow-y-auto py-1 scroll-quiet">
+            @for (node of visibleTree(); track node.path) {
+              <li>
+                @if (node.kind === 'folder') {
+                  <button
+                    type="button"
+                    (click)="toggleFolder(node.path)"
+                    class="w-full flex items-center gap-1.5 py-1 pr-2 text-left text-xs hover:bg-muted/60 transition-colors text-foreground"
+                    [style.padding-left.rem]="0.5 + node.depth * 0.85"
+                  >
+                    <ng-icon
+                      [name]="isFolderExpanded(node.path) ? 'lucideChevronDown' : 'lucideChevronRight'"
+                      size="11"
+                      class="text-muted-foreground shrink-0"
+                    ></ng-icon>
+                    <ng-icon
+                      [name]="isFolderExpanded(node.path) ? 'lucideFolderOpen' : 'lucideFolder'"
+                      size="13"
+                      class="text-sky-600 dark:text-sky-400 shrink-0"
+                    ></ng-icon>
+                    <span class="font-mono truncate flex-1 font-medium">{{ node.name }}</span>
+                    <span class="text-[10px] font-mono shrink-0 tabular-nums opacity-70">
+                      <span class="text-emerald-600 dark:text-emerald-400">+{{ node.added }}</span>
+                      <span class="text-red-600 dark:text-red-400 ml-1">-{{ node.removed }}</span>
+                    </span>
+                  </button>
+                } @else {
+                  <button
+                    type="button"
+                    (click)="selectedFilePath.set(node.path)"
+                    class="w-full flex items-center gap-1.5 py-1 pr-2 text-left text-xs hover:bg-muted/60 transition-colors"
+                    [class.bg-muted]="selectedFilePath() === node.path"
+                    [class.text-foreground]="selectedFilePath() === node.path"
+                    [class.text-muted-foreground]="selectedFilePath() !== node.path && isViewed(node.path)"
+                    [style.padding-left.rem]="0.5 + node.depth * 0.85 + 0.85"
+                  >
+                    <ng-icon name="lucideFileText" size="12" class="text-muted-foreground shrink-0"></ng-icon>
+                    <span class="inline-flex h-4 w-4 items-center justify-center rounded text-[9.5px] font-bold font-mono shrink-0"
+                          [ngClass]="statusBadge(node.status).tone">
+                      {{ statusBadge(node.status).letter }}
+                    </span>
+                    <span class="font-mono truncate flex-1" [class.line-through]="isViewed(node.path)">{{ node.name }}</span>
+                    <span class="text-[10px] font-mono shrink-0 tabular-nums">
+                      <span class="text-emerald-600 dark:text-emerald-400">+{{ node.added }}</span>
+                      <span class="text-red-600 dark:text-red-400 ml-1">-{{ node.removed }}</span>
+                    </span>
+                  </button>
+                }
+              </li>
+            }
+          </ul>
+        </aside>
+
+        <div class="flex-1 min-w-0 overflow-y-auto scroll-quiet">
+          @if (selectedDiff(); as diff) {
+            <article>
+              <header class="sticky top-0 z-10 flex items-center gap-3 px-4 py-2 bg-muted/60 backdrop-blur border-b border-border">
+                <ng-icon name="lucideFileText" size="14" class="text-muted-foreground shrink-0"></ng-icon>
+                <span class="font-mono text-xs truncate">{{ diff.path }}</span>
+                <span class="inline-flex h-4 items-center rounded-full bg-background border border-border px-1.5 text-[10px] font-medium text-muted-foreground">
+                  {{ diff.language }}
+                </span>
+                <span class="font-mono text-[11px]">
+                  <span class="text-emerald-600 dark:text-emerald-400">+{{ diff.added }}</span>
+                  <span class="text-red-600 dark:text-red-400 ml-1">-{{ diff.removed }}</span>
+                </span>
+                <div class="flex-1"></div>
+                <label class="flex items-center gap-1.5 text-xs cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    [checked]="isViewed(diff.path)"
+                    (change)="toggleViewed(diff.path)"
+                    class="size-3.5 accent-foreground"
+                  />
+                  Viewed
+                </label>
+                <button hlmBtn variant="ghost" size="icon" class="h-7 w-7" aria-label="File actions">
+                  <ng-icon name="lucideEllipsis" size="14"></ng-icon>
+                </button>
+              </header>
+
+              @for (hunk of diff.hunks; track hunk.header; let h = $index) {
+                <div class="px-4 py-1 text-[11px] font-mono bg-muted/30 border-b border-border text-muted-foreground select-none">
+                  {{ hunk.header }}
+                </div>
+                <div class="font-mono text-[12px] leading-[1.55]">
+                  @for (line of hunk.lines; track $index; let i = $index) {
+                    @let key = diff.path + ':' + h + ':' + i;
+                    <div
+                      class="group relative grid items-baseline transition-colors hover:bg-muted/40"
+                      style="grid-template-columns: 44px 44px minmax(0, 1fr)"
+                      [class.bg-emerald-500/10]="line.kind === 'add'"
+                      [class.bg-red-500/10]="line.kind === 'del'"
+                    >
+                      <span class="text-right pr-2 text-[10.5px] text-muted-foreground/60 select-none tabular-nums">
+                        {{ line.oldNo }}
+                      </span>
+                      <span class="text-right pr-2 text-[10.5px] text-muted-foreground/60 select-none tabular-nums">
+                        {{ line.newNo }}
+                      </span>
+                      <div class="whitespace-pre overflow-x-auto pr-4 scroll-quiet"
+                            [class.text-emerald-700]="line.kind === 'add'"
+                            [class.dark:text-emerald-300]="line.kind === 'add'"
+                            [class.text-red-700]="line.kind === 'del'"
+                            [class.dark:text-red-300]="line.kind === 'del'">
+                        @if (line.kind === 'add') { + }
+                        @else if (line.kind === 'del') { - }
+                        @else { &nbsp; }
+                        {{ line.text }}
+                      </div>
+
+                      <button
+                        type="button"
+                        (click)="toggleComment(key)"
+                        class="absolute top-1/2 left-[78px] -translate-y-1/2 size-5 rounded-md bg-primary text-primary-foreground shadow-md ring-2 ring-background flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 hover:scale-110 focus-visible:opacity-100 focus-visible:outline-none transition-all"
+                        [class.!opacity-100]="commentingKey() === key"
+                        aria-label="Add a comment on this line"
+                      >
+                        <ng-icon name="lucideMessageSquarePlus" size="11"></ng-icon>
+                      </button>
+                    </div>
+
+                    @if (commentingKey() === key) {
+                      <div class="border-y border-border bg-muted/30 px-4 py-3">
+                        <form class="rounded-lg border border-border bg-card overflow-hidden ml-[88px] max-w-2xl shadow-sm">
+                          <div class="flex items-center gap-2 px-3 py-2 bg-muted/40 border-b border-border">
+                            <hlm-avatar class="size-5">
+                              <span hlmAvatarFallback class="text-[9px] font-semibold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">MJ</span>
+                            </hlm-avatar>
+                            <span class="text-xs font-medium">Mofiro Jean</span>
+                            <span class="text-[11px] text-muted-foreground font-mono">
+                              {{ diff.path }}:{{ line.newNo ?? line.oldNo }}
+                            </span>
+                          </div>
+                          <textarea
+                            rows="3"
+                            autofocus
+                            placeholder="Leave a comment,"
+                            class="block w-full px-4 py-2.5 text-sm bg-transparent focus:outline-none resize-none font-sans"
+                          ></textarea>
+                          <div class="flex items-center justify-between gap-2 px-3 py-2 border-t border-border bg-muted/20">
+                            <span class="text-[11px] text-muted-foreground">Markdown supported</span>
+                            <div class="flex items-center gap-2">
+                              <button type="button" hlmBtn variant="ghost" size="sm" (click)="closeComment()">Cancel</button>
+                              <button type="button" hlmBtn variant="outline" size="sm" (click)="closeComment()">Start review</button>
+                              <button type="button" hlmBtn size="sm" (click)="closeComment()">Add comment</button>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    }
+                  }
+                </div>
+              }
+            </article>
+          }
+        </div>
+      </div>
+    }
+
+    @case ('commits') {
+      <div class="flex-1 min-h-0 overflow-auto scroll-quiet">
+        <ul class="divide-y divide-border">
+          @for (c of commits; track c.sha) {
+            <li class="flex items-center gap-4 px-6 py-3 hover:bg-muted/40 transition-colors">
+              <span class="font-mono text-[11px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground tabular-nums">
+                {{ c.sha }}
+              </span>
+              <span class="text-sm truncate flex-1 min-w-0">{{ c.message }}</span>
+              <hlm-avatar class="size-6">
+                <span hlmAvatarFallback class="text-[10px] font-semibold" [ngClass]="c.author.tone">{{ c.author.initials }}</span>
+              </hlm-avatar>
+              <span class="text-xs text-muted-foreground hidden sm:inline">{{ c.author.name }}</span>
+              <span class="text-xs text-muted-foreground tabular-nums hidden md:inline">{{ c.ago }}</span>
+              <ng-icon
+                [name]="statusIcon(c.status)"
+                size="14"
+                [ngClass]="statusTone(c.status)"
+              ></ng-icon>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+
+    @case ('checks') {
+      <div class="flex-1 min-h-0 overflow-auto scroll-quiet">
+        <div class="px-6 py-5 grid gap-3 grid-cols-1 lg:grid-cols-2">
+          @for (chk of checks; track chk.name) {
+            <article class="rounded-lg border border-border bg-card overflow-hidden">
+              <header class="flex items-center gap-3 px-4 py-3 border-b border-border">
+                <ng-icon
+                  [name]="statusIcon(chk.status)"
+                  size="18"
+                  [ngClass]="statusTone(chk.status)"
+                ></ng-icon>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-medium truncate">{{ chk.name }}</p>
+                  <p class="text-[11px] text-muted-foreground font-mono truncate">{{ chk.suite }}</p>
+                </div>
+                <span class="text-xs text-muted-foreground tabular-nums">{{ chk.duration }}</span>
+              </header>
+              <div class="px-4 py-3 text-xs text-muted-foreground">
+                <p>{{ chk.detail }}</p>
+                @if (chk.status === 'pending' && chk.progress !== undefined) {
+                  <div class="mt-2 h-1 w-full rounded-full bg-muted overflow-hidden">
+                    <div class="h-full bg-amber-500 rounded-full transition-all" [style.width.%]="chk.progress"></div>
+                  </div>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      </div>
+    }
+  }
 </section>

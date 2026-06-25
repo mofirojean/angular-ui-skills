@@ -1,14 +1,4 @@
-export interface NavItem {
-  readonly path: string;
-  readonly label: string;
-  readonly icon: string;
-  readonly badge?: number | string;
-}
-
-export interface NavSection {
-  readonly label: string;
-  readonly items: readonly NavItem[];
-}
+import type { NavSection } from './model';
 
 export const NAV: readonly NavSection[] = [
   {

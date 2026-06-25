@@ -8,13 +8,7 @@ import { HlmCommandImports } from '@spartan-ng/helm/command';
 
 import { CommandPaletteService } from '../core/command-palette.service';
 import { ThemeService } from '../core/theme.service';
-
-interface CommandEntry {
-  readonly label: string;
-  readonly hint: string;
-  readonly icon: string;
-  readonly action: () => void;
-}
+import type { CommandEntry } from '../core/model';
 
 @Component({
   selector: 'app-command-palette',
