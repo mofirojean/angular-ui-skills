@@ -33,11 +33,6 @@ export const routes: Routes = [
     title: 'Author, Forge',
   },
   {
-    path: 'settings',
-    loadComponent: () => import('./pages/settings/settings').then((m) => m.Settings),
-    title: 'Settings, Forge',
-  },
-  {
     path: '**',
     loadComponent: () => import('./pages/not-found/not-found').then((m) => m.NotFound),
     title: 'Not found, Forge',

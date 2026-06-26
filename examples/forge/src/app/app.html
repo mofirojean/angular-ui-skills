@@ -37,12 +37,26 @@
             <ul hlmSidebarMenu>
               @for (item of section.items; track item.path) {
                 <li hlmSidebarMenuItem>
+                  @if (item.path === '/settings') {
+                    <button
+                      hlmSidebarMenuButton
+                      type="button"
+                      (click)="settings.show()"
+                      [attr.title]="item.shortcut ? item.label + ', ' + item.shortcut : item.label"
+                    >
+                      <ng-icon [name]="item.icon" size="16"></ng-icon>
+                      <span class="flex-1 text-left">{{ item.label }}</span>
+                      @if (item.shortcut) {
+                        <kbd class="font-mono text-[10px] px-1 py-0.5 rounded border border-border bg-muted text-muted-foreground opacity-0 group-hover/menu-item:opacity-100 transition-opacity group-data-[collapsible=icon]:hidden">{{ item.shortcut }}</kbd>
+                      }
+                    </button>
+                  } @else {
                   <a
                     hlmSidebarMenuButton
                     [routerLink]="item.path"
                     routerLinkActive="bg-sidebar-accent text-sidebar-accent-foreground"
                     [routerLinkActiveOptions]="{ exact: item.path === '/' }"
-                    [title]="item.shortcut ? item.label + ' — ' + item.shortcut : item.label"
+                    [title]="item.shortcut ? item.label + ', ' + item.shortcut : item.label"
                   >
                     <ng-icon [name]="item.icon" size="16"></ng-icon>
                     <span class="flex-1">{{ item.label }}</span>
@@ -61,6 +75,7 @@
                       <kbd class="font-mono text-[10px] px-1 py-0.5 rounded border border-border bg-muted text-muted-foreground opacity-0 group-hover/menu-item:opacity-100 transition-opacity group-data-[collapsible=icon]:hidden">{{ item.shortcut }}</kbd>
                     }
                   </a>
+                  }
                 </li>
               }
             </ul>
@@ -116,7 +131,7 @@
                 <ng-icon name="lucideCircleUserRound" size="14"></ng-icon>
                 <span>Profile</span>
               </button>
-              <button hlmDropdownMenuItem>
+              <button hlmDropdownMenuItem (click)="settings.show()">
                 <ng-icon name="lucideSettings" size="14"></ng-icon>
                 <span class="flex-1 justify-start">Settings</span>
                 <kbd class="font-mono text-[10px] px-1 py-0.5 rounded border border-border bg-muted">g s</kbd>
@@ -204,4 +219,5 @@
 
 <app-command-palette />
 <app-notifications-sheet />
+<app-settings-dialog />
 <hlm-toaster />

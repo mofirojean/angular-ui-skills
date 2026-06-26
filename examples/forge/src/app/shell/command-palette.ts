@@ -8,6 +8,7 @@ import { HlmCommandImports } from '@spartan-ng/helm/command';
 
 import { CommandPaletteService } from '../core/command-palette.service';
 import { ThemeService } from '../core/theme.service';
+import { SettingsDialogService } from '../core/settings-dialog.service';
 import type { CommandEntry } from '../core/model';
 
 @Component({
@@ -52,6 +53,7 @@ import type { CommandEntry } from '../core/model';
 export class CommandPalette {
   private readonly palette = inject(CommandPaletteService);
   private readonly theme = inject(ThemeService);
+  private readonly settings = inject(SettingsDialogService);
   private readonly router = inject(Router);
 
   protected readonly state = computed<BrnDialogState>(() =>
@@ -71,7 +73,7 @@ export class CommandPalette {
     { label: 'Go to Inbox',       hint: 'G I',  icon: 'lucideInbox',               action: () => this.router.navigate(['/']) },
     { label: 'Open PR #142',      hint: '',     icon: 'lucideGitPullRequestArrow', action: () => this.router.navigate(['/pr', '142']) },
     { label: 'View author profile', hint: '',   icon: 'lucideCircleUserRound',     action: () => this.router.navigate(['/author', 'sashalin']) },
-    { label: 'Open Settings',     hint: 'G S',  icon: 'lucideSettings',            action: () => this.router.navigate(['/settings']) },
+    { label: 'Open Settings',     hint: 'G S',  icon: 'lucideSettings',            action: () => this.settings.show() },
   ];
 
   protected readonly actionItems: readonly CommandEntry[] = [

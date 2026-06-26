@@ -16,9 +16,11 @@ import { ThemeService } from './core/theme.service';
 import { MockDataService } from './core/mock-data.service';
 import { CommandPaletteService } from './core/command-palette.service';
 import { NotificationsService } from './core/notifications.service';
+import { SettingsDialogService } from './core/settings-dialog.service';
 import { NAV } from './core/nav';
 import { CommandPalette } from './shell/command-palette';
 import { NotificationsSheet } from './shell/notifications-sheet';
+import { SettingsDialog } from './shell/settings-dialog';
 import type { PinnedRepo } from './core/model';
 
 @Component({
@@ -36,6 +38,7 @@ import type { PinnedRepo } from './core/model';
     HlmTooltip,
     CommandPalette,
     NotificationsSheet,
+    SettingsDialog,
     HlmSidebarImports,
   ],
   templateUrl: './app.html',
@@ -50,6 +53,7 @@ export class App {
   protected readonly data = inject(MockDataService);
   protected readonly palette = inject(CommandPaletteService);
   protected readonly notifs = inject(NotificationsService);
+  protected readonly settings = inject(SettingsDialogService);
   private readonly router = inject(Router);
 
   protected onGlobalKey(event: KeyboardEvent): void {
