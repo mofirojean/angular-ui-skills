@@ -10,6 +10,7 @@ import { HlmSidebarImports } from '@spartan-ng/helm/sidebar';
 import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
 import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
 import { HlmToaster } from '@spartan-ng/helm/sonner';
+import { HlmTooltip } from '@spartan-ng/helm/tooltip';
 
 import { ThemeService } from './core/theme.service';
 import { MockDataService } from './core/mock-data.service';
@@ -32,6 +33,7 @@ import type { PinnedRepo } from './core/model';
     HlmDropdownMenuImports,
     HlmAvatarImports,
     HlmToaster,
+    HlmTooltip,
     CommandPalette,
     NotificationsSheet,
     HlmSidebarImports,

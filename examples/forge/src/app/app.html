@@ -165,7 +165,14 @@
         </kbd>
       </button>
 
-      <button hlmBtn variant="ghost" size="icon" (click)="theme.toggle()" [attr.aria-label]="theme.mode() === 'dark' ? 'Switch to light' : 'Switch to dark'">
+      <button
+        hlmBtn
+        variant="ghost"
+        size="icon"
+        (click)="theme.toggle()"
+        [attr.aria-label]="theme.mode() === 'dark' ? 'Switch to light' : 'Switch to dark'"
+        [hlmTooltip]="theme.mode() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+      >
         @if (theme.mode() === 'dark') {
           <ng-icon name="lucideSun" size="16"></ng-icon>
         } @else {
@@ -180,7 +187,7 @@
         class="relative"
         (click)="notifs.show()"
         [attr.aria-label]="'Notifications (' + notifs.unreadCount() + ' unread)'"
-        [title]="'Notifications (' + notifs.unreadCount() + ' unread)'"
+        [hlmTooltip]="notifs.unreadCount() > 0 ? notifs.unreadCount() + ' unread notifications' : 'Notifications'"
       >
         <ng-icon name="lucideBell" size="16"></ng-icon>
         @if (notifs.unreadCount() > 0) {
