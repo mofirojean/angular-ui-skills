@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgClass } from '@angular/common';
+import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { NgIcon } from '@ng-icons/core';
 
 import { HlmButtonImports } from '@spartan-ng/helm/button';
@@ -23,13 +24,20 @@ import type {
 } from '../../core/model';
 import {
   type Token,
-  type Lang,
   type LangMeta,
   detectLang,
   langMeta,
   tokenize,
   tokenClass,
 } from '../../core/highlight';
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
 
 interface PrReviewer {
   readonly author: Author;
@@ -44,6 +52,7 @@ interface PrReviewer {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PrDetail {
+  private readonly sanitizer = inject(DomSanitizer);
   readonly id = input<string>('');
 
   protected readonly activeTab = signal<PrDetailTab>('files');
@@ -168,10 +177,19 @@ export class PrDetail {
         kind: line.kind,
         oldNo: line.oldNo,
         newNo: line.newNo,
-        tokens: tokenize(line.text, lang),
+        html: this.buildLineHtml(tokenize(line.text, lang)),
       })),
     }));
   });
+
+  private buildLineHtml(tokens: readonly Token[]): SafeHtml {
+    const html = tokens.map(tok => {
+      const text = escapeHtml(tok.v);
+      if (tok.t === 'plain') return text;
+      return `<span class="${tokenClass(tok.t)}">${text}</span>`;
+    }).join('');
+    return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
 
   protected readonly selectedLang = computed<LangMeta>(() =>
     langMeta(detectLang(this.selectedDiff().path)),

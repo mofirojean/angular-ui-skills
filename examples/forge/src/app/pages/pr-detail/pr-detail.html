@@ -564,15 +564,10 @@
                         [class.bg-emerald-500]="line.kind === 'add'"
                         [class.bg-red-500]="line.kind === 'del'"
                       ></span>
-                      <div class="whitespace-pre overflow-x-auto pr-4 pl-3 py-0.5 scroll-quiet">
-                        @for (tok of line.tokens; track $index) {
-                          @if (tok.t === 'plain') {
-                            <span>{{ tok.v }}</span>
-                          } @else {
-                            <span [ngClass]="tokenClass(tok.t)">{{ tok.v }}</span>
-                          }
-                        }
-                      </div>
+                      <div
+                        class="whitespace-pre overflow-x-auto pr-4 pl-3 py-0.5 scroll-quiet"
+                        [innerHTML]="line.html"
+                      ></div>
 
                       <button
                         type="button"
