@@ -198,7 +198,6 @@ export class PrDetail {
   protected readonly selectedPathParts = computed(() => this.selectedDiff().path.split('/'));
 
   protected langFor(path: string): LangMeta { return langMeta(detectLang(path)); }
-  protected tokenClass(t: Token['t']): string { return tokenClass(t); }
 
   protected readonly diffs: readonly FileDiff[] = [
     {
