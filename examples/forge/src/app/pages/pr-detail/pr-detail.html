@@ -581,32 +581,91 @@
                     </div>
 
                     @if (commentingKey() === key) {
-                      <div class="border-y border-border bg-muted/30 px-4 py-3">
-                        <form class="rounded-lg border border-border bg-card overflow-hidden ml-[88px] max-w-2xl shadow-sm">
-                          <div class="flex items-center gap-2 px-3 py-2 bg-muted/40 border-b border-border">
-                            <hlm-avatar class="size-5">
-                              <span hlmAvatarFallback class="text-[9px] font-semibold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">MJ</span>
-                            </hlm-avatar>
-                            <span class="text-xs font-medium">Mofiro Jean</span>
-                            <span class="text-[11px] text-muted-foreground font-mono">
-                              {{ diff.path }}:{{ line.newNo ?? line.oldNo }}
-                            </span>
-                          </div>
-                          <textarea
-                            rows="3"
-                            autofocus
-                            placeholder="Leave a comment,"
-                            class="block w-full px-4 py-2.5 text-sm bg-transparent focus-visible:outline-none resize-none font-sans"
-                          ></textarea>
-                          <div class="flex items-center justify-between gap-2 px-3 py-2 border-t border-border bg-muted/20">
-                            <span class="text-[11px] text-muted-foreground">Markdown supported</span>
-                            <div class="flex items-center gap-2">
-                              <button type="button" hlmBtn variant="ghost" size="sm" (click)="closeComment()">Cancel</button>
-                              <button type="button" hlmBtn variant="outline" size="sm" (click)="closeComment()">Start review</button>
-                              <button type="button" hlmBtn size="sm" (click)="closeComment()">Add comment</button>
-                            </div>
-                          </div>
-                        </form>
+                      <div class="bg-muted/15 px-4 py-3 border-y border-border/70">
+                        <div class="ml-[92px] max-w-2xl relative">
+                          <span aria-hidden="true" class="absolute -top-3 left-3 size-3 rotate-45 bg-card border-l border-t border-sky-500/40"></span>
+                          <form class="relative rounded-lg bg-card border border-border ring-1 ring-sky-500/20 shadow-lg overflow-hidden">
+                            <header class="flex items-center gap-2 px-3.5 py-2 bg-gradient-to-r from-sky-500/[0.06] via-transparent to-transparent border-b border-border">
+                              <hlm-avatar class="size-6">
+                                <span hlmAvatarFallback class="text-[10px] font-semibold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">MJ</span>
+                              </hlm-avatar>
+                              <span class="text-xs font-medium">Mofiro Jean</span>
+                              <span class="text-[10.5px] text-muted-foreground">commenting on</span>
+                              <span class="inline-flex items-center gap-1 font-mono text-[10.5px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground tabular-nums">
+                                <ng-icon name="lucideFileText" size="10"></ng-icon>
+                                {{ diff.path.split('/').pop() }}:{{ line.newNo ?? line.oldNo }}
+                              </span>
+                              <div class="flex-1"></div>
+                              <button
+                                type="button"
+                                class="size-6 inline-flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                                (click)="closeComment()"
+                                [hlmTooltip]="'Cancel (Esc)'"
+                                aria-label="Cancel"
+                              >
+                                <ng-icon name="lucideX" size="13"></ng-icon>
+                              </button>
+                            </header>
+
+                            <nav class="flex items-center border-b border-border bg-muted/20 px-1.5 py-1">
+                              <button type="button" class="px-2.5 py-0.5 text-[11px] font-medium border-b-2 border-foreground -mb-[5px] text-foreground">Write</button>
+                              <button type="button" class="px-2.5 py-0.5 text-[11px] font-medium border-b-2 border-transparent -mb-[5px] text-muted-foreground hover:text-foreground transition-colors">Preview</button>
+                              <div class="flex-1"></div>
+                              <div class="flex items-center gap-0">
+                                <button type="button" class="size-6 inline-flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" [hlmTooltip]="'Bold'" aria-label="Bold">
+                                  <ng-icon name="lucideBold" size="11"></ng-icon>
+                                </button>
+                                <button type="button" class="size-6 inline-flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" [hlmTooltip]="'Italic'" aria-label="Italic">
+                                  <ng-icon name="lucideItalic" size="11"></ng-icon>
+                                </button>
+                                <span class="w-px h-3 bg-border mx-0.5"></span>
+                                <button type="button" class="size-6 inline-flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" [hlmTooltip]="'Inline code'" aria-label="Inline code">
+                                  <ng-icon name="lucideCode" size="11"></ng-icon>
+                                </button>
+                                <button type="button" class="size-6 inline-flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" [hlmTooltip]="'Quote'" aria-label="Quote">
+                                  <ng-icon name="lucideQuote" size="11"></ng-icon>
+                                </button>
+                                <button type="button" class="size-6 inline-flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" [hlmTooltip]="'Link'" aria-label="Link">
+                                  <ng-icon name="lucideLink2" size="11"></ng-icon>
+                                </button>
+                                <span class="w-px h-3 bg-border mx-0.5"></span>
+                                <button type="button" class="size-6 inline-flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" [hlmTooltip]="'Mention'" aria-label="Mention">
+                                  <ng-icon name="lucideAtSign" size="11"></ng-icon>
+                                </button>
+                                <button type="button" class="size-6 inline-flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" [hlmTooltip]="'Suggest a code change'" aria-label="Suggest change">
+                                  <ng-icon name="lucideFilePen" size="11"></ng-icon>
+                                </button>
+                              </div>
+                            </nav>
+
+                            <textarea
+                              rows="4"
+                              autofocus
+                              placeholder="Leave a comment about this line, use @ to mention"
+                              class="block w-full px-4 py-2.5 text-sm bg-transparent focus-visible:outline-none resize-none font-sans"
+                            ></textarea>
+
+                            <footer class="flex flex-wrap items-center justify-between gap-2 px-3 py-2 border-t border-border bg-muted/15">
+                              <span class="text-[10.5px] text-muted-foreground inline-flex items-center gap-1.5">
+                                <ng-icon name="lucideMessageSquare" size="10"></ng-icon>
+                                <span>Adds to your in-progress review</span>
+                              </span>
+                              <div class="flex items-center gap-1.5">
+                                <button type="button" hlmBtn variant="ghost" size="sm" class="h-7 text-xs px-2.5" (click)="closeComment()">
+                                  Cancel
+                                </button>
+                                <button type="button" hlmBtn variant="outline" size="sm" class="h-7 text-xs gap-1.5 px-2.5" (click)="closeComment()">
+                                  <ng-icon name="lucideMessageSquare" size="11"></ng-icon>
+                                  Single comment
+                                </button>
+                                <button type="button" hlmBtn size="sm" class="h-7 text-xs gap-1.5 px-2.5" (click)="closeComment()">
+                                  <ng-icon name="lucideMessageSquarePlus" size="11"></ng-icon>
+                                  Add to review
+                                </button>
+                              </div>
+                            </footer>
+                          </form>
+                        </div>
                       </div>
                     }
                   }
