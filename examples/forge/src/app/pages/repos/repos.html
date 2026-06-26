@@ -1,0 +1,166 @@
+<section class="flex flex-col h-full">
+  <header class="flex-shrink-0 bg-background border-b border-border max-w-screen-2xl w-full mx-auto">
+    <div class="flex items-end justify-between gap-4 flex-wrap px-6 pt-6 pb-3">
+      <div>
+        <h2 class="text-xl font-semibold tracking-tight">Repositories</h2>
+        <p class="text-sm text-muted-foreground mt-1 flex items-center gap-2 flex-wrap">
+          <span>{{ visibleRepos().length }} repositor{{ visibleRepos().length === 1 ? 'y' : 'ies' }}</span>
+          @if (totalOpenPrs() > 0) {
+            <span class="text-muted-foreground/40">·</span>
+            <span class="text-foreground font-medium tabular-nums">{{ totalOpenPrs() }}</span>
+            <span>open pull requests across all</span>
+          }
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="relative">
+          <ng-icon name="lucideSearch" size="12" class="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"></ng-icon>
+          <input
+            type="text"
+            placeholder="Find a repository"
+            class="pl-7 pr-2 py-1 h-8 text-xs bg-background border border-border rounded-md w-56 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          />
+        </div>
+        <button hlmBtn size="sm" class="gap-2">
+          <ng-icon name="lucidePlus" size="14"></ng-icon>
+          New repo
+        </button>
+      </div>
+    </div>
+
+    <nav class="flex items-center gap-1 px-6">
+      @for (f of filters; track f.key) {
+        <button
+          type="button"
+          (click)="setFilter(f.key)"
+          class="px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors"
+          [class.border-foreground]="activeFilter() === f.key"
+          [class.text-foreground]="activeFilter() === f.key"
+          [class.border-transparent]="activeFilter() !== f.key"
+          [class.text-muted-foreground]="activeFilter() !== f.key"
+        >
+          {{ f.label }}
+          <span class="ml-1.5 inline-flex h-4 items-center rounded-full bg-muted px-1.5 text-[10px] font-medium text-muted-foreground tabular-nums">{{ f.count }}</span>
+        </button>
+      }
+    </nav>
+  </header>
+
+  @if (visibleRepos().length === 0) {
+    <div class="flex-1 min-h-0 overflow-y-auto max-w-screen-2xl w-full mx-auto scroll-quiet">
+      <div class="flex flex-col items-center justify-center py-20 px-6 text-center max-w-sm mx-auto">
+        <span class="mb-4 size-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+          <ng-icon name="lucideFolderGit2" size="22"></ng-icon>
+        </span>
+        <h3 class="text-base font-semibold tracking-tight">Nothing in this view</h3>
+        <p class="mt-1 text-sm text-muted-foreground">
+          Try another tab, or create a new repository.
+        </p>
+      </div>
+    </div>
+  } @else {
+    <ul class="flex-1 min-h-0 overflow-y-auto divide-y divide-border max-w-screen-2xl w-full mx-auto scroll-quiet">
+      @for (r of visibleRepos(); track r.name) {
+        <li class="group relative transition-colors hover:bg-muted/40"
+            [class.opacity-60]="r.archived">
+          <a [routerLink]="['/']" class="flex items-start gap-4 px-6 py-4">
+            <span class="mt-0.5 inline-flex size-8 items-center justify-center rounded-md bg-muted text-muted-foreground shrink-0">
+              <ng-icon [name]="r.archived ? 'lucideFolder' : 'lucideFolderGit2'" size="16"></ng-icon>
+            </span>
+
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h3 class="font-mono text-sm font-semibold tracking-tight group-hover:text-primary">{{ r.name }}</h3>
+
+                @if (r.pinned) {
+                  <span class="inline-flex items-center" [hlmTooltip]="'Pinned to your sidebar'" aria-label="Pinned">
+                    <ng-icon name="lucideTag" size="11" class="text-amber-500"></ng-icon>
+                  </span>
+                }
+
+                @if (r.protected) {
+                  <span class="inline-flex items-center" [hlmTooltip]="'Branch protection on ' + r.defaultBranch" aria-label="Protected">
+                    <ng-icon name="lucideShieldCheck" size="11" class="text-emerald-600 dark:text-emerald-400"></ng-icon>
+                  </span>
+                }
+
+                @if (r.archived) {
+                  <span class="inline-flex items-center text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-zinc-500/10 text-zinc-700 dark:text-zinc-300 ring-1 ring-zinc-500/30">
+                    Archived
+                  </span>
+                } @else {
+                  @let vis = visibilityChip(r.visibility);
+                  <span class="inline-flex items-center text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full" [ngClass]="vis.tone">
+                    {{ vis.label }}
+                  </span>
+                }
+              </div>
+
+              <p class="mt-1 text-sm text-muted-foreground line-clamp-1">{{ r.description }}</p>
+
+              <div class="mt-2 flex items-center gap-3 text-[11px] text-muted-foreground flex-wrap">
+                <span class="inline-flex items-center gap-1.5">
+                  <span class="size-2 rounded-full shrink-0" [ngClass]="r.langTone"></span>
+                  {{ r.lang }}
+                </span>
+
+                <span class="inline-flex items-center gap-1.5" [hlmTooltip]="ciLabel(r.ci)">
+                  <ng-icon [name]="ciIcon(r.ci)" size="11" [ngClass]="ciTone(r.ci)"></ng-icon>
+                  <span [ngClass]="ciTone(r.ci)">CI</span>
+                </span>
+
+                <span class="inline-flex items-center gap-1">
+                  <ng-icon name="lucideGitPullRequestArrow" size="11"></ng-icon>
+                  <span class="font-medium text-foreground tabular-nums">{{ r.openPrs }}</span>
+                  open
+                </span>
+
+                <span class="inline-flex items-center gap-1">
+                  <ng-icon name="lucideGitMerge" size="11"></ng-icon>
+                  <span class="tabular-nums">{{ r.branches }}</span>
+                  branch{{ r.branches === 1 ? '' : 'es' }}
+                </span>
+
+                <span class="inline-flex items-center gap-1">
+                  <ng-icon name="lucideCircleUserRound" size="11"></ng-icon>
+                  <span class="tabular-nums">{{ r.contributors }}</span>
+                </span>
+
+                @if (r.commitsToday > 0) {
+                  <span class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                    <ng-icon name="lucideGitCommit" size="11"></ng-icon>
+                    <span class="tabular-nums">{{ r.commitsToday }}</span>
+                    today
+                  </span>
+                }
+
+                @for (t of r.topics; track t.name) {
+                  <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium" [ngClass]="t.tone">
+                    {{ t.name }}
+                  </span>
+                }
+              </div>
+            </div>
+
+            <div class="flex flex-col items-end gap-1 shrink-0">
+              <span class="text-[11px] text-muted-foreground tabular-nums">{{ r.lastPush }}</span>
+              <span class="text-[10px] text-muted-foreground/60 font-mono">{{ r.defaultBranch }}</span>
+            </div>
+          </a>
+
+          <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity flex items-center gap-1 bg-gradient-to-l from-background via-background to-transparent pl-6 pr-1">
+            <button type="button" hlmBtn variant="ghost" size="icon" class="size-7" [hlmTooltip]="'View open PRs'" aria-label="View open PRs">
+              <ng-icon name="lucideGitPullRequestArrow" size="13"></ng-icon>
+            </button>
+            <button type="button" hlmBtn variant="ghost" size="icon" class="size-7" [hlmTooltip]="'Copy clone URL'" aria-label="Copy clone URL">
+              <ng-icon name="lucideLink2" size="13"></ng-icon>
+            </button>
+            <button type="button" hlmBtn variant="ghost" size="icon" class="size-7" [hlmTooltip]="r.pinned ? 'Unpin from sidebar' : 'Pin to sidebar'" [attr.aria-label]="r.pinned ? 'Unpin from sidebar' : 'Pin to sidebar'">
+              <ng-icon [name]="r.pinned ? 'lucideEyeOff' : 'lucideTag'" size="13"></ng-icon>
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</section>

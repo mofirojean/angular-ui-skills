@@ -23,6 +23,11 @@ export const routes: Routes = [
     title: 'Drafts, Forge',
   },
   {
+    path: 'repos',
+    loadComponent: () => import('./pages/repos/repos').then((m) => m.Repos),
+    title: 'Repositories, Forge',
+  },
+  {
     path: 'pr/:id',
     loadComponent: () => import('./pages/pr-detail/pr-detail').then((m) => m.PrDetail),
     title: 'Pull request, Forge',
