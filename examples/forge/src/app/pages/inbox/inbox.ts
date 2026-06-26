@@ -6,6 +6,8 @@ import { NgIcon } from '@ng-icons/core';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
+import { HlmSkeleton } from '@spartan-ng/helm/skeleton';
+import { HlmTooltip } from '@spartan-ng/helm/tooltip';
 
 import type { PrRow } from '../../core/model';
 
@@ -13,13 +15,24 @@ type FilterKey = 'needs' | 'wait' | 'approved' | 'all';
 
 @Component({
   selector: 'app-inbox',
-  imports: [NgClass, RouterLink, NgIcon, HlmButtonImports, HlmBadgeImports, HlmAvatarImports],
+  imports: [
+    NgClass, RouterLink, NgIcon,
+    HlmButtonImports, HlmBadgeImports, HlmAvatarImports, HlmSkeleton, HlmTooltip,
+  ],
   templateUrl: './inbox.html',
   styleUrl: './inbox.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Inbox {
   protected readonly activeFilter = signal<FilterKey>('needs');
+  protected readonly loading = signal<boolean>(false);
+  protected readonly skeletonRows = [0, 1, 2, 3, 4, 5];
+
+  protected refresh(): void {
+    if (this.loading()) return;
+    this.loading.set(true);
+    setTimeout(() => this.loading.set(false), 700);
+  }
 
   protected readonly filters: { key: FilterKey; label: string; count: number }[] = [
     { key: 'needs',    label: 'Needs review',      count: 13 },

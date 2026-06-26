@@ -5,6 +5,23 @@
       <p class="text-sm text-muted-foreground mt-1">{{ subtitle() }}</p>
     </div>
     <div class="flex items-center gap-2">
+      <button
+        type="button"
+        hlmBtn
+        variant="ghost"
+        size="icon"
+        class="size-8"
+        [disabled]="loading()"
+        (click)="refresh()"
+        [hlmTooltip]="loading() ? 'Refreshing' : 'Refresh inbox'"
+        aria-label="Refresh inbox"
+      >
+        <ng-icon
+          name="lucideRefreshCw"
+          size="14"
+          [class.animate-spin]="loading()"
+        ></ng-icon>
+      </button>
       <button hlmBtn size="sm" class="gap-2">
         <ng-icon name="lucideGitPullRequestArrow" size="14"></ng-icon>
         New PR
@@ -54,7 +71,34 @@
   </div>
 </div>
 
-@if (visibleRows().length === 0) {
+@if (loading()) {
+  <ul class="flex-1 min-h-0 overflow-y-auto divide-y divide-border max-w-screen-2xl w-full mx-auto scroll-quiet">
+    @for (i of skeletonRows; track i) {
+      <li class="border-l-2 border-l-transparent">
+        <div class="grid items-center gap-3 pl-5 pr-4 py-2.5"
+             style="grid-template-columns: 32px minmax(0, 1fr) 152px 88px 96px 88px 32px"
+             [style.animation-delay.ms]="i * 60">
+          <hlm-skeleton class="size-3.5" />
+          <div class="space-y-1.5">
+            <hlm-skeleton class="h-3 rounded" [style.width.%]="60 + i * 5" />
+            <hlm-skeleton class="h-2.5 w-1/2 rounded" />
+          </div>
+          <div class="flex items-center gap-2">
+            <hlm-skeleton class="size-6 rounded-full" />
+            <hlm-skeleton class="h-3 w-20 rounded" />
+          </div>
+          <hlm-skeleton class="h-3 w-14 rounded justify-self-end" />
+          <div class="flex items-center justify-end -space-x-2">
+            <hlm-skeleton class="size-6 rounded-full" />
+            <hlm-skeleton class="size-6 rounded-full" />
+          </div>
+          <hlm-skeleton class="h-3 w-12 rounded justify-self-end" />
+          <span></span>
+        </div>
+      </li>
+    }
+  </ul>
+} @else if (visibleRows().length === 0) {
   <div class="flex-1 min-h-0 overflow-y-auto max-w-screen-2xl w-full mx-auto scroll-quiet">
     <div class="flex flex-col items-center justify-center py-20 px-6 text-center max-w-sm mx-auto">
       <span class="mb-4 size-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
