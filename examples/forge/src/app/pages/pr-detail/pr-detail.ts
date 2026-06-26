@@ -5,6 +5,7 @@ import { NgIcon } from '@ng-icons/core';
 
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
+import { HlmTooltip } from '@spartan-ng/helm/tooltip';
 
 import type {
   Author,
@@ -20,6 +21,15 @@ import type {
   TimelineItem,
   TreeNode,
 } from '../../core/model';
+import {
+  type Token,
+  type Lang,
+  type LangMeta,
+  detectLang,
+  langMeta,
+  tokenize,
+  tokenClass,
+} from '../../core/highlight';
 
 interface PrReviewer {
   readonly author: Author;
@@ -28,7 +38,7 @@ interface PrReviewer {
 
 @Component({
   selector: 'app-pr-detail',
-  imports: [NgClass, RouterLink, NgIcon, HlmButtonImports, HlmAvatarImports],
+  imports: [NgClass, RouterLink, NgIcon, HlmButtonImports, HlmAvatarImports, HlmTooltip],
   templateUrl: './pr-detail.html',
   styleUrl: './pr-detail.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -148,6 +158,29 @@ export class PrDetail {
     const path = this.selectedFilePath();
     return this.diffs.find(d => d.path === path) ?? this.diffs[0];
   });
+
+  protected readonly tokenizedHunks = computed(() => {
+    const diff = this.selectedDiff();
+    const lang = detectLang(diff.path);
+    return diff.hunks.map(hunk => ({
+      header: hunk.header,
+      lines: hunk.lines.map(line => ({
+        kind: line.kind,
+        oldNo: line.oldNo,
+        newNo: line.newNo,
+        tokens: tokenize(line.text, lang),
+      })),
+    }));
+  });
+
+  protected readonly selectedLang = computed<LangMeta>(() =>
+    langMeta(detectLang(this.selectedDiff().path)),
+  );
+
+  protected readonly selectedPathParts = computed(() => this.selectedDiff().path.split('/'));
+
+  protected langFor(path: string): LangMeta { return langMeta(detectLang(path)); }
+  protected tokenClass(t: Token['t']): string { return tokenClass(t); }
 
   protected readonly diffs: readonly FileDiff[] = [
     {

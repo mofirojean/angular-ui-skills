@@ -464,6 +464,7 @@
                     </span>
                   </button>
                 } @else {
+                  @let nodeLang = langFor(node.path);
                   <button
                     type="button"
                     (click)="selectedFilePath.set(node.path)"
@@ -473,7 +474,7 @@
                     [class.text-muted-foreground]="selectedFilePath() !== node.path && isViewed(node.path)"
                     [style.padding-left.rem]="0.5 + node.depth * 0.85 + 0.85"
                   >
-                    <ng-icon name="lucideFileText" size="12" class="text-muted-foreground shrink-0"></ng-icon>
+                    <ng-icon [name]="nodeLang.icon" size="12" [ngClass]="nodeLang.tone" class="shrink-0 !bg-transparent !ring-0 !p-0"></ng-icon>
                     <span class="inline-flex h-4 w-4 items-center justify-center rounded text-[9.5px] font-bold font-mono shrink-0"
                           [ngClass]="statusBadge(node.status).tone">
                       {{ statusBadge(node.status).letter }}
@@ -493,69 +494,90 @@
         <div class="flex-1 min-w-0 overflow-y-auto scroll-quiet">
           @if (selectedDiff(); as diff) {
             <article>
-              <header class="sticky top-0 z-10 flex items-center gap-3 px-4 py-2 bg-muted/60 backdrop-blur border-b border-border">
-                <ng-icon name="lucideFileText" size="14" class="text-muted-foreground shrink-0"></ng-icon>
-                <span class="font-mono text-xs truncate">{{ diff.path }}</span>
-                <span class="inline-flex h-4 items-center rounded-full bg-background border border-border px-1.5 text-[10px] font-medium text-muted-foreground">
-                  {{ diff.language }}
-                </span>
-                <span class="font-mono text-[11px] tabular-nums">
-                  <span class="text-emerald-600 dark:text-emerald-400">+{{ diff.added }}</span>
-                  <span class="text-red-600 dark:text-red-400 ml-1">-{{ diff.removed }}</span>
-                </span>
-                <div class="flex-1"></div>
-                <label class="flex items-center gap-1.5 text-xs cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    [checked]="isViewed(diff.path)"
-                    (change)="toggleViewed(diff.path)"
-                    class="size-3.5 accent-foreground"
-                  />
-                  Viewed
-                </label>
-                <button hlmBtn variant="ghost" size="icon" class="h-7 w-7" aria-label="File actions">
-                  <ng-icon name="lucideEllipsis" size="14"></ng-icon>
-                </button>
+              <header class="sticky top-0 z-10 px-4 py-2.5 bg-muted/60 backdrop-blur border-b border-border">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <div class="flex items-center gap-1.5 min-w-0">
+                    <ng-icon [name]="selectedLang().icon" size="13" class="text-muted-foreground shrink-0"></ng-icon>
+                    @for (seg of selectedPathParts(); track $index; let first = $first; let last = $last) {
+                      @if (!first) {
+                        <ng-icon name="lucideChevronRight" size="9" class="text-muted-foreground/40 shrink-0"></ng-icon>
+                      }
+                      <span class="font-mono text-xs"
+                            [class.text-muted-foreground]="!last"
+                            [class.font-semibold]="last"
+                            [class.text-foreground]="last">{{ seg }}</span>
+                    }
+                  </div>
+
+                  <span class="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full ring-1" [ngClass]="selectedLang().tone">
+                    {{ selectedLang().label }}
+                  </span>
+
+                  <span class="font-mono text-[11px] tabular-nums">
+                    <span class="text-emerald-600 dark:text-emerald-400">+{{ diff.added }}</span>
+                    <span class="text-red-600 dark:text-red-400 ml-1">−{{ diff.removed }}</span>
+                  </span>
+
+                  <div class="flex-1"></div>
+
+                  <label class="flex items-center gap-1.5 text-xs cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      [checked]="isViewed(diff.path)"
+                      (change)="toggleViewed(diff.path)"
+                      class="size-3.5 accent-foreground"
+                    />
+                    Viewed
+                  </label>
+                  <button hlmBtn variant="ghost" size="icon" class="h-7 w-7" [hlmTooltip]="'File actions'" aria-label="File actions">
+                    <ng-icon name="lucideEllipsis" size="14"></ng-icon>
+                  </button>
+                </div>
               </header>
 
-              @for (hunk of diff.hunks; track hunk.header; let h = $index) {
+              @for (hunk of tokenizedHunks(); track hunk.header; let h = $index) {
                 @let parsed = parseHunk(hunk.header);
-                <div class="flex items-center gap-2 px-4 py-1.5 text-[11px] bg-muted/30 border-y border-border">
-                  <span class="font-mono font-semibold text-foreground tabular-nums">{{ parsed.range }}</span>
+                <div class="flex items-center gap-3 px-4 py-1.5 bg-muted/20 border-y border-border/70">
+                  <span class="size-1 rounded-full bg-muted-foreground/40 rotate-45"></span>
+                  <span class="font-mono text-[11px] font-semibold tabular-nums">{{ parsed.range }}</span>
                   @if (parsed.ctx) {
-                    <span class="font-mono text-muted-foreground truncate">{{ parsed.ctx }}</span>
+                    <span class="font-mono text-[11px] text-muted-foreground/80 truncate">{{ parsed.ctx }}</span>
                   }
                 </div>
                 <div class="font-mono text-[12px] leading-[1.55]">
                   @for (line of hunk.lines; track $index; let i = $index) {
                     @let key = diff.path + ':' + h + ':' + i;
                     <div
-                      class="group relative grid items-baseline transition-colors hover:bg-muted/40"
-                      style="grid-template-columns: 44px 44px minmax(0, 1fr)"
-                      [class.bg-emerald-500/10]="line.kind === 'add'"
-                      [class.bg-red-500/10]="line.kind === 'del'"
+                      class="group relative grid items-stretch transition-colors hover:bg-muted/40"
+                      style="grid-template-columns: 44px 44px 4px minmax(0, 1fr)"
+                      [class.bg-emerald-500/[0.07]]="line.kind === 'add'"
+                      [class.bg-red-500/[0.07]]="line.kind === 'del'"
                     >
-                      <span class="text-right pr-2 text-[10.5px] text-muted-foreground/60 select-none tabular-nums">
+                      <span class="text-right pr-2 py-0.5 text-[10.5px] text-muted-foreground/60 select-none tabular-nums">
                         {{ line.oldNo }}
                       </span>
-                      <span class="text-right pr-2 text-[10.5px] text-muted-foreground/60 select-none tabular-nums">
+                      <span class="text-right pr-2 py-0.5 text-[10.5px] text-muted-foreground/60 select-none tabular-nums">
                         {{ line.newNo }}
                       </span>
-                      <div class="whitespace-pre overflow-x-auto pr-4 scroll-quiet"
-                            [class.text-emerald-700]="line.kind === 'add'"
-                            [class.dark:text-emerald-300]="line.kind === 'add'"
-                            [class.text-red-700]="line.kind === 'del'"
-                            [class.dark:text-red-300]="line.kind === 'del'">
-                        @if (line.kind === 'add') { + }
-                        @else if (line.kind === 'del') { - }
-                        @else { &nbsp; }
-                        {{ line.text }}
+                      <span
+                        aria-hidden="true"
+                        [class.bg-emerald-500]="line.kind === 'add'"
+                        [class.bg-red-500]="line.kind === 'del'"
+                      ></span>
+                      <div class="whitespace-pre overflow-x-auto pr-4 pl-3 py-0.5 scroll-quiet">
+                        @for (tok of line.tokens; track $index) {
+                          @if (tok.t === 'plain') {
+                            <span>{{ tok.v }}</span>
+                          } @else {
+                            <span [ngClass]="tokenClass(tok.t)">{{ tok.v }}</span>
+                          }
+                        }
                       </div>
 
                       <button
                         type="button"
                         (click)="toggleComment(key)"
-                        class="absolute top-1/2 left-[78px] -translate-y-1/2 size-5 rounded-md bg-primary text-primary-foreground shadow-md ring-2 ring-background flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 hover:scale-110 focus-visible:opacity-100 focus-visible:outline-none transition-all"
+                        class="absolute top-1/2 left-[80px] -translate-y-1/2 size-5 rounded-md bg-primary text-primary-foreground shadow-md ring-2 ring-background flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 hover:scale-110 focus-visible:opacity-100 focus-visible:outline-none transition-all"
                         [class.!opacity-100]="commentingKey() === key"
                         aria-label="Add a comment on this line"
                       >
