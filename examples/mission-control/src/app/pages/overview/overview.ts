@@ -43,6 +43,26 @@ import { ACTIVITY_ENTRIES, AGENT_USAGE, KPIS, RECENT_RUNS, RUNS_TREND, STATUS_BR
 })
 export class Overview {
   protected readonly isLoading = signal(true);
+  protected readonly range = signal<'today' | '7d' | '30d'>('7d');
+  protected readonly lastRefreshed = signal<string>('12s ago');
+
+  protected readonly ranges: { key: 'today' | '7d' | '30d'; label: string }[] = [
+    { key: 'today', label: 'Today' },
+    { key: '7d',    label: '7d' },
+    { key: '30d',   label: '30d' },
+  ];
+
+  protected setRange(r: 'today' | '7d' | '30d'): void {
+    this.range.set(r);
+    this.refresh();
+  }
+
+  protected refresh(): void {
+    if (this.isLoading()) return;
+    this.isLoading.set(true);
+    this.lastRefreshed.set('just now');
+    setTimeout(() => this.isLoading.set(false), 600);
+  }
 
   protected readonly kpis = KPIS;
   protected readonly runsTrend = RUNS_TREND;
@@ -50,6 +70,16 @@ export class Overview {
   protected readonly agentUsage: readonly AgentUsage[] = AGENT_USAGE;
   protected readonly activity = ACTIVITY_ENTRIES;
   private readonly runs = RECENT_RUNS;
+
+  protected readonly trendTotal = computed(() =>
+    this.runsTrend.reduce((s, p) => s + p.count, 0),
+  );
+
+  protected agentBarTone(rate: number): string {
+    if (rate >= 95) return 'from-emerald-500 to-emerald-500/60';
+    if (rate >= 90) return 'from-amber-500 to-amber-500/60';
+    return 'from-red-500 to-red-500/60';
+  }
 
   protected readonly maxDuration = Math.max(...this.runs.map((r) => r.durationSeconds));
 

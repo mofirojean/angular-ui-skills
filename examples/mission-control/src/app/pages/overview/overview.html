@@ -1,16 +1,57 @@
 <div class="flex flex-col gap-3">
-  <header>
-    <h1 class="text-xl font-semibold tracking-tight leading-none">Overview</h1>
-    <p class="text-muted-foreground mt-1 text-xs">Today's runs, costs, and activity.</p>
+  <header class="flex items-end justify-between gap-3 flex-wrap">
+    <div>
+      <h1 class="text-xl font-semibold tracking-tight leading-none">Overview</h1>
+      <p class="text-muted-foreground mt-1 text-xs">Runs, costs, and activity across your workspace.</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="inline-flex items-center rounded-md border border-border bg-card p-0.5">
+        @for (r of ranges; track r.key) {
+          <button
+            type="button"
+            (click)="setRange(r.key)"
+            class="px-2.5 py-1 text-xs rounded transition-colors"
+            [class.bg-muted]="range() === r.key"
+            [class.text-foreground]="range() === r.key"
+            [class.text-muted-foreground]="range() !== r.key"
+            [class.font-medium]="range() === r.key"
+          >
+            {{ r.label }}
+          </button>
+        }
+      </div>
+      <span class="text-[10.5px] text-muted-foreground inline-flex items-center gap-1 tabular-nums">
+        <span class="size-1.5 rounded-full bg-emerald-500"></span>
+        Updated {{ lastRefreshed() }}
+      </span>
+      <button
+        type="button"
+        hlmBtn
+        variant="ghost"
+        size="icon-sm"
+        [disabled]="isLoading()"
+        (click)="refresh()"
+        aria-label="Refresh dashboard"
+        title="Refresh"
+      >
+        <ng-icon hlm size="sm" name="lucideRefreshCw" [class.animate-spin]="isLoading()" />
+      </button>
+    </div>
   </header>
 
   <section class="grid gap-3 lg:grid-cols-3">
     
     <section hlmCard class="lg:col-span-2">
       <div hlmCardHeader class="flex items-start justify-between p-4! pb-2!">
-        <div>
-          <h2 hlmCardTitle class="text-sm">Runs over last 7 days</h2>
-          <p hlmCardDescription class="text-xs">Hover the chart for daily totals.</p>
+        <div class="flex items-baseline gap-3 flex-wrap">
+          <div>
+            <h2 hlmCardTitle class="text-sm">Runs over last 7 days</h2>
+            <p hlmCardDescription class="text-xs">Hover the chart for daily totals.</p>
+          </div>
+          <p class="text-2xl font-semibold tabular-nums tracking-tight leading-none">
+            {{ trendTotal() }}
+            <span class="text-muted-foreground text-[10.5px] font-normal ml-1 uppercase tracking-wider">runs</span>
+          </p>
         </div>
         <span hlmBadge variant="outline" class="gap-1 text-[10px]">
           <ng-icon hlm size="xs" name="lucideTrendingUp" class="text-emerald-600" />
@@ -86,7 +127,7 @@
           >
             <div hlmCardContent class="p-3! flex flex-1 flex-col gap-1.5">
               <div class="flex items-center justify-between">
-                <p class="text-muted-foreground text-[9px] font-semibold uppercase tracking-wider leading-none">{{ kpi.label }}</p>
+                <p class="text-muted-foreground text-[10.5px] font-semibold uppercase tracking-wider leading-none">{{ kpi.label }}</p>
                 <ng-icon hlm [name]="kpi.icon" class="text-muted-foreground" size="xs" />
               </div>
               <div class="flex items-baseline justify-between gap-1">
@@ -176,7 +217,11 @@
                   </span>
                 </div>
                 <div class="bg-muted h-1.5 overflow-hidden rounded-full">
-                  <div class="from-primary to-primary/60 h-full rounded-full bg-linear-to-r transition-all duration-700" [style.width]="bar.widthPercent"></div>
+                  <div
+                    class="h-full rounded-full bg-linear-to-r transition-all duration-700"
+                    [class]="agentBarTone(bar.successRate)"
+                    [style.width]="bar.widthPercent"
+                  ></div>
                 </div>
               </div>
             }
@@ -206,7 +251,7 @@
               <svg viewBox="0 0 100 100" class="h-20 w-20 -rotate-90">
                 <circle cx="50" cy="50" r="40" fill="transparent" stroke="var(--muted)" stroke-width="14" />
                 @for (seg of donutSegments(); track seg.label) {
-                  <circle cx="50" cy="50" r="40" fill="transparent" [attr.stroke]="seg.color" stroke-width="14" [attr.stroke-dasharray]="seg.dashArray" [attr.stroke-dashoffset]="seg.dashOffset" stroke-linecap="butt" class="transition-all hover:stroke-16" />
+                  <circle cx="50" cy="50" r="40" fill="transparent" [attr.stroke]="seg.color" stroke-width="14" [attr.stroke-dasharray]="seg.dashArray" [attr.stroke-dashoffset]="seg.dashOffset" stroke-linecap="butt" class="transition-all" />
                 }
               </svg>
               <div class="absolute inset-0 flex flex-col items-center justify-center">
@@ -362,7 +407,13 @@
             </thead>
             <tbody hlmTBody>
               @for (run of paginatedRuns(); track run.id) {
-                <tr hlmTr class="hover:bg-muted/40 cursor-pointer transition-colors">
+                <tr hlmTr
+                  class="hover:bg-muted/40 cursor-pointer transition-colors border-l-2"
+                  [class.border-l-red-500]="run.status === 'failed'"
+                  [class.border-l-amber-500]="run.status === 'running'"
+                  [class.border-l-transparent]="run.status === 'success'"
+                  [class.bg-red-500/[0.04]]="run.status === 'failed'"
+                >
                   <td hlmTd class="font-mono text-[11px]">{{ run.id }}</td>
                   <td hlmTd class="font-medium">{{ run.agent }}</td>
                   <td hlmTd>
