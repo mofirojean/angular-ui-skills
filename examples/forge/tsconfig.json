@@ -33,7 +33,8 @@
       "@spartan-ng/helm/input-group": ["./src/libs/ui/input-group/src/index.ts"],
       "@spartan-ng/helm/textarea": ["./src/libs/ui/textarea/src/index.ts"],
       "@spartan-ng/helm/dropdown-menu": ["./src/libs/ui/dropdown-menu/src/index.ts"],
-      "@spartan-ng/helm/sonner": ["./src/libs/ui/sonner/src/index.ts"]
+      "@spartan-ng/helm/sonner": ["./src/libs/ui/sonner/src/index.ts"],
+      "@spartan-ng/helm/combobox": ["./src/libs/ui/combobox/src/index.ts"]
     }
   },
   "angularCompilerOptions": {

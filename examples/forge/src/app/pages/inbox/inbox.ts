@@ -8,6 +8,7 @@ import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
 import { HlmSkeleton } from '@spartan-ng/helm/skeleton';
 import { HlmTooltip } from '@spartan-ng/helm/tooltip';
+import { HlmComboboxImports } from '@spartan-ng/helm/combobox';
 
 import type { PrRow } from '../../core/model';
 
@@ -17,7 +18,7 @@ type FilterKey = 'needs' | 'wait' | 'approved' | 'all';
   selector: 'app-inbox',
   imports: [
     NgClass, RouterLink, NgIcon,
-    HlmButtonImports, HlmBadgeImports, HlmAvatarImports, HlmSkeleton, HlmTooltip,
+    HlmButtonImports, HlmBadgeImports, HlmAvatarImports, HlmSkeleton, HlmTooltip, HlmComboboxImports,
   ],
   templateUrl: './inbox.html',
   styleUrl: './inbox.css',
@@ -28,11 +29,31 @@ export class Inbox {
   protected readonly loading = signal<boolean>(false);
   protected readonly skeletonRows = [0, 1, 2, 3, 4, 5];
 
+  protected readonly repoFilter = signal<string | null>(null);
+  protected readonly authorFilter = signal<string | null>(null);
+
   protected refresh(): void {
     if (this.loading()) return;
     this.loading.set(true);
     setTimeout(() => this.loading.set(false), 700);
   }
+
+  protected clearFilters(): void {
+    this.repoFilter.set(null);
+    this.authorFilter.set(null);
+  }
+
+  protected readonly hasExtraFilters = computed(() =>
+    this.repoFilter() !== null || this.authorFilter() !== null,
+  );
+
+  protected readonly availableRepos = computed<readonly string[]>(() =>
+    Array.from(new Set(this.rows.map(r => r.repo))).sort(),
+  );
+
+  protected readonly availableAuthors = computed<readonly string[]>(() =>
+    Array.from(new Set(this.rows.map(r => r.author.name))).sort(),
+  );
 
   protected readonly filters: { key: FilterKey; label: string; count: number }[] = [
     { key: 'needs',    label: 'Needs review',      count: 13 },
@@ -45,10 +66,18 @@ export class Inbox {
 
   protected readonly visibleRows = computed<readonly PrRow[]>(() => {
     const f = this.activeFilter();
-    if (f === 'all') return this.rows;
-    if (f === 'approved') return this.rows.filter(r => r.status === 'approved');
-    if (f === 'wait') return this.rows.filter(r => r.status === 'changes-requested');
-    return this.rows.filter(r => r.status === 'open' || r.status === 'draft');
+    const repo = this.repoFilter();
+    const author = this.authorFilter();
+
+    let rows: readonly PrRow[] = this.rows;
+    if (f === 'approved') rows = rows.filter(r => r.status === 'approved');
+    else if (f === 'wait') rows = rows.filter(r => r.status === 'changes-requested');
+    else if (f === 'needs') rows = rows.filter(r => r.status === 'open' || r.status === 'draft');
+
+    if (repo)   rows = rows.filter(r => r.repo === repo);
+    if (author) rows = rows.filter(r => r.author.name === author);
+
+    return rows;
   });
 
   protected readonly subtitle = computed<string>(() => {

@@ -29,6 +29,59 @@
     </div>
   </header>
 
+  <div class="flex items-center gap-2 flex-wrap px-6 pb-2">
+    <hlm-combobox [value]="repoFilter()" (valueChange)="repoFilter.set($event ?? null)">
+      <hlm-combobox-trigger class="gap-2 h-8 text-xs">
+        <ng-icon name="lucideFolderGit2" size="12" class="text-muted-foreground"></ng-icon>
+        <hlm-combobox-value placeholder="All repositories" />
+      </hlm-combobox-trigger>
+
+      <ng-template hlmComboboxPortal>
+        <hlm-combobox-content>
+          <hlm-combobox-input placeholder="Filter repositories," />
+          <div hlmComboboxList>
+            <hlm-combobox-empty>No repos match.</hlm-combobox-empty>
+            <div hlmComboboxGroup>
+              <hlm-combobox-item [value]="null">All repositories</hlm-combobox-item>
+              @for (repo of availableRepos(); track repo) {
+                <hlm-combobox-item [value]="repo">{{ repo }}</hlm-combobox-item>
+              }
+            </div>
+          </div>
+        </hlm-combobox-content>
+      </ng-template>
+    </hlm-combobox>
+
+    <hlm-combobox [value]="authorFilter()" (valueChange)="authorFilter.set($event ?? null)">
+      <hlm-combobox-trigger class="gap-2 h-8 text-xs">
+        <ng-icon name="lucideCircleUserRound" size="12" class="text-muted-foreground"></ng-icon>
+        <hlm-combobox-value placeholder="All authors" />
+      </hlm-combobox-trigger>
+
+      <ng-template hlmComboboxPortal>
+        <hlm-combobox-content>
+          <hlm-combobox-input placeholder="Filter authors," />
+          <div hlmComboboxList>
+            <hlm-combobox-empty>No authors match.</hlm-combobox-empty>
+            <div hlmComboboxGroup>
+              <hlm-combobox-item [value]="null">All authors</hlm-combobox-item>
+              @for (a of availableAuthors(); track a) {
+                <hlm-combobox-item [value]="a">{{ a }}</hlm-combobox-item>
+              }
+            </div>
+          </div>
+        </hlm-combobox-content>
+      </ng-template>
+    </hlm-combobox>
+
+    @if (hasExtraFilters()) {
+      <button type="button" hlmBtn variant="ghost" size="sm" class="gap-1.5 h-8 text-xs text-muted-foreground" (click)="clearFilters()">
+        <ng-icon name="lucideX" size="11"></ng-icon>
+        Clear filters
+      </button>
+    }
+  </div>
+
   <nav class="flex items-center gap-1 px-6">
     @for (f of filters; track f.key) {
       <button
