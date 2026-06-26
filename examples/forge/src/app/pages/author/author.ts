@@ -4,6 +4,7 @@ import { NgIcon } from '@ng-icons/core';
 
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
+import { HlmCardImports } from '@spartan-ng/helm/card';
 
 type StatTrend = 'up' | 'down' | 'flat';
 type AuthorTab = 'activity' | 'open' | 'reviews' | 'merged';
@@ -27,7 +28,7 @@ interface ActivityRow {
 
 @Component({
   selector: 'app-author',
-  imports: [NgClass, NgIcon, HlmButtonImports, HlmAvatarImports],
+  imports: [NgClass, NgIcon, HlmButtonImports, HlmAvatarImports, HlmCardImports],
   templateUrl: './author.html',
   styleUrl: './author.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
