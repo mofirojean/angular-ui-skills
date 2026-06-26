@@ -183,12 +183,18 @@ export class PrDetail {
   });
 
   private buildLineHtml(tokens: readonly Token[]): SafeHtml {
-    const html = tokens.map(tok => {
-      const text = escapeHtml(tok.v);
+    let firstSeen = false;
+    const parts = tokens.map(tok => {
+      let text = escapeHtml(tok.v);
+      const isLeading = !firstSeen && tok.t === 'plain' && /^[ \t]+$/.test(tok.v);
+      firstSeen = true;
+      if (isLeading) {
+        text = text.replace(/ /g, '&nbsp;').replace(/\t/g, '&nbsp;&nbsp;');
+      }
       if (tok.t === 'plain') return text;
       return `<span class="${tokenClass(tok.t)}">${text}</span>`;
-    }).join('');
-    return this.sanitizer.bypassSecurityTrustHtml(html);
+    });
+    return this.sanitizer.bypassSecurityTrustHtml(parts.join(''));
   }
 
   protected readonly selectedLang = computed<LangMeta>(() =>
