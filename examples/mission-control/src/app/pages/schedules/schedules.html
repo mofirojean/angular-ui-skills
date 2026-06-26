@@ -1,40 +1,29 @@
 <div class="flex flex-col gap-3">
   
-  <header
-    class="animate-in fade-in-50 slide-in-from-top-2 bg-card relative overflow-hidden rounded-lg border duration-500"
-  >
-    <div class="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/20 blur-3xl"></div>
-    <div class="pointer-events-none absolute -bottom-16 -left-12 h-40 w-40 rounded-full bg-emerald-500/10 blur-3xl"></div>
-
-    <div class="relative flex flex-wrap items-center justify-between gap-4 p-5">
-      <div class="flex items-center gap-4">
-        <div class="bg-primary text-primary-foreground ring-primary/10 flex h-12 w-12 items-center justify-center rounded-xl ring-4">
-          <ng-icon hlm size="lg" name="lucideCalendar" />
-        </div>
-        <div>
-          <div class="flex flex-wrap items-center gap-2">
-            <h1 class="text-2xl font-semibold leading-none tracking-tight">Schedules</h1>
-            <span hlmBadge variant="outline" class="gap-1.5">
-              <span class="relative flex h-2 w-2">
-                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75"></span>
-                <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
-              </span>
-              {{ kpis()[0].value }} active
-            </span>
-          </div>
-          <p class="text-muted-foreground mt-1.5 text-sm">{{ todayLabel() }} · {{ todayTotalRuns() }} runs scheduled today</p>
-        </div>
+  <header class="flex items-end justify-between gap-3 flex-wrap pb-1">
+    <div class="flex items-start gap-3">
+      <div class="size-9 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/30 flex items-center justify-center shrink-0">
+        <ng-icon hlm size="sm" name="lucideCalendar" />
       </div>
-
-      <button
-        hlmBtn
-        (click)="openNewScheduleDialog()"
-        class="shadow-primary/20 hover:shadow-primary/30 group shadow-lg transition-shadow hover:shadow-xl"
-      >
-        <ng-icon hlm size="sm" name="lucidePlus" class="transition-transform group-hover:rotate-90" />
-        New schedule
-      </button>
+      <div>
+        <div class="flex flex-wrap items-center gap-2">
+          <h1 class="text-xl font-semibold leading-none tracking-tight">Schedules</h1>
+          <span hlmBadge variant="outline" class="gap-1.5">
+            <span class="relative flex size-1.5">
+              <span class="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-75"></span>
+              <span class="relative inline-flex size-1.5 rounded-full bg-emerald-500"></span>
+            </span>
+            {{ kpis()[0].value }} active
+          </span>
+        </div>
+        <p class="text-muted-foreground mt-1 text-xs">{{ todayLabel() }} · {{ todayTotalRuns() }} runs scheduled today</p>
+      </div>
     </div>
+
+    <button hlmBtn size="sm" class="gap-2" (click)="openNewScheduleDialog()">
+      <ng-icon hlm size="xs" name="lucidePlus" />
+      New schedule
+    </button>
   </header>
 
   <section class="grid grid-cols-2 gap-3 lg:grid-cols-4">

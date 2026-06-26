@@ -1,26 +1,19 @@
 <div class="flex flex-col gap-3">
   
-  <header
-    class="animate-in fade-in-50 slide-in-from-top-2 bg-card relative overflow-hidden rounded-lg border duration-500"
-  >
-    <div class="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/20 blur-3xl"></div>
-    <div class="pointer-events-none absolute -bottom-16 -left-12 h-40 w-40 rounded-full bg-amber-500/10 blur-3xl"></div>
-
-    <div class="relative flex flex-wrap items-center justify-between gap-4 p-5">
-      <div class="flex items-center gap-4">
-        <div class="bg-primary text-primary-foreground ring-primary/10 flex h-12 w-12 items-center justify-center rounded-xl ring-4">
-          <ng-icon hlm size="lg" name="lucideSettings" />
+  <header class="flex items-end justify-between gap-3 flex-wrap pb-1">
+    <div class="flex items-start gap-3">
+      <div class="size-9 rounded-md bg-primary/15 text-primary ring-1 ring-primary/30 flex items-center justify-center shrink-0">
+        <ng-icon hlm size="sm" name="lucideSettings" />
+      </div>
+      <div>
+        <div class="flex flex-wrap items-center gap-2">
+          <h1 class="text-xl font-semibold leading-none tracking-tight">Settings</h1>
+          <span hlmBadge variant="outline" class="gap-1">
+            <ng-icon hlm size="xs" name="lucideSparkles" class="text-primary" />
+            {{ plan.name }} workspace
+          </span>
         </div>
-        <div>
-          <div class="flex flex-wrap items-center gap-2">
-            <h1 class="text-2xl font-semibold leading-none tracking-tight">Settings</h1>
-            <span hlmBadge variant="outline" class="gap-1">
-              <ng-icon hlm size="xs" name="lucideSparkles" class="text-primary" />
-              {{ plan.name }} workspace
-            </span>
-          </div>
-          <p class="text-muted-foreground mt-1.5 text-sm">Profile, team, billing, notifications, and integrations.</p>
-        </div>
+        <p class="text-muted-foreground mt-1 text-xs">Profile, team, billing, notifications, and integrations.</p>
       </div>
     </div>
   </header>
