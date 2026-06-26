@@ -1,0 +1,105 @@
+<section class="flex flex-col h-full">
+  <header class="flex-shrink-0 px-6 pt-6 pb-3 border-b border-border max-w-screen-2xl w-full mx-auto">
+    <div class="flex items-end justify-between gap-4 flex-wrap">
+      <div>
+        <h2 class="text-xl font-semibold tracking-tight">Drafts</h2>
+        <p class="text-sm text-muted-foreground mt-1">
+          @if (count() === 0) {
+            No drafts in progress
+          } @else {
+            {{ count() }} pull request{{ count() === 1 ? '' : 's' }} in progress, only you can see these
+          }
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button hlmBtn size="sm" class="gap-2">
+          <ng-icon name="lucidePlus" size="14"></ng-icon>
+          Start a draft
+        </button>
+      </div>
+    </div>
+  </header>
+
+  @if (count() === 0) {
+    <div class="flex-1 min-h-0 overflow-y-auto max-w-screen-2xl w-full mx-auto scroll-quiet">
+      <div class="flex flex-col items-center justify-center py-20 px-6 text-center max-w-sm mx-auto">
+        <span class="mb-4 size-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+          <ng-icon name="lucideFilePen" size="22"></ng-icon>
+        </span>
+        <h3 class="text-base font-semibold tracking-tight">No drafts yet</h3>
+        <p class="mt-1 text-sm text-muted-foreground">
+          Drafts are private to you. Start one to stash WIP work before opening it for review.
+        </p>
+        <button hlmBtn size="sm" class="mt-4 gap-2">
+          <ng-icon name="lucidePlus" size="14"></ng-icon>
+          Start a draft
+        </button>
+      </div>
+    </div>
+  } @else {
+    <ul class="flex-1 min-h-0 overflow-y-auto max-w-screen-2xl w-full mx-auto scroll-quiet divide-y divide-border">
+      @for (d of drafts(); track d.id) {
+        <li class="group relative border-l-2 border-l-amber-500/50 transition-colors hover:bg-muted/40">
+          <a [routerLink]="['/pr', d.id]" class="flex items-start gap-4 pl-5 pr-4 py-3">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 ring-1 ring-amber-500/30">
+                  <ng-icon name="lucideFilePen" size="10"></ng-icon>
+                  Draft
+                </span>
+                <h3 class="text-sm font-medium truncate group-hover:text-primary">{{ d.title }}</h3>
+              </div>
+
+              <div class="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground flex-wrap">
+                <span class="font-mono">{{ d.repo }}#{{ d.id }}</span>
+                <span class="text-muted-foreground/40">·</span>
+                <span class="font-mono">{{ d.branch }}</span>
+                <span class="text-muted-foreground/40">·</span>
+                <span class="inline-flex items-center gap-1">
+                  <ng-icon name="lucideFileText" size="10"></ng-icon>
+                  {{ d.files }} {{ d.files === 1 ? 'file' : 'files' }}
+                </span>
+                <span class="text-muted-foreground/40">·</span>
+                <span class="inline-flex items-center gap-1.5 font-mono tabular-nums">
+                  <span class="text-emerald-600 dark:text-emerald-400">+{{ d.added }}</span>
+                  <span class="text-red-600 dark:text-red-400">−{{ d.removed }}</span>
+                </span>
+              </div>
+
+              @if (d.note) {
+                <p class="mt-2 text-[11px] inline-flex items-start gap-1.5 text-muted-foreground italic">
+                  <ng-icon name="lucideClock" size="11" class="mt-0.5 shrink-0"></ng-icon>
+                  {{ d.note }}
+                </p>
+              }
+            </div>
+
+            <div class="flex flex-col items-end gap-1.5 shrink-0">
+              <span class="text-[11px] text-muted-foreground tabular-nums">{{ d.lastTouched }}</span>
+              <span class="text-[10px] text-muted-foreground/70">{{ d.autosavedAgo }}</span>
+            </div>
+          </a>
+
+          <div class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity flex items-center gap-1 bg-gradient-to-l from-background via-background to-transparent pl-6 pr-1">
+            <button type="button" hlmBtn variant="outline" size="sm" class="gap-1.5">
+              <ng-icon name="lucideGitPullRequestArrow" size="12"></ng-icon>
+              Open for review
+            </button>
+            <button
+              type="button"
+              hlmBtn
+              variant="ghost"
+              size="icon"
+              class="size-7 text-muted-foreground hover:text-red-600"
+              (click)="$event.preventDefault(); $event.stopPropagation(); discard(d.id)"
+              aria-label="Discard draft"
+              title="Discard draft"
+            >
+              <ng-icon name="lucideX" size="13"></ng-icon>
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</section>

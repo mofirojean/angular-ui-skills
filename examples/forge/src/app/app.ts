@@ -14,8 +14,10 @@ import { HlmToaster } from '@spartan-ng/helm/sonner';
 import { ThemeService } from './core/theme.service';
 import { MockDataService } from './core/mock-data.service';
 import { CommandPaletteService } from './core/command-palette.service';
+import { NotificationsService } from './core/notifications.service';
 import { NAV } from './core/nav';
 import { CommandPalette } from './shell/command-palette';
+import { NotificationsSheet } from './shell/notifications-sheet';
 import type { PinnedRepo } from './core/model';
 
 @Component({
@@ -31,6 +33,7 @@ import type { PinnedRepo } from './core/model';
     HlmAvatarImports,
     HlmToaster,
     CommandPalette,
+    NotificationsSheet,
     HlmSidebarImports,
   ],
   templateUrl: './app.html',
@@ -44,6 +47,7 @@ export class App {
   protected readonly theme = inject(ThemeService);
   protected readonly data = inject(MockDataService);
   protected readonly palette = inject(CommandPaletteService);
+  protected readonly notifs = inject(NotificationsService);
   private readonly router = inject(Router);
 
   protected onGlobalKey(event: KeyboardEvent): void {

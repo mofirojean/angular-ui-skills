@@ -1,0 +1,115 @@
+<section class="flex flex-col h-full">
+  <header class="flex-shrink-0 bg-background border-b border-border max-w-screen-2xl w-full mx-auto">
+    <div class="flex items-end justify-between gap-4 flex-wrap px-6 pt-6 pb-3">
+      <div>
+        <h2 class="text-xl font-semibold tracking-tight">Authored</h2>
+        <p class="text-sm text-muted-foreground mt-1">
+          {{ visibleRows().length }} pull request{{ visibleRows().length === 1 ? '' : 's' }} you've opened
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button hlmBtn size="sm" class="gap-2">
+          <ng-icon name="lucideGitPullRequestArrow" size="14"></ng-icon>
+          New PR
+        </button>
+      </div>
+    </div>
+
+    <nav class="flex items-center gap-1 px-6">
+      @for (t of tabs; track t.key) {
+        <button
+          type="button"
+          (click)="setTab(t.key)"
+          class="px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors"
+          [class.border-foreground]="activeTab() === t.key"
+          [class.text-foreground]="activeTab() === t.key"
+          [class.border-transparent]="activeTab() !== t.key"
+          [class.text-muted-foreground]="activeTab() !== t.key"
+        >
+          {{ t.label }}
+          <span class="ml-1.5 inline-flex h-4 items-center rounded-full bg-muted px-1.5 text-[10px] font-medium text-muted-foreground tabular-nums">{{ t.count }}</span>
+        </button>
+      }
+    </nav>
+  </header>
+
+  @if (visibleRows().length === 0) {
+    <div class="flex-1 min-h-0 overflow-y-auto max-w-screen-2xl w-full mx-auto scroll-quiet">
+      <div class="flex flex-col items-center justify-center py-20 px-6 text-center max-w-sm mx-auto">
+        <span class="mb-4 size-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+          <ng-icon name="lucideGitPullRequestArrow" size="22"></ng-icon>
+        </span>
+        <h3 class="text-base font-semibold tracking-tight">Nothing here</h3>
+        <p class="mt-1 text-sm text-muted-foreground">
+          Switch tabs to see merged or closed PRs you've opened.
+        </p>
+      </div>
+    </div>
+  } @else {
+    <ul class="flex-1 min-h-0 overflow-y-auto divide-y divide-border max-w-screen-2xl w-full mx-auto scroll-quiet">
+      @for (row of visibleRows(); track row.id) {
+        @let summary = reviewSummary(row);
+        <li class="group relative border-l-2 transition-colors hover:bg-muted/40"
+            [ngClass]="statusAccent(row.status)"
+            [class.opacity-70]="row.status === 'merged' || row.status === 'closed'">
+          <a [routerLink]="['/pr', row.id]" class="grid items-center gap-3 pl-5 pr-4 py-3"
+             style="grid-template-columns: minmax(0, 1fr) 152px 96px 80px">
+
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <h3 class="text-sm font-medium truncate group-hover:text-primary">{{ row.title }}</h3>
+                @if (row.status === 'merged') {
+                  <span class="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-violet-500/10 text-violet-700 dark:text-violet-300 ring-1 ring-violet-500/30">
+                    <ng-icon name="lucideGitMerge" size="9"></ng-icon>
+                    Merged
+                  </span>
+                } @else if (row.status === 'closed') {
+                  <span class="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-zinc-500/10 text-zinc-700 dark:text-zinc-300 ring-1 ring-zinc-500/30">
+                    Closed
+                  </span>
+                }
+              </div>
+              <div class="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground flex-wrap">
+                <span class="font-mono">{{ row.repo }}#{{ row.id }}</span>
+                <span class="text-muted-foreground/40">·</span>
+                <span class="font-mono">{{ row.branch }}</span>
+                <span class="text-muted-foreground/40">·</span>
+                <span class="inline-flex items-center gap-1.5 font-mono tabular-nums">
+                  <span class="text-emerald-600 dark:text-emerald-400">+{{ row.added }}</span>
+                  <span class="text-red-600 dark:text-red-400">−{{ row.removed }}</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="inline-flex items-center gap-1.5 text-xs truncate" [ngClass]="summary.tone">
+                <ng-icon [name]="summary.icon" size="12" class="shrink-0"></ng-icon>
+                <span class="truncate">{{ summary.label }}</span>
+              </span>
+            </div>
+
+            <div class="flex items-center justify-end -space-x-2">
+              @for (r of row.reviewers.slice(0, 3); track $index) {
+                <hlm-avatar class="size-6 ring-2" [ngClass]="reviewerRing(r)" [title]="r.initials + ' (' + (r.review ?? 'pending') + ')'">
+                  <span hlmAvatarFallback [ngClass]="r.tone" class="text-[10px] font-semibold">{{ r.initials }}</span>
+                </hlm-avatar>
+              }
+              @if (row.reviewers.length > 3) {
+                <span class="size-6 inline-flex items-center justify-center rounded-full ring-2 ring-background bg-muted text-[10px] font-semibold text-muted-foreground">
+                  +{{ row.reviewers.length - 3 }}
+                </span>
+              }
+            </div>
+
+            <div class="flex items-center justify-end gap-2 text-[11px] text-muted-foreground">
+              @if (row.ci !== 'none') {
+                <ng-icon [name]="ciIcon(row.ci)" size="13" [ngClass]="ciTone(row.ci)" [title]="'CI ' + row.ci"></ng-icon>
+              }
+              <span class="tabular-nums">{{ row.mergedAgo ?? row.age }}</span>
+            </div>
+          </a>
+        </li>
+      }
+    </ul>
+  }
+</section>

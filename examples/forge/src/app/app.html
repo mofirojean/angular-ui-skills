@@ -173,9 +173,19 @@
         }
       </button>
 
-      <button hlmBtn variant="ghost" size="icon" class="relative" aria-label="Notifications (3 unread)" title="Notifications (3 unread)">
+      <button
+        hlmBtn
+        variant="ghost"
+        size="icon"
+        class="relative"
+        (click)="notifs.show()"
+        [attr.aria-label]="'Notifications (' + notifs.unreadCount() + ' unread)'"
+        [title]="'Notifications (' + notifs.unreadCount() + ' unread)'"
+      >
         <ng-icon name="lucideBell" size="16"></ng-icon>
-        <span class="absolute top-1.5 right-1.5 size-2 rounded-full bg-red-500 ring-2 ring-background"></span>
+        @if (notifs.unreadCount() > 0) {
+          <span class="absolute top-1.5 right-1.5 size-2 rounded-full bg-red-500 ring-2 ring-background"></span>
+        }
       </button>
     </header>
 
@@ -186,4 +196,5 @@
 </div>
 
 <app-command-palette />
+<app-notifications-sheet />
 <hlm-toaster />

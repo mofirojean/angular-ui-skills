@@ -1,0 +1,118 @@
+<section class="flex flex-col h-full">
+  <header class="flex-shrink-0 bg-background border-b border-border max-w-screen-2xl w-full mx-auto">
+    <div class="flex items-end justify-between gap-4 flex-wrap px-6 pt-6 pb-3">
+      <div>
+        <h2 class="text-xl font-semibold tracking-tight">Reviewing</h2>
+        <p class="text-sm text-muted-foreground mt-1">
+          PRs where you're a requested reviewer
+        </p>
+      </div>
+    </div>
+
+    <nav class="flex items-center gap-1 px-6">
+      @for (f of filters; track f.key) {
+        <button
+          type="button"
+          (click)="setFilter(f.key)"
+          class="px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors"
+          [class.border-foreground]="filter() === f.key"
+          [class.text-foreground]="filter() === f.key"
+          [class.border-transparent]="filter() !== f.key"
+          [class.text-muted-foreground]="filter() !== f.key"
+        >
+          {{ f.label }}
+          <span class="ml-1.5 inline-flex h-4 items-center rounded-full px-1.5 text-[10px] font-medium tabular-nums"
+                [class.bg-emerald-500/15]="f.key === 'pending' && filter() === 'pending'"
+                [class.text-emerald-700]="f.key === 'pending' && filter() === 'pending'"
+                [class.dark:text-emerald-300]="f.key === 'pending' && filter() === 'pending'"
+                [class.ring-1]="f.key === 'pending' && filter() === 'pending'"
+                [class.ring-emerald-500/30]="f.key === 'pending' && filter() === 'pending'"
+                [class.bg-muted]="!(f.key === 'pending' && filter() === 'pending')"
+                [class.text-muted-foreground]="!(f.key === 'pending' && filter() === 'pending')">{{ f.count }}</span>
+        </button>
+      }
+    </nav>
+  </header>
+
+  @if (visibleRows().length === 0) {
+    <div class="flex-1 min-h-0 overflow-y-auto max-w-screen-2xl w-full mx-auto scroll-quiet">
+      <div class="flex flex-col items-center justify-center py-20 px-6 text-center max-w-sm mx-auto">
+        <span class="mb-4 size-12 rounded-full bg-emerald-500/15 ring-1 ring-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+          <ng-icon name="lucideCircleCheck" size="22"></ng-icon>
+        </span>
+        <h3 class="text-base font-semibold tracking-tight">You're caught up</h3>
+        <p class="mt-1 text-sm text-muted-foreground">
+          No PRs are waiting on your review. Nice.
+        </p>
+      </div>
+    </div>
+  } @else {
+    <ul class="flex-1 min-h-0 overflow-y-auto divide-y divide-border max-w-screen-2xl w-full mx-auto scroll-quiet">
+      @for (row of visibleRows(); track row.id) {
+        @let badge = reviewBadge(row.myReview);
+        <li class="group relative border-l-2 transition-colors hover:bg-muted/40"
+            [ngClass]="statusAccent(row.myReview)">
+          <a [routerLink]="['/pr', row.id]" class="grid items-center gap-3 pl-5 pr-4 py-3"
+             style="grid-template-columns: minmax(0, 1fr) 168px 96px 96px">
+
+            <div class="min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                @if (row.urgent && row.myReview === 'pending') {
+                  <span class="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-red-500/10 text-red-700 dark:text-red-300 ring-1 ring-red-500/30">
+                    Urgent
+                  </span>
+                }
+                <h3 class="text-sm font-medium truncate group-hover:text-primary">{{ row.title }}</h3>
+              </div>
+              <div class="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground flex-wrap">
+                <span class="font-mono">{{ row.repo }}#{{ row.id }}</span>
+                <span class="text-muted-foreground/40">·</span>
+                <span class="font-mono">{{ row.branch }}</span>
+                <span class="text-muted-foreground/40">·</span>
+                <span class="inline-flex items-center gap-1.5 font-mono tabular-nums">
+                  <span class="text-emerald-600 dark:text-emerald-400">+{{ row.added }}</span>
+                  <span class="text-red-600 dark:text-red-400">−{{ row.removed }}</span>
+                </span>
+              </div>
+            </div>
+
+            <span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-1 rounded-full justify-self-start" [ngClass]="badge.tone">
+              <ng-icon [name]="badge.icon" size="11"></ng-icon>
+              {{ badge.label }}
+            </span>
+
+            <div class="flex items-center gap-2 min-w-0">
+              <hlm-avatar class="size-6 shrink-0">
+                <span hlmAvatarFallback class="text-[10px] font-semibold" [ngClass]="row.author.tone ?? ''">{{ row.author.initials }}</span>
+              </hlm-avatar>
+              <span class="text-xs truncate">{{ row.author.name }}</span>
+            </div>
+
+            <div class="flex flex-col items-end gap-0.5 text-[11px] text-muted-foreground">
+              <span class="tabular-nums">{{ row.requestedAt }}</span>
+              @if (row.otherApprovals > 0) {
+                <span class="text-emerald-600 dark:text-emerald-400 inline-flex items-center gap-1">
+                  <ng-icon name="lucideCheck" size="10"></ng-icon>
+                  {{ row.otherApprovals }} other
+                </span>
+              }
+            </div>
+          </a>
+
+          @if (row.myReview === 'pending') {
+            <div class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity flex items-center gap-1 bg-gradient-to-l from-background via-background to-transparent pl-6 pr-1">
+              <button type="button" hlmBtn variant="outline" size="sm" class="gap-1.5">
+                <ng-icon name="lucideEye" size="12"></ng-icon>
+                Open
+              </button>
+              <button type="button" hlmBtn size="sm" class="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white">
+                <ng-icon name="lucideCheck" size="12"></ng-icon>
+                Approve
+              </button>
+            </div>
+          }
+        </li>
+      }
+    </ul>
+  }
+</section>
