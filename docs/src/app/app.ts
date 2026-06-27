@@ -96,6 +96,18 @@ export class App {
       logo: 'logos/angular-material.webp',
       logoBg: 'bg-pink-50 dark:bg-pink-950/30',
     },
+    {
+      slug: 'ui-craft',
+      name: 'ui-craft',
+      library: 'Cross-cutting',
+      site: 'https://www.refactoringui.com',
+      description:
+        'Library-neutral design discipline, the three tells of an amateur dashboard, plus the Refactoring UI principles (hierarchy, spacing, typography, color, depth, finishing) mapped onto every library skill.',
+      status: 'ready',
+      tracks: 'Refactoring UI + 3 tells',
+      logo: 'logos/ui-craft.svg',
+      logoBg: 'bg-violet-50 dark:bg-violet-950/30',
+    },
   ];
 
   protected readonly examples: readonly Example[] = [
@@ -203,7 +215,8 @@ export class App {
         { tk: 'cmd', text: '    angular-ui-skills-master/skills/spartan-ng-developer \\' },
         { tk: 'cmd', text: '    angular-ui-skills-master/skills/primeng-developer \\' },
         { tk: 'cmd', text: '    angular-ui-skills-master/skills/ng-zorro-developer \\' },
-        { tk: 'cmd', text: '    angular-ui-skills-master/skills/angular-material-developer' },
+        { tk: 'cmd', text: '    angular-ui-skills-master/skills/angular-material-developer \\' },
+        { tk: 'cmd', text: '    angular-ui-skills-master/skills/ui-craft' },
       ],
     },
     gemini: {
@@ -215,7 +228,8 @@ export class App {
         { tk: 'cmd', text: '    angular-ui-skills-master/skills/spartan-ng-developer \\' },
         { tk: 'cmd', text: '    angular-ui-skills-master/skills/primeng-developer \\' },
         { tk: 'cmd', text: '    angular-ui-skills-master/skills/ng-zorro-developer \\' },
-        { tk: 'cmd', text: '    angular-ui-skills-master/skills/angular-material-developer' },
+        { tk: 'cmd', text: '    angular-ui-skills-master/skills/angular-material-developer \\' },
+        { tk: 'cmd', text: '    angular-ui-skills-master/skills/ui-craft' },
         { tk: 'cmd', text: '' },
         { tk: 'cmd', text: '# Then in Gemini CLI:  /skills reload' },
       ],
@@ -224,8 +238,8 @@ export class App {
       label: 'Cursor / Codex',
       lines: [
         { tk: 'cmd', text: 'mkdir -p .cursor/rules && \\' },
-        { tk: 'cmd', text: '  for s in spartan-ng primeng ng-zorro angular-material; do \\' },
-        { tk: 'cmd', text: '    curl -fsSL "https://raw.githubusercontent.com/mofirojean/angular-ui-skills/master/skills/$s-developer/SKILL.md" \\' },
+        { tk: 'cmd', text: '  for s in spartan-ng-developer primeng-developer ng-zorro-developer angular-material-developer ui-craft; do \\' },
+        { tk: 'cmd', text: '    curl -fsSL "https://raw.githubusercontent.com/mofirojean/angular-ui-skills/master/skills/$s/SKILL.md" \\' },
         { tk: 'cmd', text: '      -o ".cursor/rules/$s.md"; \\' },
         { tk: 'cmd', text: '  done' },
       ],
