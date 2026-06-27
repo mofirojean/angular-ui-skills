@@ -199,7 +199,16 @@
             </thead>
             <tbody hlmTBody>
               @for (run of paginatedRuns(); track run.id) {
-                <tr hlmTr (click)="openDetail(run)" class="hover:bg-muted/40 cursor-pointer transition-colors">
+                <tr hlmTr
+                  (click)="openDetail(run)"
+                  class="hover:bg-muted/40 cursor-pointer transition-colors border-l-2"
+                  [class.border-l-red-500]="run.status === 'failed'"
+                  [class.border-l-amber-500]="run.status === 'running'"
+                  [class.border-l-zinc-300]="run.status === 'queued'"
+                  [class.dark:border-l-zinc-700]="run.status === 'queued'"
+                  [class.border-l-transparent]="run.status === 'success'"
+                  [class.bg-red-500/[0.04]]="run.status === 'failed'"
+                >
                   <td hlmTd class="font-mono text-[11px]">{{ run.id }}</td>
                   <td hlmTd>
                     <span class="inline-flex items-center gap-2">

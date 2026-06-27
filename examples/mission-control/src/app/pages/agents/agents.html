@@ -240,8 +240,14 @@
                   [hlmContextMenuTrigger]="rowActions"
                   (hlmContextMenuOpened)="setActiveAgent(agent)"
                   (click)="openPreview(agent)"
-                  class="hover:bg-muted/40 group/row relative cursor-pointer transition-colors"
+                  class="hover:bg-muted/40 group/row relative cursor-pointer transition-colors border-l-2"
                   [class.bg-primary/5]="isSelected(agent.id)"
+                  [class.border-l-red-500]="needsAttention(agent)"
+                  [class.border-l-amber-500]="agent.status === 'draft'"
+                  [class.border-l-zinc-300]="agent.status === 'disabled'"
+                  [class.dark:border-l-zinc-700]="agent.status === 'disabled'"
+                  [class.border-l-transparent]="agent.status === 'active' && !needsAttention(agent)"
+                  [class.opacity-60]="agent.status === 'disabled'"
                 >
                   <td hlmTd (click)="$event.stopPropagation()">
                     <hlm-checkbox
