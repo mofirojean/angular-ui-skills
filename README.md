@@ -20,8 +20,9 @@ Drop the `-g` for a project-scoped install.
 | [`primeng-developer`](./skills/primeng-developer) | PrimeNG | 21.1.9 |
 | [`ng-zorro-developer`](./skills/ng-zorro-developer) | NG-ZORRO | `ng-zorro-antd` 21.3.1 |
 | [`angular-material-developer`](./skills/angular-material-developer) | Angular Material | `@angular/material` 21.2.14 |
+| [`ui-craft`](./skills/ui-craft) | Cross-cutting | Refactoring UI + the 3 tells |
 
-Each skill is validated by a deployed reference app under [`examples/`](./examples).
+The first four skills are library-specific and load when their packages are detected. `ui-craft` is library-neutral, it teaches design discipline (hierarchy, spacing, color, depth, finishing) and composes with any of them. Each library skill is validated by a deployed reference app under [`examples/`](./examples).
 
 ## Links
 
@@ -39,7 +40,8 @@ mkdir -p ~/.claude/skills && \
     angular-ui-skills-master/skills/spartan-ng-developer \
     angular-ui-skills-master/skills/primeng-developer \
     angular-ui-skills-master/skills/ng-zorro-developer \
-    angular-ui-skills-master/skills/angular-material-developer
+    angular-ui-skills-master/skills/angular-material-developer \
+    angular-ui-skills-master/skills/ui-craft
 ```
 
 For Cursor, drop a `SKILL.md` into `.cursor/rules/`. For other agents, copy any `skills/<name>/SKILL.md` into the agent's skill or rules folder.
