@@ -59,6 +59,10 @@ Spartan/ng provides 56 stable Helm components, grouped here by category. The sha
 - **Display**: Alert, Avatar, Badge, Empty, Icon, Item, Kbd, Progress, Skeleton, Spinner. Read [display.md](references/display.md)
 - **Data display**: Breadcrumb, Calendar, Carousel, Data Table, Pagination, Table. Read [data-display.md](references/data-display.md)
 
+## Recipes
+
+Cookbook patterns that compound multiple Helm components into a purpose-built surface. None of these are shipped Helm components, the recipe is the contribution. Start with the diff viewer (syntax highlighting, per-line gutter, file tree, inline line comments) if you're building a code-review tool. Read [recipes.md](references/recipes.md)
+
 ## Brain primitives
 
 - **Brain**: Headless primitives, when to drop down from Helm, building custom compositions. Read [brain.md](references/brain.md)
