@@ -20,21 +20,22 @@
         <button
           type="button"
           (click)="pick(s)"
-          class="border-border bg-card hover:bg-accent hover:border-border/80 group flex items-start gap-3 rounded-xl border p-3.5 text-left transition-all hover:-translate-y-0.5"
+          class="border-border bg-card hover:bg-accent/40 group flex items-start gap-3 rounded-xl border p-3.5 text-left transition-colors"
         >
-          <span class="bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors">
+          <span class="bg-primary/10 text-primary ring-1 ring-primary/20 group-hover:bg-primary/15 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors">
             <ng-icon hlm [name]="s.icon" size="xs" />
           </span>
           <div class="min-w-0 flex-1">
             <p class="text-foreground text-[13px] font-medium leading-tight">{{ s.title }}</p>
             <p class="text-muted-foreground mt-0.5 text-[12px] leading-tight">{{ s.hint }}</p>
           </div>
+          <ng-icon hlm name="lucideArrowRight" size="xs" class="text-muted-foreground/0 group-hover:text-muted-foreground mt-1 shrink-0 transition-colors" />
         </button>
       }
     </div>
 
-    <p class="text-muted-foreground mt-10 text-center text-[11px]">
-      Apex can make mistakes. This is a portfolio demo with hardcoded responses, nothing is sent to a real model.
+    <p class="text-muted-foreground/70 mt-10 text-center text-[10.5px]">
+      Portfolio demo with hardcoded responses, nothing is sent to a real model.
     </p>
   </div>
 </div>

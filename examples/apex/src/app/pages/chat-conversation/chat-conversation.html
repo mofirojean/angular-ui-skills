@@ -1,18 +1,24 @@
 @if (conversation(); as c) {
   <header class="border-border flex items-center justify-between gap-3 border-b px-5 py-2.5">
-    <div class="min-w-0 flex-1">
-      <h1 class="text-foreground truncate text-[14px] font-medium">{{ c.title }}</h1>
+    <div class="min-w-0 flex-1 flex items-center gap-2">
+      <h1 class="font-serif text-foreground truncate text-[15px] font-medium tracking-tight">{{ c.title }}</h1>
+      @if (isStreaming()) {
+        <span class="inline-flex items-center gap-1 text-[10.5px] text-emerald-600 dark:text-emerald-400 shrink-0">
+          <span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          streaming
+        </span>
+      }
     </div>
     <div class="flex items-center gap-1">
       <button hlmBtn variant="ghost" size="sm" class="gap-1.5 text-[12px]" type="button">
-        <ng-icon hlm name="lucideSparkles" size="xs" class="text-primary" />
+        <ng-icon hlm name="lucideSparkles" size="xs" class="text-muted-foreground" />
         <span class="hidden sm:inline">{{ model().label }}</span>
-        <ng-icon hlm name="lucideChevronDown" size="xs" />
+        <ng-icon hlm name="lucideChevronDown" size="xs" class="opacity-60" />
       </button>
-      <button hlmBtn variant="ghost" size="sm" class="h-8 w-8 p-0" type="button" aria-label="Share">
+      <button hlmBtn variant="ghost" size="sm" class="h-8 w-8 p-0" type="button" aria-label="Share conversation" title="Share conversation">
         <ng-icon hlm name="lucideShare2" size="xs" />
       </button>
-      <button hlmBtn variant="ghost" size="sm" class="h-8 w-8 p-0" type="button" aria-label="More">
+      <button hlmBtn variant="ghost" size="sm" class="h-8 w-8 p-0" type="button" aria-label="More actions" title="More actions">
         <ng-icon hlm name="lucideEllipsisVertical" size="xs" />
       </button>
     </div>
@@ -39,7 +45,7 @@
                   </div>
                 </div>
               } @else {
-                <div class="mb-8">
+                <div class="mb-8 group/msg">
                   <div class="apex-prose font-serif text-foreground space-y-4 text-[15px] leading-[1.7]">
                     @for (b of blocks(visibleContent(m), m.id); track $index) {
                       @switch (b.kind) {
@@ -60,19 +66,18 @@
                   </div>
 
                   @if (!isLastAssistant(m) || !isStreaming()) {
-                    <div class="text-muted-foreground mt-3 flex items-center gap-1">
-                      <button hlmBtn variant="ghost" size="sm" class="h-7 px-2 gap-1.5 text-[11px]" type="button" (click)="copy(m.content)">
+                    <div class="text-muted-foreground mt-3 -ml-2 flex items-center gap-0.5 opacity-0 group-hover/msg:opacity-100 focus-within:opacity-100 transition-opacity">
+                      <button hlmBtn variant="ghost" size="sm" class="h-7 w-7 p-0" type="button" aria-label="Copy response" title="Copy response" (click)="copy(m.content)">
                         <ng-icon hlm name="lucideCopy" size="xs" />
-                        Copy
                       </button>
-                      <button hlmBtn variant="ghost" size="sm" class="h-7 px-2 gap-1.5 text-[11px]" type="button">
+                      <button hlmBtn variant="ghost" size="sm" class="h-7 w-7 p-0" type="button" aria-label="Retry response" title="Retry response">
                         <ng-icon hlm name="lucideRefreshCw" size="xs" />
-                        Retry
                       </button>
-                      <button hlmBtn variant="ghost" size="sm" class="h-7 w-7 p-0" type="button" aria-label="Good response">
+                      <span class="bg-border w-px h-3 mx-1"></span>
+                      <button hlmBtn variant="ghost" size="sm" class="h-7 w-7 p-0" type="button" aria-label="Good response" title="Good response">
                         <ng-icon hlm name="lucideThumbsUp" size="xs" />
                       </button>
-                      <button hlmBtn variant="ghost" size="sm" class="h-7 w-7 p-0" type="button" aria-label="Bad response">
+                      <button hlmBtn variant="ghost" size="sm" class="h-7 w-7 p-0" type="button" aria-label="Bad response" title="Bad response">
                         <ng-icon hlm name="lucideThumbsDown" size="xs" />
                       </button>
                     </div>
