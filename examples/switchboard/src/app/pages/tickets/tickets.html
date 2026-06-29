@@ -134,6 +134,8 @@
         @for (row of t.data; track row.id) {
           <tr
             class="ticket-row"
+            [class.ticket-row--breached]="sla(row.slaDueAt).breached"
+            [class.ticket-row--urgent]="row.priority === 'urgent'"
             (click)="open(row.id)"
             (contextmenu)="onRowContext($event, row)"
           >

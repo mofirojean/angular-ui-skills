@@ -126,7 +126,12 @@
             </thead>
             <tbody>
               @for (row of t.data; track row.id) {
-                <tr (click)="goTo(row.id)" class="ticket-row">
+                @let rowSla = sla(row.slaDueAt);
+                <tr
+                  (click)="goTo(row.id)"
+                  class="ticket-row"
+                  [class.ticket-row--breached]="rowSla.breached"
+                >
                   <td class="mono">{{ row.id }}</td>
                   <td>
                     <p class="ticket-row__subject">{{ row.subject }}</p>

@@ -141,12 +141,37 @@
   transition: background 120ms ease;
 }
 
+.ticket-row > td:first-of-type {
+  box-shadow: inset 2px 0 0 transparent;
+  transition: box-shadow 120ms ease;
+}
+
+.ticket-row--breached > td:first-of-type {
+  box-shadow: inset 2px 0 0 #ef4444;
+}
+
+.ticket-row--breached {
+  background: rgba(239, 68, 68, 0.025);
+}
+
+:host-context(.theme-dark) .ticket-row--breached {
+  background: rgba(239, 68, 68, 0.06);
+}
+
 .ticket-row:hover {
   background: rgba(37, 99, 235, 0.04);
 }
 
+.ticket-row--breached:hover {
+  background: rgba(239, 68, 68, 0.05);
+}
+
 :host-context(.theme-dark) .ticket-row:hover {
   background: rgba(96, 165, 250, 0.08);
+}
+
+:host-context(.theme-dark) .ticket-row--breached:hover {
+  background: rgba(239, 68, 68, 0.09);
 }
 
 .ticket-row__subject {
