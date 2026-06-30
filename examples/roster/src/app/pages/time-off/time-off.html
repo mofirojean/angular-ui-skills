@@ -173,7 +173,12 @@
               </ng-container>
 
               <tr mat-header-row *matHeaderRowDef="requestCols; sticky: true"></tr>
-              <tr mat-row *matRowDef="let row; columns: requestCols"></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: requestCols"
+                [class.row-accent--rejected]="row.status === 'rejected'"
+                [class.row-accent--pending]="row.status === 'pending'"
+              ></tr>
 
               <tr class="mat-row" *matNoDataRow>
                 <td class="mat-cell empty-row" [attr.colspan]="requestCols.length">

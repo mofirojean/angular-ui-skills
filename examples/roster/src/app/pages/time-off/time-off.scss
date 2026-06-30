@@ -361,6 +361,21 @@ excel:host {
 .status-pill--approved { background: color-mix(in srgb, mediumseagreen 18%, var(--mat-sys-surface-container-high)); }
 .status-pill--rejected { background: color-mix(in srgb, var(--mat-sys-error) 14%, var(--mat-sys-surface-container-high)); }
 
+// --- Status-tier left accent on the request row ---
+
+.req-table .mat-mdc-row .mat-mdc-cell:first-of-type {
+  box-shadow: inset 2px 0 0 transparent;
+  transition: box-shadow 120ms ease;
+}
+
+.req-table .mat-mdc-row.row-accent--rejected .mat-mdc-cell:first-of-type {
+  box-shadow: inset 2px 0 0 #ef4444;
+}
+
+.req-table .mat-mdc-row.row-accent--pending .mat-mdc-cell:first-of-type {
+  box-shadow: inset 2px 0 0 #f59e0b;
+}
+
 .actions-cell { width: 48px; text-align: center; padding: 0 !important; }
 
 .menu-positive { color: color-mix(in srgb, mediumseagreen 60%, var(--mat-sys-on-surface)); }

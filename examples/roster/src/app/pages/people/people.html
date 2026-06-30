@@ -307,6 +307,8 @@
           mat-row
           *matRowDef="let row; columns: displayedColumns"
           [class.row-selected]="selection.isSelected(row)"
+          [class.row-accent--on-leave]="row.status === 'on-leave'"
+          [class.row-accent--onboarding]="row.status === 'onboarding'"
           (click)="onRowClick(row, $event)"
         ></tr>
 

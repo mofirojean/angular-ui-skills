@@ -225,6 +225,21 @@
   cursor: pointer;
 }
 
+// --- Status-tier left accent on the row ---
+
+.people-table .mat-mdc-row .mat-mdc-cell:first-of-type {
+  box-shadow: inset 2px 0 0 transparent;
+  transition: box-shadow 120ms ease;
+}
+
+.people-table .mat-mdc-row.row-accent--on-leave .mat-mdc-cell:first-of-type {
+  box-shadow: inset 2px 0 0 #f59e0b;
+}
+
+.people-table .mat-mdc-row.row-accent--onboarding .mat-mdc-cell:first-of-type {
+  box-shadow: inset 2px 0 0 #0ea5e9;
+}
+
 .people-table .mat-mdc-row.row-selected {
   background: color-mix(in srgb, var(--mat-sys-primary) 10%, var(--mat-sys-surface));
 }
