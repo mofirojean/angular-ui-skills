@@ -13,15 +13,16 @@ metadata:
 
 ## Compatibility
 
-- **Tracks:** `@spartan-ng/brain` v0.0.1-alpha.714 exactly. Spartan ships near-daily alpha patches, the skill is re-validated each time the tracked version is bumped.
-- **Angular:** v18 or newer required. Standalone components, control flow (`@if` / `@for`), and signal-based APIs (`input()` / `output()`) are assumed. Will not generate `NgModule`-based or decorator-based code.
+- **Tracks:** `@spartan-ng/brain` v1.0.2 (released 2026-06-26). Spartan reached 1.0 stable in June 2026, the API surface is now versioned and re-validated each patch bump.
+- **1.0.2 highlights:** Calendar accepts partial i18n config, Combobox force-invalid trigger fix, `BrnFieldControl` can inject `ngControl` from a host component and set the label's `for` attribute, backdrop double-fade fix on overlays. No breaking changes vs 1.0.1.
+- **Angular:** v18 or newer required. Standalone components, control flow (`@if` / `@for`), and signal-based APIs (`input()` / `output()`) are assumed. Will not generate `NgModule`-based or decorator-based code. Angular v22 stable shipped 2026-06-03 and Spartan 1.0.2 works with it (the brain primitives don't rely on v22-only APIs), but the skill's example apps still target v21 pending an explicit Spartan v22 compatibility statement.
 - **Tailwind:** v3 or v4. The skill detects the major version from `package.json` and adapts.
-- **Not supported:** other Spartan alphas with API drift, Angular v17 or below, projects using `@spartan-ng/ui-*` packages (deprecated, replaced by `@spartan-ng/helm`).
+- **Not supported:** old alphas (`v0.0.1-alpha.*`) with pre-1.0 API drift, Angular v17 or below, projects using `@spartan-ng/ui-*` packages (deprecated, replaced by `@spartan-ng/helm`).
 
 If the project's installed version differs significantly from the tracked one, warn the user before generating code, the API surface may have shifted.
 
 
-1. Always check the project's Spartan/ng version before providing guidance. Spartan is pre-1.0 and conventions evolve - `package.json` is the source of truth.
+1. Always check the project's Spartan/ng version before providing guidance. Spartan is now 1.0 stable but still evolves, `package.json` is the source of truth.
 
 2. Detect the project layout up front:
    - If `nx.json` exists → Nx workspace. Use `npx nx g @spartan-ng/cli:ui <name>` commands.

@@ -100,9 +100,9 @@ function usernameAvailableValidator(api: UsersApi): AsyncValidatorFn {
 }
 ```
 
-## Signal Forms (Angular v22+)
+## Signal Forms (Angular v22, stable)
 
-Once Angular v22 ships Signal Forms stable, NG-ZORRO's CVA implementations work the same way, the form layer is decoupled. The triad markup is unchanged.
+Angular v22 shipped Signal Forms stable in June 2026. NG-ZORRO's `ng-zorro-antd@21.3.2` is v21-aligned; if the project is on Angular v22 + `ng-zorro-antd@22.0.0-alpha.1`, the CVA implementations work the same way, the form layer is decoupled. The `nz-form-item` / `nz-form-label` / `nz-form-control` triad markup is unchanged.
 
 ## Template-driven (`ngModel`)
 

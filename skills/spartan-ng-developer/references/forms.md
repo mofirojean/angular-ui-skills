@@ -9,14 +9,14 @@ Sources used below:
 
 ## 1. Which form system to use
 
-**Default to ReactiveForms.** Signal Forms is on track for stable release in Angular v22 - until then, it remains experimental and its API is still moving. Pick based on project state:
+**Default to ReactiveForms.** Signal Forms shipped stable in Angular v22 (June 2026) and is now safe to use in production, but ReactiveForms remains this skill's default because most existing projects and validators are wired for it. Pick based on project state:
 
 | Project state | Use |
 |---|---|
 | New form, any Angular version up to v21 | **ReactiveForms** |
 | Existing form using ReactiveForms | **ReactiveForms** (match the existing strategy) |
 | Existing form using Template-driven | **Template-driven** (match the existing strategy) |
-| Angular v22+ greenfield, willing to track upcoming-stable API | **Signal Forms** (see §4 - still verify against your installed version) |
+| Angular v22+ greenfield, want the newest paradigm | **Signal Forms** (see §4, now stable) |
 
 Spartan Helm form components work with all of these - the wiring differs slightly per system.
 
@@ -113,9 +113,9 @@ Per their component pages, the following accept `formControlName` / `[formContro
 
 (Button, Button Group, Field, Input Group, and Label are visual/structural - they don't participate in the form value.)
 
-## 4. Signal Forms (experimental - stable in Angular v22)
+## 4. Signal Forms (stable in Angular v22)
 
-> ⚠ Signal Forms is still experimental at time of writing. It is on track to ship stable in Angular v22. **For new forms on Angular v21 or earlier, use ReactiveForms (§3) instead** - Signal Forms' API has shifted across the experimental period and importing the wrong helpers from the wrong path is an easy way to waste time. Defer to `angular-developer`'s `signal-forms.md` reference for the canonical patterns once you're on v22+.
+> Signal Forms shipped stable in Angular v22 (2026-06-03). **For projects on Angular v21 or earlier, use ReactiveForms (§3) instead**, Signal Forms' pre-v22 API shifted across the experimental period. On v22+, defer to `angular-developer`'s `signal-forms.md` reference for the canonical patterns.
 
 > ⚠ Could not verify Spartan-specific Signal Forms guidance from https://spartan.ng/forms/signal-forms - the page returned an SPA shell with no documentation content. Verify the API against your installed Angular version.
 

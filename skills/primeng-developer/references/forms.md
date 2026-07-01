@@ -122,9 +122,9 @@ New pattern is to *bind explicitly* via `[invalid]`. Benefits:
 
 For new code prefer Reactive Forms (the workspace's documented default). Template-driven shines for small, self-contained inputs.
 
-## Signal Forms (Angular v22+)
+## Signal Forms (Angular v22, stable)
 
-Angular's experimental Signal Forms API is expected to stabilize in v22. PrimeNG's CVA-based components should integrate via the same adapter, but as of PrimeNG v21 this is untested. Recommendation: stick with Reactive Forms until both stabilize.
+Angular v22 shipped Signal Forms stable in June 2026. PrimeNG v22 stable is not out yet (RC exists), so if you're on PrimeNG v21 the ControlValueAccessor path is your safest bet, stick with Reactive Forms until PrimeNG v22 is validated against Signal Forms end-to-end. On Angular v22 + PrimeNG v22 RC, Signal Forms should compose via the same CVA adapter, but validate against your installed version first.
 
 ## Field wrappers
 

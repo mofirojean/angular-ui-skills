@@ -56,7 +56,7 @@ export class App {
       description:
         'Headless brain primitives + helm components, with theming via CSS variables and the hlm-tailwind-preset.',
       status: 'ready',
-      tracks: '@spartan-ng/brain v1.0.1',
+      tracks: '@spartan-ng/brain v1.0.2',
       logo: 'logos/spartan-ng.svg',
       logoBg: 'bg-rose-50 dark:bg-rose-950/40',
     },
@@ -80,7 +80,7 @@ export class App {
       description:
         'Ant Design system for Angular, with LESS theming, internationalisation, and the full nz-* component set including services, drag-drop, and Watermark.',
       status: 'ready',
-      tracks: 'ng-zorro-antd 21.3.1',
+      tracks: 'ng-zorro-antd 21.3.2',
       logo: 'logos/ng-zorro.svg',
       logoBg: 'bg-sky-50 dark:bg-sky-950/30',
     },
@@ -92,7 +92,7 @@ export class App {
       description:
         'Material 3 components with the mat.theme() Sass mixin, prebuilt palettes, density tuning, plus CDK primitives (Overlay, A11y, Drag-Drop, VirtualScroll).',
       status: 'ready',
-      tracks: '@angular/material 21.2.14',
+      tracks: '@angular/material 22.0.2',
       logo: 'logos/angular-material.webp',
       logoBg: 'bg-pink-50 dark:bg-pink-950/30',
     },

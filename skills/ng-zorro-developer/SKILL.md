@@ -13,7 +13,9 @@ metadata:
 
 ## Compatibility
 
-- **Tracks:** `ng-zorro-antd@21.3.1` (latest), aligned with Angular `^21.0.0`. NG-ZORRO follows Angular's major version, the major number of `ng-zorro-antd` always matches `@angular/core`.
+- **Tracks:** `ng-zorro-antd@21.3.2` (released 2026-06-27), aligned with Angular `^21.0.0`. NG-ZORRO follows Angular's major version, the major number of `ng-zorro-antd` always matches `@angular/core`.
+- **21.3.2 delta:** schematics publish as CommonJS, dropdown option overflow fix in Select. Bug-fix-only bump, no API drift vs 21.3.1.
+- **v22 status:** `ng-zorro-antd@22.0.0-alpha.1` exists on the `alpha` channel (Angular v22 shipped stable 2026-06-03). No stable v22 yet, expect one after upstream Ant Design catches up.
 - **Works for:** NG-ZORRO v17 → v21 projects. The skill assumes the v21 API surface, the [`migration.md`](references/migration.md) reference covers the module → standalone shift, the i18n provider change, and the per-version deprecations.
 - **Angular:** v17 or newer (standalone components and the new control flow). v21 is the closest match.
 - **Zoneless / OnPush:** NG-ZORRO officially supports zoneless change detection and `ChangeDetectionStrategy.OnPush`, the components are signal-aware and use `markForCheck()` internally where needed.

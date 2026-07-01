@@ -115,9 +115,9 @@ Material doesn't change how Angular async validators work, the `<mat-error>` sho
 </mat-form-field>
 ```
 
-## Signal Forms (Angular v22+)
+## Signal Forms (Angular v22, stable)
 
-Material's CVA implementations work the same way with Signal Forms once Angular v22 ships stable. The `<mat-form-field>` markup is unchanged.
+Signal Forms shipped stable in Angular v22 (2026-06-03). Material's CVA implementations work the same way whether you're on Reactive Forms or Signal Forms, the `<mat-form-field>` markup is unchanged. See `angular-developer`'s `signal-forms.md` for the canonical `form()` / `field()` / `validators()` shape.
 
 ## Common pitfalls
 

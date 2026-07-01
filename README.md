@@ -16,10 +16,10 @@ Drop the `-g` for a project-scoped install.
 
 | Skill | Library | Tracks |
 |---|---|---|
-| [`spartan-ng-developer`](./skills/spartan-ng-developer) | Spartan/ng | `@spartan-ng/brain` 1.0.1 |
+| [`spartan-ng-developer`](./skills/spartan-ng-developer) | Spartan/ng | `@spartan-ng/brain` 1.0.2 |
 | [`primeng-developer`](./skills/primeng-developer) | PrimeNG | 21.1.9 |
-| [`ng-zorro-developer`](./skills/ng-zorro-developer) | NG-ZORRO | `ng-zorro-antd` 21.3.1 |
-| [`angular-material-developer`](./skills/angular-material-developer) | Angular Material | `@angular/material` 21.2.14 |
+| [`ng-zorro-developer`](./skills/ng-zorro-developer) | NG-ZORRO | `ng-zorro-antd` 21.3.2 |
+| [`angular-material-developer`](./skills/angular-material-developer) | Angular Material | `@angular/material` 22.0.2 |
 | [`ui-craft`](./skills/ui-craft) | Cross-cutting | Refactoring UI + the 3 tells |
 
 The first four skills are library-specific and load when their packages are detected. `ui-craft` is library-neutral, it teaches design discipline (hierarchy, spacing, color, depth, finishing) and composes with any of them. Each library skill is validated by a deployed reference app under [`examples/`](./examples).

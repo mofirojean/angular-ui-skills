@@ -13,15 +13,31 @@ metadata:
 
 ## Compatibility
 
-- **Tracks:** `@angular/material@21.2.14` (the v21-aligned LTS), paired with `@angular/cdk@21.2.14`.
-- **Works for:** Material v19 → v21 projects (the M3 theming system landed in v19; older majors used M2 with the now-legacy `mat.define-light-theme` / `mat.define-dark-theme` API).
-- **Angular:** v19 or newer required. The skill assumes standalone components, control flow (`@if` / `@for`), and signal-based APIs.
+- **Tracks:** `@angular/material@22.0.2` (Angular v22 stable, released 2026-06-03), paired with `@angular/cdk@22.0.2`. The v21-aligned LTS remains available at `21.2.14` for legacy projects.
+- **Works for:** Material v19 → v22 projects (M3 theming system landed in v19; older majors used M2 with the now-legacy `mat.define-light-theme` / `mat.define-dark-theme` API).
+- **Angular:** v19 or newer required. v22 requires Node 22 or 26 and TypeScript 6. The skill assumes standalone components, control flow (`@if` / `@for`), and signal-based APIs.
 - **Sass:** required for theming. The build pipeline must support `.scss` (Angular CLI does by default). Standalone CSS-only theming is not supported by Material's theming engine.
 - **Not supported:** Material v18 and below (M2-only with `mat.define-*-theme()` API), Angular v18 or below (NgModule patterns + older animations API).
 
-If the project is on Material v22+ paired with Angular v22+, this skill still applies, the component API is stable across v21 → v22, only theming-internal Sass changes between majors.
+### v22 breaking changes (from v21)
 
-The Material v21 → v22 jump is **not** a redesign, it's an Angular version bump. The component selectors, inputs, and outputs are the same.
+The v21 → v22 jump has real API drift, not just an Angular version bump. Watch for:
+
+- **Combobox:** legacy combobox and autocomplete promoted / removed. `SimpleCombobox` promoted to `Combobox` with all `simpleCombobox*` symbols renamed to `combobox*`.
+- **List:** `MatListOption.checkboxPosition` removed, use `togglePosition` instead. `MatListOptionCheckboxPosition` renamed to `MatListOptionTogglePosition`.
+- **CDK:** `injector` parameter is now required on `ConfigurableFocusTrap` and `FocusTrap` constructors. `ConfigurableFocusTrapFactory.create` boolean parameter replaced with a config object. `DropListRef.drop` event parameter is now required. `ContextMenuTracker` renamed to `MenuTracker`. Removed: `CDK_DESCRIBEDBY_HOST_ATTRIBUTE`, `CDK_DESCRIBEDBY_ID_PREFIX`, `MESSAGES_CONTAINER_ID`.
+- **Multiple components:** input/model rename from `values` to `value` across Combobox, Listbox, Tree, Menu, Toolbar, Select. Constructors with rest arguments removed (affects code that extends Material or CDK components).
+- **Dialog / Overlay:** `ArrowViewState` and `ArrowViewStateTransition` types removed.
+
+Most of these have automatic `ng update` migrations. When in doubt, run `ng update @angular/material` and let the schematic do the work before hand-editing.
+
+### v22 new features worth knowing
+
+- **Signal Forms stable** (was experimental in v21). Angular's signal-based form API is now safe to use in production. `mat-form-field` composes with both `ReactiveFormsModule` and Signal Forms.
+- **Angular Aria stable** (was preview). New accessibility primitives ship in the framework, which reduces the need to reach for CDK's a11y module for some patterns.
+- **Button progress indicator** support inside `<button>` component.
+- **Portal directives** support on `ComponentPortal`.
+- **Separate tab animation durations** (per-tab enter/exit timing).
 
 
 1. **Check the project's Material version before answering.** Material's M3 theming engine was introduced in v19 (`mat.theme()` mixin replacing `mat.define-light-theme` and `mat.define-dark-theme`). Code generated against M3 will silently break on M2 projects. `package.json` is the source of truth.
