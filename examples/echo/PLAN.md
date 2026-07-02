@@ -6,7 +6,7 @@ A reference Angular application built with the `primeng-developer` skill. The po
 
 ## What it is
 
-**Echo**, a music player + library for a fictional streaming service. Browse albums, artists, and playlists. Play a track and it lives in a persistent bottom player bar with a scrubber, volume, shuffle/repeat, and a queue drawer. Fullscreen "Now Playing" view with a waveform scrubber and lyrics tab. Drag-drop to build playlists and reorder the queue. Search across songs / artists / albums / playlists via a global AutoComplete.
+**Echo**, a real, local-first music player that actually plays music. Drop MP3 / FLAC / WAV / OGG / M4A files onto the app and they're imported into the library, metadata (title / artist / album / year / genre / cover art) is extracted from the file's tags, waveform peaks are computed from the decoded PCM, and everything is persisted in IndexedDB so the library survives reloads. Click a track and it plays through a real Web Audio graph: HTMLAudioElement source → GainNode (volume) → 5-band BiquadFilterNode EQ → AnalyserNode (visualizer) → destination. Browse the library by album / artist / playlist. Fullscreen "Now Playing" with a real waveform scrubber drawn from the cached peaks. Drag-drop to build playlists and reorder the queue. Search across songs / artists / albums / playlists via a global AutoComplete.
 
 The narrative fits PrimeNG's underused vocabulary from Quanta Desk: **Slider** graduates from a filter widget to the audio scrubber and volume rail, **Knob** becomes the EQ band control, **OrderList** and **PickList** move from a settings toy to the primary queue-editing surface, **Galleria** shows album art at full resolution, **Carousel** is featured playlists on the home page, **MegaMenu** browses by genre / mood / decade.
 
@@ -19,26 +19,53 @@ The narrative fits PrimeNG's underused vocabulary from Quanta Desk: **Slider** g
 
 ## Out of scope
 
-- Auth (mock a signed-in listener)
-- Real audio streaming. The player uses `<audio>` with a small set of royalty-free / silent placeholder tracks, or a purely simulated timer. No CDN, no DRM, no licensing.
-- Real music metadata APIs (Spotify, MusicBrainz). Everything is mock data.
-- Uploads / user-generated audio.
-- Social features (following, sharing, comments).
-- SSR (later)
+- Auth (single-user local library, no accounts)
+- Server-side storage. Everything is client-side, files live in the browser (IndexedDB blob store) or, on capable browsers, linked directly to a folder via the File System Access API.
+- Streaming from URLs, DRM, licensing, catalog APIs (Spotify / Apple / Tidal). Local files only.
+- Social features (following, sharing, comments), external identity, cloud sync.
+- Radio in the "algorithmic station" sense. The Browse page is a filter view over the local library grouped by genre / decade / format tags read from ID3, no true recommendation engine.
+- SSR (later, and largely moot for a client-side player)
 - Unit / E2E tests (this is manual visual + functional validation, the *skill* is what we're testing)
-- A native waveform decoder. The waveform is a stylized SVG / canvas rendering of a fixed peak array per track, not real FFT.
+- Native app packaging (Electron / Tauri). PWA only, installable via the browser but not shipped as a native binary.
 
 ## Tech stack
+
+### UI layer
 
 - **Angular v22+**, standalone components, signals, control flow syntax, zoneless via `provideZonelessChangeDetection()`
 - **PrimeNG v21** with `@primeuix/themes` (Aura preset, customized to a dark-first cover-art-forward palette) + `@primeuix/styles`. Install via the skill's `setup.md`.
 - **Tailwind v4** with `tailwindcss-primeui` and `cssLayer` enabled
 - **PrimeIcons** for chrome icons; **Lucide** via `@ng-icons/lucide` for player controls where PrimeIcons lacks the exact glyph (play, pause, skip-forward, skip-backward, shuffle, repeat, volume variants)
-- **Chart.js** for the equalizer visualization and listening-history bars
-- **[ngx-transforms](https://www.npmjs.com/package/ngx-transforms)** for `| initials`, `| timeAgo`, `| truncate`, dogfood the user's own library on artist bylines, played-at labels, and marquee-cropped titles
+- **Chart.js** for the equalizer preview curve and listening-history bars
+- **[ngx-transforms](https://www.npmjs.com/package/ngx-transforms)** for `| initials`, `| timeAgo`, `| truncate`, `| duration`, dogfood the user's own library
 - **Reactive forms** for search, playlist creation, settings
-- **No state library**, signals + a single `PlayerService` (the play head, queue, and history live here as signals) + a `LibraryService` for mock data
-- **Custom track duration formatter**, `mm:ss` for < 1h, `h:mm:ss` past that
+
+### Audio engine (this is what makes Echo real)
+
+- **HTMLAudioElement** as the source node. The `<audio>` element is created once per playing track, wired to the AudioContext via `createMediaElementSource()`, then routed through the graph and finally to `context.destination`. Using `<audio>` (not `AudioBufferSourceNode`) means large files stream from disk rather than being loaded fully into memory.
+- **Web Audio API graph** per playback session:
+  `MediaElementSource → GainNode (master volume) → BiquadFilterNode × 5 (EQ: 60 Hz / 250 Hz / 1 kHz / 4 kHz / 12 kHz) → AnalyserNode (for the live visualizer) → context.destination`
+- **[`music-metadata-browser`](https://www.npmjs.com/package/music-metadata-browser)** for extracting ID3v2 / Vorbis / MP4 / FLAC tags at import time (title, artist, album, year, genre, track number, cover art as Blob, duration, sample rate, bit rate)
+- **Waveform peaks** computed once at import: decode the file with `OfflineAudioContext.decodeAudioData`, downsample the PCM into ~2000 min/max pairs, cache the peaks in IndexedDB. Rendering the waveform on the Now-Playing scrubber becomes a cheap canvas draw.
+- **[`idb`](https://www.npmjs.com/package/idb)** (Jake Archibald's tiny wrapper) for IndexedDB access. Object stores: `tracks` (metadata + peaks), `blobs` (the audio file itself as a `Blob`), `covers` (extracted cover art as a `Blob`), `playlists`, `plays` (history), `settings`.
+- **`URL.createObjectURL()`** on the stored `Blob` to feed `<audio>.src`. Blob URLs are revoked when a track leaves the current playback window to avoid the leak this pattern normally causes.
+- **File System Access API** (progressively enhanced): when available (Chromium browsers), users can pick a folder once and Echo watches it. Fallback for Safari / Firefox is drag-drop or `<input type="file" multiple accept="audio/*">`.
+- **Media Session API**: `navigator.mediaSession.metadata` + `setActionHandler` for OS-level media controls (headphone buttons, macOS Control Center, Chrome media notification, Windows SMTC)
+- **Storage estimate**: `navigator.storage.estimate()` powers the Settings → Storage view with real numbers, not mocked
+
+### State
+
+- No state library, signals + services only:
+  - `PlayerService`, playback state (current track, isPlaying, progress, duration, volume, shuffle, repeat, queue, history) all as signals; owns the `AudioContext` and the graph
+  - `LibraryService`, tracks / albums / artists / playlists derived from the IndexedDB `tracks` store, exposed as signals; recomputes on import
+  - `ImportService`, takes a `File[]` (from drag-drop, file input, or File System Access API), streams each through `music-metadata-browser`, decodes for peaks, writes to IndexedDB, emits per-file progress
+  - `EqService`, owns the BiquadFilterNode chain, persists preset + band values
+
+### Custom formatters
+
+- Track duration `mm:ss` for < 1h, `h:mm:ss` past that (add to ngx-transforms as `| duration` if not already there)
+- Bit rate `320 kbps` / sample rate `44.1 kHz` for the track-info popover
+- File size (bytes → KB / MB / GB) for Settings → Storage per-file breakdown
 
 ## Visual identity
 
@@ -54,14 +81,23 @@ Light mode exists but the default is dark. Toggle persists via the `dark` class 
 
 ## Pages
 
-### 1. Home / Discover (`/`)
-Landing page. Editorial + personalized.
-- Hero **Carousel** of featured playlists (full-bleed cover, artist byline, "Play" **Button** overlay on hover)
-- "New releases" **DataView** grid of album cards (cover, title, artist, released via `| timeAgo`) with grid / list toggle
-- "Made for you" **DataView** row of personalized playlists (horizontal scroller layout)
-- "Top charts" **Table** condensed, 10 rows, sortable by rank / plays / duration, row click plays the track
-- "Recently played" **Timeline** with cover thumbnails on the left rail
-- **Skeleton** placeholders during the 400ms simulated load
+### 1. Home (`/`)
+Landing page. Shaped around the local library, not a store front.
+- **Empty-state view** (first run, no tracks imported yet): big centered drop zone using **FileUpload** in advanced mode (`accept="audio/*"`, `multiple`, folder-drop supported), a "Choose folder" **Button** for the File System Access API path, and a link to a small "supported formats" **Panel**
+- **Populated view**:
+  - "Recently added" **DataView** grid of albums (sorted by import timestamp) with grid / list toggle
+  - "Recently played" **Timeline** with cover thumbnails on the left rail (from the `plays` store)
+  - "Jump back in" **Carousel** of the top 6 albums by play count
+  - "Your top artists" **DataView** row (circular avatars)
+- Persistent header **FileUpload** in `mode="basic"` (upload icon) so import works from anywhere
+- **Skeleton** placeholders while IndexedDB reads on cold start
+
+### 1a. Import (`/import`), dedicated importer surface
+Reachable from the Home empty state and from a header button. Renders even when tracks already exist.
+- Full-height **FileUpload** advanced mode drop zone
+- **Table** of "in progress" imports with columns: filename, size, extracted title / artist (as parsing completes), progress **ProgressBar** per row, status **Tag** (Queued / Parsing / Decoding peaks / Storing / Done / Failed), remove **Button**
+- Summary strip at top: imported / failed / total, "Cancel all" and "Clear finished" **Button**s
+- `ImportService` processes files with limited concurrency (say 3 in parallel) so the UI stays responsive on a 500-file drop
 
 ### 2. Library (`/library`)
 The user's collection. Table-heavy.
@@ -118,11 +154,12 @@ Standalone queue editor (also reachable from the player bar Drawer).
 - **Toolbar**: Clear queue, Save as playlist (**ConfirmDialog** → **Dialog** with name input → **Toast** confirmation)
 - Empty state: **Empty** with "Browse to add tracks" **Button**
 
-### 8. Radio (`/radio`)
-- **MegaMenu** at top: Genre · Mood · Decade · Activity
-- **DataView** grid of stations, each a **Card** with a stylized gradient background (no cover art, this is where the palette flexes)
-- Play button on the card triggers a station (fills the queue with a mock genre feed)
-- "Personal stations" **DataView** row + "Trending" **DataView** row
+### 8. Browse (`/browse`)
+The old "Radio" page, repurposed as a filter view over the local library. No streaming, no algorithms, real ID3-tag-driven grouping.
+- **MegaMenu** at top: Genre · Decade · Year · Format (MP3 / FLAC / WAV / OGG / M4A) · Bit rate bucket
+- **DataView** grid of "stations", each a **Card** with a stylized gradient background labelled by the facet value ("Jazz", "1980s", "FLAC only", "> 256 kbps")
+- Clicking a card fills the queue with every track in the library matching that facet (shuffled by default) and starts playback
+- Facets are derived at runtime from `LibraryService` signals, if no tracks have a genre tag, the Genre section shows an **Empty** state instead of gradient tiles
 
 ### 9. Search (`/search`)
 - Persistent **AutoComplete** in the header opens this route with the query pre-filled
@@ -132,14 +169,13 @@ Standalone queue editor (also reachable from the player bar Drawer).
 - Empty state: **Empty** with recent searches list
 
 ### 10. Settings (`/settings`)
-- **Tabs**: Profile · Playback · Storage · Devices · Notifications · Privacy · About
-- **Profile**: name (**InputText**), display picture (**FileUpload**), country (**Select**), pronouns (**Select**)
-- **Playback**: crossfade duration (**Slider** 0-12s), gapless (**ToggleSwitch**), normalization (**SelectButton** Off / Quiet / Normal / Loud), streaming quality (**RadioButton** stack), download quality (**RadioButton** stack), equalizer (5-band **Knob** array + preset **Select** with Custom / Rock / Jazz / Classical / Bass Boost / Vocal), preview via a mini **Chart** (line)
-- **Storage**: used vs free (**MeterGroup**), per-category breakdown (**ProgressBar** rows), "Clear cache" **Button** (**ConfirmPopup**), downloaded content **Table** with per-item remove
-- **Devices**: **Table** of connected devices, last-active `| timeAgo`, action column with a "Sign out" **Button** (per row **ConfirmDialog** on click). "Sign out all" toolbar action
-- **Notifications**: grid of **ToggleSwitch** rows per channel × event (new release, playlist update, artist news, weekly recap, live event)
-- **Privacy**: **ToggleSwitch** stack (private session, hide activity, block explicit content), **Password** for account changes, delete account (**ConfirmDialog** with typed confirmation)
-- **About**: version, credits, licenses (**Panel** with expand)
+- **Tabs**: Profile · Playback · Library · Storage · Notifications · About
+- **Profile**: display name (**InputText**), avatar (**FileUpload**), preferred output device (**Listbox** populated from `navigator.mediaDevices.enumerateDevices({kind: 'audiooutput'})`)
+- **Playback**: crossfade duration (**Slider** 0-12s), gapless (**ToggleSwitch**), replay gain / normalization (**SelectButton** Off / Track / Album), pre-amp gain (**Slider** ±12 dB), equalizer (5-band **Knob** array wired live to the BiquadFilterNode chain + preset **Select** with Flat / Rock / Jazz / Classical / Bass Boost / Vocal / Custom), preview via a mini **Chart** (line, the frequency response actually computed from the current filter values)
+- **Library**: watched folders **Table** (path, track count, last scanned, remove **Button**), "Add folder" **Button** (File System Access API), "Rescan all" **Button**, file-type include filter (**MultiSelect** of extensions), "Reset library" (**ConfirmDialog** with typed "DELETE" confirmation, wipes IndexedDB)
+- **Storage**: real numbers from `navigator.storage.estimate()`, used vs free (**MeterGroup**), per-store breakdown blobs / covers / peaks / metadata (**ProgressBar** rows), largest tracks **Table** (top 20, with per-row delete), "Recompute peaks" **Button** (**ConfirmPopup**, regenerates the peaks cache), "Purge orphaned blobs" **Button**
+- **Notifications**: **ToggleSwitch** stack for OS-level media session controls (show cover on lock screen, show controls in browser notification, keep playing when tab is hidden), plus per-event browser notifications toggle
+- **About**: version, build hash, dependency versions (Angular / PrimeNG / Chart.js / music-metadata-browser), licenses (**Panel** with expand), a "Diagnostics" section with the current AudioContext state, sample rate, and a small **Terminal**-rendered log of the last N audio events (useful for debugging user reports)
 
 ### 11. 404
 - **Empty** state with "Back to home" **Button**
@@ -174,7 +210,7 @@ Mobile shape: Sidebar collapses to a bottom **TabMenu** (Home / Search / Library
 | Form | ColorPicker | Playlist cover picker (custom colour mode) |
 | Form | DatePicker | Settings, listening history range |
 | Form | Editor | Artist bio (read-only), playlist description (rich mode) |
-| Form | FileUpload | Playlist cover, profile picture |
+| Form | FileUpload | Import drop zone (Home empty state + /import + header), playlist cover, profile avatar |
 | Form | FloatLabel | Playlist create form, settings |
 | Form | IconField | Search inputs, add-track input |
 | Form | InputMask | Explicit content settings PIN |
@@ -227,7 +263,7 @@ Mobile shape: Sidebar collapses to a bottom **TabMenu** (Home / Search / Library
 | Display | Ripple | Buttons (global via providePrimeNG) |
 | Display | Skeleton | Loading states everywhere (Home strips, Library tabs) |
 | Display | Tag | Genre tags, "Explicit", "New" |
-| Display | Terminal | Lyrics tab in Now Playing (monospace scroller) |
+| Display | Terminal | Settings → About → Diagnostics log (audio event stream) |
 | Data | Carousel | Featured playlists on Home |
 | Data | DataView | Albums, artists, playlists, stations, related tracks |
 | Data | Galleria | Album art viewer (deluxe / vinyl / alt covers) |
@@ -236,12 +272,12 @@ Mobile shape: Sidebar collapses to a bottom **TabMenu** (Home / Search / Library
 | Data | PickList | Playlist add-tracks drawer (universe ⇄ playlist) |
 | Data | Table | Songs library, top charts, downloaded content, devices |
 | Data | Timeline | Recently played on Home, Artist career milestones |
-| Data | Tree | Genre browse in Radio (Genre → Subgenre) |
+| Data | Tree | Settings → Library → folder tree of watched paths |
 | Data | TreeTable | Album detail track expansion + credits |
 | Menu | Breadcrumb | Header path (Library / Albums / [Name]) |
 | Menu | ContextMenu | Right-click any track / album / artist row |
 | Menu | Dock | Optional: alternate mobile-style transport |
-| Menu | MegaMenu | Radio browse (Genre / Mood / Decade / Activity) |
+| Menu | MegaMenu | Browse page facets (Genre / Decade / Year / Format / Bit rate) |
 | Menu | Menu | Avatar dropdown |
 | Menu | MenuBar | Optional Now-Playing secondary controls |
 | Menu | PanelMenu | Settings sidebar |
@@ -265,41 +301,53 @@ Small slices. Each phase ends runnable + committable.
 ### Phase 1, Shell + routing
 Sidebar Drawer + header Toolbar + player bar (static, no real audio yet) + main outlet. Route stubs for all 11 pages. Theme toggle. Mock user in header dropdown. Toast + ConfirmDialog mounted at root. Player bar renders a hardcoded "current track" with transport buttons that don't wire yet.
 
-### Phase 2, PlayerService + fake audio engine
+### Phase 2, IndexedDB schema + ImportService (no library UI yet)
+- Wire `idb` with the object stores (`tracks`, `blobs`, `covers`, `playlists`, `plays`, `settings`)
+- `ImportService` accepts `File[]`, runs each through `music-metadata-browser` for tags + cover, decodes to compute peaks via `OfflineAudioContext`, writes to IndexedDB, emits per-file progress via a signal
+- Concurrency limit of 3, cancel-token support
+- Ship with a temporary "drop files here" test route to validate the pipeline before the real UI lands
+
+### Phase 3, PlayerService + real Web Audio graph
 - `PlayerService` with signals: `currentTrack`, `isPlaying`, `progress`, `duration`, `volume`, `queue`, `history`, `shuffle`, `repeatMode`
-- A `setInterval` loop advances `progress` while `isPlaying` is true (or wire a real `<audio>` with silent MP3 placeholders)
-- Player bar transport buttons dispatch to the service
-- **Slider** scrubber is two-way bound to `progress` with a `(seek)` output
-- Keyboard: space toggles play/pause globally
+- Owns the `AudioContext` (created lazily on first user gesture per browser autoplay rules)
+- Builds the graph: `<audio>` → `MediaElementSource` → `GainNode` → 5× `BiquadFilterNode` → `AnalyserNode` → `destination`
+- `ontimeupdate` from the `<audio>` element updates the `progress` signal (throttled to 10 Hz for the UI)
+- Wires `navigator.mediaSession.metadata` on track change so OS media controls display cover + title + artist
+- `EqService` wraps the BiquadFilterNode chain, exposes band gains as signals, persists preset choice
+- Blob URLs are managed with a per-track lifecycle: created when the track becomes current, revoked when it leaves the queue window
 
-### Phase 3, Home / Discover
-Hero **Carousel**, **DataView** grids for new releases and made-for-you, **Table** for top charts, **Timeline** for recently played. Skeleton loaders during simulated load.
+### Phase 4, Home + Import UI
+- Empty-state Home page with the big **FileUpload** drop zone
+- Dedicated `/import` route with the progress table
+- Populated Home view (Recently added, Recently played, Jump back in, Your top artists) rendered from `LibraryService` signals
+- Header **FileUpload** basic mode for import-from-anywhere
 
-### Phase 4, Library
-**Tabs**: Songs / Albums / Artists / Playlists. Songs Table with virtual scroll, filter bar (AutoComplete + Select + SelectButton). DataView grids for the other tabs. ContextMenu on rows. Create-playlist Dialog with Reactive form.
+### Phase 5, Library
+**Tabs**: Songs / Albums / Artists / Playlists. Songs Table with virtual scroll, filter bar (AutoComplete + Select + SelectButton). DataView grids for the other tabs. ContextMenu on rows. Create-playlist Dialog with Reactive form. Playing a track from any surface goes through PlayerService, so at the end of this phase Echo actually plays music.
 
-### Phase 5, Album + Artist detail
-Album: Splitter layout, tracklist Table with row expansion (TreeTable-style credits), SplitButton actions. Artist: hero Toolbar, Tabs (Overview / Discography / Related / About), monthly plays Chart, Timeline for milestones.
+### Phase 6, Album + Artist detail
+Album: Splitter layout, tracklist Table with row expansion (TreeTable-style credits from ID3 comment / composer / performer fields), SplitButton actions. Artist: hero Toolbar, Tabs (Overview / Discography / Related / About), monthly plays Chart derived from the `plays` store, Timeline for release years.
 
-### Phase 6, Playlist detail + Queue + drag-drop
-OrderList for playlist tracklist. Editable Inplace title + description. Add-tracks Drawer with an AutoComplete + a mini PickList. Queue standalone page + Queue Drawer from the player bar (same OrderList component in two containers).
+### Phase 7, Playlist detail + Queue + drag-drop
+OrderList for playlist tracklist. Editable Inplace title + description. Add-tracks Drawer with an AutoComplete + a mini PickList. Queue standalone page + Queue Drawer from the player bar (same OrderList component in two containers). Queue reorder reflects live in playback order.
 
-### Phase 7, Now Playing + Lyrics + Radio
-Fullscreen Now Playing route with Galleria (multi-cover), large Slider scrubber, transport, Tabs (Up next / Lyrics / Related), Terminal-style scrolling lyrics that highlight the current line based on `progress`. Radio page with MegaMenu browse + DataView of gradient stations.
+### Phase 8, Now Playing + Waveform + Browse
+Fullscreen Now Playing route with Galleria for the cover, canvas-rendered waveform scrubber drawn from the cached peaks (click a bar → seek to that timestamp), transport, Tabs (Up next / Info / Related). Info tab replaces "Lyrics" and shows the raw metadata: bit rate, sample rate, file format, file path, file size, all tag frames. Browse page with MegaMenu facets over the local library.
 
-### Phase 8, Search
-Persistent header AutoComplete opens `/search` with query. Tabs (All / Songs / Artists / Albums / Playlists / Lyrics). "Top result" featured Card + section DataViews on All tab.
+### Phase 9, Search
+Persistent header AutoComplete opens `/search` with the query pre-filled. Tabs (All / Songs / Artists / Albums / Playlists). "Top result" featured Card + section DataViews on the All tab. Search is a plain substring match over the LibraryService signals, no fuzzy library needed.
 
-### Phase 9, Settings + Command palette
-All settings Tabs (Profile / Playback / Storage / Devices / Notifications / Privacy / About). Equalizer with 5 Knobs + Chart preview + preset Select. Cmd+K palette via DynamicDialog + AutoComplete (Go to page, Search library, Play radio: X, Open settings section).
+### Phase 10, Settings + Command palette
+All settings Tabs (Profile / Playback / Library / Storage / Notifications / About). Equalizer with 5 Knobs wired live to the BiquadFilterNode gains + Chart preview of the frequency response + preset Select. Reset-library confirmation flow. Cmd+K palette via DynamicDialog + AutoComplete (Go to page, Play song / album / artist, Play random, Toggle shuffle, Import files).
 
-### Phase 10, Polish
-- Onboarding Stepper (first-run only, LocalStorage flag)
-- Empty / loading / error states everywhere
+### Phase 11, Polish
+- Onboarding: first-run modal with the drop zone + a "Choose folder" button
+- Empty / loading / error states everywhere (empty library, decode failure, quota exceeded)
 - Mobile responsive: Sidebar → TabMenu, player bar compressed, Now-Playing full-sheet
 - Accessibility sweep: Tab order, focus rings, aria-live for track changes, screen-reader smoke test (per `accessibility.md`)
 - Dark mode / light mode pass on every page
 - Keyboard shortcut cheat sheet (`?` opens a **Dialog** with all bindings)
+- PWA manifest + service worker (installable, offline shell, but audio decode still needs the tab open)
 
 ## Definition of done
 
@@ -322,10 +370,12 @@ For every PrimeNG component used:
 Don't paper over skill bugs in the app. The app is the test.
 
 Extra validation this app provides beyond Quanta Desk:
-- **Slider** used continuously (scrubber updates 10x/sec, volume Slider bound to a signal, Crossfade Slider in settings). Quanta Desk only used Slider as a filter widget.
-- **OrderList / PickList** as first-class editing surfaces, not just settings toys.
-- **Galleria** and **Carousel** as content-forward hero surfaces on Now-Playing and Home, not as one-off examples.
-- **Terminal** in a real user-facing role (synced lyrics), not just a diagnostics page.
+- **Slider** used continuously (scrubber updates 10x/sec from real `<audio>.currentTime`, volume Slider wired to a Web Audio `GainNode`, Crossfade Slider in settings). Quanta Desk only used Slider as a filter widget.
+- **Knob** wired live to a real `BiquadFilterNode.gain` (five bands), not just a static risk-score visualizer.
+- **OrderList / PickList** as first-class editing surfaces that mutate real playback order, not settings toys.
+- **Galleria** showing real cover art extracted from ID3 APIC frames at import time.
+- **FileUpload** driving a real client-side import pipeline (parse tags → decode PCM → downsample peaks → write to IndexedDB), not just a display prop.
+- **Table** with virtual scroll against a real IndexedDB-backed dataset that grows as the user imports files.
 
 ## Next session: where to start
 

@@ -1,36 +1,47 @@
 # Echo
 
-A reference Angular application that validates the [`primeng-developer`](../../skills/primeng-developer) skill. Echo is a music player and library for a fictional streaming service, browse albums / artists / playlists, drag-drop the queue, tune the equalizer, scrub through a track with a waveform view, all wrapped in a persistent player shell.
+A reference Angular application that validates the [`primeng-developer`](../../skills/primeng-developer) skill. Echo is a real, local-first music player: drop MP3 / FLAC / WAV / OGG / M4A files onto it and they're imported, tag-parsed, decoded, waveform-analysed, and stored in IndexedDB. Click a track and it plays through a real Web Audio graph with a 5-band EQ. Browse the library by album / artist / playlist, drag-drop to build queues, scrub through a real canvas-rendered waveform, all wrapped in a persistent player shell.
 
 **Status:** Plan only. Not yet scaffolded. See [PLAN.md](./PLAN.md).
 
-The point of this app is not the app itself, it's that building it proves the skill is correct **on a shape Quanta Desk did not cover**. Quanta Desk validates dense-data-table PrimeNG (finance chrome, TreeTable, Editor). Echo validates media / entertainment PrimeNG: continuous controls (Slider as scrubber and volume, Knob as EQ), drag-driven reordering (OrderList and PickList as primary editing surfaces), rich cover-art surfaces (DataView, Galleria, Carousel), and a persistent player bar that lives across every route.
+The point of this app is not the app itself, it's that building it proves the skill is correct **on a shape Quanta Desk did not cover**. Quanta Desk validates dense-data-table PrimeNG (finance chrome, TreeTable, Editor). Echo validates media / entertainment PrimeNG under real load: **Slider** as an audio scrubber updated 10x/sec from the actual `<audio>.currentTime`, **Knob** wired live to real `BiquadFilterNode` gains, **OrderList** and **PickList** as primary drag-drop editing surfaces that mutate real playback order, **Galleria** showing real cover art extracted from ID3 APIC frames, **FileUpload** driving a real client-side import pipeline (parse tags → decode PCM → downsample peaks → write to IndexedDB).
 
 ## Stack
+
+### UI
 
 - **Angular v22+** with standalone components, signals, control flow syntax, zoneless
 - **PrimeNG v21** with `@primeuix/themes` (Aura preset, customized to a dark-first violet palette) + `@primeuix/styles`
 - **Tailwind v4** with `tailwindcss-primeui`
 - **PrimeIcons** + `@ng-icons/lucide` for transport glyphs
-- **Chart.js** for the equalizer preview and listening-history bars
-- **[ngx-transforms](https://www.npmjs.com/package/ngx-transforms)** for `| initials`, `| timeAgo`, `| truncate`
+- **Chart.js** for the EQ frequency-response preview and listening-history bars
+- **[ngx-transforms](https://www.npmjs.com/package/ngx-transforms)** for `| initials`, `| timeAgo`, `| truncate`, `| duration`
 - **Reactive forms** for search, playlist create, settings
-- **PlayerService** in signals as the single source of truth for playback state
+
+### Audio + storage
+
+- **HTMLAudioElement** → **Web Audio graph**: `MediaElementSource → GainNode → 5× BiquadFilterNode (60 Hz / 250 Hz / 1 kHz / 4 kHz / 12 kHz) → AnalyserNode → destination`
+- **[`music-metadata-browser`](https://www.npmjs.com/package/music-metadata-browser)** for ID3 / Vorbis / MP4 / FLAC tag extraction at import
+- **[`idb`](https://www.npmjs.com/package/idb)** for IndexedDB (tracks / blobs / covers / playlists / plays / settings stores)
+- **OfflineAudioContext** for one-time waveform-peak generation per track (cached)
+- **File System Access API** (progressively enhanced), drag-drop or `<input type="file">` as fallback
+- **Media Session API** for OS-level media controls
 
 ## Pages
 
 | Route | What it exercises |
 |---|---|
-| `/` (Home) | Carousel of featured playlists, DataView grids, Timeline of recently played, top charts Table |
-| `/library` | Tabs (Songs / Albums / Artists / Playlists), virtual-scroll Table, ContextMenu, bulk Toolbar |
+| `/` (Home) | Empty-state FileUpload drop zone (first run), then DataView / Carousel / Timeline of the imported library |
+| `/import` | Full-height FileUpload + progress Table (filename, parsed metadata as it lands, per-file ProgressBar, status Tag) |
+| `/library` | Tabs (Songs / Albums / Artists / Playlists), virtual-scroll Table against IndexedDB, ContextMenu, bulk Toolbar |
 | `/album/:id` | Splitter (cover ⇆ tracklist), TreeTable credits expansion, Rating, SplitButton actions |
-| `/artist/:id` | Tabs, monthly plays Chart, Timeline of milestones, DataView discography |
+| `/artist/:id` | Tabs, monthly plays Chart from the `plays` store, Timeline of release years, DataView discography |
 | `/playlist/:id` | OrderList drag-drop tracklist, Inplace title/description, add-tracks Drawer with PickList |
-| `/now-playing` | Galleria multi-cover, big Slider scrubber, Terminal-style scrolling lyrics, Tabs |
-| `/queue` | OrderList queue editor with sections (Now Playing / Next Up / Auto-Queue) |
-| `/radio` | MegaMenu browse (Genre / Mood / Decade / Activity), DataView of gradient stations |
-| `/search` | AutoComplete-driven, Tabs, mixed DataView with "Top result" featured Card |
-| `/settings` | 7 tabs including a 5-Knob equalizer, MeterGroup storage, ConfirmDialog per-device sign-out |
+| `/now-playing` | Galleria for the cover, canvas waveform scrubber drawn from cached peaks, transport, Info Tabs |
+| `/queue` | OrderList queue editor (Now Playing / Next Up / Auto-Queue sections) |
+| `/browse` | MegaMenu facets (Genre / Decade / Year / Format / Bit rate) over the local library |
+| `/search` | AutoComplete-driven substring search over LibraryService signals, Tabs, "Top result" featured Card |
+| `/settings` | 6 tabs including live-wired 5-Knob EQ, real `navigator.storage.estimate()` MeterGroup, watched-folder Table |
 
 ## Player shell
 
@@ -57,4 +68,4 @@ The skill ships green when this app builds and looks right. When PrimeNG release
 4. Fix the affected reference file in [`skills/primeng-developer/references/`](../../skills/primeng-developer/references)
 5. Re-run the build, when it's clean, the skill is back in sync
 
-Quanta Desk covers PrimeNG's dense-data half. Echo covers the continuous-controls + media half. Together they exhaust the skill's coverage map.
+Quanta Desk covers PrimeNG's dense-data half. Echo covers the continuous-controls + media half, and unlike Quanta Desk it plays real audio, so any component whose behaviour depends on continuous state (Slider, Knob, ProgressBar) gets stressed against real timing, not a mocked timer.
