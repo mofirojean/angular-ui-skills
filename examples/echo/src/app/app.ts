@@ -1,26 +1,26 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { Button } from 'primeng/button';
+import { Component } from '@angular/core';
+import { Toast } from 'primeng/toast';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { Shell } from './shell/shell';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Button],
-  templateUrl: './app.html',
-  styleUrl: './app.css',
-  host: {
-    class: 'block min-h-screen',
-  },
+  imports: [Shell, Toast, ConfirmDialog],
+  template: `
+    <echo-shell (themeToggled)="toggleTheme()" />
+    <p-toast position="bottom-right" />
+    <p-confirmdialog />
+  `,
 })
 export class App {
-  protected readonly title = signal('Echo');
-  protected readonly isDark = signal(true);
+  private isDark = true;
 
   constructor() {
-    document.documentElement.classList.toggle('dark', this.isDark());
+    document.documentElement.classList.toggle('dark', this.isDark);
   }
 
   toggleTheme() {
-    this.isDark.update((v) => !v);
-    document.documentElement.classList.toggle('dark', this.isDark());
+    this.isDark = !this.isDark;
+    document.documentElement.classList.toggle('dark', this.isDark);
   }
 }

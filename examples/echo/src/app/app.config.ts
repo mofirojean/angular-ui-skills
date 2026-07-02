@@ -3,8 +3,9 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { providePrimeNG } from 'primeng/config';
+import { MessageService, ConfirmationService } from 'primeng/api';
 
 import { routes } from './app.routes';
 import EchoPreset from './theme/echo-preset';
@@ -13,7 +14,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideRouter(routes),
+    provideRouter(routes, withComponentInputBinding()),
     providePrimeNG({
       theme: {
         preset: EchoPreset,
@@ -27,5 +28,7 @@ export const appConfig: ApplicationConfig = {
       },
       ripple: true,
     }),
+    MessageService,
+    ConfirmationService,
   ],
 };
