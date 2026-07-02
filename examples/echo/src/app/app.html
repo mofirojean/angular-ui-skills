@@ -1,0 +1,22 @@
+<main class="flex min-h-screen flex-col items-center justify-center gap-8 px-6">
+  <div class="flex flex-col items-center gap-3 text-center">
+    <span class="text-xs font-medium uppercase tracking-[0.24em] text-[var(--p-primary-400)]">
+      Phase 0 · foundation
+    </span>
+    <h1 class="text-5xl font-semibold tracking-tight text-[var(--p-surface-0)]">
+      {{ title() }}
+    </h1>
+    <p class="max-w-md text-sm leading-relaxed text-[var(--p-surface-300)]">
+      A real, local-first music player validating the primeng-developer skill. Drop audio files in and
+      they'll be imported, decoded, and played through a Web Audio graph. Nothing wired yet, this is
+      just the themed shell.
+    </p>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <p-button label="Play something" icon="pi pi-play" />
+    <p-button label="Toggle theme" icon="pi pi-moon" severity="secondary" (onClick)="toggleTheme()" />
+  </div>
+
+  <router-outlet />
+</main>
