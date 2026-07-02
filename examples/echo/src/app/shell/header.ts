@@ -14,7 +14,7 @@ import { MenuItem } from 'primeng/api';
   imports: [Button, IconField, InputIcon, InputText, Avatar, Menu, RouterLink],
   host: {
     class:
-      'flex h-14 items-center gap-3 border-b border-[var(--p-surface-800)] bg-[var(--p-surface-950)] px-4',
+      'flex h-14 items-center gap-3 border-b border-[var(--echo-border)] bg-[var(--echo-chrome-bg)] px-4',
   },
   template: `
     <div class="hidden items-center gap-1 md:flex">
@@ -84,7 +84,7 @@ import { MenuItem } from 'primeng/api';
 
     <button
       type="button"
-      class="ml-1 flex items-center gap-2 rounded-full p-1 transition hover:bg-[var(--p-surface-800)] md:pr-3"
+      class="ml-1 flex items-center gap-2 rounded-full p-1 transition hover:bg-[var(--echo-hover)] md:pr-3"
       (click)="menu.toggle($event)"
     >
       <p-avatar
@@ -92,7 +92,7 @@ import { MenuItem } from 'primeng/api';
         shape="circle"
         [style]="{ 'background-color': 'var(--p-primary-500)', color: 'white' }"
       />
-      <span class="hidden text-sm text-[var(--p-surface-200)] md:inline">You</span>
+      <span class="hidden text-sm text-[var(--echo-text)] md:inline">You</span>
     </button>
 
     <p-menu #menu [model]="userMenu" [popup]="true" appendTo="body" />

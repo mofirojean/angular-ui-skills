@@ -6,16 +6,38 @@
 
 @layer theme, base, primeng, utilities;
 
+:root {
+  --echo-bg: var(--p-surface-50);
+  --echo-chrome-bg: var(--p-surface-0);
+  --echo-border: var(--p-surface-200);
+  --echo-heading: var(--p-surface-950);
+  --echo-text: var(--p-surface-700);
+  --echo-muted: var(--p-surface-500);
+  --echo-hover: var(--p-surface-100);
+  --echo-tile: var(--p-surface-100);
+  --echo-accent: var(--p-primary-600);
+  color-scheme: light;
+}
+
+html.dark {
+  --echo-bg: var(--p-surface-950);
+  --echo-chrome-bg: var(--p-surface-950);
+  --echo-border: var(--p-surface-800);
+  --echo-heading: var(--p-surface-0);
+  --echo-text: var(--p-surface-200);
+  --echo-muted: var(--p-surface-400);
+  --echo-hover: var(--p-surface-800);
+  --echo-tile: var(--p-surface-800);
+  --echo-accent: var(--p-primary-400);
+  color-scheme: dark;
+}
+
 html,
 body {
   height: 100%;
   margin: 0;
   font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
     'Helvetica Neue', Arial, sans-serif;
-  background: var(--p-surface-950);
-  color: var(--p-surface-100);
-}
-
-html.dark {
-  color-scheme: dark;
+  background: var(--echo-bg);
+  color: var(--echo-text);
 }

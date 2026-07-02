@@ -14,7 +14,7 @@ interface NavItem {
   imports: [RouterLink, RouterLinkActive, Button],
   host: {
     class:
-      'hidden h-full w-60 shrink-0 flex-col border-r border-[var(--p-surface-800)] bg-[var(--p-surface-950)] md:flex',
+      'hidden h-full w-60 shrink-0 flex-col border-r border-[var(--echo-border)] bg-[var(--echo-chrome-bg)] md:flex',
   },
   template: `
     <div class="flex items-center gap-2 px-5 pt-5 pb-4">
@@ -23,7 +23,7 @@ interface NavItem {
       >
         <i class="pi pi-wave-pulse text-sm"></i>
       </span>
-      <span class="text-lg font-semibold tracking-tight text-[var(--p-surface-0)]">Echo</span>
+      <span class="text-lg font-semibold tracking-tight text-[var(--echo-heading)]">Echo</span>
     </div>
 
     <nav class="flex flex-col gap-0.5 px-3">
@@ -40,7 +40,7 @@ interface NavItem {
       }
     </nav>
 
-    <div class="mx-5 my-3 h-px bg-[var(--p-surface-800)]"></div>
+    <div class="mx-5 my-3 h-px bg-[var(--echo-border)]"></div>
 
     <nav class="flex flex-col gap-0.5 px-3">
       @for (item of listening; track item.path) {
@@ -55,10 +55,10 @@ interface NavItem {
       }
     </nav>
 
-    <div class="mx-5 my-3 h-px bg-[var(--p-surface-800)]"></div>
+    <div class="mx-5 my-3 h-px bg-[var(--echo-border)]"></div>
 
     <div class="flex items-center justify-between px-5 pb-2">
-      <span class="text-xs font-medium uppercase tracking-[0.2em] text-[var(--p-surface-500)]">
+      <span class="text-xs font-medium uppercase tracking-[0.2em] text-[var(--echo-muted)]">
         Playlists
       </span>
       <p-button
@@ -72,12 +72,12 @@ interface NavItem {
     </div>
 
     <div class="flex-1 overflow-y-auto px-5 pb-4">
-      <p class="mt-2 text-xs leading-relaxed text-[var(--p-surface-500)]">
+      <p class="mt-2 text-xs leading-relaxed text-[var(--echo-muted)]">
         No playlists yet. Import some tracks and build your first one.
       </p>
     </div>
 
-    <div class="border-t border-[var(--p-surface-800)] px-3 py-3">
+    <div class="border-t border-[var(--echo-border)] px-3 py-3">
       <a routerLink="/settings" routerLinkActive="nav-active" class="nav-item">
         <i class="pi pi-cog nav-icon"></i>
         <span>Settings</span>
@@ -94,17 +94,17 @@ interface NavItem {
         border-radius: 6px;
         font-size: 0.875rem;
         line-height: 1;
-        color: var(--p-surface-300);
+        color: var(--echo-text);
         text-decoration: none;
         transition: background-color 120ms ease, color 120ms ease;
       }
       :host ::ng-deep .nav-item:hover {
-        background: var(--p-surface-800);
-        color: var(--p-surface-0);
+        background: var(--echo-hover);
+        color: var(--echo-heading);
       }
       :host ::ng-deep .nav-item.nav-active {
         background: color-mix(in oklab, var(--p-primary-500) 12%, transparent);
-        color: var(--p-primary-300);
+        color: var(--echo-accent);
       }
       :host ::ng-deep .nav-icon {
         font-size: 0.95rem;

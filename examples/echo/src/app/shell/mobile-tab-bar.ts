@@ -13,7 +13,7 @@ interface Tab {
   imports: [RouterLink, RouterLinkActive],
   host: {
     class:
-      'flex h-16 shrink-0 items-stretch border-t border-[var(--p-surface-800)] bg-[var(--p-surface-950)] md:hidden',
+      'flex h-16 shrink-0 items-stretch border-t border-[var(--echo-border)] bg-[var(--echo-chrome-bg)] md:hidden',
     style: 'padding-bottom: env(safe-area-inset-bottom, 0px);',
   },
   template: `
@@ -38,15 +38,15 @@ interface Tab {
         align-items: center;
         justify-content: center;
         gap: 0.2rem;
-        color: var(--p-surface-400);
+        color: var(--echo-muted);
         text-decoration: none;
         transition: color 120ms ease;
       }
       :host ::ng-deep .tab-item.tab-active {
-        color: var(--p-primary-400);
+        color: var(--echo-accent);
       }
       :host ::ng-deep .tab-item:active {
-        background: var(--p-surface-800);
+        background: var(--echo-hover);
       }
     `,
   ],

@@ -4,14 +4,14 @@ import { Component, input } from '@angular/core';
   selector: 'echo-page-placeholder',
   template: `
     <section class="flex h-full flex-col items-start justify-start px-10 pt-10 pb-16">
-      <span class="text-xs font-medium uppercase tracking-[0.24em] text-[var(--p-primary-400)]">
+      <span class="text-xs font-medium uppercase tracking-[0.24em] text-[var(--echo-accent)]">
         Phase {{ phase() }} · {{ label() }}
       </span>
-      <h1 class="mt-2 text-4xl font-semibold tracking-tight text-[var(--p-surface-0)]">
+      <h1 class="mt-2 text-4xl font-semibold tracking-tight text-[var(--echo-heading)]">
         {{ title() }}
       </h1>
       @if (subtitle()) {
-        <p class="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--p-surface-300)]">
+        <p class="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--echo-text)]">
           {{ subtitle() }}
         </p>
       }

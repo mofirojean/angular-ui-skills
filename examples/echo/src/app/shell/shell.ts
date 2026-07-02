@@ -9,7 +9,7 @@ import { MobileTabBar } from './mobile-tab-bar';
   selector: 'echo-shell',
   imports: [RouterOutlet, Sidebar, Header, PlayerBar, MobileTabBar],
   host: {
-    class: 'flex h-[100dvh] w-screen flex-col bg-[var(--p-surface-950)]',
+    class: 'flex h-[100dvh] w-screen flex-col bg-[var(--echo-bg)]',
   },
   template: `
     <div class="flex flex-1 overflow-hidden">

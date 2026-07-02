@@ -9,21 +9,21 @@ import { Slider } from 'primeng/slider';
   imports: [FormsModule, RouterLink, Button, Slider],
   host: {
     class:
-      'shrink-0 border-t border-[var(--p-surface-800)] bg-[var(--p-surface-950)]',
+      'shrink-0 border-t border-[var(--echo-border)] bg-[var(--echo-chrome-bg)]',
   },
   template: `
     <div class="flex h-14 items-center gap-3 px-3 md:hidden">
       <a routerLink="/now-playing" class="flex min-w-0 flex-1 items-center gap-2">
         <div
-          class="grid h-10 w-10 shrink-0 place-items-center rounded bg-[var(--p-surface-800)] text-[var(--p-surface-500)]"
+          class="grid h-10 w-10 shrink-0 place-items-center rounded bg-[var(--echo-tile)] text-[var(--echo-muted)]"
         >
           <i class="pi pi-image text-sm"></i>
         </div>
         <div class="min-w-0 flex-1">
-          <div class="truncate text-sm font-medium text-[var(--p-surface-100)]">
+          <div class="truncate text-sm font-medium text-[var(--echo-heading)]">
             Nothing playing
           </div>
-          <div class="truncate text-xs text-[var(--p-surface-400)]">
+          <div class="truncate text-xs text-[var(--echo-muted)]">
             Tap to open
           </div>
         </div>
@@ -47,15 +47,15 @@ import { Slider } from 'primeng/slider';
     <div class="hidden h-20 items-center gap-6 px-4 md:flex">
       <a routerLink="/now-playing" class="flex min-w-0 flex-1 items-center gap-3">
         <div
-          class="grid h-14 w-14 shrink-0 place-items-center rounded-md bg-[var(--p-surface-800)] text-[var(--p-surface-500)]"
+          class="grid h-14 w-14 shrink-0 place-items-center rounded-md bg-[var(--echo-tile)] text-[var(--echo-muted)]"
         >
           <i class="pi pi-image"></i>
         </div>
         <div class="min-w-0 flex-1">
-          <div class="truncate text-sm font-medium text-[var(--p-surface-100)]">
+          <div class="truncate text-sm font-medium text-[var(--echo-heading)]">
             Nothing playing
           </div>
-          <div class="truncate text-xs text-[var(--p-surface-400)]">
+          <div class="truncate text-xs text-[var(--echo-muted)]">
             Import a track to get started
           </div>
         </div>
@@ -114,7 +114,7 @@ import { Slider } from 'primeng/slider';
         </div>
 
         <div class="flex w-full max-w-xl items-center gap-3">
-          <span class="w-10 text-right text-xs tabular-nums text-[var(--p-surface-400)]">
+          <span class="w-10 text-right text-xs tabular-nums text-[var(--echo-muted)]">
             0:00
           </span>
           <p-slider
@@ -124,7 +124,7 @@ import { Slider } from 'primeng/slider';
             [min]="0"
             [max]="100"
           />
-          <span class="w-10 text-xs tabular-nums text-[var(--p-surface-400)]">0:00</span>
+          <span class="w-10 text-xs tabular-nums text-[var(--echo-muted)]">0:00</span>
         </div>
       </div>
 
@@ -139,7 +139,7 @@ import { Slider } from 'primeng/slider';
           routerLink="/queue"
         />
         <div class="flex items-center gap-2 pl-2">
-          <i class="pi pi-volume-up text-[var(--p-surface-400)]"></i>
+          <i class="pi pi-volume-up text-[var(--echo-muted)]"></i>
           <p-slider
             class="w-24"
             [ngModel]="volume()"
