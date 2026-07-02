@@ -14,7 +14,7 @@ interface NavItem {
   imports: [RouterLink, RouterLinkActive, Button],
   host: {
     class:
-      'flex h-full w-60 shrink-0 flex-col border-r border-[var(--p-surface-800)] bg-[var(--p-surface-950)]',
+      'hidden h-full w-60 shrink-0 flex-col border-r border-[var(--p-surface-800)] bg-[var(--p-surface-950)] md:flex',
   },
   template: `
     <div class="flex items-center gap-2 px-5 pt-5 pb-4">

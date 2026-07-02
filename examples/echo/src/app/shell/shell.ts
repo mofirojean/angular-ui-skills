@@ -3,12 +3,13 @@ import { RouterOutlet } from '@angular/router';
 import { Sidebar } from './sidebar';
 import { Header } from './header';
 import { PlayerBar } from './player-bar';
+import { MobileTabBar } from './mobile-tab-bar';
 
 @Component({
   selector: 'echo-shell',
-  imports: [RouterOutlet, Sidebar, Header, PlayerBar],
+  imports: [RouterOutlet, Sidebar, Header, PlayerBar, MobileTabBar],
   host: {
-    class: 'flex h-screen w-screen flex-col bg-[var(--p-surface-950)]',
+    class: 'flex h-[100dvh] w-screen flex-col bg-[var(--p-surface-950)]',
   },
   template: `
     <div class="flex flex-1 overflow-hidden">
@@ -21,6 +22,7 @@ import { PlayerBar } from './player-bar';
       </div>
     </div>
     <echo-player-bar />
+    <echo-mobile-tab-bar />
   `,
 })
 export class Shell {

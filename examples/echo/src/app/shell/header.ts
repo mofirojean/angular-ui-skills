@@ -1,6 +1,6 @@
 import { Component, inject, output } from '@angular/core';
 import { Location } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
@@ -11,13 +11,13 @@ import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'echo-header',
-  imports: [Button, IconField, InputIcon, InputText, Avatar, Menu],
+  imports: [Button, IconField, InputIcon, InputText, Avatar, Menu, RouterLink],
   host: {
     class:
       'flex h-14 items-center gap-3 border-b border-[var(--p-surface-800)] bg-[var(--p-surface-950)] px-4',
   },
   template: `
-    <div class="flex items-center gap-1">
+    <div class="hidden items-center gap-1 md:flex">
       <p-button
         icon="pi pi-chevron-left"
         [rounded]="true"
@@ -38,7 +38,19 @@ import { MenuItem } from 'primeng/api';
       />
     </div>
 
-    <div class="mx-auto flex w-full max-w-md items-center">
+    <a
+      routerLink="/"
+      class="flex items-center gap-2 md:hidden"
+      aria-label="Home"
+    >
+      <span
+        class="grid h-8 w-8 place-items-center rounded-md bg-[var(--p-primary-500)] text-[var(--p-primary-contrast-color)]"
+      >
+        <i class="pi pi-wave-pulse text-sm"></i>
+      </span>
+    </a>
+
+    <div class="flex flex-1 items-center md:mx-auto md:max-w-md">
       <p-iconfield class="w-full">
         <p-inputicon class="pi pi-search" />
         <input
@@ -72,7 +84,7 @@ import { MenuItem } from 'primeng/api';
 
     <button
       type="button"
-      class="ml-1 flex items-center gap-2 rounded-full p-1 pr-3 transition hover:bg-[var(--p-surface-800)]"
+      class="ml-1 flex items-center gap-2 rounded-full p-1 transition hover:bg-[var(--p-surface-800)] md:pr-3"
       (click)="menu.toggle($event)"
     >
       <p-avatar
@@ -80,7 +92,7 @@ import { MenuItem } from 'primeng/api';
         shape="circle"
         [style]="{ 'background-color': 'var(--p-primary-500)', color: 'white' }"
       />
-      <span class="text-sm text-[var(--p-surface-200)]">You</span>
+      <span class="hidden text-sm text-[var(--p-surface-200)] md:inline">You</span>
     </button>
 
     <p-menu #menu [model]="userMenu" [popup]="true" appendTo="body" />
