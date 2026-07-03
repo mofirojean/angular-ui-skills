@@ -53,6 +53,19 @@ export class LibraryService {
     );
   });
 
+  readonly recentAlbums = computed<AlbumSummary[]>(() => {
+    const tracks = this._tracks();
+    const latestByKey = new Map<string, number>();
+    for (const t of tracks) {
+      const key = `${t.albumArtist}::${t.album}`;
+      const current = latestByKey.get(key) ?? 0;
+      if (t.addedAt > current) latestByKey.set(key, t.addedAt);
+    }
+    return [...this.albums()].sort(
+      (a, b) => (latestByKey.get(b.key) ?? 0) - (latestByKey.get(a.key) ?? 0),
+    );
+  });
+
   readonly artists = computed<ArtistSummary[]>(() => {
     const byName = new Map<string, ArtistSummary>();
     for (const track of this._tracks()) {

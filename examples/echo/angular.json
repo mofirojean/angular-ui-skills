@@ -56,7 +56,10 @@
             "allowedCommonJsDependencies": [
               "debug",
               "ieee754",
-              "content-type"
+              "content-type",
+              "jsbarcode",
+              "js-md5",
+              "qrcode"
             ]
           },
           "configurations": {

@@ -114,6 +114,11 @@ export class ImportService {
     this._entries.set(new Map());
   }
 
+  remove(id: string): void {
+    const next = new Map(this._entries());
+    if (next.delete(id)) this._entries.set(next);
+  }
+
   private patch(id: string, patch: Partial<ImportEntry>): void {
     const next = new Map(this._entries());
     const current = next.get(id);

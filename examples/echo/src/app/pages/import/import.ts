@@ -1,64 +1,79 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { Button } from 'primeng/button';
 import { ProgressBar } from 'primeng/progressbar';
 import { Tag } from 'primeng/tag';
 import { TableModule } from 'primeng/table';
+import { FileUpload, type FileUploadHandlerEvent } from 'primeng/fileupload';
 import { MessageService } from 'primeng/api';
 import { PlayerService } from '../../audio/player.service';
 import { ImportService } from '../../data/import.service';
 import { LibraryService } from '../../data/library.service';
+import {
+  pickAudioDirectory,
+  supportsDirectoryPicker,
+} from '../../data/pick-files';
 import type { ImportEntry, ImportStatus } from '../../data/types';
 
 @Component({
   selector: 'echo-import',
-  imports: [Button, ProgressBar, Tag, TableModule],
+  imports: [Button, ProgressBar, Tag, TableModule, FileUpload],
   template: `
     <section class="flex h-full flex-col gap-6 px-6 py-8 md:px-10">
       <header class="flex flex-col gap-2">
         <span
           class="text-xs font-medium uppercase tracking-[0.24em] text-[var(--echo-accent)]"
         >
-          Phase 2 · pipeline test
+          Import
         </span>
         <h1
           class="text-3xl font-semibold tracking-tight text-[var(--echo-heading)]"
         >
-          Import files
+          Add music to your library
         </h1>
         <p class="max-w-2xl text-sm text-[var(--echo-text)]">
-          Drop MP3, FLAC, WAV, OGG, or M4A files here. Echo parses tags, decodes
-          PCM to compute waveform peaks, and stores everything in IndexedDB.
-          This is a Phase 2 test surface, the finished Import UI lands in Phase 4.
+          Drop MP3, FLAC, WAV, OGG, M4A, or AAC files here. Echo parses tags,
+          decodes PCM to compute waveform peaks, and stores everything locally
+          in IndexedDB. Concurrency is capped at three.
         </p>
       </header>
 
-      <button
-        type="button"
-        class="drop-zone"
-        [class.drop-zone--active]="isDragOver()"
-        (click)="filePicker.click()"
-        (dragenter)="onDragEnter($event)"
-        (dragover)="onDragOver($event)"
-        (dragleave)="onDragLeave($event)"
-        (drop)="onDrop($event)"
-      >
-        <i class="pi pi-cloud-upload text-4xl text-[var(--echo-accent)]"></i>
-        <div class="mt-3 text-base font-medium text-[var(--echo-heading)]">
-          Drop audio files here
-        </div>
-        <div class="mt-1 text-sm text-[var(--echo-muted)]">
-          or click to browse. Concurrent processing capped at 3.
-        </div>
-      </button>
-
-      <input
-        #filePicker
-        type="file"
-        accept="audio/*,.flac,.mp3,.wav,.ogg,.m4a"
-        multiple
-        class="hidden"
-        (change)="onFilesPicked($event)"
-      />
+      <div class="flex flex-col gap-3">
+        <p-fileUpload
+          #uploader
+          mode="advanced"
+          [auto]="true"
+          [multiple]="true"
+          accept="audio/*,.flac,.mp3,.wav,.ogg,.m4a,.aac"
+          [customUpload]="true"
+          [showUploadButton]="false"
+          [showCancelButton]="false"
+          chooseLabel="Choose files"
+          chooseIcon="pi pi-cloud-upload"
+          (uploadHandler)="onUploadHandler($event, uploader)"
+          styleClass="echo-import-upload"
+        >
+          <ng-template pTemplate="content">
+            <div class="drop-inner">
+              <i class="pi pi-cloud-upload text-3xl text-[var(--echo-accent)]"></i>
+              <div class="mt-2 text-sm text-[var(--echo-muted)]">
+                Or drag files into this area.
+              </div>
+            </div>
+          </ng-template>
+        </p-fileUpload>
+        @if (canPickFolder) {
+          <div>
+            <p-button
+              label="Choose folder"
+              icon="pi pi-folder-open"
+              severity="secondary"
+              [outlined]="true"
+              size="small"
+              (onClick)="onPickFolder()"
+            />
+          </div>
+        }
+      </div>
 
       <div class="flex flex-wrap items-center gap-3">
         <span class="pill">
@@ -73,7 +88,7 @@ import type { ImportEntry, ImportStatus } from '../../data/types';
         <span class="pill pill--err">
           Failed <strong>{{ counts().failed }}</strong>
         </span>
-        <div class="ml-auto flex gap-2">
+        <div class="ml-auto flex flex-wrap gap-2">
           <p-button
             label="Play imported"
             icon="pi pi-play"
@@ -113,11 +128,12 @@ import type { ImportEntry, ImportStatus } from '../../data/types';
         >
           <ng-template pTemplate="header">
             <tr>
-              <th style="width: 30%">File</th>
+              <th style="width: 28%">File</th>
               <th style="width: 25%">Detected</th>
               <th style="width: 10%">Size</th>
-              <th style="width: 20%">Progress</th>
-              <th style="width: 15%">Status</th>
+              <th style="width: 22%">Progress</th>
+              <th style="width: 10%">Status</th>
+              <th style="width: 5%" class="text-right">Actions</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-entry>
@@ -162,6 +178,18 @@ import type { ImportEntry, ImportStatus } from '../../data/types';
                   [severity]="statusSeverity(entry.status)"
                 />
               </td>
+              <td class="text-right">
+                <p-button
+                  icon="pi pi-times"
+                  [rounded]="true"
+                  severity="secondary"
+                  [text]="true"
+                  size="small"
+                  ariaLabel="Remove"
+                  [disabled]="isEntryInFlight(entry.status)"
+                  (onClick)="onRemove(entry.id)"
+                />
+              </td>
             </tr>
           </ng-template>
         </p-table>
@@ -179,24 +207,30 @@ import type { ImportEntry, ImportStatus } from '../../data/types';
       :host {
         display: block;
         height: 100%;
+        overflow-y: auto;
       }
-      .drop-zone {
+      :host ::ng-deep .echo-import-upload.p-fileupload {
+        background: transparent;
+        border: 2px dashed var(--echo-border);
+        border-radius: 12px;
+        padding: 0.75rem;
+      }
+      :host ::ng-deep .echo-import-upload .p-fileupload-header {
+        background: transparent;
+        border: none;
+        padding-bottom: 0;
+      }
+      :host ::ng-deep .echo-import-upload .p-fileupload-content {
+        background: transparent;
+        border: none;
+        padding: 0.75rem 0;
+      }
+      .drop-inner {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        min-height: 180px;
-        border: 2px dashed var(--echo-border);
-        border-radius: 12px;
-        background: var(--echo-chrome-bg);
-        color: inherit;
-        cursor: pointer;
-        transition: border-color 120ms ease, background 120ms ease;
-      }
-      .drop-zone:hover,
-      .drop-zone--active {
-        border-color: var(--echo-accent);
-        background: var(--echo-hover);
+        padding: 0.75rem;
       }
       .pill {
         display: inline-flex;
@@ -237,7 +271,7 @@ export class Import {
   protected readonly entries = this.importer.entries;
   protected readonly counts = this.importer.counts;
   protected readonly running = this.importer.running;
-  protected readonly isDragOver = signal(false);
+  protected readonly canPickFolder = supportsDirectoryPicker();
   protected readonly canPlay = computed(
     () => !this.running() && this.doneTrackIds().length > 0,
   );
@@ -249,47 +283,47 @@ export class Import {
       .reverse(),
   );
 
-  onDragEnter(event: DragEvent): void {
-    event.preventDefault();
-    this.isDragOver.set(true);
+  async onUploadHandler(
+    event: FileUploadHandlerEvent,
+    uploader: FileUpload,
+  ): Promise<void> {
+    const files = event.files as File[];
+    uploader.clear();
+    if (!files.length) return;
+    await this.dispatch(files);
   }
 
-  onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    if (event.dataTransfer) event.dataTransfer.dropEffect = 'copy';
-    this.isDragOver.set(true);
-  }
-
-  onDragLeave(event: DragEvent): void {
-    event.preventDefault();
-    this.isDragOver.set(false);
-  }
-
-  async onDrop(event: DragEvent): Promise<void> {
-    event.preventDefault();
-    this.isDragOver.set(false);
-    const files = Array.from(event.dataTransfer?.files ?? []).filter(this.isAudioLike);
-    if (files.length === 0) {
+  async onPickFolder(): Promise<void> {
+    try {
+      const files = await pickAudioDirectory();
+      if (!files || files.length === 0) {
+        this.messages.add({
+          severity: 'info',
+          summary: 'No audio found',
+          detail: 'The selected folder had no audio files.',
+        });
+        return;
+      }
+      await this.dispatch(files);
+    } catch (err) {
       this.messages.add({
-        severity: 'warn',
-        summary: 'No audio files',
-        detail: 'Drop MP3, FLAC, WAV, OGG, or M4A files.',
+        severity: 'error',
+        summary: 'Folder pick failed',
+        detail: err instanceof Error ? err.message : String(err),
       });
-      return;
     }
-    await this.dispatch(files);
-  }
-
-  async onFilesPicked(event: Event): Promise<void> {
-    const input = event.target as HTMLInputElement;
-    const files = Array.from(input.files ?? []);
-    input.value = '';
-    if (files.length === 0) return;
-    await this.dispatch(files);
   }
 
   onCancel(): void {
     this.importer.cancel();
+  }
+
+  onClearFinished(): void {
+    this.importer.clearFinished();
+  }
+
+  onRemove(id: string): void {
+    this.importer.remove(id);
   }
 
   async onPlayImported(): Promise<void> {
@@ -315,10 +349,6 @@ export class Import {
         detail: err instanceof Error ? err.message : String(err),
       });
     }
-  }
-
-  onClearFinished(): void {
-    this.importer.clearFinished();
   }
 
   progressPercent(entry: ImportEntry): number {
@@ -350,10 +380,11 @@ export class Import {
     return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
   }
 
-  private isAudioLike = (file: File): boolean => {
-    if (file.type.startsWith('audio/')) return true;
-    return /\.(mp3|flac|wav|ogg|m4a|aac)$/i.test(file.name);
-  };
+  isEntryInFlight(status: ImportStatus): boolean {
+    return (
+      status === 'parsing' || status === 'decoding' || status === 'storing'
+    );
+  }
 
   private async dispatch(files: File[]): Promise<void> {
     try {
