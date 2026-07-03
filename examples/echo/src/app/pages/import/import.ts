@@ -1,10 +1,12 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Button } from 'primeng/button';
 import { ProgressBar } from 'primeng/progressbar';
 import { Tag } from 'primeng/tag';
 import { TableModule } from 'primeng/table';
 import { MessageService } from 'primeng/api';
+import { PlayerService } from '../../audio/player.service';
 import { ImportService } from '../../data/import.service';
+import { LibraryService } from '../../data/library.service';
 import type { ImportEntry, ImportStatus } from '../../data/types';
 
 @Component({
@@ -72,6 +74,14 @@ import type { ImportEntry, ImportStatus } from '../../data/types';
           Failed <strong>{{ counts().failed }}</strong>
         </span>
         <div class="ml-auto flex gap-2">
+          <p-button
+            label="Play imported"
+            icon="pi pi-play"
+            severity="primary"
+            size="small"
+            [disabled]="!canPlay()"
+            (onClick)="onPlayImported()"
+          />
           <p-button
             label="Cancel"
             icon="pi pi-times"
@@ -220,12 +230,24 @@ import type { ImportEntry, ImportStatus } from '../../data/types';
 })
 export class Import {
   private readonly importer = inject(ImportService);
+  private readonly library = inject(LibraryService);
+  private readonly player = inject(PlayerService);
   private readonly messages = inject(MessageService);
 
   protected readonly entries = this.importer.entries;
   protected readonly counts = this.importer.counts;
   protected readonly running = this.importer.running;
   protected readonly isDragOver = signal(false);
+  protected readonly canPlay = computed(
+    () => !this.running() && this.doneTrackIds().length > 0,
+  );
+
+  private readonly doneTrackIds = computed(() =>
+    this.entries()
+      .filter((e) => e.status === 'done' && e.trackId)
+      .map((e) => e.trackId!)
+      .reverse(),
+  );
 
   onDragEnter(event: DragEvent): void {
     event.preventDefault();
@@ -268,6 +290,31 @@ export class Import {
 
   onCancel(): void {
     this.importer.cancel();
+  }
+
+  async onPlayImported(): Promise<void> {
+    await this.library.refresh();
+    const ids = this.doneTrackIds();
+    const tracks = ids
+      .map((id) => this.library.getById(id))
+      .filter((t): t is NonNullable<typeof t> => !!t);
+    if (tracks.length === 0) {
+      this.messages.add({
+        severity: 'warn',
+        summary: 'Nothing to play',
+        detail: 'Import at least one track first.',
+      });
+      return;
+    }
+    try {
+      await this.player.playTrack(tracks[0], tracks);
+    } catch (err) {
+      this.messages.add({
+        severity: 'error',
+        summary: 'Playback failed',
+        detail: err instanceof Error ? err.message : String(err),
+      });
+    }
   }
 
   onClearFinished(): void {
