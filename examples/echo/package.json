@@ -20,6 +20,8 @@
     "@primeuix/styles": "^2.0.3",
     "@primeuix/themes": "^2.0.3",
     "chart.js": "^4.5.1",
+    "idb": "^8.0.3",
+    "music-metadata": "^11.13.0",
     "primeicons": "^7.0.0",
     "primeng": "^21.1.9",
     "rxjs": "~7.8.0",

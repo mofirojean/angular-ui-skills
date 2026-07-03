@@ -52,6 +52,11 @@
             ],
             "styles": [
               "src/styles.css"
+            ],
+            "allowedCommonJsDependencies": [
+              "debug",
+              "ieee754",
+              "content-type"
             ]
           },
           "configurations": {
