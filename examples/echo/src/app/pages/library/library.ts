@@ -22,7 +22,7 @@ import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 import { Textarea } from 'primeng/textarea';
 import { PlayerService } from '../../audio/player.service';
 import { openEchoDb } from '../../data/db';
-import { LibraryService, type AlbumSummary } from '../../data/library.service';
+import { LibraryService, type AlbumSummary, type ArtistSummary } from '../../data/library.service';
 import { PlaylistService } from '../../data/playlist.service';
 import type { Playlist, Track } from '../../data/types';
 import { AlbumTile } from '../../shared/album-tile/album-tile';
@@ -207,7 +207,7 @@ type ArtistSort = 'name' | 'count';
                   <echo-album-tile
                     [album]="album"
                     (play)="onPlayAlbum($event)"
-                    (open)="onPlayAlbum($event)"
+                    (open)="onOpenAlbum($event)"
                   />
                 }
               </div>
@@ -230,7 +230,10 @@ type ArtistSort = 'name' | 'count';
             } @else {
               <div class="tile-grid tile-grid--artists">
                 @for (artist of artists(); track artist.name) {
-                  <echo-artist-tile [artist]="artist" />
+                  <echo-artist-tile
+                    [artist]="artist"
+                    (open)="onOpenArtist($event)"
+                  />
                 }
               </div>
             }
@@ -763,6 +766,14 @@ export class Library {
         });
       },
     });
+  }
+
+  onOpenAlbum(album: AlbumSummary): void {
+    void this.router.navigate(['/album', encodeURIComponent(album.key)]);
+  }
+
+  onOpenArtist(artist: ArtistSummary): void {
+    void this.router.navigate(['/artist', encodeURIComponent(artist.name)]);
   }
 
   async onPlayAlbum(album: AlbumSummary): Promise<void> {

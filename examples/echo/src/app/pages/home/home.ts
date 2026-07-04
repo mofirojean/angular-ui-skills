@@ -5,7 +5,7 @@ import { FileUpload, type FileUploadHandlerEvent } from 'primeng/fileupload';
 import { MessageService } from 'primeng/api';
 import { PlayerService } from '../../audio/player.service';
 import { ImportService } from '../../data/import.service';
-import { LibraryService, type AlbumSummary } from '../../data/library.service';
+import { LibraryService, type AlbumSummary, type ArtistSummary } from '../../data/library.service';
 import { pickAudioDirectory, supportsDirectoryPicker } from '../../data/pick-files';
 import { AlbumTile } from '../../shared/album-tile/album-tile';
 import { ArtistTile } from '../../shared/artist-tile/artist-tile';
@@ -118,7 +118,7 @@ import { ArtistTile } from '../../shared/artist-tile/artist-tile';
                 <echo-album-tile
                   [album]="album"
                   (play)="onPlayAlbum($event)"
-                  (open)="onPlayAlbum($event)"
+                  (open)="onOpenAlbum($event)"
                 />
               }
             </div>
@@ -141,7 +141,10 @@ import { ArtistTile } from '../../shared/artist-tile/artist-tile';
             </div>
             <div class="artist-grid">
               @for (artist of topArtists(); track artist.name) {
-                <echo-artist-tile [artist]="artist" />
+                <echo-artist-tile
+                  [artist]="artist"
+                  (open)="onOpenArtist($event)"
+                />
               }
             </div>
           </section>
@@ -241,6 +244,14 @@ export class Home {
         detail: err instanceof Error ? err.message : String(err),
       });
     }
+  }
+
+  onOpenAlbum(album: AlbumSummary): void {
+    void this.router.navigate(['/album', encodeURIComponent(album.key)]);
+  }
+
+  onOpenArtist(artist: ArtistSummary): void {
+    void this.router.navigate(['/artist', encodeURIComponent(artist.name)]);
   }
 
   async onPlayAlbum(album: AlbumSummary): Promise<void> {

@@ -111,6 +111,37 @@ export class LibraryService {
     return this._tracks().find((t) => t.id === id);
   }
 
+  getAlbum(key: string): AlbumSummary | undefined {
+    return this.albums().find((a) => a.key === key);
+  }
+
+  getArtist(name: string): ArtistSummary | undefined {
+    return this.artists().find((a) => a.name === name);
+  }
+
+  tracksInAlbum(key: string): Track[] {
+    const album = this.getAlbum(key);
+    if (!album) return [];
+    return album.trackIds
+      .map((id) => this.getById(id))
+      .filter((t): t is Track => !!t)
+      .sort(
+        (a, b) =>
+          (a.discNo ?? 0) - (b.discNo ?? 0) ||
+          (a.trackNo ?? 0) - (b.trackNo ?? 0),
+      );
+  }
+
+  tracksByArtist(name: string): Track[] {
+    return this._tracks().filter(
+      (t) => t.artist === name || t.albumArtist === name,
+    );
+  }
+
+  albumsByArtist(name: string): AlbumSummary[] {
+    return this.albums().filter((a) => a.albumArtist === name);
+  }
+
   async loadAudioBlob(trackId: string): Promise<Blob | null> {
     const db = await openEchoDb();
     const record = await db.get('blobs', trackId);
