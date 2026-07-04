@@ -113,8 +113,62 @@ Roster's reporting tree, now as an editable canvas. Drag an employee node onto a
 | **Clarity Design** | Enterprise admin, VMware-funded, deep table + form vocabulary | clarity-developer |
 | **Nebular** | Cross-platform admin (Akveo) | nebular-developer |
 | **ng-bootstrap** | Bootstrap-styled Angular | ng-bootstrap-developer |
+| **angular-three** | Browser games, 3D scenes, animation-heavy UI, declarative Three.js in Angular | angular-three-developer |
 
 Each new skill needs its own validator app, so this branch is the most expensive direction.
+
+### Sweep, top-down shooter (angular-three showcase)
+
+Twin-stick shooter: corridor / room maps, waves of enemies, cash drops, shop between missions, weapon and armor upgrades, save / continue. Original assets, original title, the theme lands at build time.
+
+- **Best skill**: needs a new **angular-three-developer** skill (see the skill-ecosystem table above); the HUD, menus, and shop chrome ride on **primeng-developer**, already validated by Echo and Quanta Desk
+- **Validates**: the entire angular-three surface plus the Angular game-app pattern, signal-driven game state, DI-scoped `InputService` / `WorldService` / `HudService`, IndexedDB save slots, routed menu / level-select / play / pause / shop screens, PrimeNG chrome overlaid on a Three.js canvas
+- **Why now**: nothing in the fleet exercises real-time, animation-driven, physics-backed UI. Every existing app is admin-shaped or media-shaped. A game validator forces the stack to hold up under different pressure (60 fps target, GC-sensitive state, canvas plus DOM interop)
+- **Visual register**: dark neon corridor tiles, muzzle-flash bloom, splatter decals, chunky HUD in the corners. Distinct from every existing app in the fleet
+- **One-line story**: "A top-down shooter, built in the browser with Angular."
+
+#### Stack + requirements
+
+Everything Sweep needs, grouped so future PLAN work knows what to install:
+
+**Rendering + scene graph**
+- `angular-three`, declarative Three.js in Angular
+- `@angular-three/soba`, drei-port helpers (cameras, controls, loaders, primitives)
+- `@angular-three/postprocessing`, bloom, SSAO, DOF for the neon-corridor look
+- `three`, the underlying renderer, WebGL now, `WebGPURenderer` as a later upgrade
+
+**Physics + collision**
+- `@dimforge/rapier3d-compat`, WASM physics engine (character controller for the player, rigid bodies for enemies, raycasts for bullets)
+
+**Pathfinding**
+- `recast-navigation-js`, baked navmesh per level so enemies chase via Detour A*
+
+**Audio**
+- `howler`, cross-browser audio, ducking, spatialization, adaptive music cross-fade on wave start
+
+**Asset pipeline**
+- Three's built-in `GLTFLoader` and `DRACOLoader` for meshes
+- Kenney.nl top-down shooter pack (CC0) for the first slice, commissioned art beyond that
+
+**Game logic**
+- Angular signals for reactive game state (HP, armor, cash, XP, current wave, enemy count)
+- Signal-based services: `InputService` (WASD, mouse aim, GamepadAPI), `WorldService` (level, entities, spawning), `HudService` (UI state)
+- Optional `miniplex` ECS if the hand-rolled entity classes get unwieldy
+
+**UI chrome + menus**
+- **`primeng-developer`** for the HUD: MeterGroup (health / armor), ProgressBar (XP), Dialog (pause, inventory, shop), Toast (pickups), OrderList (inventory)
+- Tailwind v4 for HUD layout and menu screens
+- Angular Router for menu → level-select → play → shop → pause navigation
+
+**Persistence**
+- `idb`, IndexedDB save slots, high scores, unlocked levels (same wrapper Echo uses)
+
+**Multiplayer** (out of scope for v1, listed so the door stays open)
+- Colyseus, room-based Node server, TypeScript-first
+- Geckos.io, UDP-over-WebRTC for lower-latency real-time
+
+**Testing**
+- Manual gameplay validation, no unit tests, the point is that the skills survive game load, not that the mechanics are covered
 
 ## Selection criteria
 
