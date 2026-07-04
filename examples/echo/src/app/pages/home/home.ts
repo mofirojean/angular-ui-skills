@@ -52,7 +52,7 @@ import { ArtistTile } from '../../shared/artist-tile/artist-tile';
               chooseLabel="Choose files"
               chooseIcon="pi pi-cloud-upload"
               (uploadHandler)="onUploadHandler($event, uploader)"
-              styleClass="w-full echo-hero-upload"
+              class="w-full echo-hero-upload"
             >
               <ng-template pTemplate="content">
                 <div class="hero-drop">

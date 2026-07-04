@@ -82,9 +82,10 @@ import { ImportService } from '../data/import.service';
       [auto]="true"
       [multiple]="true"
       [customUpload]="true"
+      size="small"
       accept="audio/*,.flac,.mp3,.wav,.ogg,.m4a,.aac"
       (uploadHandler)="onImport($event, headerUpload)"
-      styleClass="echo-header-upload"
+      class="echo-header-upload"
     />
 
     <p-button

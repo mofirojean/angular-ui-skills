@@ -68,20 +68,28 @@ type ArtistSort = 'name' | 'count';
       <p-tabs [(value)]="activeTab" scrollable="true" class="library-tabs">
         <p-tablist>
           <p-tab value="songs">
-            <i class="pi pi-list"></i>
-            <span>Songs</span>
+            <div class="flex justify-center items-center gap-2">
+              <i class="pi pi-list"></i>
+              <span>Songs</span>
+            </div>
           </p-tab>
           <p-tab value="albums">
-            <i class="pi pi-th-large"></i>
-            <span>Albums</span>
+            <div class="flex justify-center items-center gap-2">
+              <i class="pi pi-th-large"></i>
+              <span>Albums</span>
+            </div>
           </p-tab>
           <p-tab value="artists">
-            <i class="pi pi-user"></i>
-            <span>Artists</span>
+            <div class="flex justify-center items-center gap-2">
+              <i class="pi pi-user"></i>
+              <span>Artists</span>
+            </div>
           </p-tab>
           <p-tab value="playlists">
-            <i class="pi pi-heart"></i>
-            <span>Playlists</span>
+            <div class="flex justify-center items-center gap-2">
+              <i class="pi pi-heart"></i>
+              <span>Playlists</span>
+            </div>
           </p-tab>
         </p-tablist>
         <p-tabpanels>
@@ -133,7 +141,7 @@ type ArtistSort = 'name' | 'count';
                 [virtualScroll]="true"
                 [virtualScrollItemSize]="52"
                 size="small"
-                styleClass="songs-table"
+                class="songs-table"
                 [rowTrackBy]="trackById"
               >
                 <ng-template pTemplate="header">
@@ -373,19 +381,21 @@ type ArtistSort = 'name' | 'count';
         display: flex;
         flex-direction: column;
         padding-inline: 0;
+        padding: 0;
       }
       :host ::ng-deep .library-tabs .p-tabpanel {
         flex: 1;
         min-height: 0;
         display: flex;
         flex-direction: column;
-        padding: 1rem 0 0;
+        padding: 1rem 1rem 0;
         gap: 1rem;
       }
       .filter-bar {
         display: flex;
         flex-wrap: wrap;
         gap: 0.75rem;
+        padding: 0 0.3rem;
         align-items: center;
       }
       .filter-search {

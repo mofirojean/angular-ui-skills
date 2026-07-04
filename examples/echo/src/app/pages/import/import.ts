@@ -50,7 +50,7 @@ import type { ImportEntry, ImportStatus } from '../../data/types';
           chooseLabel="Choose files"
           chooseIcon="pi pi-cloud-upload"
           (uploadHandler)="onUploadHandler($event, uploader)"
-          styleClass="echo-import-upload"
+          class="echo-import-upload"
         >
           <ng-template pTemplate="content">
             <div class="drop-inner">
@@ -124,7 +124,7 @@ import type { ImportEntry, ImportStatus } from '../../data/types';
           [scrollable]="true"
           scrollHeight="flex"
           size="small"
-          styleClass="import-table"
+          class="import-table"
         >
           <ng-template pTemplate="header">
             <tr>
@@ -169,7 +169,7 @@ import type { ImportEntry, ImportStatus } from '../../data/types';
                 <p-progressBar
                   [value]="progressPercent(entry)"
                   [showValue]="false"
-                  styleClass="import-progress"
+                  class="import-progress"
                 />
               </td>
               <td>
