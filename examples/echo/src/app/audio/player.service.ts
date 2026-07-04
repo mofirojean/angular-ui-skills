@@ -240,6 +240,53 @@ export class PlayerService {
     this._queue.update((q) => [...q, ...tracks]);
   }
 
+  reorderQueue(tracks: Track[]): void {
+    const current = this._currentTrack();
+    this._queue.set([...tracks]);
+    if (!current) {
+      this._queueIndex.set(-1);
+      return;
+    }
+    const nextIndex = tracks.findIndex((t) => t.id === current.id);
+    this._queueIndex.set(nextIndex);
+  }
+
+  removeFromQueueAt(index: number): void {
+    const queue = this._queue();
+    if (index < 0 || index >= queue.length) return;
+    const currentIndex = this._queueIndex();
+    const removingCurrent = index === currentIndex;
+    const next = [...queue.slice(0, index), ...queue.slice(index + 1)];
+    this._queue.set(next);
+    if (removingCurrent) {
+      if (next.length === 0) {
+        this.pause();
+        this._queueIndex.set(-1);
+        this._currentTrack.set(null);
+        this._progress.set(0);
+        this._duration.set(0);
+        this.audioElement.removeAttribute('src');
+        this.audioElement.load();
+      } else {
+        const nextIndex = Math.min(index, next.length - 1);
+        this._queueIndex.set(nextIndex);
+        void this.loadCurrent().then(() => this.play());
+      }
+      return;
+    }
+    if (index < currentIndex) {
+      this._queueIndex.set(currentIndex - 1);
+    }
+  }
+
+  moveInQueue(from: number, to: number): void {
+    const queue = [...this._queue()];
+    if (from < 0 || from >= queue.length || to < 0 || to >= queue.length) return;
+    const [moved] = queue.splice(from, 1);
+    queue.splice(to, 0, moved);
+    this.reorderQueue(queue);
+  }
+
   clearQueue(): void {
     this.pause();
     this._queue.set([]);
