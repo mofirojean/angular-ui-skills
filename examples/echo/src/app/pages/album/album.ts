@@ -41,7 +41,7 @@ import type { Playlist, Track } from '../../data/types';
         <p-splitter
           [panelSizes]="[38, 62]"
           [minSizes]="[25, 40]"
-          styleClass="album-splitter"
+          class="album-splitter"
         >
           <ng-template pTemplate>
             <div class="album-cover-panel">
