@@ -7,13 +7,14 @@ import {
   output,
   signal,
 } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 import { Button } from 'primeng/button';
 import { LibraryService } from '../../data/library.service';
 import type { AlbumSummary } from '../../data/library.service';
 
 @Component({
   selector: 'echo-album-tile',
-  imports: [Button],
+  imports: [Button, NgOptimizedImage],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <button
@@ -24,7 +25,7 @@ import type { AlbumSummary } from '../../data/library.service';
     >
       <div class="cover">
         @if (coverUrl(); as url) {
-          <img [src]="url" alt="" loading="lazy" />
+          <img [ngSrc]="url" alt="" fill />
         } @else {
           <div class="cover-fallback">
             <i class="pi pi-image"></i>
