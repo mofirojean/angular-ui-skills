@@ -1,5 +1,4 @@
 import { Component, computed, inject } from '@angular/core';
-import { NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
@@ -8,7 +7,7 @@ import { PlayerService } from '../audio/player.service';
 
 @Component({
   selector: 'echo-player-bar',
-  imports: [FormsModule, RouterLink, Button, Slider, NgOptimizedImage],
+  imports: [FormsModule, RouterLink, Button, Slider],
   host: {
     class:
       'shrink-0 border-t border-[var(--echo-border)] bg-[var(--echo-chrome-bg)]',
@@ -18,11 +17,8 @@ import { PlayerService } from '../audio/player.service';
       <a routerLink="/now-playing" class="flex min-w-0 flex-1 items-center gap-2">
         @if (coverUrl(); as url) {
           <img
-            [ngSrc]="url"
+            [src]="url"
             alt=""
-            width="512"
-            height="512"
-            priority
             class="h-10 w-10 shrink-0 rounded object-cover"
           />
         } @else {
@@ -62,11 +58,8 @@ import { PlayerService } from '../audio/player.service';
       <a routerLink="/now-playing" class="flex min-w-0 flex-1 items-center gap-3">
         @if (coverUrl(); as url) {
           <img
-            [ngSrc]="url"
+            [src]="url"
             alt=""
-            width="512"
-            height="512"
-            priority
             class="h-14 w-14 shrink-0 rounded-md object-cover"
           />
         } @else {

@@ -8,7 +8,6 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { NgOptimizedImage } from '@angular/common';
 import { Router } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Breadcrumb } from 'primeng/breadcrumb';
@@ -26,7 +25,6 @@ import type { Playlist, Track } from '../../data/types';
 @Component({
   selector: 'echo-album',
   imports: [
-    NgOptimizedImage,
     Breadcrumb,
     Button,
     ContextMenu,
@@ -47,15 +45,13 @@ import type { Playlist, Track } from '../../data/types';
         >
           <ng-template pTemplate>
             <div class="album-cover-panel">
-              <div class="cover-wrap">
-                @if (coverUrl(); as url) {
-                  <img [ngSrc]="url" alt="" fill priority />
-                } @else {
-                  <div class="cover-fallback">
-                    <i class="pi pi-image text-3xl"></i>
-                  </div>
-                }
-              </div>
+              @if (coverUrl(); as url) {
+                <img [src]="url" alt="" class="cover" />
+              } @else {
+                <div class="cover cover-fallback">
+                  <i class="pi pi-image text-3xl"></i>
+                </div>
+              }
               <div class="meta">
                 <span class="eyebrow">Album</span>
                 <h1 class="title">{{ data.album }}</h1>
@@ -199,20 +195,14 @@ import type { Playlist, Track } from '../../data/types';
         padding-right: 1.5rem;
         width: 100%;
       }
-      .cover-wrap {
-        position: relative;
+      .cover {
         aspect-ratio: 1 / 1;
         width: 100%;
         max-width: 320px;
         border-radius: 12px;
-        overflow: hidden;
-      }
-      .cover-wrap img {
         object-fit: cover;
       }
       .cover-fallback {
-        width: 100%;
-        height: 100%;
         background: var(--echo-tile);
         display: grid;
         place-items: center;
