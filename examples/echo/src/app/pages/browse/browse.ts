@@ -170,8 +170,8 @@ const BITRATE_BUCKETS: Array<{
         cursor: pointer;
         background: linear-gradient(
           145deg,
-          hsl(calc(var(--tone) * 1deg), 65%, 42%) 0%,
-          hsl(calc(var(--tone) * 1deg + 40), 60%, 22%) 100%
+          hsl(var(--tone), 65%, 42%) 0%,
+          hsl(calc(var(--tone) + 40), 60%, 22%) 100%
         );
         transition: transform 150ms ease, box-shadow 150ms ease;
       }

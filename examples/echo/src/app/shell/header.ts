@@ -79,11 +79,16 @@ import { ImportService } from '../data/import.service';
       #headerUpload
       mode="basic"
       chooseIcon="pi pi-upload"
-      chooseLabel=""
+      [chooseButtonProps]="{
+        severity: 'secondary',
+        text: true,
+        rounded: true,
+        size: 'small',
+        ariaLabel: 'Import files'
+      }"
       [auto]="true"
       [multiple]="true"
       [customUpload]="true"
-      size="small"
       accept="audio/*,.flac,.mp3,.wav,.ogg,.m4a,.aac"
       (uploadHandler)="onImport($event, headerUpload)"
       class="echo-header-upload"
@@ -115,19 +120,10 @@ import { ImportService } from '../data/import.service';
   `,
   styles: [
     `
-      :host ::ng-deep .echo-header-upload .p-fileupload-choose {
-        background: transparent;
-        color: var(--echo-muted);
-        border: none;
-        padding: 0.4rem;
-        border-radius: 999px;
-        transition: color 120ms ease, background 120ms ease;
+      :host ::ng-deep .echo-header-upload .p-fileupload-choose-button .p-button-label {
+        display: none;
       }
-      :host ::ng-deep .echo-header-upload .p-fileupload-choose:hover {
-        background: var(--echo-hover);
-        color: var(--echo-heading);
-      }
-      :host ::ng-deep .echo-header-upload .p-fileupload-choose .p-button-icon {
+      :host ::ng-deep .echo-header-upload .p-fileupload-choose-button .p-button-icon {
         margin: 0;
       }
     `,
