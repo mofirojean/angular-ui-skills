@@ -7,5 +7,6 @@ export const SITE_CONFIG = {
     switchboard: 'https://switchboard-olive.vercel.app',
     roster: 'https://roster-khaki-pi.vercel.app',
     forge: 'https://forge-opal-eta.vercel.app',
+    echo: 'https://echo-neon-three.vercel.app',
   },
 } as const;

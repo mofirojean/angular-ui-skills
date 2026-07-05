@@ -195,6 +195,20 @@ export class App {
       image: 'projects/forge-inbox-dark-mode.png',
       demo: SITE_CONFIG.demos.forge,
     },
+    {
+      slug: 'echo',
+      name: 'Echo',
+      tagline: 'Local-first music player',
+      description:
+        'A real music player, not a mock. Drop MP3 / FLAC / WAV / OGG files and Echo extracts tags + cover art, computes waveform peaks, and stores everything in IndexedDB. Playback runs through a live Web Audio graph with a 5-band EQ wired to Knobs, a canvas waveform scrubber, drag-drop queue + playlists, MegaMenu browse facets, and OS media controls. Validates primeng-developer on media-shaped UI under real audio load.',
+      stack: ['Angular v21', 'PrimeNG v21', 'Tailwind v4', 'Web Audio API', 'music-metadata', 'idb', 'Zoneless'],
+      skill: 'primeng-developer',
+      path: 'examples/echo',
+      accent: 'from-violet-500/25 via-purple-400/15 to-transparent',
+      badges: ['Real Web Audio', 'PWA', 'Lighthouse a11y 100'],
+      image: 'projects/echo-light-mode.png',
+      demo: SITE_CONFIG.demos.echo,
+    },
   ];
 
   protected readonly tabKeys: readonly InstallTab[] = ['cli', 'claude', 'gemini', 'cursor', 'manual'];
