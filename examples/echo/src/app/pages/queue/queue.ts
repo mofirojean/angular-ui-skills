@@ -68,7 +68,7 @@ import type { Track } from '../../data/types';
           [responsive]="true"
           class="queue-order"
         >
-          <ng-template let-track let-i="index" pTemplate="item">
+          <ng-template #item let-track let-i="index">
             <div class="track-row" [class.is-current]="isCurrent(track)">
               <div class="row-index">
                 @if (isCurrent(track)) {

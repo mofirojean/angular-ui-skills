@@ -64,10 +64,10 @@ import type { Track } from '../../data/types';
               (onActivate)="editingTitle.set(true); startEditTitle()"
               (onDeactivate)="editingTitle.set(false)"
             >
-              <ng-template pTemplate="display">
+              <ng-template #display>
                 <h1 class="title">{{ data.name }}</h1>
               </ng-template>
-              <ng-template pTemplate="content">
+              <ng-template #content>
                 <input
                   pInputText
                   class="title-input"
@@ -85,12 +85,12 @@ import type { Track } from '../../data/types';
               (onActivate)="editingDescription.set(true); startEditDescription()"
               (onDeactivate)="editingDescription.set(false)"
             >
-              <ng-template pTemplate="display">
+              <ng-template #display>
                 <p class="description">
                   {{ data.description || 'Add a description.' }}
                 </p>
               </ng-template>
-              <ng-template pTemplate="content">
+              <ng-template #content>
                 <textarea
                   pTextarea
                   rows="3"
@@ -166,7 +166,7 @@ import type { Track } from '../../data/types';
             [stripedRows]="true"
             class="playlist-order"
           >
-            <ng-template let-track pTemplate="item">
+            <ng-template #item let-track>
               <div class="track-row">
                 <button
                   type="button"

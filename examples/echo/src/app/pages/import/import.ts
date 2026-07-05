@@ -52,7 +52,7 @@ import type { ImportEntry, ImportStatus } from '../../data/types';
           (uploadHandler)="onUploadHandler($event, uploader)"
           class="echo-import-upload"
         >
-          <ng-template pTemplate="content">
+          <ng-template #content>
             <div class="drop-inner">
               <i class="pi pi-cloud-upload text-3xl text-[var(--echo-accent)]"></i>
               <div class="mt-2 text-sm text-[var(--echo-muted)]">

@@ -54,7 +54,7 @@ import { ArtistTile } from '../../shared/artist-tile/artist-tile';
               (uploadHandler)="onUploadHandler($event, uploader)"
               class="w-full echo-hero-upload"
             >
-              <ng-template pTemplate="content">
+              <ng-template #content>
                 <div class="hero-drop">
                   <i class="pi pi-cloud-upload text-3xl text-[var(--echo-accent)]"></i>
                   <div class="mt-2 text-sm text-[var(--echo-muted)]">
