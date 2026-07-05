@@ -103,6 +103,16 @@ import { ImportService } from '../data/import.service';
       (onClick)="themeToggled.emit()"
     />
 
+    <a
+      href="https://github.com/mofirojean/angular-ui-skills"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="hidden h-8 w-8 place-items-center rounded-full text-[var(--echo-muted)] transition hover:bg-[var(--echo-hover)] hover:text-[var(--echo-heading)] md:grid"
+      aria-label="View the angular-ui-skills repository on GitHub"
+    >
+      <i class="pi pi-github"></i>
+    </a>
+
     <button
       type="button"
       class="ml-1 flex items-center gap-2 rounded-full p-1 transition hover:bg-[var(--echo-hover)] md:pr-3"
