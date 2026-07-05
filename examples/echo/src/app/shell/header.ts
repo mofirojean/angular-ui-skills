@@ -70,6 +70,7 @@ import { ImportService } from '../data/import.service';
           placeholder="Search songs, artists, albums"
           class="w-full"
           (focus)="router.navigate(['/search'])"
+          (input)="onSearchInput($event)"
         />
       </p-iconfield>
     </div>
@@ -146,6 +147,14 @@ export class Header {
     { separator: true },
     { label: 'About Echo', icon: 'pi pi-info-circle', routerLink: '/settings' },
   ];
+
+  onSearchInput(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    void this.router.navigate(['/search'], {
+      queryParams: { q: value || null },
+      queryParamsHandling: 'merge',
+    });
+  }
 
   async onImport(event: FileUploadHandlerEvent, uploader: FileUpload): Promise<void> {
     const files = event.files as File[];
