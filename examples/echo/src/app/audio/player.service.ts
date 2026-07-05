@@ -60,6 +60,7 @@ export class PlayerService {
   private currentObjectUrl: string | null = null;
   private tickHandle: number | null = null;
   private currentCoverUrl: string | null = null;
+  private playRecorded = false;
 
   constructor() {
     const audio = new Audio();
@@ -69,7 +70,14 @@ export class PlayerService {
 
     audio.addEventListener('play', () => this._isPlaying.set(true));
     audio.addEventListener('pause', () => this._isPlaying.set(false));
-    audio.addEventListener('playing', () => this._buffering.set(false));
+    audio.addEventListener('playing', () => {
+      this._buffering.set(false);
+      const track = this._currentTrack();
+      if (track && !this.playRecorded) {
+        this.playRecorded = true;
+        void this.library.recordPlay(track.id);
+      }
+    });
     audio.addEventListener('waiting', () => this._buffering.set(true));
     audio.addEventListener('loadedmetadata', () => {
       this._duration.set(audio.duration || this._currentTrack()?.duration || 0);
@@ -324,6 +332,7 @@ export class PlayerService {
     this._progress.set(0);
     this._duration.set(track.duration);
     this._buffering.set(true);
+    this.playRecorded = false;
 
     const blob = await this.library.loadAudioBlob(track.id);
     if (!blob) {

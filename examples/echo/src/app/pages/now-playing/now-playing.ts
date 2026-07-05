@@ -1,6 +1,5 @@
 import {
   Component,
-  HostListener,
   computed,
   effect,
   inject,
@@ -507,22 +506,6 @@ export class NowPlaying {
       const url = this.coverUrl();
       this.backdropUrl.set(url);
     });
-  }
-
-  @HostListener('window:keydown', ['$event'])
-  onKeyDown(event: KeyboardEvent): void {
-    const target = event.target as HTMLElement | null;
-    if (target && ['INPUT', 'TEXTAREA'].includes(target.tagName)) return;
-    if (event.code === 'Space') {
-      event.preventDefault();
-      void this.player.togglePlay();
-    } else if (event.code === 'ArrowRight') {
-      event.preventDefault();
-      void this.player.next();
-    } else if (event.code === 'ArrowLeft') {
-      event.preventDefault();
-      void this.player.previous();
-    }
   }
 
   onClose(): void {

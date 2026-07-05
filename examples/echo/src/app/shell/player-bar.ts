@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
 import { Slider } from 'primeng/slider';
 import { PlayerService } from '../audio/player.service';
+import { LibraryService } from '../data/library.service';
 
 @Component({
   selector: 'echo-player-bar',
@@ -38,12 +39,14 @@ import { PlayerService } from '../audio/player.service';
         </div>
       </a>
       <p-button
-        icon="pi pi-heart"
+        [icon]="liked() ? 'pi pi-heart-fill' : 'pi pi-heart'"
         [rounded]="true"
-        severity="secondary"
+        [severity]="liked() ? 'primary' : 'secondary'"
         [text]="true"
         size="small"
         ariaLabel="Like"
+        [disabled]="!currentTrack()"
+        (onClick)="onToggleLike()"
       />
       <p-button
         [icon]="isPlaying() ? 'pi pi-pause' : 'pi pi-play'"
@@ -78,13 +81,14 @@ import { PlayerService } from '../audio/player.service';
           </div>
         </div>
         <p-button
-          icon="pi pi-heart"
+          [icon]="liked() ? 'pi pi-heart-fill' : 'pi pi-heart'"
           [rounded]="true"
-          severity="secondary"
+          [severity]="liked() ? 'primary' : 'secondary'"
           [text]="true"
           size="small"
           ariaLabel="Like"
-          (click)="$event.preventDefault()"
+          [disabled]="!currentTrack()"
+          (click)="$event.preventDefault(); onToggleLike()"
         />
       </a>
 
@@ -199,6 +203,13 @@ import { PlayerService } from '../audio/player.service';
 })
 export class PlayerBar {
   private readonly player = inject(PlayerService);
+  private readonly library = inject(LibraryService);
+
+  protected readonly liked = computed(() => {
+    const track = this.player.currentTrack();
+    if (!track) return false;
+    return this.library.getById(track.id)?.liked ?? false;
+  });
 
   protected readonly currentTrack = this.player.currentTrack;
   protected readonly isPlaying = this.player.isPlaying;
@@ -261,6 +272,12 @@ export class PlayerBar {
 
   onToggleMute(): void {
     this.player.toggleMute();
+  }
+
+  async onToggleLike(): Promise<void> {
+    const track = this.player.currentTrack();
+    if (!track) return;
+    await this.library.toggleLiked(track.id);
   }
 }
 

@@ -142,6 +142,44 @@ export class LibraryService {
     return this.albums().filter((a) => a.albumArtist === name);
   }
 
+  async toggleLiked(trackId: string): Promise<boolean> {
+    const db = await openEchoDb();
+    const track = await db.get('tracks', trackId);
+    if (!track) return false;
+    const next = { ...track, liked: !track.liked };
+    await db.put('tracks', next);
+    this._tracks.update((list) =>
+      list.map((t) => (t.id === trackId ? next : t)),
+    );
+    return next.liked;
+  }
+
+  async recordPlay(trackId: string): Promise<void> {
+    const db = await openEchoDb();
+    const track = await db.get('tracks', trackId);
+    if (!track) return;
+    const now = Date.now();
+    const next = {
+      ...track,
+      playCount: track.playCount + 1,
+      lastPlayedAt: now,
+    };
+    const tx = db.transaction(['tracks', 'plays'], 'readwrite');
+    await Promise.all([
+      tx.objectStore('tracks').put(next),
+      tx.objectStore('plays').add({
+        trackId,
+        at: now,
+        msPlayed: 0,
+        completed: false,
+      }),
+      tx.done,
+    ]);
+    this._tracks.update((list) =>
+      list.map((t) => (t.id === trackId ? next : t)),
+    );
+  }
+
   async loadAudioBlob(trackId: string): Promise<Blob | null> {
     const db = await openEchoDb();
     const record = await db.get('blobs', trackId);
