@@ -4,10 +4,11 @@ import { Sidebar } from './sidebar';
 import { Header } from './header';
 import { PlayerBar } from './player-bar';
 import { MobileTabBar } from './mobile-tab-bar';
+import { CommandPalette } from './command-palette';
 
 @Component({
   selector: 'echo-shell',
-  imports: [RouterOutlet, Sidebar, Header, PlayerBar, MobileTabBar],
+  imports: [RouterOutlet, Sidebar, Header, PlayerBar, MobileTabBar, CommandPalette],
   host: {
     class: 'flex h-[100dvh] w-screen flex-col bg-[var(--echo-bg)]',
   },
@@ -23,6 +24,7 @@ import { MobileTabBar } from './mobile-tab-bar';
     </div>
     <echo-player-bar />
     <echo-mobile-tab-bar />
+    <echo-command-palette />
   `,
 })
 export class Shell {

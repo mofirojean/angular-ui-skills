@@ -304,6 +304,14 @@ export class PlayerService {
     return this.graph?.analyser ?? null;
   }
 
+  getContextDiagnostics(): { state: string; sampleRate: number } | null {
+    if (!this.graph) return null;
+    return {
+      state: this.graph.context.state,
+      sampleRate: this.graph.context.sampleRate,
+    };
+  }
+
   private async loadCurrent(): Promise<void> {
     const q = this._queue();
     const idx = this._queueIndex();
