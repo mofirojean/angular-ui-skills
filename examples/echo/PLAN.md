@@ -1,6 +1,6 @@
 # Echo, Build Plan
 
-> **Status:** Plan. Not yet scaffolded. See "Next session: where to start" at the bottom.
+> **Status:** Built through the Settings + command palette slice and the polish pass (shortcuts, persisted theme, likes, play history). All eleven pages are live against real audio. Remaining from the original plan: PWA manifest + service worker, the accessibility sweep, onboarding modal, and the README demo recording.
 
 A reference Angular application built with the `primeng-developer` skill. The point is not the app, the point is that **building this proves the skill is correct on a shape Quanta Desk did not cover**. Quanta Desk validated dense-data-table PrimeNG (finance chrome, sortable grids, Editor, TreeTable). Echo validates media / entertainment PrimeNG: continuous controls (Slider, Knob), drag-driven reordering (OrderList, PickList), rich cover-art surfaces (DataView, Galleria, Carousel), and a persistent player shell that lives across every route.
 
