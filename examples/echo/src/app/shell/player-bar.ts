@@ -14,6 +14,12 @@ import { LibraryService } from '../data/library.service';
       'shrink-0 border-t border-[var(--echo-border)] bg-[var(--echo-chrome-bg)]',
   },
   template: `
+    <span class="sr-only" role="status" aria-live="polite">
+      @if (currentTrack(); as track) {
+        Now playing: {{ track.title }} by {{ track.artist }}
+      }
+    </span>
+
     <div class="flex h-14 items-center gap-3 px-3 md:hidden">
       <a routerLink="/now-playing" class="flex min-w-0 flex-1 items-center gap-2">
         @if (coverUrl(); as url) {

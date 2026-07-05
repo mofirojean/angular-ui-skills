@@ -2,7 +2,6 @@ import { Component, ViewChild, computed, inject, signal } from '@angular/core';
 import { FormsModule, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
-import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
 import { OrderList } from 'primeng/orderlist';
@@ -16,7 +15,6 @@ import type { Track } from '../../data/types';
     FormsModule,
     ReactiveFormsModule,
     Button,
-    ConfirmDialog,
     Dialog,
     InputText,
     OrderList,
@@ -144,7 +142,6 @@ import type { Track } from '../../data/types';
       </form>
     </p-dialog>
 
-    <p-confirmDialog />
   `,
   styles: [
     `

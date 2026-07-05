@@ -9,7 +9,6 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService, MenuItem } from 'primeng/api';
 import { Button } from 'primeng/button';
-import { ConfirmDialog } from 'primeng/confirmdialog';
 import { ContextMenu } from 'primeng/contextmenu';
 import { Dialog } from 'primeng/dialog';
 import { IconField } from 'primeng/iconfield';
@@ -38,7 +37,6 @@ type ArtistSort = 'name' | 'count';
     FormsModule,
     ReactiveFormsModule,
     Button,
-    ConfirmDialog,
     ContextMenu,
     Dialog,
     IconField,
@@ -326,7 +324,6 @@ type ArtistSort = 'name' | 'count';
       </form>
     </p-dialog>
 
-    <p-confirmDialog />
   `,
   styles: [
     `

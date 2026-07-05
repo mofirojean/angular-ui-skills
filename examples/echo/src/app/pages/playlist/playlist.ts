@@ -12,7 +12,6 @@ import { Router } from '@angular/router';
 import { ConfirmationService, MessageService, MenuItem } from 'primeng/api';
 import { Breadcrumb } from 'primeng/breadcrumb';
 import { Button } from 'primeng/button';
-import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Drawer } from 'primeng/drawer';
 import { IconField } from 'primeng/iconfield';
 import { Inplace } from 'primeng/inplace';
@@ -32,7 +31,6 @@ import type { Track } from '../../data/types';
     FormsModule,
     Breadcrumb,
     Button,
-    ConfirmDialog,
     Drawer,
     IconField,
     Inplace,
@@ -251,7 +249,6 @@ import type { Track } from '../../data/types';
         </div>
       </p-drawer>
 
-      <p-confirmDialog />
     } @else {
       <section class="playlist-page">
         <div class="empty large">

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, afterNextRender, inject } from '@angular/core';
 import { Toast } from 'primeng/toast';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { SettingsStore } from './data/settings.store';
@@ -18,6 +18,11 @@ export class App {
   private isDark = true;
 
   constructor() {
+    afterNextRender(() => {
+      document
+        .querySelector('p-confirmdialog p-dialog')
+        ?.setAttribute('aria-label', 'Confirmation');
+    });
     document.documentElement.classList.toggle('dark', this.isDark);
     void this.settings.get<boolean>('theme.dark').then((stored) => {
       if (stored === undefined || stored === this.isDark) return;
