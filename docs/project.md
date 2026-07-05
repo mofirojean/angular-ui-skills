@@ -11,6 +11,7 @@ A catalogue of validator-app concepts for the `angular-ui-skills` ecosystem. The
 | **Quanta Desk** | primeng-developer | Portfolio + trading desk | quanta-desk.vercel.app |
 | **Switchboard** | ng-zorro-developer | Support-ops helpdesk | switchboard-olive.vercel.app |
 | **Roster** | angular-material-developer | HR + people management | roster-khaki-pi.vercel.app |
+| **Echo** | primeng-developer | Local-first music player | echo-neon-three.vercel.app |
 
 ## Recommended next builds
 
