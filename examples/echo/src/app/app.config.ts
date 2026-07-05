@@ -2,6 +2,7 @@ import {
   ApplicationConfig,
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
+  isDevMode,
 } from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { providePrimeNG } from 'primeng/config';
@@ -9,6 +10,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 
 import { routes } from './app.routes';
 import EchoPreset from './theme/echo-preset';
+import { provideServiceWorker } from '@angular/service-worker';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -30,5 +32,9 @@ export const appConfig: ApplicationConfig = {
     }),
     MessageService,
     ConfirmationService,
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
   ],
 };
