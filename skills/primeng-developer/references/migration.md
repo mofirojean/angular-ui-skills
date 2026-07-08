@@ -103,6 +103,48 @@ v20 added a unified `[invalid]` input to every form-bearing component. It replac
 
 You decide when to mark a control invalid (typically `dirty && (touched || submitted)`). See [forms.md](./forms.md).
 
+### `pTemplate` silently fails with standalone component imports
+
+`pTemplate` is a directive (`PrimeTemplate` from `primeng/api`). When you import a component's standalone class (`import { OrderList } from 'primeng/orderlist'`), `PrimeTemplate` is **not** pulled into your template's compilation scope, so `<ng-template pTemplate="item">` compiles cleanly as an unknown attribute and the template **never registers**. There is no build error and no runtime error, the component just renders its fallback (usually empty labels or blank rows). Legacy `*Module` imports (`TableModule`, etc.) don't hit this because they re-export `SharedModule`, which carries `PrimeTemplate`.
+
+**Broken (standalone import + pTemplate):**
+```typescript
+import { OrderList } from 'primeng/orderlist';
+```
+```html
+<p-orderList [value]="tracks">
+  <ng-template pTemplate="item" let-track>{{ track.title }}</ng-template>
+  <!-- renders empty rows: pTemplate is inert without SharedModule -->
+</p-orderList>
+```
+
+**Fixed (template reference, the v21-preferred form):**
+```html
+<p-orderList [value]="tracks">
+  <ng-template #item let-track>{{ track.title }}</ng-template>
+</p-orderList>
+```
+
+Every v21 component content-queries named template refs directly (`#item`, `#header`, `#body`, `#content`, `#display`, `#empty`, …) with `PrimeTemplate` kept only as a legacy fallback. Since `pTemplate` is deprecated for removal in v22 anyway, always use the `#ref` form in new code.
+
+### `styleClass` deprecated in favor of native `class`
+
+Every host-enabled component (Table, DataView, ProgressBar, FileUpload, Slider, Toast, and most others) previously exposed a `styleClass: string | undefined` input to inject classes into the rendered element. It's deprecated since v20 because Angular's native `class` binding already reaches the host element.
+
+**Old (deprecated, still works):**
+```html
+<p-table [value]="rows" styleClass="songs-table">…</p-table>
+<p-progressBar [value]="pct" styleClass="import-progress" />
+```
+
+**New (v20+):**
+```html
+<p-table [value]="rows" class="songs-table">…</p-table>
+<p-progressBar [value]="pct" class="import-progress" />
+```
+
+Use `[class]="expr()"` or `[ngClass]="{ 'is-active': cond }"` for dynamic values. Existing `::ng-deep` selectors that matched both classes on one element (`.foo.p-fileupload`) continue to work because PrimeNG's host metadata puts its `p-*` class on the same host element that receives your `class` attribute.
+
 ### Package source migration
 
 The internal styles and tokens moved from `@primeng/themes` to `@primeuix/themes` (shared with PrimeVue, PrimeReact).
@@ -122,8 +164,8 @@ import Aura from '@primeuix/themes/aura';
 | API | Replacement |
 |---|---|
 | `@primeng/themes` | `@primeuix/themes` |
-| `pTemplate="x"` | `<ng-template #x>` with template ref |
-| `styleClass` on host-enabled components | Native `class` attribute |
+| `pTemplate="x"` | `<ng-template #x>` with template ref, see the warning below |
+| `styleClass` on host-enabled components | Native `class` attribute, see the section below |
 | Global `inputStyle` config | `inputVariant` |
 | CamelCase selectors (`<p-confirmDialog>`) | Kebab-case (`<p-confirmdialog>`) , both work today |
 | `pButton` `icon`, `label`, `iconPos`, `loadingIcon` properties | `pButtonIcon` and `pButtonLabel` directives |
@@ -183,7 +225,9 @@ If you're migrating an existing project to PrimeNG v21:
 7. **Audit `*Module` imports** , prefer standalone class imports for new code (`import { Button } from 'primeng/button'`).
 8. **Drop `showTransitionOptions` / `hideTransitionOptions`** , they're no-ops in v21.
 9. **Search for `Messages` (plural)** , replace with array + loop of `Message`.
-10. **Run `ng build`** and verify no compile errors. Visual changes are likely (the new tokens differ from the v17 SCSS theme).
+10. **Rename every `styleClass="…"` to `class="…"`** , see the v20 deprecations section above; the class attribute reaches the host element and behaves identically.
+11. **Replace `pTemplate="x"` with `<ng-template #x>`** , mandatory wherever the component is imported standalone (the directive isn't in scope and fails silently), and the `#ref` form is the v21-preferred syntax everywhere else.
+12. **Run `ng build`** and verify no compile errors. Visual changes are likely (the new tokens differ from the v17 SCSS theme).
 
 ## When in doubt
 
