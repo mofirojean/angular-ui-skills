@@ -1,0 +1,31 @@
+@use '@angular/material' as mat;
+@use 'styles/theme-colors' as brand;
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: brand.$primary-palette,
+        tertiary: brand.$tertiary-palette,
+      ),
+      typography: Roboto,
+      density: -2,
+    )
+  );
+}
+
+body {
+  color-scheme: light;
+
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  margin: 0;
+  height: 100%;
+}
+
+html.dark body {
+  color-scheme: dark;
+}
