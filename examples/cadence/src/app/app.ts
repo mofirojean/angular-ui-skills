@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -11,9 +11,12 @@ import {
 } from '@angular/material/sidenav';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbar } from '@angular/material/toolbar';
+import { MatTooltip } from '@angular/material/tooltip';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { map } from 'rxjs';
 import { ThemeService } from './shared/theme.service';
+
+const COLLAPSED_KEY = 'cadence.sidenav.collapsed';
 
 interface NavItem {
   label: string;
@@ -36,18 +39,22 @@ interface NavItem {
     MatSidenavContainer,
     MatSidenavContent,
     MatToolbar,
+    MatTooltip,
   ],
   template: `
-    <mat-sidenav-container class="shell">
+    <mat-sidenav-container class="shell" autosize>
       <mat-sidenav
         #side
         [mode]="isHandset() ? 'over' : 'side'"
         [opened]="!isHandset()"
         class="sidenav"
+        [class.collapsed]="isRail()"
       >
         <div class="brand">
           <mat-icon aria-hidden="true">event_repeat</mat-icon>
-          <span>Cadence</span>
+          @if (!isRail()) {
+            <span>Cadence</span>
+          }
         </div>
         <mat-nav-list>
           @for (item of nav; track item.path) {
@@ -55,6 +62,8 @@ interface NavItem {
               mat-list-item
               [routerLink]="item.path"
               routerLinkActive="nav-active"
+              [matTooltip]="isRail() ? item.label : ''"
+              matTooltipPosition="right"
               (click)="isHandset() && side.close()"
             >
               <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
@@ -68,6 +77,8 @@ interface NavItem {
             mat-list-item
             routerLink="/settings"
             routerLinkActive="nav-active"
+            [matTooltip]="isRail() ? 'Settings' : ''"
+            matTooltipPosition="right"
             (click)="isHandset() && side.close()"
           >
             <mat-icon matListItemIcon>settings</mat-icon>
@@ -78,15 +89,13 @@ interface NavItem {
 
       <mat-sidenav-content class="content">
         <mat-toolbar class="header">
-          @if (isHandset()) {
-            <button
-              mat-icon-button
-              (click)="side.toggle()"
-              aria-label="Toggle navigation"
-            >
-              <mat-icon>menu</mat-icon>
-            </button>
-          }
+          <button
+            mat-icon-button
+            (click)="onToggleSidenav(side)"
+            [attr.aria-label]="isHandset() ? 'Toggle navigation' : (collapsed() ? 'Expand navigation' : 'Collapse navigation')"
+          >
+            <mat-icon>{{ isHandset() || collapsed() ? 'menu' : 'menu_open' }}</mat-icon>
+          </button>
           <span class="spacer"></span>
           <button
             mat-icon-button
@@ -117,6 +126,21 @@ interface NavItem {
       border-right: 1px solid var(--mat-sys-outline-variant);
       border-radius: 0;
       background: var(--mat-sys-surface);
+      transition: width 200ms ease;
+    }
+    .sidenav.collapsed {
+      width: 68px;
+    }
+    .sidenav.collapsed .brand {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .sidenav.collapsed .mdc-list-item__content {
+      display: none;
+    }
+    .sidenav.collapsed mat-icon[matListItemIcon] {
+      margin: 0;
     }
     .brand {
       display: flex;
@@ -190,6 +214,21 @@ export class App {
       .pipe(map((state) => state.matches)),
     { initialValue: false },
   );
+
+  protected readonly collapsed = signal(
+    localStorage.getItem(COLLAPSED_KEY) === 'true',
+  );
+  protected readonly isRail = computed(() => !this.isHandset() && this.collapsed());
+
+  onToggleSidenav(side: MatSidenav): void {
+    if (this.isHandset()) {
+      void side.toggle();
+      return;
+    }
+    const next = !this.collapsed();
+    this.collapsed.set(next);
+    localStorage.setItem(COLLAPSED_KEY, String(next));
+  }
 
   protected readonly nav: NavItem[] = [
     { label: 'Calendar', icon: 'calendar_month', path: '/calendar' },
