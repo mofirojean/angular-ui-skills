@@ -134,12 +134,20 @@ interface NavItem {
       border-radius: 6px;
       height: 42px;
       margin-bottom: 2px;
+      display: flex;
+      justify-content: center;
+      align-content: center;
     }
     .sidenav mat-icon[matListItemIcon] {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      align-self: center;
       font-size: 20px;
+      line-height: 1;
       width: 20px;
       height: 20px;
-      margin-right: 4px;
+      margin: 0 4px 0 0;
       color: var(--mat-sys-on-surface-variant);
     }
     .sidenav-spacer {
