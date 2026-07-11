@@ -5,6 +5,7 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatDivider } from '@angular/material/divider';
 import { MatIcon } from '@angular/material/icon';
 import { MatListItem, MatNavList } from '@angular/material/list';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import {
   MatSidenav,
   MatSidenavContainer,
@@ -37,6 +38,9 @@ interface NavItem {
     MatIcon,
     MatNavList,
     MatListItem,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger,
     MatSidenav,
     MatSidenavContainer,
     MatSidenavContent,
@@ -73,6 +77,22 @@ interface NavItem {
             </a>
           }
         </mat-nav-list>
+        @if (!isRail()) {
+          <span class="section-label nav-label">Planning</span>
+        }
+        <mat-nav-list>
+          @for (item of planned; track item.label) {
+            <button
+              mat-list-item
+              [matTooltip]="isRail() ? item.label : ''"
+              matTooltipPosition="right"
+              (click)="onComingSoon(item.label)"
+            >
+              <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+              <span matListItemTitle>{{ item.label }}</span>
+            </button>
+          }
+        </mat-nav-list>
         <div class="sidenav-spacer"></div>
         @if (!isRail()) {
           <mat-divider class="side-divider" />
@@ -106,15 +126,43 @@ interface NavItem {
             <span matListItemTitle>Settings</span>
           </a>
         </mat-nav-list>
-        <div class="profile" [class.rail]="isRail()">
+        <button
+          type="button"
+          class="profile"
+          [class.rail]="isRail()"
+          [matMenuTriggerFor]="profileMenu"
+          [matTooltip]="isRail() ? 'Account' : ''"
+          matTooltipPosition="right"
+          aria-label="Open account menu"
+        >
           <span class="avatar" aria-hidden="true">MJ</span>
           @if (!isRail()) {
             <div class="profile-meta">
               <span class="profile-name">Mofiro Jean</span>
               <span class="profile-role">Workspace admin</span>
             </div>
+            <mat-icon class="profile-chevron">unfold_more</mat-icon>
           }
-        </div>
+        </button>
+        <mat-menu #profileMenu="matMenu" yPosition="above">
+          <button mat-menu-item (click)="onComingSoon('Profile')">
+            <mat-icon>person</mat-icon>
+            <span>Profile</span>
+          </button>
+          <button mat-menu-item routerLink="/settings">
+            <mat-icon>settings</mat-icon>
+            <span>Account settings</span>
+          </button>
+          <button mat-menu-item (click)="onComingSoon('Switch workspace')">
+            <mat-icon>swap_horiz</mat-icon>
+            <span>Switch workspace</span>
+          </button>
+          <mat-divider />
+          <button mat-menu-item (click)="onComingSoon('Sign out')">
+            <mat-icon>logout</mat-icon>
+            <span>Sign out</span>
+          </button>
+        </mat-menu>
       </mat-sidenav>
 
       <mat-sidenav-content class="content">
@@ -196,13 +244,24 @@ interface NavItem {
       padding: 0 0.625rem 0.625rem;
       --mat-list-list-item-label-text-weight: 500;
     }
-    .sidenav mat-nav-list a.mat-mdc-list-item {
+    .sidenav mat-nav-list .mat-mdc-list-item {
       border-radius: 6px;
       height: 42px;
       margin-bottom: 2px;
-      display: flex;
+    }
+    /* Neutralize the <button> user-agent chrome so the Planning items render
+       pixel-identical to the <a> nav items (buttons inherit text-align:center,
+       which shifts the label inside MDC's content box). */
+    .sidenav mat-nav-list button.mat-mdc-list-item {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    .sidenav.collapsed mat-nav-list .mat-mdc-list-item {
       justify-content: center;
-      align-content: center;
     }
     .sidenav mat-icon[matListItemIcon] {
       display: inline-flex;
@@ -234,6 +293,9 @@ interface NavItem {
       text-transform: uppercase;
       color: var(--mat-sys-on-surface-variant);
       padding: 0 0.375rem 0.35rem;
+    }
+    .nav-label {
+      padding: 0.75rem 1.375rem 0.35rem;
     }
     .cal-row {
       display: flex;
@@ -307,11 +369,27 @@ interface NavItem {
       align-items: center;
       gap: 0.7rem;
       padding: 0.8rem 1rem;
+      border: none;
       border-top: 1px solid var(--mat-sys-outline-variant);
+      background: transparent;
+      text-align: left;
+      width: 100%;
+      cursor: pointer;
+      font: inherit;
+    }
+    .profile:hover {
+      background: var(--mat-sys-surface-container);
     }
     .profile.rail {
       justify-content: center;
       padding: 0.8rem 0;
+    }
+    .profile-chevron {
+      margin-left: auto;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      color: var(--mat-sys-on-surface-variant);
     }
     .avatar {
       display: grid;
@@ -401,6 +479,12 @@ export class App {
     { label: 'Bookings', icon: 'list_alt', path: '/bookings' },
   ];
 
+  protected readonly planned = [
+    { label: 'Timeline', icon: 'view_timeline' },
+    { label: 'Reports', icon: 'insights' },
+    { label: 'Approvals', icon: 'fact_check' },
+  ];
+
   protected readonly calendars = [
     { name: 'Meeting rooms', color: '#0f766e' },
     { name: 'People', color: '#b45309' },
@@ -410,6 +494,12 @@ export class App {
 
   onNewBooking(): void {
     this.snackBar.open('The booking wizard lands with a later slice.', 'OK', {
+      duration: 3000,
+    });
+  }
+
+  onComingSoon(feature: string): void {
+    this.snackBar.open(`${feature} lands with a later slice.`, 'OK', {
       duration: 3000,
     });
   }
