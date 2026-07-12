@@ -21,6 +21,8 @@
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
     "date-fns": "^4.4.0",
+    "idb": "^8.0.3",
+    "rrule": "^2.8.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
