@@ -1,233 +1,230 @@
-import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import {
+  MatChipListbox,
+  MatChipOption,
+  type MatChipListboxChange,
+} from '@angular/material/chips';
+import { MatCalendar } from '@angular/material/datepicker';
+import { MatIcon } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   addDays,
-  eachDayOfInterval,
+  addMonths,
+  endOfMonth,
   endOfWeek,
   format,
-  isSameDay,
+  startOfMonth,
   startOfWeek,
+  subMonths,
 } from 'date-fns';
 import { ScheduleService } from '../../data/schedule.service';
-import type { BookingInstance } from '../../data/types';
+import {
+  CALENDAR_COLORS,
+  CALENDAR_LABELS,
+  type BookingInstance,
+  type CalendarKey,
+} from '../../data/types';
+import { MonthGrid } from './month-grid';
 
-interface DayGroup {
-  date: Date;
-  label: string;
-  instances: BookingInstance[];
-}
+const ALL_KEYS: CalendarKey[] = ['rooms', 'people', 'equipment', 'external'];
 
 @Component({
   selector: 'cad-calendar',
-  imports: [DatePipe],
+  imports: [
+    MatButton,
+    MatIconButton,
+    MatIcon,
+    MatCalendar,
+    MatChipListbox,
+    MatChipOption,
+    MonthGrid,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="page">
-      <header>
-        <span class="eyebrow">Schedule kernel · verification</span>
-        <h1>Next two weeks</h1>
-        <p>
-          Temporary Phase 2 surface. Every card below is a concrete instance
-          expanded by <code>ScheduleService.instancesFor()</code>, recurring
-          series included, per-occurrence exceptions applied. The custom
-          calendar grid replaces this next.
-        </p>
-      </header>
+      <aside class="rail">
+        @for (key of [miniKey()]; track key) {
+          <mat-calendar
+            class="mini"
+            [startAt]="viewDate()"
+            [selected]="viewDate()"
+            (selectedChange)="onJump($event)"
+          />
+        }
+        <div class="filters">
+          <span class="filters-label">Calendars</span>
+          <mat-chip-listbox
+            [multiple]="true"
+            [value]="active()"
+            (change)="onFilter($event)"
+            aria-label="Filter calendars"
+          >
+            @for (key of allKeys; track key) {
+              <mat-chip-option [value]="key" [selected]="active().includes(key)">
+                <span class="chip-dot" [style.background]="colors[key]"></span>
+                {{ labels[key] }}
+              </mat-chip-option>
+            }
+          </mat-chip-listbox>
+        </div>
+      </aside>
 
-      @if (!schedule.ready()) {
-        <p class="muted">Loading schedule…</p>
-      } @else {
-        <div class="summary">
-          <span class="pill">{{ total() }} instances</span>
-          <span class="pill">{{ recurringCount() }} recurring</span>
-          <span class="pill">{{ exceptionCount() }} exceptions</span>
+      <div class="main">
+        <div class="toolbar">
+          <button mat-stroked-button (click)="today()">Today</button>
+          <button mat-icon-button (click)="prev()" aria-label="Previous month">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button mat-icon-button (click)="next()" aria-label="Next month">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+          <h1 class="range">{{ rangeLabel() }}</h1>
         </div>
-        <div class="grid">
-          @for (day of days(); track day.label) {
-            <div class="day">
-              <div class="day-head">
-                <span class="dow">{{ day.label }}</span>
-                <span class="count">{{ day.instances.length }}</span>
-              </div>
-              @for (i of day.instances; track i.occurrenceId) {
-                <div class="event" [style.border-left-color]="i.color">
-                  <div class="time">
-                    {{ i.start | date: 'HH:mm' }}–{{ i.end | date: 'HH:mm' }}
-                  </div>
-                  <div class="title">{{ i.title }}</div>
-                  <div class="meta">
-                    <span>{{ resourceName(i.resourceId) }}</span>
-                    @if (i.isRecurring) {
-                      <span class="badge recur">↻</span>
-                    }
-                    @if (i.isException) {
-                      <span class="badge exc">edited</span>
-                    }
-                  </div>
-                </div>
-              } @empty {
-                <span class="empty">—</span>
-              }
-            </div>
-          }
+        <div class="grid-wrap">
+          <cad-month-grid
+            [month]="viewDate()"
+            [instances]="instances()"
+            (selectDay)="onSelectDay($event)"
+            (selectInstance)="onSelectInstance($event)"
+          />
         </div>
-      }
+      </div>
     </section>
   `,
   styles: `
+    :host {
+      display: block;
+      height: 100%;
+    }
     .page {
+      display: grid;
+      grid-template-columns: 256px 1fr;
+      height: 100%;
+      min-height: 0;
+    }
+    .rail {
       display: flex;
       flex-direction: column;
       gap: 1rem;
-      padding: 2rem 2.5rem;
+      padding: 1rem;
+      border-right: 1px solid var(--mat-sys-outline-variant);
+      overflow-y: auto;
     }
-    .eyebrow {
-      font: var(--mat-sys-label-small);
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--mat-sys-primary);
+    .mini {
+      border: 1px solid var(--mat-sys-outline-variant);
+      border-radius: 10px;
+      padding: 0.25rem;
     }
-    h1 {
-      font: var(--mat-sys-headline-medium);
-      margin: 0.25rem 0 0;
-    }
-    p {
-      font: var(--mat-sys-body-medium);
-      color: var(--mat-sys-on-surface-variant);
-      max-width: 70ch;
-      margin: 0;
-    }
-    code {
-      font-family: ui-monospace, monospace;
-      background: var(--mat-sys-surface-container);
-      padding: 0 0.25rem;
-      border-radius: 4px;
-    }
-    .muted {
-      color: var(--mat-sys-on-surface-variant);
-    }
-    .summary {
-      display: flex;
-      gap: 0.5rem;
-    }
-    .pill {
-      font: var(--mat-sys-label-medium);
-      padding: 0.25rem 0.75rem;
-      border-radius: 999px;
-      background: var(--mat-sys-surface-container);
-      color: var(--mat-sys-on-surface-variant);
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: 0.75rem;
-    }
-    .day {
+    .filters {
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
-      min-height: 120px;
     }
-    .day-head {
+    .filters-label {
+      font: var(--mat-sys-label-small);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--mat-sys-on-surface-variant);
+    }
+    .chip-dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 3px;
+      margin-right: 0.4rem;
+    }
+    .main {
       display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      padding-bottom: 0.25rem;
-      border-bottom: 1px solid var(--mat-sys-outline-variant);
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
     }
-    .dow {
-      font: var(--mat-sys-title-small);
-    }
-    .count {
-      font: var(--mat-sys-label-small);
-      color: var(--mat-sys-on-surface-variant);
-    }
-    .event {
-      border: 1px solid var(--mat-sys-outline-variant);
-      border-left: 3px solid;
-      border-radius: 6px;
-      padding: 0.4rem 0.5rem;
-      background: var(--mat-sys-surface-container-low);
-    }
-    .time {
-      font: var(--mat-sys-label-small);
-      color: var(--mat-sys-on-surface-variant);
-      font-variant-numeric: tabular-nums;
-    }
-    .title {
-      font: var(--mat-sys-body-small);
-      font-weight: 500;
-      color: var(--mat-sys-on-surface);
-    }
-    .meta {
+    .toolbar {
       display: flex;
       align-items: center;
-      gap: 0.35rem;
-      margin-top: 0.15rem;
-      font: var(--mat-sys-label-small);
-      color: var(--mat-sys-on-surface-variant);
+      gap: 0.5rem;
+      padding: 1rem 1.5rem;
     }
-    .badge {
-      font-size: 0.65rem;
-      padding: 0 0.3rem;
-      border-radius: 4px;
-      line-height: 1.3;
+    .range {
+      font: var(--mat-sys-title-large);
+      margin: 0 0 0 0.5rem;
     }
-    .badge.recur {
-      background: var(--mat-sys-secondary-container);
-      color: var(--mat-sys-on-secondary-container);
-    }
-    .badge.exc {
-      background: var(--mat-sys-tertiary-container);
-      color: var(--mat-sys-on-tertiary-container);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-    .empty {
-      color: var(--mat-sys-outline);
-      text-align: center;
+    .grid-wrap {
+      flex: 1;
+      min-height: 0;
+      padding: 0 1.5rem 1.5rem;
     }
     @media (max-width: 900px) {
-      .grid {
+      .page {
         grid-template-columns: 1fr;
+      }
+      .rail {
+        display: none;
       }
     }
   `,
 })
 export class Calendar {
-  protected readonly schedule = inject(ScheduleService);
+  private readonly schedule = inject(ScheduleService);
+  private readonly snackBar = inject(MatSnackBar);
 
-  private readonly window = computed(() => {
+  protected readonly allKeys = ALL_KEYS;
+  protected readonly colors = CALENDAR_COLORS;
+  protected readonly labels = CALENDAR_LABELS;
+
+  protected readonly viewDate = signal(new Date());
+  protected readonly active = signal<CalendarKey[]>([...ALL_KEYS]);
+
+  protected readonly miniKey = computed(() => format(this.viewDate(), 'yyyy-MM'));
+  protected readonly rangeLabel = computed(() =>
+    format(this.viewDate(), 'MMMM yyyy'),
+  );
+
+  protected readonly instances = computed<BookingInstance[]>(() => {
     void this.schedule.bookings();
-    const start = startOfWeek(new Date(), { weekStartsOn: 1 });
-    const end = addDays(endOfWeek(new Date(), { weekStartsOn: 1 }), 7);
-    return { start, end };
+    const m = this.viewDate();
+    const start = startOfWeek(startOfMonth(m), { weekStartsOn: 1 });
+    const end = addDays(endOfWeek(endOfMonth(m), { weekStartsOn: 1 }), 1);
+    const allowed = new Set(this.active());
+    return this.schedule
+      .instancesFor(start, end)
+      .filter((i) => allowed.has(i.calendarKey));
   });
 
-  private readonly instances = computed(() => {
-    const { start, end } = this.window();
-    return this.schedule.instancesFor(start, addDays(end, 1));
-  });
+  today(): void {
+    this.viewDate.set(new Date());
+  }
 
-  protected readonly days = computed<DayGroup[]>(() => {
-    const { start, end } = this.window();
-    const all = this.instances();
-    return eachDayOfInterval({ start, end }).map((date) => ({
-      date,
-      label: format(date, 'EEE d'),
-      instances: all.filter((i) => isSameDay(i.start, date)),
-    }));
-  });
+  prev(): void {
+    this.viewDate.update((d) => subMonths(d, 1));
+  }
 
-  protected readonly total = computed(() => this.instances().length);
-  protected readonly recurringCount = computed(
-    () => this.instances().filter((i) => i.isRecurring).length,
-  );
-  protected readonly exceptionCount = computed(
-    () => this.instances().filter((i) => i.isException).length,
-  );
+  next(): void {
+    this.viewDate.update((d) => addMonths(d, 1));
+  }
 
-  resourceName(id: string): string {
-    return this.schedule.resourceById(id)?.name ?? 'Unknown';
+  onJump(date: Date | null): void {
+    if (date) this.viewDate.set(date);
+  }
+
+  onFilter(event: MatChipListboxChange): void {
+    this.active.set((event.value as CalendarKey[]) ?? []);
+  }
+
+  onSelectDay(day: Date): void {
+    this.snackBar.open(
+      `New booking on ${format(day, 'MMM d')} lands with the wizard slice.`,
+      'OK',
+      { duration: 2500 },
+    );
+  }
+
+  onSelectInstance(instance: BookingInstance): void {
+    this.snackBar.open(
+      `${instance.title} — event peek lands with a later slice.`,
+      'OK',
+      { duration: 2500 },
+    );
   }
 }
