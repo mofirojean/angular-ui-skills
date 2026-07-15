@@ -3,7 +3,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatDivider } from '@angular/material/divider';
-import { MatIcon } from '@angular/material/icon';
+import { MatIcon, MatIconRegistry } from '@angular/material/icon';
 import { MatListItem, MatNavList } from '@angular/material/list';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import {
@@ -14,11 +14,16 @@ import {
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatTooltip } from '@angular/material/tooltip';
+import { DomSanitizer } from '@angular/platform-browser';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { map } from 'rxjs';
 import { ThemeService } from './shared/theme.service';
 
 const COLLAPSED_KEY = 'cadence.sidenav.collapsed';
+
+const REPO_URL = 'https://github.com/mofirojean/angular-ui-skills';
+
+const GITHUB_SVG = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.29-.01-1.05-.02-2.06-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.21.09 1.85 1.24 1.85 1.24 1.07 1.84 2.81 1.31 3.5 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.34-5.47-5.96 0-1.32.47-2.39 1.24-3.23-.12-.31-.54-1.53.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.18.77.84 1.24 1.91 1.24 3.23 0 4.63-2.81 5.65-5.49 5.95.43.37.81 1.1.81 2.22 0 1.61-.01 2.9-.01 3.29 0 .32.22.7.83.58A12.01 12.01 0 0 0 24 12.5C24 5.87 18.63.5 12 .5z"/></svg>`;
 
 interface NavItem {
   label: string;
@@ -185,6 +190,32 @@ interface NavItem {
             </div>
           }
           <span class="spacer"></span>
+          <button
+            mat-icon-button
+            [matMenuTriggerFor]="langMenu"
+            matTooltip="Language"
+            aria-label="Change language"
+          >
+            <mat-icon>language</mat-icon>
+          </button>
+          <mat-menu #langMenu="matMenu">
+            @for (lang of languages; track lang.code) {
+              <button mat-menu-item>
+                <mat-icon>{{ lang.code === activeLang ? 'check' : '' }}</mat-icon>
+                <span>{{ lang.label }}</span>
+              </button>
+            }
+          </mat-menu>
+          <a
+            mat-icon-button
+            [href]="repoUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            matTooltip="View on GitHub"
+            aria-label="View the angular-ui-skills repository on GitHub"
+          >
+            <mat-icon svgIcon="github" />
+          </a>
           <button
             mat-icon-button
             (click)="theme.toggle()"
@@ -450,6 +481,15 @@ interface NavItem {
 export class App {
   protected readonly theme = inject(ThemeService);
   private readonly snackBar = inject(MatSnackBar);
+  protected readonly repoUrl = REPO_URL;
+
+  constructor() {
+    const sanitizer = inject(DomSanitizer);
+    inject(MatIconRegistry).addSvgIconLiteral(
+      'github',
+      sanitizer.bypassSecurityTrustHtml(GITHUB_SVG),
+    );
+  }
 
   protected readonly isHandset = toSignal(
     inject(BreakpointObserver)
@@ -477,6 +517,16 @@ export class App {
     { label: 'Calendar', icon: 'calendar_month', path: '/calendar' },
     { label: 'Resources', icon: 'meeting_room', path: '/resources' },
     { label: 'Bookings', icon: 'list_alt', path: '/bookings' },
+  ];
+
+  protected readonly activeLang = 'en';
+  protected readonly languages = [
+    { code: 'en', label: 'English' },
+    { code: 'es', label: 'Español' },
+    { code: 'fr', label: 'Français' },
+    { code: 'de', label: 'Deutsch' },
+    { code: 'pt', label: 'Português' },
+    { code: 'ja', label: '日本語' },
   ];
 
   protected readonly planned = [
