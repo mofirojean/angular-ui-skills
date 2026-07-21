@@ -11,12 +11,14 @@ import {
   MatSidenavContainer,
   MatSidenavContent,
 } from '@angular/material/sidenav';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatTooltip } from '@angular/material/tooltip';
 import { DomSanitizer } from '@angular/platform-browser';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { map } from 'rxjs';
+import { BookingWizard } from './pages/calendar/booking-wizard';
 import { ThemeService } from './shared/theme.service';
 
 const COLLAPSED_KEY = 'cadence.sidenav.collapsed';
@@ -481,6 +483,7 @@ interface NavItem {
 export class App {
   protected readonly theme = inject(ThemeService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
   protected readonly repoUrl = REPO_URL;
 
   constructor() {
@@ -543,8 +546,10 @@ export class App {
   ];
 
   onNewBooking(): void {
-    this.snackBar.open('The booking wizard lands with a later slice.', 'OK', {
-      duration: 3000,
+    this.dialog.open(BookingWizard, {
+      width: '580px',
+      maxWidth: '95vw',
+      autoFocus: 'dialog',
     });
   }
 

@@ -12,7 +12,6 @@ import {
 import { MatCalendar } from '@angular/material/datepicker';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   addDays,
   addMonths,
@@ -35,6 +34,7 @@ import {
   type CalendarKey,
 } from '../../data/types';
 import { AgendaView } from './agenda-view';
+import { BookingWizard } from './booking-wizard';
 import { EventDetail } from './event-detail';
 import { MonthGrid } from './month-grid';
 import { TimeGrid } from './time-grid';
@@ -191,7 +191,6 @@ type View = 'month' | 'week' | 'day' | 'agenda';
 })
 export class Calendar {
   private readonly schedule = inject(ScheduleService);
-  private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
 
   protected readonly allKeys = ALL_KEYS;
@@ -287,19 +286,20 @@ export class Calendar {
   }
 
   onSelectDay(day: Date): void {
-    this.snackBar.open(
-      `New booking on ${format(day, 'MMM d')} lands with the wizard.`,
-      'OK',
-      { duration: 2500 },
-    );
+    this.openWizard(day);
   }
 
   onSelectSlot(slot: Date): void {
-    this.snackBar.open(
-      `New booking at ${format(slot, 'MMM d, HH:mm')} lands with the wizard.`,
-      'OK',
-      { duration: 2500 },
-    );
+    this.openWizard(slot);
+  }
+
+  private openWizard(start: Date): void {
+    this.dialog.open(BookingWizard, {
+      data: { start },
+      width: '580px',
+      maxWidth: '95vw',
+      autoFocus: 'dialog',
+    });
   }
 
   onSelectInstance(instance: BookingInstance): void {
