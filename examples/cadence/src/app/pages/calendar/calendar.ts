@@ -1,21 +1,30 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import {
+  MatButtonToggle,
+  MatButtonToggleGroup,
+} from '@angular/material/button-toggle';
+import {
   MatChipListbox,
   MatChipOption,
   type MatChipListboxChange,
 } from '@angular/material/chips';
 import { MatCalendar } from '@angular/material/datepicker';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   addDays,
   addMonths,
+  eachDayOfInterval,
   endOfMonth,
   endOfWeek,
   format,
+  isSameMonth,
+  startOfDay,
   startOfMonth,
   startOfWeek,
+  subDays,
   subMonths,
 } from 'date-fns';
 import { ScheduleService } from '../../data/schedule.service';
@@ -25,20 +34,28 @@ import {
   type BookingInstance,
   type CalendarKey,
 } from '../../data/types';
+import { AgendaView } from './agenda-view';
+import { EventDetail } from './event-detail';
 import { MonthGrid } from './month-grid';
+import { TimeGrid } from './time-grid';
 
 const ALL_KEYS: CalendarKey[] = ['rooms', 'people', 'equipment', 'external'];
+type View = 'month' | 'week' | 'day' | 'agenda';
 
 @Component({
   selector: 'cad-calendar',
   imports: [
     MatButton,
     MatIconButton,
+    MatButtonToggle,
+    MatButtonToggleGroup,
     MatIcon,
     MatCalendar,
     MatChipListbox,
     MatChipOption,
+    AgendaView,
     MonthGrid,
+    TimeGrid,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -73,30 +90,57 @@ const ALL_KEYS: CalendarKey[] = ['rooms', 'people', 'equipment', 'external'];
       <div class="main">
         <div class="toolbar">
           <button mat-stroked-button (click)="today()">Today</button>
-          <button mat-icon-button (click)="prev()" aria-label="Previous month">
+          <button mat-icon-button (click)="prev()" aria-label="Previous">
             <mat-icon>chevron_left</mat-icon>
           </button>
-          <button mat-icon-button (click)="next()" aria-label="Next month">
+          <button mat-icon-button (click)="next()" aria-label="Next">
             <mat-icon>chevron_right</mat-icon>
           </button>
           <h1 class="range">{{ rangeLabel() }}</h1>
+          <span class="grow"></span>
+          <mat-button-toggle-group
+            [value]="view()"
+            (change)="view.set($event.value)"
+            hideSingleSelectionIndicator
+            aria-label="Calendar view"
+          >
+            <mat-button-toggle value="month">Month</mat-button-toggle>
+            <mat-button-toggle value="week">Week</mat-button-toggle>
+            <mat-button-toggle value="day">Day</mat-button-toggle>
+            <mat-button-toggle value="agenda">Agenda</mat-button-toggle>
+          </mat-button-toggle-group>
         </div>
         <div class="grid-wrap">
-          <cad-month-grid
-            [month]="viewDate()"
-            [instances]="instances()"
-            (selectDay)="onSelectDay($event)"
-            (selectInstance)="onSelectInstance($event)"
-          />
+          @switch (view()) {
+            @case ('month') {
+              <cad-month-grid
+                [month]="viewDate()"
+                [instances]="instances()"
+                (selectDay)="onSelectDay($event)"
+                (selectInstance)="onSelectInstance($event)"
+              />
+            }
+            @case ('agenda') {
+              <cad-agenda-view
+                [instances]="instances()"
+                (selectInstance)="onSelectInstance($event)"
+              />
+            }
+            @default {
+              <cad-time-grid
+                [days]="timeGridDays()"
+                [instances]="instances()"
+                (selectSlot)="onSelectSlot($event)"
+                (selectInstance)="onSelectInstance($event)"
+              />
+            }
+          }
         </div>
       </div>
     </section>
   `,
   styles: `
-    :host {
-      display: block;
-      height: 100%;
-    }
+    :host { display: block; height: 100%; }
     .page {
       display: grid;
       grid-template-columns: 256px 1fr;
@@ -116,11 +160,7 @@ const ALL_KEYS: CalendarKey[] = ['rooms', 'people', 'equipment', 'external'];
       border-radius: 10px;
       padding: 0.25rem;
     }
-    .filters {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
+    .filters { display: flex; flex-direction: column; gap: 0.5rem; }
     .filters-label {
       font: var(--mat-sys-label-small);
       letter-spacing: 0.08em;
@@ -129,66 +169,89 @@ const ALL_KEYS: CalendarKey[] = ['rooms', 'people', 'equipment', 'external'];
     }
     .chip-dot {
       display: inline-block;
-      width: 9px;
-      height: 9px;
+      width: 9px; height: 9px;
       border-radius: 3px;
       margin-right: 0.4rem;
     }
-    .main {
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-      min-height: 0;
-    }
+    .main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
     .toolbar {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       padding: 1rem 1.5rem;
     }
-    .range {
-      font: var(--mat-sys-title-large);
-      margin: 0 0 0 0.5rem;
-    }
-    .grid-wrap {
-      flex: 1;
-      min-height: 0;
-      padding: 0 1.5rem 1.5rem;
-    }
+    .range { font: var(--mat-sys-title-large); margin: 0 0 0 0.5rem; }
+    .grow { flex: 1; }
+    .grid-wrap { flex: 1; min-height: 0; padding: 0 1.5rem 1.5rem; }
     @media (max-width: 900px) {
-      .page {
-        grid-template-columns: 1fr;
-      }
-      .rail {
-        display: none;
-      }
+      .page { grid-template-columns: 1fr; }
+      .rail { display: none; }
     }
   `,
 })
 export class Calendar {
   private readonly schedule = inject(ScheduleService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
 
   protected readonly allKeys = ALL_KEYS;
   protected readonly colors = CALENDAR_COLORS;
   protected readonly labels = CALENDAR_LABELS;
 
   protected readonly viewDate = signal(new Date());
+  protected readonly view = signal<View>('month');
   protected readonly active = signal<CalendarKey[]>([...ALL_KEYS]);
 
   protected readonly miniKey = computed(() => format(this.viewDate(), 'yyyy-MM'));
-  protected readonly rangeLabel = computed(() =>
-    format(this.viewDate(), 'MMMM yyyy'),
-  );
+
+  private readonly range = computed(() => {
+    const d = this.viewDate();
+    switch (this.view()) {
+      case 'week':
+        return {
+          start: startOfWeek(d, { weekStartsOn: 1 }),
+          end: endOfWeek(d, { weekStartsOn: 1 }),
+        };
+      case 'day':
+        return { start: startOfDay(d), end: startOfDay(d) };
+      default:
+        return {
+          start: startOfWeek(startOfMonth(d), { weekStartsOn: 1 }),
+          end: endOfWeek(endOfMonth(d), { weekStartsOn: 1 }),
+        };
+    }
+  });
+
+  protected readonly rangeLabel = computed(() => {
+    const d = this.viewDate();
+    switch (this.view()) {
+      case 'day':
+        return format(d, 'EEEE, MMM d');
+      case 'week': {
+        const { start, end } = this.range();
+        const left = format(start, 'MMM d');
+        const right = isSameMonth(start, end)
+          ? format(end, 'd, yyyy')
+          : format(end, 'MMM d, yyyy');
+        return `${left} – ${right}`;
+      }
+      default:
+        return format(d, 'MMMM yyyy');
+    }
+  });
+
+  protected readonly timeGridDays = computed<Date[]>(() => {
+    if (this.view() === 'day') return [startOfDay(this.viewDate())];
+    const { start, end } = this.range();
+    return eachDayOfInterval({ start, end });
+  });
 
   protected readonly instances = computed<BookingInstance[]>(() => {
     void this.schedule.bookings();
-    const m = this.viewDate();
-    const start = startOfWeek(startOfMonth(m), { weekStartsOn: 1 });
-    const end = addDays(endOfWeek(endOfMonth(m), { weekStartsOn: 1 }), 1);
+    const { start, end } = this.range();
     const allowed = new Set(this.active());
     return this.schedule
-      .instancesFor(start, end)
+      .instancesFor(start, addDays(end, 1))
       .filter((i) => allowed.has(i.calendarKey));
   });
 
@@ -197,11 +260,22 @@ export class Calendar {
   }
 
   prev(): void {
-    this.viewDate.update((d) => subMonths(d, 1));
+    this.viewDate.update((d) => this.shift(d, -1));
   }
 
   next(): void {
-    this.viewDate.update((d) => addMonths(d, 1));
+    this.viewDate.update((d) => this.shift(d, 1));
+  }
+
+  private shift(d: Date, dir: number): Date {
+    switch (this.view()) {
+      case 'week':
+        return dir > 0 ? addDays(d, 7) : subDays(d, 7);
+      case 'day':
+        return dir > 0 ? addDays(d, 1) : subDays(d, 1);
+      default:
+        return dir > 0 ? addMonths(d, 1) : subMonths(d, 1);
+    }
   }
 
   onJump(date: Date | null): void {
@@ -214,17 +288,27 @@ export class Calendar {
 
   onSelectDay(day: Date): void {
     this.snackBar.open(
-      `New booking on ${format(day, 'MMM d')} lands with the wizard slice.`,
+      `New booking on ${format(day, 'MMM d')} lands with the wizard.`,
+      'OK',
+      { duration: 2500 },
+    );
+  }
+
+  onSelectSlot(slot: Date): void {
+    this.snackBar.open(
+      `New booking at ${format(slot, 'MMM d, HH:mm')} lands with the wizard.`,
       'OK',
       { duration: 2500 },
     );
   }
 
   onSelectInstance(instance: BookingInstance): void {
-    this.snackBar.open(
-      `${instance.title} — event peek lands with a later slice.`,
-      'OK',
-      { duration: 2500 },
-    );
+    this.dialog.open(EventDetail, {
+      data: {
+        instance,
+        resourceName: this.schedule.resourceById(instance.resourceId)?.name ?? 'Unknown',
+      },
+      autoFocus: 'dialog',
+    });
   }
 }
