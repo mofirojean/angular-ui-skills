@@ -24,7 +24,6 @@ import { ScheduleService } from '../../data/schedule.service';
 import type { BookingInstance } from '../../data/types';
 
 const MAX_CHIPS = 3;
-const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 @Component({
   selector: 'cad-month-grid',
@@ -33,7 +32,7 @@ const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   template: `
     <div class="month">
       <div class="dow-row">
-        @for (d of weekdays; track d) {
+        @for (d of weekdayLabels(); track d) {
           <span class="dow">{{ d }}</span>
         }
       </div>
@@ -290,11 +289,15 @@ export class MonthGrid {
 
   readonly month = input.required<Date>();
   readonly instances = input.required<BookingInstance[]>();
+  readonly weekStartsOn = input<0 | 1>(1);
   readonly selectDay = output<Date>();
   readonly selectInstance = output<BookingInstance>();
 
-  protected readonly weekdays = WEEKDAYS;
   protected readonly isToday = isToday;
+
+  protected readonly weekdayLabels = computed(() =>
+    (this.weeks()[0] ?? []).map((d) => format(d, 'EEE')),
+  );
 
   protected readonly moreDay = signal<Date | null>(null);
   protected readonly moreOrigin = signal<CdkOverlayOrigin | null>(null);
@@ -313,8 +316,9 @@ export class MonthGrid {
 
   protected readonly weeks = computed<Date[][]>(() => {
     const m = this.month();
-    const start = startOfWeek(startOfMonth(m), { weekStartsOn: 1 });
-    const end = endOfWeek(endOfMonth(m), { weekStartsOn: 1 });
+    const wso = this.weekStartsOn();
+    const start = startOfWeek(startOfMonth(m), { weekStartsOn: wso });
+    const end = endOfWeek(endOfMonth(m), { weekStartsOn: wso });
     const days = eachDayOfInterval({ start, end });
     const out: Date[][] = [];
     for (let i = 0; i < days.length; i += 7) {

@@ -186,6 +186,7 @@ interface Column {
 export class TimeGrid implements AfterViewInit {
   readonly days = input.required<Date[]>();
   readonly instances = input.required<BookingInstance[]>();
+  readonly scrollToHour = input(7);
   readonly selectSlot = output<Date>();
   readonly selectInstance = output<BookingInstance>();
 
@@ -216,7 +217,7 @@ export class TimeGrid implements AfterViewInit {
 
   ngAfterViewInit(): void {
     const el = this.scroll()?.nativeElement;
-    if (el) el.scrollTop = 7 * HOUR_HEIGHT;
+    if (el) el.scrollTop = this.scrollToHour() * HOUR_HEIGHT;
   }
 
   hourLabel(h: number): string {

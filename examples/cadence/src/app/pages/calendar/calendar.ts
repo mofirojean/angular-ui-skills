@@ -27,6 +27,7 @@ import {
   subMonths,
 } from 'date-fns';
 import { ScheduleService } from '../../data/schedule.service';
+import { SettingsService } from '../../shared/settings.service';
 import {
   CALENDAR_COLORS,
   CALENDAR_LABELS,
@@ -116,6 +117,7 @@ type View = 'month' | 'week' | 'day' | 'agenda';
               <cad-month-grid
                 [month]="viewDate()"
                 [instances]="instances()"
+                [weekStartsOn]="weekStartsOn()"
                 (selectDay)="onSelectDay($event)"
                 (selectInstance)="onSelectInstance($event)"
               />
@@ -130,6 +132,7 @@ type View = 'month' | 'week' | 'day' | 'agenda';
               <cad-time-grid
                 [days]="timeGridDays()"
                 [instances]="instances()"
+                [scrollToHour]="settings.settings().workingHoursStart"
                 (selectSlot)="onSelectSlot($event)"
                 (selectInstance)="onSelectInstance($event)"
               />
@@ -191,6 +194,7 @@ type View = 'month' | 'week' | 'day' | 'agenda';
 })
 export class Calendar {
   private readonly schedule = inject(ScheduleService);
+  protected readonly settings = inject(SettingsService);
   private readonly dialog = inject(MatDialog);
 
   protected readonly allKeys = ALL_KEYS;
@@ -203,20 +207,23 @@ export class Calendar {
 
   protected readonly miniKey = computed(() => format(this.viewDate(), 'yyyy-MM'));
 
+  protected readonly weekStartsOn = computed(() => this.settings.settings().weekStartsOn);
+
   private readonly range = computed(() => {
     const d = this.viewDate();
+    const wso = this.weekStartsOn();
     switch (this.view()) {
       case 'week':
         return {
-          start: startOfWeek(d, { weekStartsOn: 1 }),
-          end: endOfWeek(d, { weekStartsOn: 1 }),
+          start: startOfWeek(d, { weekStartsOn: wso }),
+          end: endOfWeek(d, { weekStartsOn: wso }),
         };
       case 'day':
         return { start: startOfDay(d), end: startOfDay(d) };
       default:
         return {
-          start: startOfWeek(startOfMonth(d), { weekStartsOn: 1 }),
-          end: endOfWeek(endOfMonth(d), { weekStartsOn: 1 }),
+          start: startOfWeek(startOfMonth(d), { weekStartsOn: wso }),
+          end: endOfWeek(endOfMonth(d), { weekStartsOn: wso }),
         };
     }
   });
